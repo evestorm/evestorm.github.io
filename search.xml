@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[BFC的理解与应用]]></title>
+    <url>%2Fposts%2F9722%2F</url>
+    <content type="text"><![CDATA[定义先上MDN上对 BFC 的定义： 块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。 ———— BFC | MDN 不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的认知。 理解这里谈下我对BFC的理解：BFC其实是一个独立的，与外界隔离了的容器，容器里面的子元素不会影响到外面的元素，外面的也同样不会影响到容器内部的元素。我们可以利用这个特性，来解决一些布局上的问题。 BFC触发条件BFC的触发条件有很多，想要知道所有细节可以移步上面给出的 MDN 链接。这里我只列出一些常见触发条件： 根元素（HTML元素） 浮动元素（float不为none） 绝对定位元素（position 为 absolute 或 fixed） display 为 block, inline-block, flex, inline-flex, list-item, table overflow 值不为 visible 的块元素 BFC布局特性对于一个BFC容器来说： 内部相邻的两个元素垂直方向上的 margin 会发生重叠 不会与外界的浮动元素产生交集，而是紧贴浮动元素的边缘 元素从容器的顶端开始垂直地一个接一个地排列 每一个元素的左外边缘（margin-left）会触碰到容器的左边缘（border-left）（如果设置了容器内部的元素从右到左的格式排布，则触碰的是右边缘） 在计算它的高度时，还会检测内部浮动或者定位元素的高度 实际应用清除浮动利用BFC “在计算它的高度时，还会检测内部浮动或者定位元素的高度” 这条特性，我们可以触发父元素的BFC来清除子元素浮动带来的影响。常见的用法是给父元素设置 overflow: hidden 样式（如果考虑IE6版本，还需设置 zoom: 1，因为IE6不支持 overflow: hidden 来清除浮动）： See the Pen 利用BFC清除浮动 by JingW (@JingW) on CodePen. 解决外边距合并问题如果看上面标题不知道在说什么，请很戳这里了解详情。由于属于同一个BFC的两个相邻盒子的垂直margin会发生重叠，那么我们可以隔离开这两个元素，让它们不属于同一个BFC，这样就不会发生margin重叠了。 See the Pen 解决外边距合并问题 by JingW (@JingW) on CodePen. 两栏布局，右边宽度自适应我们常常在开发中有这样类似的需求：两栏布局，左边定宽，右边自适应。这时我们就可以利用BFC特性来实现需求：左边设置定宽+左浮动；右边给自己加上 overflow: hidden 。原理就是：给元素设置BFC后，为了和浮动元素不产生任何交集，它会顺着浮动元素的边缘形成自己的封闭上下文。直接上代码看效果： See the Pen 利用BFC实现两栏布局 by JingW (@JingW) on CodePen. 以上是我对BFC的一些理解以及实际应用，希望能够帮助大家了解BFC这个听起来摸不着头脑的东西。]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>css bfc</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[三栏布局方案(圣杯+双飞翼)]]></title>
     <url>%2Fposts%2F55613%2F</url>
     <content type="text"><![CDATA[圣杯布局步骤一 - HTML框架搭建 &amp; 初始化CSS首先把基本框架搭起来（注意中间部分放最前面）： 12345&lt;div class="container"&gt; &lt;div class="center"&gt;我是中间&lt;/div&gt; &lt;div class="left"&gt;我是左边&lt;/div&gt; &lt;div class="right"&gt;我是右边&lt;/div&gt;&lt;/div&gt; 接下来是初始化样式。left, right宽度分别设置为100px和200px；然后设置container的 padding-left: 100px + padding-right: 200px 来占据两侧填充；center宽度设为100%，这样能够自适应剩下的宽度。再让所有子元素左浮动。代码如下： 12345678910111213141516171819202122232425.container &#123; padding: 0 200px 0 100px; /* 左边100， 右边200*/ background-color: #e1e1e1; height: 300px; /* 为了看效果，给个300px把高度撑起来 */&#125;.left, .center, .right &#123; float: left; height: 100%;&#125;.center &#123; width: 100%; /* 占据父元素剩下的宽度*/ background-color: lightblue;&#125;.left &#123; width: 100px; background-color: pink;&#125;.right &#123; width: 200px; background-color: yellow;&#125; 此时的页面效果： 步骤二 - 让left占据最左列为了让left能越过center，我们先给它设置一个 -100% 的左边距。这个100%是在container中的宽度，也就是center的宽度： 123456.left &#123; margin-left: -100%; width: 100px; /*为了看left和center的重叠效果，暂时bgc设为半透明*/ background-color: rgba(255,204,204,.6);&#125; 页面效果： 此时，我们已经让left从“第二行”升到了“第一行”，为了让它靠到最左侧，不与center重叠，可以给它设置相对定位，然后给个 left: -100px ，让它定位到container最左侧： 123456789.left &#123; /* 设置相对定位 */ position: relative; /* 靠到最左侧 */ left: -100px; margin-left: -100%; width: 100px; background-color: pink;&#125; 页面效果： 步骤三 - 让right占据最右列定位好了left，也是时候让right呆在最右边来填充位置了，我们继续使用负margin： 12345.right &#123; width: 200px; margin-right: -200px; background-color: yellow;&#125; 页面效果： 步骤四 - 给container设置min-width看起来已经实现了不是吗？但我们还差最后一步，给container设置一个 min-width: 400px （400px = leftWidth[200] * 2 + rightWidth[100]），否则当浏览器缩小到一定程度时，这个布局可能会被破坏。原因简单来讲就是：“由于设置了相对定位，所以当left原来的位置和right的位置产生重叠时，由于浮动的原因一行放不下就会换行”。所以布局就被打乱了。 123456.container &#123; min-width: 400px; background-color: #e1e1e1; padding: 0 200px 0 100px; height: 300px;&#125; 完整代码 + 最终效果这样，我们就实现了圣杯布局，完整代码和效果见下： See the Pen 三栏布局 - 圣杯布局 by JingW (@JingW) on CodePen. 双飞翼布局如果上面圣杯布局你已经理解并自己实践了一遍，那么这里的双飞翼布局你也应该不再话下。跟着我一起撸一遍代码吧。 步骤一 - HTML框架搭建 &amp; 初始化CSS首先搭建html，仔细观察下方代码你会发现，双飞翼布局在html上面有一点和圣杯布局有差别，那就是双飞翼在center里又套了一个div。到后面你就会知道这样设置的目的。 12345&lt;div class="container"&gt; &lt;div class="center"&gt;&lt;div&gt;我是中间&lt;/div&gt;&lt;/div&gt; &lt;div class="left"&gt;我是左边&lt;/div&gt; &lt;div class="right"&gt;我是右边&lt;/div&gt;&lt;/div&gt; 然后编写初始样式。left定宽100；right定宽200；left, right, center全部设置左浮动。其他例如设置颜色高度等等直接看下方代码： 1234567891011121314151617181920212223.container &#123; background-color: #e1e1e1; height: 300px;&#125;.center &#123; background-color: lightblue;&#125;.left &#123; width: 100px; background-color: pink;&#125;.right &#123; width: 200px; background-color: yellow;&#125;.left, .center, .right &#123; float: left; height: 100%;&#125; 效果如下： 步骤二 - 设置center为100%宽将center的宽度设为100%，这样会把left，right“挤”到第二行： 1234.center &#123; width: 100%; background-color: lightblue;&#125; 效果如下： 步骤三 - 分别让left,right回到最左边和最右边接着，给left设置 margin-left: -100% 回到最左边，给right设置 margin-left: -200px 回到最右边。此时center和left,right都有重叠区域，为了看效果，设置了半透明背景颜色。 1234567891011.left &#123; width: 100px; margin-left: -100%; background-color: pink;&#125;.right &#123; width: 200px; margin-left: -200px; background-color: yellow;&#125; 效果如下： 步骤四 - 给center的子div设置左右margin其实上面的效果图已经实现了三栏布局中间自适应。但有个问题是center左右部分区域会被遮挡，这个时候在步骤一提到的center子div的作用就体现出来了，我们可以给它设置一个左右的margin值，分别等于left的宽和right的宽，消除掉重叠的副作用。 1234.center div &#123; /* 左margin100，右margin200 */ margin: 0 200px 0 100px;&#125; 效果如下： 步骤五 - 给container设置min-width最后，给container设置一个min-width，让container最小宽度不小于left宽+right宽 12345.container &#123; min-width: 300px; background-color: #e1e1e1; height: 300px;&#125; 大功告成~ 完整代码 + 最终效果 See the Pen 三栏布局 - 双飞翼布局 by JingW (@JingW) on CodePen.]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>css 布局</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[两栏布局方案汇总]]></title>
