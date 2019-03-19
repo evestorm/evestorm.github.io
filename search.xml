@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[如何清除浮动]]></title>
+    <url>%2Fposts%2F12906%2F</url>
+    <content type="text"><![CDATA[为什么要清除浮动其实浮动（e.g. float: left;）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。 由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。 clear清除浮动的核心css属性是 clear ，基本语法如下： 123选择器: &#123; clear: 属性值;&#125; 属性值 描述 left 不允许左侧有浮动元素（清除左侧浮动的影响） right 不允许右侧有浮动元素（清除右侧浮动的影响） both 同时清除左右两侧浮动的影响 清除浮动常见方案额外标记法在浮动元素后面添加一个空标签，例如： 12&lt;div style="float: left;"&gt;&lt;/div&gt;&lt;div style="clear: both;"&gt;&lt;/div&gt; 优点：通俗易懂，书写方便缺点：加入了过多的没有实际含义的额外标签，结构化差。 父元素添加overflow通过触发BFC达到清除浮动的效果。（p.s. 对bfc不了解可以看这篇文章） 123.parent &#123; overflow: hidden;&#125; 优点：代码简洁缺点：超出的内容会被隐藏 before和after双伪元素方案1234567891011.clearfix:before,.clearfix:after &#123; content:""; display: table; /* 触发BFC清除浮动 */&#125;.clearfix:after &#123; clear: both;&#125;.clearfix &#123; *zoom: 1;&#125; 优点：代码简洁缺点：IE6-7不支持:after，需要使用 zoom: 1 触发 hasLayout 使用after伪元素（我平常使用的）1234567891011.clearfix::after &#123; content: "."; display: block; height: 0; visibility: hidden; clear: both;&#125;.clearfix &#123; *zoom: 1;&#125; /* IE6、7 专有 */ 使用方式：给浮动元素的父元素添加一个class类：clearfix优点：一次书写多处使用，并且符合闭合浮动思想，结构语义化正确缺点：IE6-7不支持:after，需要使用 zoom: 1 触发 hasLayout注意：content:&quot;.&quot; 内容尽量不为空，可以跟一个小点，否则在firefox 7.0前的版本会生成空格 :after 和 ::after 的区别:before、:after 在旧版本里是伪元素，CSS3的规范里 “:” 用来表示伪类，”::” 用来表示伪元素，但是在高版本浏览器下 :before、:after 会被自动识别为 ::before、::after ，这样做的目的是用来做兼容处理。 相同点伪类对象，用来设置对象前的内容:before 和 ::before 写法是等效的 不同点:before 是 css2 的写法，::before 是 css3 的写法:before 兼容性比 ::before要好 注意伪类元素必须要配合 content 属性一起使用，否则无效伪类元素是css渲染层加入的，不能通过js来操作]]></content>
+      <categories>
+        <category>前端</category>
+        <category>css</category>
+      </categories>
+      <tags>
+        <tag>css</tag>
+        <tag>清除浮动</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[BFC的理解与应用]]></title>
     <url>%2Fposts%2F9722%2F</url>
     <content type="text"><![CDATA[定义先上MDN上对 BFC 的定义： 块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。 ———— BFC | MDN 不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的认知。 理解这里谈下我对BFC的理解：BFC其实是一个独立的，与外界隔离了的容器，容器里面的子元素不会影响到外面的元素，外面的也同样不会影响到容器内部的元素。我们可以利用这个特性，来解决一些布局上的问题。 BFC触发条件BFC的触发条件有很多，想要知道所有细节可以移步上面给出的 MDN 链接。这里我只列出一些常见触发条件： 根元素（HTML元素） 浮动元素（float不为none） 绝对定位元素（position 为 absolute 或 fixed） display 为 block, inline-block, flex, inline-flex, list-item, table overflow 值不为 visible 的块元素 BFC布局特性对于一个BFC容器来说： 内部相邻的两个元素垂直方向上的 margin 会发生重叠 不会与外界的浮动元素产生交集，而是紧贴浮动元素的边缘 元素从容器的顶端开始垂直地一个接一个地排列 每一个元素的左外边缘（margin-left）会触碰到容器的左边缘（border-left）（如果设置了容器内部的元素从右到左的格式排布，则触碰的是右边缘） 在计算它的高度时，还会检测内部浮动或者定位元素的高度 实际应用清除浮动利用BFC “在计算它的高度时，还会检测内部浮动或者定位元素的高度” 这条特性，我们可以触发父元素的BFC来清除子元素浮动带来的影响。常见的用法是给父元素设置 overflow: hidden 样式（如果考虑IE6版本，还需设置 zoom: 1，因为IE6不支持 overflow: hidden 来清除浮动）： See the Pen 利用BFC清除浮动 by JingW (@JingW) on CodePen. 解决外边距合并问题如果看上面标题不知道在说什么，请很戳这里了解详情。由于属于同一个BFC的两个相邻盒子的垂直margin会发生重叠，那么我们可以隔离开这两个元素，让它们不属于同一个BFC，这样就不会发生margin重叠了。 See the Pen 解决外边距合并问题 by JingW (@JingW) on CodePen. 两栏布局，右边宽度自适应我们常常在开发中有这样类似的需求：两栏布局，左边定宽，右边自适应。这时我们就可以利用BFC特性来实现需求：左边设置定宽+左浮动；右边给自己加上 overflow: hidden 。原理就是：给元素设置BFC后，为了和浮动元素不产生任何交集，它会顺着浮动元素的边缘形成自己的封闭上下文。直接上代码看效果： See the Pen 利用BFC实现两栏布局 by JingW (@JingW) on CodePen. 以上是我对BFC的一些理解以及实际应用，希望能够帮助大家了解BFC这个听起来摸不着头脑的东西。]]></content>
