@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[去除图片上下左右间隙]]></title>
+    <url>%2Fposts%2F31251%2F</url>
+    <content type="text"><![CDATA[情景当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙： See the Pen KEBmRP by JingW (@JingW) on CodePen. 原因 左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。 上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。 解决方案 移除上下间隙： img本身设置 display: block; 父元素设置 font-size: 0; （基线与字体大小有关，字体为零，基线间就没距离了） img本身设置 vertical-align: bottom;（让inline-block 的 img 与每行的底部对齐） 移除左右间距： 行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐） 第一行img结尾写上 &lt;!-- ，第二行img开头跟上 --&gt; 。即利用注释消除间距 父元素 font-size: 0]]></content>
+      <categories>
+        <category>前端</category>
+        <category>css</category>
+      </categories>
+      <tags>
+        <tag>css</tag>
+        <tag>img</tag>
+        <tag>inline-block</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[如何清除浮动]]></title>
     <url>%2Fposts%2F12906%2F</url>
     <content type="text"><![CDATA[为什么要清除浮动其实浮动（e.g. float: left;）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。 由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。 clear清除浮动的核心css属性是 clear ，基本语法如下： 123选择器: &#123; clear: 属性值;&#125; 属性值 描述 left 不允许左侧有浮动元素（清除左侧浮动的影响） right 不允许右侧有浮动元素（清除右侧浮动的影响） both 同时清除左右两侧浮动的影响 清除浮动常见方案额外标记法在浮动元素后面添加一个空标签，例如： 12&lt;div style="float: left;"&gt;&lt;/div&gt;&lt;div style="clear: both;"&gt;&lt;/div&gt; 优点：通俗易懂，书写方便缺点：加入了过多的没有实际含义的额外标签，结构化差。 父元素添加overflow通过触发BFC达到清除浮动的效果。（p.s. 对bfc不了解可以看这篇文章） 123.parent &#123; overflow: hidden;&#125; 优点：代码简洁缺点：超出的内容会被隐藏 before和after双伪元素方案1234567891011.clearfix:before,.clearfix:after &#123; content:""; display: table; /* 触发BFC清除浮动 */&#125;.clearfix:after &#123; clear: both;&#125;.clearfix &#123; *zoom: 1;&#125; 优点：代码简洁缺点：IE6-7不支持:after，需要使用 zoom: 1 触发 hasLayout 使用after伪元素（我平常使用的）1234567891011.clearfix::after &#123; content: "."; display: block; height: 0; visibility: hidden; clear: both;&#125;.clearfix &#123; *zoom: 1;&#125; /* IE6、7 专有 */ 使用方式：给浮动元素的父元素添加一个class类：clearfix优点：一次书写多处使用，并且符合闭合浮动思想，结构语义化正确缺点：IE6-7不支持:after，需要使用 zoom: 1 触发 hasLayout注意：content:&quot;.&quot; 内容尽量不为空，可以跟一个小点，否则在firefox 7.0前的版本会生成空格 :after 和 ::after 的区别:before、:after 在旧版本里是伪元素，CSS3的规范里 “:” 用来表示伪类，”::” 用来表示伪元素，但是在高版本浏览器下 :before、:after 会被自动识别为 ::before、::after ，这样做的目的是用来做兼容处理。 相同点伪类对象，用来设置对象前的内容:before 和 ::before 写法是等效的 不同点:before 是 css2 的写法，::before 是 css3 的写法:before 兼容性比 ::before要好 注意伪类元素必须要配合 content 属性一起使用，否则无效伪类元素是css渲染层加入的，不能通过js来操作]]></content>
