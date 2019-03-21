@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[JS中如何实现继承]]></title>
+    <url>%2Fposts%2F2751%2F</url>
+    <content type="text"><![CDATA[组合继承（原型链 + 借用构造函数）12345678910111213141516171819202122232425262728// 组合继承:原型继承+借用（调用）构造函数继承function Person(name, age, sex) &#123; this.name = name; this.age = age; this.sex = sex;&#125;Person.prototype.sayHi = function () &#123; console.log("Hello world");&#125;;function Student(name, age, sex, score) &#123; // 借用构造函数 Person.call(this,name,age,sex); this.score = score;&#125;// 改变原型指向----继承// 我们让 Student.prototype 指向一个Person的实例对象// 这个对象的__proto__指向的是Person.prototype// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承Student.prototype=new Person();Student.prototype.eat = function () &#123; console.log("吃东西");&#125;;var stu = new Student("Lance", 20, "男", "100分");stu.sayHi();var stu2 = new Student("Jerry", 19, "男", "101分");stu2.eat();//属性和方法都被继承了 寄生组合继承（组合继承升级版）123456789101112131415161718192021222324252627282930function object(o) &#123; function F()&#123;&#125; F.prototype = o; return new F();&#125;function inheritPrototype(subType, superType) &#123; var prototype = object(superType.prototype); // 创建了父类原型的浅复制 prototype.constructor = subType; // 修正原型的构造函数 subType.prototype = prototype; // 将子类的原型替换为这个原型&#125; function SuperType(name)&#123; this.name = name; this.colors = ["red", "blue", "green"];&#125; SuperType.prototype.sayName = function() &#123; alert(this.name);&#125;; function SubType(name, age) &#123; SuperType.call(this, name); this.age = age;&#125;// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费inheritPrototype(SubType, SuperType);SubType.prototype.sayAge = function() &#123; alert(this.age);&#125; ES6继承写法12345678910class Person &#123; constructor(name, age) &#123;this.name=name;this.age=age&#125; sayHi() &#123;&#125;&#125;class Student extends Person &#123; constructor(name, age, weight) &#123; super(name, age); this.weight = weight; &#125; run() &#123;&#125;&#125; 为什么在原型链继承时，不直接 Student.prototype = Person.prototype ？因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。 组合继承的缺点缺点就是调用了两次父类的构造函数。第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：1234567891011121314function SuperType() &#123; this.name = 'parent'; this.arr = [1, 2, 3];&#125; SuperType.prototype.say = function() &#123; console.log('this is parent')&#125; function SubType() &#123; SuperType.call(this) // 第二次调用SuperType&#125; SubType.prototype = new SuperType() // 第一次调用SuperType]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>继承</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[对this指向的判定]]></title>
     <url>%2Fposts%2F33207%2F</url>
     <content type="text"><![CDATA[对 this 的理解对于this指向的判定，时刻记住下面两点就好： 普通函数的 this 指向是在函数的执行期间绑定的，换句话说 this 总是指向函数的直接调用者 箭头函数的 this 指向是在函数创建期间就绑定好了的，指向的是创建该箭头函数所在的作用域对象 普通函数中的this这里直接引用 You-Dont-Know-JS 中对 this 的判定步骤： 函数是通过 new 被调用的吗（new 绑定）？如果是，this 就是新构建的对象。var bar = new foo() 函数是通过 call 或 apply 被调用（明确绑定），甚至是隐藏在 bind 硬绑定 之中吗？如果是，this 就是那个被明确指定的对象。var bar = foo.call( obj2 ) 函数是通过环境对象（也称为拥有者或容器对象）被调用的吗（隐含绑定）？如果是，this 就是那个环境对象。var bar = obj1.foo() 否则，使用默认的 this（默认绑定）。如果在 strict mode 下，就是 undefined，否则是 global 对象。var bar = foo() 常见this指向 普通函数中this ——&gt; window 构造函数中this ——&gt; new出来的实例对象 方法中的this ——&gt; 实例对象 原型中的方法中的this ——&gt; 实例对象 定时器中的this ——&gt; window]]></content>
