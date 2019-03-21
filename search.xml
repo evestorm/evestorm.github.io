@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[对this指向的判定]]></title>
+    <url>%2Fposts%2F33207%2F</url>
+    <content type="text"><![CDATA[对 this 的理解对于this指向的判定，时刻记住下面两点就好： 普通函数的 this 指向是在函数的执行期间绑定的，换句话说 this 总是指向函数的直接调用者 箭头函数的 this 指向是在函数创建期间就绑定好了的，指向的是创建该箭头函数所在的作用域对象 普通函数中的this这里直接引用 You-Dont-Know-JS 中对 this 的判定步骤： 函数是通过 new 被调用的吗（new 绑定）？如果是，this 就是新构建的对象。var bar = new foo() 函数是通过 call 或 apply 被调用（明确绑定），甚至是隐藏在 bind 硬绑定 之中吗？如果是，this 就是那个被明确指定的对象。var bar = foo.call( obj2 ) 函数是通过环境对象（也称为拥有者或容器对象）被调用的吗（隐含绑定）？如果是，this 就是那个环境对象。var bar = obj1.foo() 否则，使用默认的 this（默认绑定）。如果在 strict mode 下，就是 undefined，否则是 global 对象。var bar = foo() 常见this指向 普通函数中this ——&gt; window 构造函数中this ——&gt; new出来的实例对象 方法中的this ——&gt; 实例对象 原型中的方法中的this ——&gt; 实例对象 定时器中的this ——&gt; window]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>this</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数组的遍历方法]]></title>
+    <url>%2Fposts%2F64478%2F</url>
+    <content type="text"><![CDATA[下面是总结的数组遍历的常见方法 for循环 标准for循环 forEach((当前值, 当前索引, 当前数组) =&gt; {…}, [, 绑定的this])` 无法中途退出循环，只能用 return 退出本次回调，进行下一次回调 它总是返回 undefined 值，即使你 return 了一个值 for…in（不推荐）会把继承链的对象属性都会遍历一遍，而且数组遍历不一定按次序 for-in 循环返回的是所有能通过对象访问的、可枚举的属性 for (variable of iterable)（ES6）可迭代Array，Map，Set，String等（迭代的是值value） 在 for..of 中如果遍历中途要退出，可以使用 break 退出循环 ES5 map (不改变原数组) 会给原数组中的每个元素都按顺序调用一次 callback 函数 reduce (不改变原数组) 数组中的前项和后项做某种计算,并累计最终值。 123456789// 语法：// arr.reduce(function(total, currentValue, currentIndex, arr), initialValue)// callback 参数// (累积器, 当前元素, 当前元素索引, 当前数组)// initialValue:指定第一次回调 的第一个参数var wallets = [4, 7.8, 3]var totalMoney = wallets.reduce(function (countedMoney, curMoney) &#123; return countedMoney + curMoney;&#125;, 0) filter (不改变原数组) 1234var arr = [2, 3, 4, 5, 6]var morearr = arr.filter(function (number) &#123; return number &gt; 3&#125;) // [4,5,6] every (不改变原数组) 测试数组的所有元素是否都通过了指定函数的测试 如果数组中检测到有一个元素不满足，则整个表达式返回 false ，且剩余的元素不会再进行检测 如果所有元素都满足条件，则返回 true 1234var arr = [1,2,3,4,5]var result = arr.every(function (item, index) &#123; return item &gt; 2&#125;) // false some (不改变原数组) 测试是否至少有一个元素通过 callback 中的条件。对于放在空数组上的任何条件，此方法返回 false 如果有一个元素满足条件，则表达式返回true, 剩余的元素不会再执行检测 如果没有满足条件的元素，则返回false 12345678// some(callback, thisArg)// callback:// (当前元素, 当前索引, 调用some的数组)var arr = [1,2,3,4,5]var result = arr.some(function (item,index) &#123; return item &gt; 3&#125;) // true ES6 find() &amp; findIndex() 根据条件找到数组成员 find 定义：用于找出第一个符合条件的数组成员，并返回该成员，如果没有符合条件的成员，则返回 undefined findIndex 定义：返回第一个符合条件的数组成员的位置，如果所有成员都不符合条件，则返回-1 123456789101112// 语法let new_array = arr.find(function(currentValue, index, arr), thisArg)let new_array = arr.findIndex(function(currentValue, index, arr), thisArg)// 这两个方法都可以识别NaN,弥补了indexOf的不足// findlet a = [1, 4, -5, 10].find((n) =&gt; n &lt; 0); // 返回元素-5let b = [1, 4, -5, 10,NaN].find((n) =&gt; Object.is(NaN, n)); // 返回元素NaN// findIndexlet a = [1, 4, -5, 10].findIndex((n) =&gt; n &lt; 0); // 返回索引2let b = [1, 4, -5, 10,NaN].findIndex((n) =&gt; Object.is(NaN, n)); // 返回索引4 keys() &amp; values() &amp; entries() 遍历键名、遍历键值、遍历键名+键值 三个方法都返回一个新的 Array Iterator 对象，对象根据方法不同包含不同的值 1234567891011121314151617181920// 语法array.keys() array.values() array.entries()for (let index of ['a', 'b'].keys()) &#123; console.log(index);&#125;// 0// 1for (let elem of ['a', 'b'].values()) &#123; console.log(elem);&#125;// 'a'// 'b'for (let [index, elem] of ['a', 'b'].entries()) &#123; console.log(index, elem);&#125;// 0 "a"// 1 "b"]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>数组</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[null 和 undefined 的区别]]></title>
     <url>%2Fposts%2F63928%2F</url>
     <content type="text"><![CDATA[含义 null 表示一个对象是“没有值”的值，也就是值为“空” undefined 表示一个变量声明了没有初始化(赋值) 类型 undefined 的类型(typeof)是 undefined null 的类型(typeof)是 object 其他Javascript会将未赋值的变量默认值设为undefined；Javascript从来不会将变量设为null。它是用来让程序员表明某个用var声明的变量时没有值的。 另外，在验证 null 时，一定要使用 === ，因为 == 无法分辨 null 和 undefined ：12null == undefined // true null === undefined // false]]></content>
