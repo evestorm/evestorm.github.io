@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="传送门 transition过渡（一）  这篇文章主要来介绍 transition 过渡分开写时，几个属性的含义和用法。 transition-property从上一篇文章能够知道 transition-property 是拿来设置元素中参与过渡的属性的。它的可选值为：  none 指所有属性都不参与过渡 all 指所有属性都参与过渡 [IDENT] 指定个别属性参与过渡  下面来看一个案例： �">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-31T16:30:03.961Z">
+<meta property="og:updated_time" content="2019-04-01T01:39:33.622Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="transition过渡（二）">
 <meta name="twitter:description" content="传送门 transition过渡（一）  这篇文章主要来介绍 transition 过渡分开写时，几个属性的含义和用法。 transition-property从上一篇文章能够知道 transition-property 是拿来设置元素中参与过渡的属性的。它的可选值为：  none 指所有属性都不参与过渡 all 指所有属性都参与过渡 [IDENT] 指定个别属性参与过渡  下面来看一个案例： �">
@@ -387,7 +387,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  175
+                  812
                 </span>
               
 
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  2
                 </span>
               
             </div>
@@ -435,10 +435,16 @@
 <li>[IDENT] 指定个别属性参与过渡</li>
 </ul>
 <p>下面来看一个案例：</p>
-<p>👇温馨提示：为了方便看效果，可点击 <code>CSS</code> 按钮折叠代码 👇</p>
+<p>👇温馨提示：为了方便看效果，可点击 <code>CSS</code> 按钮折叠代码部分，仅显示页面 👇</p>
 <iframe height="265" style="width: 100%;" scrolling="no" title="transition-property-demo1" src="//codepen.io/JingW/embed/oONwww/?height=265&theme-id=0&default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true"><br>  See the Pen <a href="https://codepen.io/JingW/pen/oONwww/" target="_blank" rel="noopener">transition-property-demo1</a> by JingW<br>  (<a href="https://codepen.io/JingW" target="_blank" rel="noopener">@JingW</a>) on <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a>.<br></iframe>
 
-<p>当你依次将鼠标移入上方演示demo中的三个按钮就会发现，显示出了一段文本。</p>
+<p>当你依次将鼠标移入上方演示demo中的三个按钮就会发现，都在各自下方显示出了一段文本。我们想要实现的，就是这段文本的显示需要有一个过渡效果，不要太生硬。最简单的一种实现方案就是鼠标移入按钮前，文本容器的 <code>height: 0</code> ，鼠标移入后固定容器高度 <code>height: 150px</code> （第一个按钮效果就用的此方案）。但在实际情况中，往往文本是自适应的，高度无法确定，所以很自然的，我们会想到将 <code>height: 150px</code> 设置为 <code>height: auto</code> ，这样不就能够实现自适应高度的容器过渡了嘛，这就是第二个按钮的一套实现方案。但结果大家都知道了，文本容器不再拥有过渡的动画，而是直接从 <code>0px</code> 瞬间变化到 <code>auto</code>，这是为什么呢？</p>
+<p><strong>答案</strong>：并不是所有的属性和属性值都能存在过渡动画。</p>
+<p>这里特别需要注意的是，如果想要指定某个属性有过渡状态，就需要保证我们能够计算出过渡过程中每个时间点的属性值。<br>比如，从 <code>height: 0;</code> 过渡到 <code>height: 150px;</code> ，过渡时间是 <code>t</code> ，那我们可以算出在 <code>x</code> 时刻的属性状态是 <code>height: (150px-0)*x/t;</code> 。（注：这里公式成立的前提是假设 <code>transition-timing-function: linear;</code> ，如果<code>transition-timing-function</code> 为其他值，一样可以计算，只不过算法不同）<br>然而刚才第二种方案设置了 <code>height: auto;</code>，则在 <code>x</code> 时刻的属性状态为 <code>height: (auto-0px)*x/t;</code> ，显然，这种状态是不存在的、无法被计算的，因此在设置高度变成 <code>auto</code> 之后，也自然不会再有过渡动画了。</p>
+<p><strong>解决方案</strong></p>
+<p>第三个按钮的效果就是我们的一种解决方案，在默认状态下，我们不设置文本容器的 <code>height: 0</code> ，而是用 <code>transform: scale(1, 0);</code> 来代替它，意思是在初始状态下，我们的文本容器比例为宽1:1，高1:0，换句话说，宽为我们设置的宽，但高度为0。在鼠标移入按钮后，用 <code>transform: scale(1, 1);</code> 来代替方案二中的 <code>height: auto</code> ，设置文本容器的宽高为1，这样就又能出现过渡动画了。</p>
+<p><strong>延伸</strong></p>
+<p>由此进行延伸，再比如日常中最常使用的控制元素显示隐藏的代码是 <code>display: block;</code> 和 <code>display: none;</code> ，这也是不存在过渡动画的，因此，可以调整改为使用 <code>opacity: 1;</code> 和 <code>opacity: 0;</code> 来替换。</p>
 
       
     </div>
@@ -639,7 +645,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">18.3k</span>
+    <span title="Site words total count">18.9k</span>
   
 </div>
 
