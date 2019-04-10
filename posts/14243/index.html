@@ -96,7 +96,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/css3/3dzuobiaoxi.png">
 <meta property="og:image" content="https://codropspz-tympanus.netdna-ssl.com/codrops/wp-content/uploads/2014/12/perspective-distance.png">
-<meta property="og:updated_time" content="2019-04-10T15:45:21.824Z">
+<meta property="og:updated_time" content="2019-04-10T16:24:13.445Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="transform3D转换（二）">
 <meta name="twitter:description" content="在我当初了解到 transform 后的一段时间，其实是不知道它能够让元素实现3d转换的。直到有一天在逛 codepen 时，我发现了下面这个demo：   See the Pen CSS3 Transforms 3D Perspective Carousel by JingW  (@JingW) on CodePen.  p.s. 原作者地址在这儿：https://codepen.io/Hubs">
@@ -390,7 +390,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  999
+                  1.4k
                 </span>
               
 
@@ -406,7 +406,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  5
                 </span>
               
             </div>
@@ -454,7 +454,14 @@
 <p>这下是不是明显多啦？其实这都全靠了 <code>perspective</code> 透视，它允许我们为场景添加深度感，原理就是<strong>使 z 轴在靠近观察者的元素看起来更大，而更远的元素看起来更小</strong>。也就是上面提到的“近大远小”。</p>
 <p>我们来看看下面这张图：<br><img src="https://codropspz-tympanus.netdna-ssl.com/codrops/wp-content/uploads/2014/12/perspective-distance.png" alt="perspective-distance"></p>
 <p>上图中蓝色圆圈表示三维空间中的元素，字母 d 表示透视的值，即观看者的眼睛和<strong>屏幕</strong>之间的距离。字母 Z 表示元素在 z 轴上的位置。元素在 z 轴上越远，相对于观察者的外观越小，它越接近，就看起来越大。这就是三维空间中透视的效果。</p>
+<h2 id="perspective-VS-perspective"><a href="#perspective-VS-perspective" class="headerlink" title="perspective VS perspective()"></a>perspective VS perspective()</h2><p>perspective有两种写法，一种是直接写在要使用3d转换的父元素身上（如上一个demo）：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 父容器 */</span></span><br><span class="line"><span class="selector-class">.contaienr</span> &#123;</span><br><span class="line">    <span class="comment">/* 将透视属性写在父容器 */</span></span><br><span class="line">    <span class="attribute">perspective</span>: <span class="number">1000px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 需要3d转换的子元素 */</span></span><br><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">    <span class="attribute">transition</span>: transform <span class="number">1s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 触发转换 */</span></span><br><span class="line"><span class="selector-class">.container</span><span class="selector-pseudo">:hover</span> <span class="selector-tag">box</span> &#123;</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">rotateY</span>(180deg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这种写法下，一旦“舞台（浏览器显示区域）”上有多个元素都进行了3d转换，可能效果就与你的预想不太一样，靠近“舞台”两边的元素会“歪着”进行旋转：</p>
+<iframe height="367" style="width: 100%;" scrolling="no" title="transform3d-perspective2" src="//codepen.io/JingW/embed/KYWedq/?height=367&theme-id=0&default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true"><br>  See the Pen <a href="https://codepen.io/JingW/pen/KYWedq/" target="_blank" rel="noopener">transform3d-perspective2</a> by JingW<br>  (<a href="https://codepen.io/JingW" target="_blank" rel="noopener">@JingW</a>) on <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a>.<br></iframe>
 
+<p>这是为什么呢？答案是因为默认我们观察者的“眼睛”是处于“舞台”正中央的前方的（这个前方是以“舞台”的视角），所以靠近我们观察者左前方的（观察者视角）卡片，在沿着 x 轴做旋转时，就是“歪着”的；同理观察者右前方卡片也是如此。</p>
+<p>那么如果你想让它们都与正中央的卡片一样效果的旋转呢？这就引出了第二种写法：<code>perspective()</code> 。该属性写在3d转换元素本身上，而不是在其父元素上了：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">    <span class="attribute">transition</span>: transform <span class="number">1s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.container</span><span class="selector-pseudo">:hover</span> <span class="selector-class">.box</span> &#123;</span><br><span class="line">    <span class="comment">/* 1. 沿着x轴旋转180° */</span></span><br><span class="line">    <span class="comment">/* 2. 给3d旋转元素本身添加 perspective 透视 */</span></span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">perspective</span>(500px) <span class="built_in">rotateX</span>(180deg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<iframe height="365" style="width: 100%;" scrolling="no" title="transform3d-perspective3" src="//codepen.io/JingW/embed/EJWpaq/?height=265&theme-id=0&default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true"><br>  See the Pen <a href="https://codepen.io/JingW/pen/EJWpaq/" target="_blank" rel="noopener">transform3d-perspective3</a> by JingW<br>  (<a href="https://codepen.io/JingW" target="_blank" rel="noopener">@JingW</a>) on <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a>.<br></iframe>
       
     </div>
     
@@ -620,7 +627,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rotateX-rotateY-rotateZ"><span class="nav-number">1.</span> <span class="nav-text">rotateX, rotateY, rotateZ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateX"><span class="nav-number">1.1.</span> <span class="nav-text">rotateX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateY"><span class="nav-number">1.2.</span> <span class="nav-text">rotateY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateZ"><span class="nav-number">1.3.</span> <span class="nav-text">rotateZ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-透视"><span class="nav-number">2.</span> <span class="nav-text">perspective 透视</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rotateX-rotateY-rotateZ"><span class="nav-number">1.</span> <span class="nav-text">rotateX, rotateY, rotateZ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateX"><span class="nav-number">1.1.</span> <span class="nav-text">rotateX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateY"><span class="nav-number">1.2.</span> <span class="nav-text">rotateY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateZ"><span class="nav-number">1.3.</span> <span class="nav-text">rotateZ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-透视"><span class="nav-number">2.</span> <span class="nav-text">perspective 透视</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-VS-perspective"><span class="nav-number">3.</span> <span class="nav-text">perspective VS perspective()</span></a></li></ol></div>
             
 
           </div>
@@ -654,7 +661,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">23.4k</span>
+    <span title="Site words total count">23.7k</span>
   
 </div>
 
