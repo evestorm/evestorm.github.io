@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Axios异步请求跨域解决方案]]></title>
+    <url>%2Fposts%2F15391%2F</url>
+    <content type="text"><![CDATA[场景 后端 127.0.0.1（默认80）；前端 127.0.0.1:8081 在 vue 开发过程中使用 axios 发起 POST 请求： 123456axios(&#123; method: 'GET', url: 'http://127.0.0.1'&#125;).then(data =&gt; &#123;&#125;); 会报跨域错误： 原因是浏览器同源策略，只有 同协议、同域名、同端口 三同的地址才能互相通过 AJAX 的方式请求。而上面情形虽然协议（http）和域名（127.0.0.1）都相同，但端口不同（80 和 8081），所以无法正常请求。 解决方案方案一服务端添加响应头，以 Koa 为例，在 app.js 中添加响应头： 1234app.use(async (ctx, next) =&gt; &#123; ctx.set("Access-Control-Allow-Origin", "*"); await next();&#125;); 这样设置会允许任何来源（*）的跨域。 但往往后端的某些接口是需要身份验证的，比如用户对文章、商品之类的进行评论或点赞，就需要用户登录才能操作。这种情况下就需要使用到 cookie 或者 session ，所以还得设置 Access-Control-Allow-Credentials 为 true ，表示在 CORS 请求中允许客户端发送 cookie 。然而一旦这样设置，Access-Control-Allow-Origin 就不能再是通配符 * ，必须指定具体的域，所以服务端最终的 header 设置为： 12345app.use(async (ctx, next) =&gt; &#123; ctx.set("Access-Control-Allow-Origin", "http://127.0.0.1:8081"); ctx.set("Access-Control-Allow-Credentials", true); await next();&#125;); 后端这样设置后，前端就能够实现跨域请求了。 方案二如果服务端不加 ctx.set(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;); 这一段。可以在 @vue-cli 中 配置代理 。也就是 前端设置代理 的解决方案。 原理利用后端不存在跨域问题，而让vue服务器代为获取数据。因为启动vue项目本质上也是用 node 启了个服务器（127.0.0.1:8080），配置了代理后，就不再是浏览器直接请求我们在 axios 中配置的 http://127.0.0.1/（默认80端口） ，而是用vue启动的这个服务器去请求 http://127.0.0.1/ 这个接口，由于后端相互之前请求不存在跨域问题，所以能获取数据，获取后给到前端。 在前端项目根目录下新建 vue.config.js 文件： 1234567891011121314module.exports = &#123; devServer: &#123; proxy: &#123; // 前端 axios 发这样的请求：http://127.0.0.1:8081/api/ (8081是启动vue项目时的端口)，会被此处捕获，然后代为请求真正的服务器API地址 `http://127.0.0.1` '/api': &#123; target: 'http://127.0.0.1', // 此处是服务端API接口，不写端口默认80 changeOrigin: true, pathRewrite: &#123; '^/api': '' &#125; &#125;, &#125; &#125;&#125; 前端发送 POST 跨域请求上面也提到了，前端有时候往往不止需要发送 GET 请求，POST 请求也是常有的事儿。所以还需要对 Axios 进行如下配置： vue 项目下的 main.js 中全局配置 axios 123456import axios from 'axios';axios.defaults.baseURL = 'http://127.0.0.1';axios.defaults.withCredentials = true; // 让 ajax 携带 cookieaxios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'; // 设置post请求的头部格式Vue.prototype.$ajax = axios 由于需要把请求时的数据序列化为url的形式，所以要下载 qs 包 1npm i qs 在具体页面中发送 POST 请求 123456789101112import qs from 'qs'let loginInfo = &#123; username: '', password: '',&#125;,this.$ajax(&#123;(&#123; method: 'post', url: 'http://127.0.0.1/login', data: qs.stringify(login_info),&#125;)]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>axios</tag>
+        <tag>跨域</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[transform3D转换（二）]]></title>
     <url>%2Fposts%2F14243%2F</url>
     <content type="text"><![CDATA[在我当初了解到 transform 后的一段时间，其实是不知道它能够让元素实现3d转换的。直到有一天在逛 codepen 时，我发现了下面这个demo： See the Pen CSS3 Transforms 3D Perspective Carousel by JingW (@JingW) on CodePen. p.s. 原作者地址在这儿：https://codepen.io/Hubson/pen/XmrEGX OS：我靠，还能这样玩儿？赶紧查查如何实现的。（点我重现查找过程） 然后就发现了张鑫旭老师的 这篇文章 。算是给我打开了新世界的大门~ 原来现在的CSS都这么强大了，要知道几年前我在学 .NET 时就接触过HTML和CSS，那个时候不还是满屏div，没啥特效的时代嘛。 扯远了，言归正传。首先来看下面这个图（copy上面文章来的~）： 这个图就是咱们3d变形所依赖的坐标系。要想理解这张图，需要一点空间想象力。我们人在看这个坐标系时，是从左下角的眼睛处从 +Z 往 -Z 里面看的。可以把这个眼睛简单的想象成你自己，由网格组成的正方形平面相当于你在屏幕上创建的一个正方形div元素。那么当你设置 transform: translate(200px, 0) 时，你的元素将会向 +X 方向前进，也就是平常在2d变换中的向右移动。现在应该理解了吧~ rotateX, rotateY, rotateZrotateXrotateX就是沿着 x 轴进行3d旋转。 在下面示例中，我们实现让一个元素沿着它的x轴旋转180°。为了让效果看起来更加明显，我把该元素分成了上下两个部分，并在中间留出了缝隙，以便当做X轴看待，当鼠标移入该元素后，它便“沿着” x 轴旋转180°： See the Pen transform3d-rotateX by JingW (@JingW) on CodePen. rotateY用和上面类似的方式，我们实现 rotateY 的3d旋转效果，让元素沿着 y 轴进行3d旋转： See the Pen transform3d-rotateY by JingW (@JingW) on CodePen. rotateZ还记得那根 z 轴嘛，当我们垂直于屏幕看向元素时，z 轴在我们眼里就是一个“点”。所以当我们使用 rotateZ 来旋转元素时，元素会沿着 z 轴进行旋转，就是下方元素中间的“点”： See the Pen transform3d-rotateZ by JingW (@JingW) on CodePen. perspective 透视这个属性英文直译过来就是 透视、视角的意思。 电脑显示屏是个2d平面，要想让元素在一个2d平面上有立体感（3d效果），就得利用这个 perspective 透视属性。perspective 可以让一个2d平面在转换过程中呈现出3d效果。 不知道大家有没有注意到上面有关 rotateY 下的demo，虽说是沿着元素 y 轴进行旋转，但一点3d立体效果都没有，要知道在现实生活中，如果一张卡片沿着它宽度一半儿的 y 轴进行旋转，肯定有近大远小的透视效果，即离我们近的一面越来越大，离我们远的一面越来越小。如果还没有明白，看了下面的示例就知道了（鼠标移入body就能触发旋转~）： See the Pen transform3d-perspective by JingW (@JingW) on CodePen. 这下是不是明显多啦？其实这都全靠了 perspective 透视，它允许我们为场景添加深度感，原理就是使 z 轴在靠近观察者的元素看起来更大，而更远的元素看起来更小。也就是上面提到的“近大远小”。 我们来看看下面这张图： 上图中蓝色圆圈表示三维空间中的元素，字母 d 表示透视的值，即观看者的眼睛和屏幕之间的距离。字母 Z 表示元素在 z 轴上的位置。元素在 z 轴上越远，相对于观察者的外观越小，它越接近，就看起来越大。这就是三维空间中透视的效果。 perspective VS perspective()perspective有两种写法，一种是直接写在要使用3d转换的父元素身上（如上一个demo）：12345678910111213/* 父容器 */.contaienr &#123; /* 将透视属性写在父容器 */ perspective: 1000px;&#125;/* 需要3d转换的子元素 */.box &#123; transition: transform 1s;&#125;/* 触发转换 */.container:hover box &#123; transform: rotateY(180deg);&#125; 在这种写法下，一旦“舞台（浏览器显示区域）”上有多个元素都进行了3d转换，可能效果就与你的预想不太一样，靠近“舞台”两边的元素会“歪着”进行旋转： See the Pen transform3d-perspective2 by JingW (@JingW) on CodePen. 这是为什么呢？答案是因为默认我们观察者的“眼睛”是处于“舞台”正中央的前方的（这个前方是以“舞台”的视角），所以靠近我们观察者左前方的（观察者视角）卡片，在沿着 x 轴做旋转时，就是“歪着”的；同理观察者右前方卡片也是如此。 那么如果你想让它们都与正中央的卡片一样效果的旋转呢？这就引出了第二种写法：perspective() 。该属性写在3d转换元素本身上，而不是在其父元素上了：12345678.box &#123; transition: transform 1s;&#125;.container:hover .box &#123; /* 1. 沿着x轴旋转180° */ /* 2. 给3d旋转元素本身添加 perspective 透视 */ transform: perspective(500px) rotateX(180deg);&#125; 效果如下： See the Pen transform3d-perspective3 by JingW (@JingW) on CodePen. perspective-origin语法：12perspective-origin: 50% 50%; /* 默认值，表示观察者在“舞台”正中央的上方 */perspective-origin: left center; /* 表示观察者在“舞台”最左边且垂直居中的上方 */ 该属性用于定义观察者观看三维空间时的位置所在。默认情况下为x轴50%、y轴50%。也就是“舞台（屏幕）”正中央的上方。 读者可以尝试用鼠标拖动下方demo中的按钮“camera”到“舞台”的各个位置，然后看看三张卡片的3d转换效果。当你在拖动“camera”改变它的位置时，也就等同于改变了 perspective-origin 的位置。例如当你把按钮“camera”拖动到左上角，就相当于设置了 perspective-origin: left top。 See the Pen transform3d-perspective-origin by JingW (@JingW) on CodePen.]]></content>
@@ -44,19 +57,6 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
-  </entry>
-  <entry>
-    <title><![CDATA[Axios异步请求跨域解决方案]]></title>
-    <url>%2Fposts%2F15391%2F</url>
-    <content type="text"><![CDATA[场景 后端 127.0.0.1（默认80）；前端 127.0.0.1:8081 在 vue 开发过程中使用 axios 发起 POST 请求： 123456axios(&#123; method: 'GET', url: 'http://127.0.0.1'&#125;).then(data =&gt; &#123;&#125;); 会报跨域错误： 原因是浏览器同源策略，只有 同协议、同域名、同端口 三同的地址才能互相通过 AJAX 的方式请求。而上面情形虽然协议（http）和域名（127.0.0.1）都相同，但端口不同（80 和 8081），所以无法正常请求。 解决方案方案一服务端添加响应头，以 Koa 为例，在 app.js 中添加响应头： 1234app.use(async (ctx, next) =&gt; &#123; ctx.set("Access-Control-Allow-Origin", "*"); await next();&#125;); 这样设置会允许任何来源（*）的跨域。 但往往后端的某些接口是需要身份验证的，比如用户对文章、商品之类的进行评论或点赞，就需要用户登录才能操作。这种情况下就需要使用到 cookie 或者 session ，所以还得设置 Access-Control-Allow-Credentials 为 true ，表示在 CORS 请求中允许客户端发送 cookie 。然而一旦这样设置，Access-Control-Allow-Origin 就不能再是通配符 * ，必须制定具体的域，所以服务端最终的 header 设置为： 12345app.use(async (ctx, next) =&gt; &#123; ctx.set("Access-Control-Allow-Origin", "http://127.0.0.1:8081"); ctx.set("Access-Control-Allow-Credentials", true); await next();&#125;); 后端这样设置后，前端就能够实现跨域请求了。 前端发送 POST 跨域请求上面也提到了，前端有时候往往不止需要发送 GET 请求，POST 请求也是常有的事儿。所以还需要对 Axios 进行如下配置： vue 项目下的 main.js 中全局配置 axios 123456import axios from 'axios';axios.defaults.baseURL = 'http://127.0.0.1';axios.defaults.withCredentials = true; // 让 ajax 携带 cookieaxios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'; // 设置post请求的头部格式Vue.prototype.$ajax = axios 由于需要把请求时的数据序列化为url的形式，所以要下载 qs 包 1npm i qs 在具体页面中发送 POST 请求 123456789101112import qs from 'qs'let loginInfo = &#123; username: '', password: '',&#125;,this.$ajax(&#123;(&#123; method: 'post', url: 'http://127.0.0.1/login', data: qs.stringify(login_info),&#125;)]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>axios</tag>
-        <tag>跨域</tag>
-      </tags>
   </entry>
   <entry>
     <title><![CDATA[基于sequelize的数据库迁移]]></title>
