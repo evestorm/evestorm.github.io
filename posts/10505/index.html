@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="ES6,">
+  <meta name="keywords" content="Node,EventLoop,">
 
 
 
@@ -86,18 +86,27 @@
 
 
 
-<meta name="description" content="什么是 REST 参数REST参数翻译过来就是剩余参数，MDN上的定义是：  剩余参数语法允许我们将一个不定数量的参数表示为一个数组。  示例说明123456789101112131415161718192021function sum(...theArgs) &amp;#123;  return theArgs.reduce((previous, current) =&amp;gt; &amp;#123;    ret">
-<meta name="keywords" content="ES6">
+<meta name="description" content="我们只关心打钩的的阶段：  timers poll（此阶段会停留一段时间） check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）  123456789101112131415161718   ┌───────────────────────┐┌─&amp;gt;│        timers   ✅    ││  └──────────┬────────────┘│">
+<meta name="keywords" content="Node,EventLoop">
 <meta property="og:type" content="article">
-<meta property="og:title" content="函数中的rest参数">
-<meta property="og:url" content="https://evestorm.github.io/posts/29820/index.html">
+<meta property="og:title" content="Event Loop 学习笔记">
+<meta property="og:url" content="https://evestorm.github.io/posts/10505/index.html">
 <meta property="og:site_name" content="EVE">
-<meta property="og:description" content="什么是 REST 参数REST参数翻译过来就是剩余参数，MDN上的定义是：  剩余参数语法允许我们将一个不定数量的参数表示为一个数组。  示例说明123456789101112131415161718192021function sum(...theArgs) &amp;#123;  return theArgs.reduce((previous, current) =&amp;gt; &amp;#123;    ret">
+<meta property="og:description" content="我们只关心打钩的的阶段：  timers poll（此阶段会停留一段时间） check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）  123456789101112131415161718   ┌───────────────────────┐┌─&amp;gt;│        timers   ✅    ││  └──────────┬────────────┘│">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-09T03:03:52.634Z">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153114984-0a52215a-de2b-43f4-9d86-3439cb9f53b8.png?x-oss-process=image/resize,w_1214">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153890523-6dd454ac-94e7-47cc-b947-1da54855698e.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153928784-12d385d5-a62b-474f-8909-ff0c3d2520da.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557154311746-b5c1210e-f541-43ad-aaf1-5a619e455505.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557159163784-2097faa6-f97c-4827-bef9-5e02cc05e2d2.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557161095157-995c2300-118f-4277-88ec-11d3aa6ba01e.png?x-oss-process=image/resize,w_1170">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557196480913-01adc892-bd3a-4638-a401-12372511956e.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557198825204-924929ec-1115-4e21-a771-cf18796f8f15.png?x-oss-process=image/resize,w_984">
+<meta property="og:updated_time" content="2019-06-11T02:50:20.118Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="函数中的rest参数">
-<meta name="twitter:description" content="什么是 REST 参数REST参数翻译过来就是剩余参数，MDN上的定义是：  剩余参数语法允许我们将一个不定数量的参数表示为一个数组。  示例说明123456789101112131415161718192021function sum(...theArgs) &amp;#123;  return theArgs.reduce((previous, current) =&amp;gt; &amp;#123;    ret">
+<meta name="twitter:title" content="Event Loop 学习笔记">
+<meta name="twitter:description" content="我们只关心打钩的的阶段：  timers poll（此阶段会停留一段时间） check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）  123456789101112131415161718   ┌───────────────────────┐┌─&amp;gt;│        timers   ✅    ││  └──────────┬────────────┘│">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153114984-0a52215a-de2b-43f4-9d86-3439cb9f53b8.png?x-oss-process=image/resize,w_1214">
 
 
 
@@ -127,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="https://evestorm.github.io/posts/29820/">
+  <link rel="canonical" href="https://evestorm.github.io/posts/10505/">
 
 
 
 
 
-  <title>函数中的rest参数 | EVE</title>
+  <title>Event Loop 学习笔记 | EVE</title>
   
 
 
@@ -295,7 +304,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/29820/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/10505/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lance">
@@ -312,7 +321,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">函数中的rest参数</h1>
+          <h1 class="post-title" itemprop="name headline">Event Loop 学习笔记</h1>
         
 
         <div class="post-meta">
@@ -324,8 +333,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-02T18:10:19+08:00">
-                2019-01-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-29T03:43:52+08:00">
+                2019-04-28
               </time>
             
 
@@ -347,8 +356,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
+                  <a href="/categories/后端/" itemprop="url" rel="index">
+                    <span itemprop="name">后端</span>
                   </a>
                 </span>
 
@@ -358,8 +367,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/JS/" itemprop="url" rel="index">
-                    <span itemprop="name">JS</span>
+                  <a href="/categories/后端/Node/" itemprop="url" rel="index">
+                    <span itemprop="name">Node</span>
                   </a>
                 </span>
 
@@ -387,7 +396,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  300
+                  2.4k
                 </span>
               
 
@@ -403,7 +412,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  9
                 </span>
               
             </div>
@@ -424,20 +433,88 @@
       
 
       
-        <h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters" target="_blank" rel="noopener">MDN</a>上的定义是：</p>
-<blockquote>
-<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
-</blockquote>
-<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
-<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+        <p>我们只关心打钩的的阶段：</p>
+<ol>
+<li>timers</li>
+<li>poll（此阶段会停留一段时间）</li>
+<li>check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   ┌───────────────────────┐</span><br><span class="line">┌─&gt;│        timers   ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     I/O callbacks     │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     idle, prepare     │</span><br><span class="line">│  └──────────┬────────────┘      ┌───────────────┐</span><br><span class="line">│  ┌──────────┴────────────┐      │   incoming:   │</span><br><span class="line">│  │         poll    ✅    │&lt;─────┤  connections, │</span><br><span class="line">│  └──────────┬────────────┘      │   data, etc.  │</span><br><span class="line">│  ┌──────────┴────────────┐      └───────────────┘</span><br><span class="line">│  │        check    ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">└──┤    close callbacks    │</span><br><span class="line">   └───────────────────────┘</span><br></pre></td></tr></table></figure>
+<h2 id="timers-和-poll"><a href="#timers-和-poll" class="headerlink" title="timers 和 poll"></a>timers 和 poll</h2><p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153114984-0a52215a-de2b-43f4-9d86-3439cb9f53b8.png?x-oss-process=image/resize,w_1214" alt="image.png"></p>
+<p>根据 <a href="https://juejin.im/post/5ab7677f6fb9a028d56711d0" target="_blank" rel="noopener">官方文档</a> 的描述，事件循环应该是从 timers 开始的，但不一定。</p>
+<p>NodeJS的内部代码大概是这样写的：</p>
 <ul>
-<li>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</li>
-<li><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</li>
-<li><code>arguments</code>对象还有一些附加的属性 （如<code>callee</code>属性）。<ul>
-<li>arguments.callee 属性包含当前正在执行的函数。</li>
+<li>开启 eventLoop()</li>
+<li>执行 JS()</li>
 </ul>
-</li>
+<p>但由于启动 event loop 是开个进程，需要时间的，而执行 JS 也得启动V8引擎，也是需要时间的，所以不确定这两个谁快谁慢。所以：</p>
+<ul>
+<li>有可能 setTimeout 先执行，后才进入 timers 阶段</li>
+<li>也有可能先进入 timers 阶段，后执行 setTimeout</li>
 </ul>
+<p>假设一段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(fn, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153890523-6dd454ac-94e7-47cc-b947-1da54855698e.png" alt="image.png"></p>
+<p>当我们在执行这段代码时，会把 fn 放进 timers 中的一个队列中去（也可以认为是一个数组）。然后JS就做自己的事情去了。此时 timers 可能开启了，也可能没有开启。但最大的可能是，在执行 <code>setTimeout(fn, 1000);</code> 的时候，我们进入了 poll 阶段，poll 阶段就是等待（e.g. 等待ajax请求成功，或者读文件成功），大概几十毫秒。在等待期间，它会看时间，比如刚才JS让我1000毫秒后执行一个fn，现在刚过去500毫秒，那我继续等，直到等到1000毫秒时，赶紧经过 check 阶段，进入 timers 阶段去执行 fn：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557153928784-12d385d5-a62b-474f-8909-ff0c3d2520da.png" alt="image.png"></p>
+<p>执行完毕后，又进入 poll 阶段，什么都不做，继续等。这个等有个时间限制的，假设是3s，那么3s后如果什么都没等到，就进入 check 阶段，然后再回到 timers 阶段，如此循环。</p>
+<h2 id="check"><a href="#check" class="headerlink" title="check"></a>check</h2><p>check 阶段会执行一些立即执行的函数，主要就是 setImmediate(fn) 函数。该函数类似 setTimeout，但没有第二个参数。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn"</span>), <span class="number">1000</span>);</span><br><span class="line">setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn2"</span>));</span><br></pre></td></tr></table></figure>
+<p>所以在执行例如 setImmediate(fn2) 时，fn2 不会进入 timers，而会进入 check 阶段的一个队列中：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557154311746-b5c1210e-f541-43ad-aaf1-5a619e455505.png" alt="image.png"></p>
+<p>由于我们不确定 timers 这个一阶段结束了还是未结束，所以我们以二阶段 poll 来研究。</p>
+<p>当执行 setTimeout 后，我们把 fn 扔进了 timers ，然后进入 poll 阶段开始等，现在又执行到了 setImmediate ，这是个立即执行函数，有事情开始做了，所以 poll 不等了，直接进入 check 阶段去执行 fn2。</p>
+<p>然后又回到 timers 阶段，不执行 fn（因为没到1000毫秒），又进入 poll 阶段，等到 1000 毫秒后，进入 check 阶段，然后返回 timers 阶段，开始执行 fn （fn只能在进入 timers 阶段才能执行）。</p>
+<h2 id="经典考题"><a href="#经典考题" class="headerlink" title="经典考题"></a>经典考题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn"</span>), <span class="number">0</span>);</span><br><span class="line">setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn2"</span>));</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557159163784-2097faa6-f97c-4827-bef9-5e02cc05e2d2.png" alt="image.png"></p>
+<p>按照理论（NodeJS内部代码先调用的 event loop，再调用的执行JS），应该 fn2 先执行，但实际结果是不一定的，有可能先打印 fn，再打印 fn2；也有可能先打印 fn2，再打印 fn。原因就在于 <strong>开启event loop</strong> 和 <strong>执行 JS</strong> 的顺序是随机的。</p>
+<p>如果先开启了 event loop ，那么就先从 poll 阶段开始，因为 timers 阶段没发现有任何函数，所以进入 poll 开始等。接着等到了 <strong>执行JS</strong> ，执行第一段代码，就把0s延迟的 fn 放进了 timers 的队列，接着执行第二段代码，把 fn2 放进了 check 队列，此刻 <strong>执行JS</strong> 完毕，event loop 说：你执行完了是吧？我可以开始做事了，然后 poll 发现有任务要执行了，就进入 check 阶段执行 fn2，再返回到 timers 阶段，发现有个 fn 已经过时间了（因为延迟0s），马上执行 fn。所以这种情况下，先打印 fn2，再打印 fn。</p>
+<p>但如果 event loop 开启的比较慢，执行JS这一步先开始了。那么就会先把 fn 扔进队列，再才开始进入 timers 的第一阶段，此刻 timers 发现已经有了个 fn，还是 0s 延迟执行，所以就执行了 fn，再进入 poll ，poll 发现还有个 fn2 在等我立即执行，就接着进入 check 然后执行 fn2。所以这种情况下，先打印 fn，再打印 fn2。</p>
+<p>说到底，就是看 fn 是在第一次进入 timers 阶段前就存在，还是第一次进入 timers 阶段后才存在。</p>
+<p>那怎样才能保证 fn2 先执行呢？解决方案把这两段代码放进一个 setTimeout 中去，然后延迟1s执行，为的就是等 event loop 开启后，进入 poll 阶段，再开始执行这两段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn"</span>), <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn2"</span>));</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="process-nextTick"><a href="#process-nextTick" class="headerlink" title="process.nextTick()"></a>process.nextTick()</h2><p>这个重要的异步API不属于 event loop 的任何一个阶段。nextTick 队列会在当前阶段后就被执行。</p>
+<p>以下面代码为例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn"</span>), <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn2"</span>));</span><br><span class="line">  process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn3"</span>));</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+<p>由于三段代码被放进了一个 setTimeout 中，且在1s后再被执行。所以1s后 event loop 肯定已经存在，此时就从 poll 阶段开始，然后执行三段代码，第一段把 fn 放进 timers 的队列，第二段把 fn2 放进 check 队列，然后 poll 阶段执行完了，根据 nextTick 队列会在<strong>当前阶段</strong>后就被执行，所以此刻在马上要进入 check 阶段之前，就把 nextTick 中的代码执行掉了，所以先打印 fn3，然后进入 check 阶段后打印 fn2，最后重新进入 timers 打印 fn。</p>
+<p>再来看下面这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"fn"</span>);</span><br><span class="line">    process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn4"</span>));</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn2"</span>));</span><br><span class="line">  process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"fn3"</span>));</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+<p>由于fn4紧跟着fn，所以在 timers 阶段完成后，就执行了fn4（注意fn4不会放进 timers 的队列，而是在队列里函数执行完后，紧跟着执行 fn4），所以最终顺序为：</p>
+<p>fn3, fn2, fn, fn4</p>
+<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"setImmediate1"</span>);</span><br><span class="line">        setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">"setTimeout1"</span>);</span><br><span class="line">        &#125;, <span class="number">0</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"setTimeout2"</span>);</span><br><span class="line">        setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">"setImmediate2"</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557161095157-995c2300-118f-4277-88ec-11d3aa6ba01e.png?x-oss-process=image/resize,w_1170" alt="image.png"></p>
+<p>执行第2行 setImmediate 后，把 setImmediate 中的函数 f1 放进 check 中（此刻不执行f1），然后执行第9行的 setTimeout ，把 setTimeout 中的函数 f2 放进 timers 中（此刻也不执行f2），然后进入poll阶段等待，发现有f1待执行，所以执行f1，打印 setImmediate1 ，接着把 f3 放进 timers 的队列。此刻check阶段完成，重回 timers 阶段，发现队列中的 f2，执行 f2，打印 setTimeout2 ，接着把 f4 扔进 check 队列，然后执行 f3， 打印 setTimeout1 ，执行完后，进入 poll 阶段，发现有 f4 没执行，进入 check 阶段，执行f4，所以最后打印 setImmediate2 。</p>
+<h2 id="宏任务-amp-微任务"><a href="#宏任务-amp-微任务" class="headerlink" title="宏任务&amp;微任务"></a>宏任务&amp;微任务</h2><h3 id="Event-Loop"><a href="#Event-Loop" class="headerlink" title="Event Loop"></a>Event Loop</h3><h4 id="NodeJS："><a href="#NodeJS：" class="headerlink" title="NodeJS："></a>NodeJS：</h4><ul>
+<li>timers（setTimeout）</li>
+<li>poll</li>
+<li>check（setImmediate）</li>
+</ul>
+<p><strong>注意：</strong>nextTick不属于任何阶段，但会在当前阶段后执行</p>
+<p>如果强行问NodeJS中的宏任务微任务，那就是：</p>
+<p>setTimeout和setImmediate是宏任务，nextTick是微任务。因为nextTick不用等到下个阶段，会在当前阶段完成后立即执行。</p>
+<p>还有个 promise.then(fn)【注意是小写的p，大写的P不能直接then】，一般不考。Node中的 promise.then 一般是用 nextTick 实现的，所以也按照当前阶段的后面来推。这里then里面的fn不是马上放队列（setTImeout，setImmediate和nextTick都是里面的fn马上放队列），而是当你resolve以后，才放进当前阶段的后面执行。</p>
+<h4 id="chrome："><a href="#chrome：" class="headerlink" title="chrome："></a>chrome：</h4><ul>
+<li>宏任务（一会儿）setTimeout</li>
+<li>微任务（马上）.then(fn) <strong>fn放马上</strong></li>
+<li>一会儿就是等会做，马上就是立即做；如果一会儿里面有个马上做的，还是马上做。</li>
+</ul>
+<p><strong>注意：</strong></p>
+<ol>
+<li>遇到 await 把它转为 promise 再看，因为 await 本来就是 promise 的语法糖。</li>
+<li>new Promise 是立即执行的，.then 才是微任务。</li>
+</ol>
+<h3 id="面试题-1"><a href="#面试题-1" class="headerlink" title="面试题"></a>面试题</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">await</span> async2();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">3</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">5</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p><strong>画图！！！不画图做不出来！！！</strong></p>
+<p>代码从上到下，先执行 11 行 async1，进入 async1，<strong>先打印1</strong>。遇到 await 转为 promise =&gt;</p>
+<p><code>async2(() =&gt; console.log(3)).then(() =&gt; console.log(2));</code></p>
+<p>（<strong>await后面所有代码都属于then当中的，</strong>比如第4行后面加个console.log(“233”)，那么此行代码也属于then）而 async2 本身的代码会被立即执行，<strong>所以打印第8行中的3</strong>。打印完后<strong>执行 then （</strong>执行then其实是需要resolve的，但async会去看你函数中有没有resolve，如果没有会自动加上resolve，相当于async帮你干了这样一件事：<strong>Promise.resolve(</strong>async2()<strong>)</strong>.then(f1)<strong>）</strong>，<strong>then就是放队列</strong>，我们把 <code>console.log(2)</code> 记做任务 f1 放进「马上」中去，但此刻不执行。此刻 async1 彻底执行完了。</p>
+<p>接着执行 13 行的 new Promise，14 到 15 行代码会被立即执行（new Promise中的函数会被立即执行，没有什么宏任务微任务，就相当于裸写14到15行代码），<strong>所以打印4</strong>。在执行完14行resolve的时候，<strong>会指明执行then后面的第一个函数，而不是第二个函数（reject时所执行的）</strong>，也就是17行代码的任务也放进「马上」中去，该任务记做 f2 ，至此当前代码全部执行完毕，然后看「马上」中的任务，执行 f1，<strong>打印2</strong>。接着执行 f2， <strong>打印5</strong>。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557196480913-01adc892-bd3a-4638-a401-12372511956e.png" alt="image.png"></p>
+<p><strong>注意点</strong>：上面的 resolve 只是决定执行then里面的成功回调函数，并不决定加入队列。<strong>决定加入队列的是 then。</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>宏任务（一会儿）：setTimeout，setInterval，setImmediate（优先级比前两个高，因为是在check阶段）</p>
+<p>微任务（马上）：promise.then，process.nextTick</p>
+<p>宏任务微任务执行顺序：有微任务先执行微任务，微任务都执行完了，再执行宏任务</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1557198825204-924929ec-1115-4e21-a771-cf18796f8f15.png?x-oss-process=image/resize,w_984" alt="image.png"></p>
 
       
     </div>
@@ -484,7 +561,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/ES6/" rel="tag"><i class="fa fa-tag"></i> ES6</a>
+            <a href="/tags/Node/" rel="tag"><i class="fa fa-tag"></i> Node</a>
+          
+            <a href="/tags/EventLoop/" rel="tag"><i class="fa fa-tag"></i> EventLoop</a>
           
         </div>
       
@@ -497,8 +576,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/2751/" rel="next" title="JS中如何实现继承">
-                <i class="fa fa-chevron-left"></i> JS中如何实现继承
+              <a href="/posts/61492/" rel="next" title="Event Loop、计时器、nextTick（转载）">
+                <i class="fa fa-chevron-left"></i> Event Loop、计时器、nextTick（转载）
               </a>
             
           </div>
@@ -507,8 +586,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/37021/" rel="prev" title="let和const和var的区别">
-                let和const和var的区别 <i class="fa fa-chevron-right"></i>
+              <a href="/posts/41624/" rel="prev" title="网站性能优化">
+                网站性能优化 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -639,7 +718,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-REST-参数"><span class="nav-number">1.</span> <span class="nav-text">什么是 REST 参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例说明"><span class="nav-number">2.</span> <span class="nav-text">示例说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rest-参数和-arguments-对象的区别"><span class="nav-number">3.</span> <span class="nav-text">rest 参数和 arguments 对象的区别</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#timers-和-poll"><span class="nav-number">1.</span> <span class="nav-text">timers 和 poll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check"><span class="nav-number">2.</span> <span class="nav-text">check</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#经典考题"><span class="nav-number">3.</span> <span class="nav-text">经典考题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#process-nextTick"><span class="nav-number">4.</span> <span class="nav-text">process.nextTick()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题"><span class="nav-number">5.</span> <span class="nav-text">面试题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#宏任务-amp-微任务"><span class="nav-number">6.</span> <span class="nav-text">宏任务&amp;微任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Event-Loop"><span class="nav-number">6.1.</span> <span class="nav-text">Event Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NodeJS："><span class="nav-number">6.1.1.</span> <span class="nav-text">NodeJS：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chrome："><span class="nav-number">6.1.2.</span> <span class="nav-text">chrome：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题-1"><span class="nav-number">6.2.</span> <span class="nav-text">面试题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
             
 
           </div>
