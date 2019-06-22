@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="安装 Nginx终端键入以下命令： 12sudo apt updatesudo apt install nginx 安装完成后查看版本： 1sudo nginx -v 输出： 1nginx version: nginx/1.14.0 (Ubuntu) 配置防火墙如果你服务器打开了防火墙，则还需要打开端口80和443。然后键入： 1sudo ufw allow &apos;Nginx Full&apos; 你可以通过下">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-22T02:32:09.128Z">
+<meta property="og:updated_time" content="2019-06-22T02:44:34.136Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ubuntu下nginx基本使用">
 <meta name="twitter:description" content="安装 Nginx终端键入以下命令： 12sudo apt updatesudo apt install nginx 安装完成后查看版本： 1sudo nginx -v 输出： 1nginx version: nginx/1.14.0 (Ubuntu) 配置防火墙如果你服务器打开了防火墙，则还需要打开端口80和443。然后键入： 1sudo ufw allow &apos;Nginx Full&apos; 你可以通过下">
@@ -400,7 +400,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1k
+                  1.1k
                 </span>
               
 
@@ -489,6 +489,20 @@
 <p>在阿里云的控制台中找到域名管理，然后选择顶级域名 evelance.cn 后面的“解析”字样。在新打开的页面中我们可以看到一个提供域名解析的界面，选择解析类型为A类解析，然后输入 mall（我们想要的二级域名的头），然后在地址里面输入我们刚才查看到的ECS的公网ip，然后点击确认，之后我们的解析就会生效了。</p>
 <h2 id="使用-Nginx-反向代理"><a href="#使用-Nginx-反向代理" class="headerlink" title="使用 Nginx 反向代理"></a>使用 Nginx 反向代理</h2><p>仍然以 <code>test</code> 文件为例，示例配置如下：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 8001;</span><br><span class="line">  listen [::]:8001;</span><br><span class="line"></span><br><span class="line">  server_name nginx.evelance.cn;</span><br><span class="line"></span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass http://www.bilibili.com;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Nginx-适配PC和移动设备"><a href="#Nginx-适配PC和移动设备" class="headerlink" title="Nginx 适配PC和移动设备"></a>Nginx 适配PC和移动设备</h2><ol>
+<li><p>在 <code>/var/www/</code> 目录下新建两个文件夹，分别为：<code>pc</code> 和 <code>mobile</code> 目录：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /var/www</span><br><span class="line">mkdir pc</span><br><span class="line">mkdir mobile</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>分别在两个目录下新建 <code>index.html</code> 文件并对应键入下面文字以示区分：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>我是PC<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>我是Mobile<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进入 <code>/etc/nginx/sites-enabled/</code> 目录，还是以 <code>test</code> 文件作为示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 8001;</span><br><span class="line">  listen [::]:8001;</span><br><span class="line"></span><br><span class="line">  server_name nginx.evelance.cn;</span><br><span class="line"></span><br><span class="line">  location / &#123;</span><br><span class="line">    root /var/www/pc;</span><br><span class="line">    if ($http_user_agent ~* '(Android|webOS|iPhone|iPod|BlackBerry)') &#123;</span><br><span class="line">      root /var/www/mobile;</span><br><span class="line">    &#125;</span><br><span class="line">    index index.html;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重启 nginx ：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx -s quit</span><br><span class="line">nginx</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
 
       
     </div>
@@ -686,7 +700,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Nginx"><span class="nav-number">1.</span> <span class="nav-text">安装 Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置防火墙"><span class="nav-number">2.</span> <span class="nav-text">配置防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试安装"><span class="nav-number">3.</span> <span class="nav-text">测试安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用systemctl管理Nginx服务"><span class="nav-number">4.</span> <span class="nav-text">使用systemctl管理Nginx服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置404"><span class="nav-number">5.</span> <span class="nav-text">配置404</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭自启服务，比如打印机"><span class="nav-number">6.</span> <span class="nav-text">关闭自启服务，比如打印机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置虚拟主机："><span class="nav-number">7.</span> <span class="nav-text">配置虚拟主机：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于端口号的配置"><span class="nav-number">7.1.</span> <span class="nav-text">基于端口号的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于IP的配置"><span class="nav-number">7.2.</span> <span class="nav-text">基于IP的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于域名的配置"><span class="nav-number">7.3.</span> <span class="nav-text">基于域名的配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Nginx-反向代理"><span class="nav-number">8.</span> <span class="nav-text">使用 Nginx 反向代理</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Nginx"><span class="nav-number">1.</span> <span class="nav-text">安装 Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置防火墙"><span class="nav-number">2.</span> <span class="nav-text">配置防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试安装"><span class="nav-number">3.</span> <span class="nav-text">测试安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用systemctl管理Nginx服务"><span class="nav-number">4.</span> <span class="nav-text">使用systemctl管理Nginx服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置404"><span class="nav-number">5.</span> <span class="nav-text">配置404</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭自启服务，比如打印机"><span class="nav-number">6.</span> <span class="nav-text">关闭自启服务，比如打印机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置虚拟主机："><span class="nav-number">7.</span> <span class="nav-text">配置虚拟主机：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于端口号的配置"><span class="nav-number">7.1.</span> <span class="nav-text">基于端口号的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于IP的配置"><span class="nav-number">7.2.</span> <span class="nav-text">基于IP的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于域名的配置"><span class="nav-number">7.3.</span> <span class="nav-text">基于域名的配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Nginx-反向代理"><span class="nav-number">8.</span> <span class="nav-text">使用 Nginx 反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-适配PC和移动设备"><span class="nav-number">9.</span> <span class="nav-text">Nginx 适配PC和移动设备</span></a></li></ol></div>
             
 
           </div>
@@ -727,7 +741,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">114k</span>
+    <span title="Site words total count">114.2k</span>
   
 </div>
 
