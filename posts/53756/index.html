@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-11T08:02:26.173Z">
+<meta property="og:updated_time" content="2019-07-25T15:06:37.044Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue面试题（面试系列）">
 <meta name="twitter:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.9k
+                  2.1k
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  7
+                  8
                 </span>
               
             </div>
@@ -542,8 +542,11 @@
 <li>组件内守卫：beforeRouteEnter【唯一next有回调】, Update, Leave</li>
 </ul>
 <h4 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h4><ul>
-<li>全局守卫：beforeEach（用户登录以及权限判定）</li>
-<li>组件内守卫：beforeRouteEnter（根据用户从何而来，修改当前组件标题）  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 详情页组件</span></span><br><span class="line">beforeRouteEnter(to, <span class="keyword">from</span>, next) &#123;</span><br><span class="line">    <span class="keyword">let</span> title = <span class="string">''</span>;</span><br><span class="line">    title = <span class="keyword">from</span>.name === <span class="string">'news.list'</span> ? <span class="string">'新闻详情'</span> : <span class="string">'商品详情'</span>;</span><br><span class="line">    <span class="comment">// 一定要调用 next ，否则无法从列表页跳转到详情页</span></span><br><span class="line">    next(<span class="function"><span class="params">vm</span> =&gt;</span> vm.title = title) <span class="comment">// 通过 vm 访问组件实例</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><p>全局守卫：beforeEach（用户登录以及权限判定）</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> isLogin = localStroage.token</span><br><span class="line">  <span class="comment">// 个人中心需要登录</span></span><br><span class="line">  <span class="keyword">if</span> (to.name === <span class="string">'Member'</span>) &#123;</span><br><span class="line">    isLogin ? next() : next(<span class="string">'/login'</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    next()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>组件内守卫：beforeRouteEnter（根据用户从何而来，修改当前组件标题）</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 详情页组件</span></span><br><span class="line">beforeRouteEnter(to, <span class="keyword">from</span>, next) &#123;</span><br><span class="line">    <span class="keyword">let</span> title = <span class="string">''</span></span><br><span class="line">    title = <span class="keyword">from</span>.name === <span class="string">'news.list'</span> ? <span class="string">'新闻详情'</span> : <span class="string">'商品详情'</span></span><br><span class="line">    <span class="comment">// 一定要调用 next ，否则无法从列表页跳转到详情页</span></span><br><span class="line">    next(<span class="function"><span class="params">vm</span> =&gt;</span> vm.title = title) <span class="comment">// 通过 vm 访问组件实例</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h2 id="你是如何使用插槽的？"><a href="#你是如何使用插槽的？" class="headerlink" title="你是如何使用插槽的？"></a>你是如何使用插槽的？</h2><ul>
@@ -555,6 +558,12 @@
 <h2 id="nextTick的更新原理"><a href="#nextTick的更新原理" class="headerlink" title="nextTick的更新原理"></a>nextTick的更新原理</h2><p>Vue 在修改数据后，视图不会立刻更新，而是等同一事件循环中的所有数据变化完成之后，再统一进行视图更新。</p>
 <p>nextTick的回调函数会等到同步任务执行完毕，DOM更新后才触发。</p>
 <p>阅读更多：<a href="https://segmentfault.com/a/1190000012861862" target="_blank" rel="noopener">Vue.nextTick 的原理和用途</a></p>
+<h2 id="在列表组件中添加-key-属性的作用？"><a href="#在列表组件中添加-key-属性的作用？" class="headerlink" title="在列表组件中添加 key 属性的作用？"></a>在列表组件中添加 key 属性的作用？</h2><p>key的主要作用是为了高效的更新虚拟 DOM。另外如果给列表组件设置了过渡效果，不添加key属性会导致过渡效果无法触发。</p>
+<p>阅读更多：</p>
+<ul>
+<li><a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/1" target="_blank" rel="noopener">写 React / Vue 项目时为什么要在列表组件中写 key，其作用是什么？</a></li>
+<li><a href="https://www.zhihu.com/question/61064119/answer/183717717" target="_blank" rel="noopener">Vue2.0 v-for 中 :key 到底有什么用？</a></li>
+</ul>
 <h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><h3 id="谈谈你对-MVVM-开发模式的理解"><a href="#谈谈你对-MVVM-开发模式的理解" class="headerlink" title="谈谈你对 MVVM 开发模式的理解"></a>谈谈你对 MVVM 开发模式的理解</h3><ul>
 <li>Model 数据模型层，保存页面中的数据</li>
 <li>View 视图层，页面数据的展示；</li>
@@ -764,7 +773,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.1.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#v-if-vs-v-show"><span class="nav-number">4.</span> <span class="nav-text">v-if vs v-show</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">10.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">10.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.1.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#v-if-vs-v-show"><span class="nav-number">4.</span> <span class="nav-text">v-if vs v-show</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在列表组件中添加-key-属性的作用？"><span class="nav-number">10.</span> <span class="nav-text">在列表组件中添加 key 属性的作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">11.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">11.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -805,7 +814,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">126.9k</span>
+    <span title="Site words total count">127k</span>
   
 </div>
 
