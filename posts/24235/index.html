@@ -88,18 +88,18 @@
 
 
 
-<meta name="description" content="讲一下 JS 垃圾回收机制这部分可参考我的博客：JS垃圾回收机制 那些操作会造成内存泄漏？❌内存泄漏指任何对象在您不再拥有或需要它之后仍然存在。 垃圾回收器定期扫描对象，并计算引用了每个对象的其他对象的数量。如果一个对象的引用数量为 0（没有其他对象引用过该对象），或对该对象的惟一引用是循环的，那么该对象的内存即可回收。 setTimeout 的第一个参数使用字符串而非函数的话，会引发内存泄漏。">
+<meta name="description" content="ES6let / const全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 window/global 就好： 12345let a">
 <meta name="keywords" content="面试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JS面试题（面试系列）">
 <meta property="og:url" content="https://evestorm.github.io/posts/24235/index.html">
 <meta property="og:site_name" content="EVE">
-<meta property="og:description" content="讲一下 JS 垃圾回收机制这部分可参考我的博客：JS垃圾回收机制 那些操作会造成内存泄漏？❌内存泄漏指任何对象在您不再拥有或需要它之后仍然存在。 垃圾回收器定期扫描对象，并计算引用了每个对象的其他对象的数量。如果一个对象的引用数量为 0（没有其他对象引用过该对象），或对该对象的惟一引用是循环的，那么该对象的内存即可回收。 setTimeout 的第一个参数使用字符串而非函数的话，会引发内存泄漏。">
+<meta property="og:description" content="ES6let / const全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 window/global 就好： 12345let a">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-11T08:02:26.170Z">
+<meta property="og:updated_time" content="2019-07-26T02:21:39.129Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JS面试题（面试系列）">
-<meta name="twitter:description" content="讲一下 JS 垃圾回收机制这部分可参考我的博客：JS垃圾回收机制 那些操作会造成内存泄漏？❌内存泄漏指任何对象在您不再拥有或需要它之后仍然存在。 垃圾回收器定期扫描对象，并计算引用了每个对象的其他对象的数量。如果一个对象的引用数量为 0（没有其他对象引用过该对象），或对该对象的惟一引用是循环的，那么该对象的内存即可回收。 setTimeout 的第一个参数使用字符串而非函数的话，会引发内存泄漏。">
+<meta name="twitter:description" content="ES6let / const全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 window/global 就好： 12345let a">
 
 
 
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  225
+                  358
                 </span>
               
 
@@ -426,7 +426,10 @@
       
 
       
-        <h2 id="讲一下-JS-垃圾回收机制"><a href="#讲一下-JS-垃圾回收机制" class="headerlink" title="讲一下 JS 垃圾回收机制"></a>讲一下 JS 垃圾回收机制</h2><p>这部分可参考我的博客：<a href="https://evestorm.github.io/posts/20229/">JS垃圾回收机制</a></p>
+        <h2 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h2><h3 id="let-const"><a href="#let-const" class="headerlink" title="let / const"></a>let / const</h3><h4 id="全局作用域中，用-const-和-let-声明的变量不在-window-上，那到底在哪里？如何去获取？"><a href="#全局作用域中，用-const-和-let-声明的变量不在-window-上，那到底在哪里？如何去获取？" class="headerlink" title="全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？"></a>全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？</h4><p>ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 <code>window/global</code> 就好：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> aa = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">const</span> bb = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(aa); <span class="comment">// 1</span></span><br><span class="line"><span class="built_in">console</span>.log(bb); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p>答案链接：<a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/30" target="_blank" rel="noopener">关于 const 和 let 声明的变量不在 window 上</a></p>
+<h2 id="讲一下-JS-垃圾回收机制"><a href="#讲一下-JS-垃圾回收机制" class="headerlink" title="讲一下 JS 垃圾回收机制"></a>讲一下 JS 垃圾回收机制</h2><p>这部分可参考我的博客：<a href="https://evestorm.github.io/posts/20229/">JS垃圾回收机制</a></p>
 <h2 id="那些操作会造成内存泄漏？❌"><a href="#那些操作会造成内存泄漏？❌" class="headerlink" title="那些操作会造成内存泄漏？❌"></a>那些操作会造成内存泄漏？❌</h2><p>内存泄漏指任何对象在您不再拥有或需要它之后仍然存在。</p>
 <p>垃圾回收器定期扫描对象，并计算引用了每个对象的其他对象的数量。如果一个对象的引用数量为 0（没有其他对象引用过该对象），或对该对象的惟一引用是循环的，那么该对象的内存即可回收。</p>
 <p>setTimeout 的第一个参数使用字符串而非函数的话，会引发内存泄漏。</p>
@@ -632,7 +635,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-JS-垃圾回收机制"><span class="nav-number">1.</span> <span class="nav-text">讲一下 JS 垃圾回收机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那些操作会造成内存泄漏？❌"><span class="nav-number">2.</span> <span class="nav-text">那些操作会造成内存泄漏？❌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写一个函数判断是否存在循环引用-❌"><span class="nav-number">2.1.</span> <span class="nav-text">写一个函数判断是否存在循环引用 ❌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何统计用户的点击量-❌"><span class="nav-number">2.2.</span> <span class="nav-text">如何统计用户的点击量 ❌</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6"><span class="nav-number">1.</span> <span class="nav-text">ES6</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#let-const"><span class="nav-number">1.1.</span> <span class="nav-text">let / const</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#全局作用域中，用-const-和-let-声明的变量不在-window-上，那到底在哪里？如何去获取？"><span class="nav-number">1.1.1.</span> <span class="nav-text">全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-JS-垃圾回收机制"><span class="nav-number">2.</span> <span class="nav-text">讲一下 JS 垃圾回收机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那些操作会造成内存泄漏？❌"><span class="nav-number">3.</span> <span class="nav-text">那些操作会造成内存泄漏？❌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写一个函数判断是否存在循环引用-❌"><span class="nav-number">3.1.</span> <span class="nav-text">写一个函数判断是否存在循环引用 ❌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何统计用户的点击量-❌"><span class="nav-number">3.2.</span> <span class="nav-text">如何统计用户的点击量 ❌</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -673,7 +676,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">127.4k</span>
+    <span title="Site words total count">127.8k</span>
   
 </div>
 
