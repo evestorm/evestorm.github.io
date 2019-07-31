@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-07-30T03:10:31.620Z">
+<meta property="og:updated_time" content="2019-07-31T03:26:48.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue面试题（面试系列）">
 <meta name="twitter:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.3k
+                  2.9k
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  8
+                  11
                 </span>
               
             </div>
@@ -579,6 +579,35 @@
 <p>M 数据改变 =&gt;VM =&gt; 触发 View 更新</p>
 <p>V 用户操作 =&gt; VM =&gt; M 数据同步更新</p>
 <p>开发者只需要专注对数据的维护操作即可，而不需要自己操作 dom 。</p>
+<h3 id="请你讲一下Vue项目中使用token登录的具体流程"><a href="#请你讲一下Vue项目中使用token登录的具体流程" class="headerlink" title="请你讲一下Vue项目中使用token登录的具体流程"></a>请你讲一下Vue项目中使用token登录的具体流程</h3><p>对 token 完全不了解的同学可以查看我博客中转载的 <a href="https://evestorm.github.io/posts/29493/">这篇文章</a> 。</p>
+<p>不想看长篇大论的我这里简单描述下基于 token 身份验证的整个流程：</p>
+<ol>
+<li>用户通过账户名和密码发送登录请求</li>
+<li>服务端对账户的有效性进行验证</li>
+<li>验证成功后再利用「密钥」和「加密算法」（如：HMAC-SHA256）对「用户数据」（如账号信息）做一个签名的 token 返回给客户端</li>
+<li>客户端本地存储 token ，并在每次请求的 header 中带上 token</li>
+<li>服务端验证 token 并返回数据</li>
+</ol>
+<p>对于 Vue 项目来说，具体流程如下：</p>
+<ol>
+<li>客户端：登录页带上用户名和密码请求登录接口</li>
+<li>服务端：接收请求并在数据库中查询账户的有效性</li>
+<li>服务端：查询通过后利用「密钥」和「加密算法」对「用户数据」做签名 token 并返回给客户端此 token （此 token 有时效性）</li>
+<li>客户端：本地存储 token（如 localStorage + Vuex）</li>
+<li>客户端：每次路由跳转前都要判断 localStorage 是否存在 token ，有则正常跳转，无则跳转回登录页</li>
+<li>客户端：每次发送请求时，在 Axios 请求头里携带上 token</li>
+<li>服务端：接收请求并判断请求头有无 token ，有且 token 没有过期，正常返回数据；无或 token 失效返回 401 状态码</li>
+<li>客户端：一旦发现 401 则重定向到登录页</li>
+</ol>
+<p>一般回答完毕后面试官还会追问一些细节，这里列举两个常问的：</p>
+<ol>
+<li><p>你是如何利用 Axios 实现携带 token 以及 401 状态码判定的？</p>
+<p> 利用 Axios 的请求/响应拦截。使用 <code>axios.interceptors.request.use</code> 进行请求拦截，判断 localStorage 是否有 token ，有则在请求头里携带 token 。使用 <code>axios.interceptors.response.use</code> 进行响应拦截，判断 response.status 是否为 401 ，是则代表 token 失效，清空本地 token ，跳转登录页</p>
+</li>
+<li><p>你是如何监控路由跳转，并在没有 token 时跳转回登录页的？</p>
+<p> 使用 Vue Router 的全局路由守卫 router.beforeEach ，该方法接收三个参数：to、from 和 next ，如果用户访问的是不需要登录就能访问的页面（如 to.path === ‘/login’），则直接跳转。否则判断本地是否有 token ，有则调用 next() ，无则 next(‘/login’) 跳转回登录页</p>
+</li>
+</ol>
 
       
     </div>
@@ -780,7 +809,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.1.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#v-if-vs-v-show"><span class="nav-number">4.</span> <span class="nav-text">v-if vs v-show</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的响应式原理中-Object-defineProperty-有什么缺陷？为什么在-Vue3-0-采用了-Proxy，抛弃了-Object-defineProperty？"><span class="nav-number">5.3.</span> <span class="nav-text">Vue 的响应式原理中 Object.defineProperty 有什么缺陷？为什么在 Vue3.0 采用了 Proxy，抛弃了 Object.defineProperty？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在列表组件中添加-key-属性的作用？"><span class="nav-number">10.</span> <span class="nav-text">在列表组件中添加 key 属性的作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Vue-中，子组件为何不可以修改父组件传递的-Prop"><span class="nav-number">11.</span> <span class="nav-text">在 Vue 中，子组件为何不可以修改父组件传递的 Prop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">12.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">12.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.1.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#v-if-vs-v-show"><span class="nav-number">4.</span> <span class="nav-text">v-if vs v-show</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的响应式原理中-Object-defineProperty-有什么缺陷？为什么在-Vue3-0-采用了-Proxy，抛弃了-Object-defineProperty？"><span class="nav-number">5.3.</span> <span class="nav-text">Vue 的响应式原理中 Object.defineProperty 有什么缺陷？为什么在 Vue3.0 采用了 Proxy，抛弃了 Object.defineProperty？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在列表组件中添加-key-属性的作用？"><span class="nav-number">10.</span> <span class="nav-text">在列表组件中添加 key 属性的作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Vue-中，子组件为何不可以修改父组件传递的-Prop"><span class="nav-number">11.</span> <span class="nav-text">在 Vue 中，子组件为何不可以修改父组件传递的 Prop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">12.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">12.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请你讲一下Vue项目中使用token登录的具体流程"><span class="nav-number">12.2.</span> <span class="nav-text">请你讲一下Vue项目中使用token登录的具体流程</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -821,7 +850,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">130.1k</span>
+    <span title="Site words total count">130.7k</span>
   
 </div>
 
