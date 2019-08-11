@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="ES6let / const全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 window/global 就好： 12345let a">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-07-30T06:55:09.907Z">
+<meta property="og:updated_time" content="2019-08-11T14:36:15.655Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JS面试题（面试系列）">
 <meta name="twitter:description" content="ES6let / const全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？ES6规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 window/global 就好： 12345let a">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  636
+                  1.3k
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  4
                 </span>
               
             </div>
@@ -441,7 +441,42 @@
 <p>new 过程大致是这样的：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">newFunc</span>(<span class="params">father, ...rest</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> result = &#123;&#125;;</span><br><span class="line">  result.__proto__ = father.prototype;</span><br><span class="line">  <span class="keyword">var</span> result2 = father.apply(result, rest);</span><br><span class="line">  <span class="keyword">if</span> (</span><br><span class="line">    (<span class="keyword">typeof</span> result2 === <span class="string">'object'</span> || <span class="keyword">typeof</span> result2 === <span class="string">'function'</span>) &amp;&amp;</span><br><span class="line">    result2 !== <span class="literal">null</span></span><br><span class="line">  ) &#123;</span><br><span class="line">    <span class="keyword">return</span> result2;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>题目来源：<a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/101" target="_blank" rel="noopener">Daily-Interview-Question 第58题</a></p>
-<h2 id="讲一下-JS-垃圾回收机制"><a href="#讲一下-JS-垃圾回收机制" class="headerlink" title="讲一下 JS 垃圾回收机制"></a>讲一下 JS 垃圾回收机制</h2><p>这部分可参考我的博客：<a href="https://evestorm.github.io/posts/20229/">JS垃圾回收机制</a></p>
+<h2 id="JS-垃圾回收机制"><a href="#JS-垃圾回收机制" class="headerlink" title="JS 垃圾回收机制"></a>JS 垃圾回收机制</h2><h3 id="谈谈垃圾回收机制的方式及内存管理？"><a href="#谈谈垃圾回收机制的方式及内存管理？" class="headerlink" title="谈谈垃圾回收机制的方式及内存管理？"></a>谈谈垃圾回收机制的方式及内存管理？</h3><p><strong>一、垃圾回收机制——GC</strong></p>
+<p>Javascript 具有自动垃圾回收机制（GC：Garbage Collecation），也就是说，执行环境会负责管理代码执行过程中使用的内存。</p>
+<p>原理：垃圾收集器会定期（周期性）找出那些不在继续使用的变量，然后释放其内存。</p>
+<p>通常情况下有两种实现方式：</p>
+<ul>
+<li>标记清除</li>
+<li>引用计数</li>
+</ul>
+<p><strong>标记清除</strong>： js 中最常用的垃圾回收方式就是标记清除。</p>
+<p>当变量进入环境时，例如，在函数中声明一个变量，就将这个变量标记为“进入环境”。从逻辑上讲，永远不能释放进入环境的变量所占用的内存，因为只要执行流进入相应的环境，就可能会用到它们。而当变量离开环境时，则将其标记为“离开环境”。</p>
+<p><strong>引用计数</strong>的含义是跟踪记录每个值被引用的次数。</p>
+<p>当声明了一个变量并将一个引用类型值赋给该变量时，则这个值的引用次数就是 1。如果同一个值又被赋给另一个变量，则该值的引用次数加 1。相反，如果包含对这个值引用的变量又取得了另外一个值，则这个值的引用次数减 1。当这个值的引用次数变成 0 时，则说明没有办法再访问这个值了，因而就可以将其占用的内存空间回收回来。这样，当垃圾回收器下次再运行时，它就会释放那些引用次数为 0 的值所占用的内存。</p>
+<p><strong>二、内存管理</strong></p>
+<ol>
+<li><p>Javascript 引擎基础 GC 方案是</p>
+<p>（simple GC）：mark and sweep（标记清除），即：</p>
+<p>1）遍历所有可访问的对象；</p>
+<p>2）回收已不可访问的对象。</p>
+</li>
+<li><p>GC 的缺陷</p>
+<p>和其他语言一样，JavaScript 的 GC 策略也无法避免一个问题：GC 时，停止响应其他操作，这是为了安全考虑。而 Javascript 的 GC 在 100ms 甚至以上，对一般的应用还好，但对于 JS 游戏，动画对连贯性要求比较高的应用，就麻烦了。这就是新引擎需要优化的点：避免 GC 造成的长时间停止响应。</p>
+</li>
+<li><p>GC 优化策略</p>
+<ul>
+<li><p>1）分代回收（Generation GC）</p>
+<p>这个和 Java 回收策略思想是一致的。目的是通过区分“临时”与“持久”对象；多回收“临时对象”区（young generation），少回收“持久对象”区（tenured generation），减少每次需遍历的对象，从而减少每次 GC 的耗时。</p>
+</li>
+<li><p>2）增量 GC</p>
+<p>这个方案的思想很简单，就是“每次处理一点，下次再处理一点”，如此类推。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="更多阅读"><a href="#更多阅读" class="headerlink" title="更多阅读"></a>更多阅读</h3><ul>
+<li><a href="https://evestorm.github.io/posts/20229/">JS垃圾回收机制</a></li>
+</ul>
 <h2 id="那些操作会造成内存泄漏？❌"><a href="#那些操作会造成内存泄漏？❌" class="headerlink" title="那些操作会造成内存泄漏？❌"></a>那些操作会造成内存泄漏？❌</h2><p>内存泄漏指任何对象在您不再拥有或需要它之后仍然存在。</p>
 <p>垃圾回收器定期扫描对象，并计算引用了每个对象的其他对象的数量。如果一个对象的引用数量为 0（没有其他对象引用过该对象），或对该对象的惟一引用是循环的，那么该对象的内存即可回收。</p>
 <p>setTimeout 的第一个参数使用字符串而非函数的话，会引发内存泄漏。</p>
@@ -647,7 +682,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6"><span class="nav-number">1.</span> <span class="nav-text">ES6</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#let-const"><span class="nav-number">1.1.</span> <span class="nav-text">let / const</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#全局作用域中，用-const-和-let-声明的变量不在-window-上，那到底在哪里？如何去获取？"><span class="nav-number">1.1.1.</span> <span class="nav-text">全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#箭头函数"><span class="nav-number">1.2.</span> <span class="nav-text">箭头函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用-new-生成实例，那么箭头函数可以吗？为什么？"><span class="nav-number">1.2.1.</span> <span class="nav-text">箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用 new 生成实例，那么箭头函数可以吗？为什么？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-JS-垃圾回收机制"><span class="nav-number">2.</span> <span class="nav-text">讲一下 JS 垃圾回收机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那些操作会造成内存泄漏？❌"><span class="nav-number">3.</span> <span class="nav-text">那些操作会造成内存泄漏？❌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写一个函数判断是否存在循环引用-❌"><span class="nav-number">3.1.</span> <span class="nav-text">写一个函数判断是否存在循环引用 ❌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何统计用户的点击量-❌"><span class="nav-number">3.2.</span> <span class="nav-text">如何统计用户的点击量 ❌</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6"><span class="nav-number">1.</span> <span class="nav-text">ES6</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#let-const"><span class="nav-number">1.1.</span> <span class="nav-text">let / const</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#全局作用域中，用-const-和-let-声明的变量不在-window-上，那到底在哪里？如何去获取？"><span class="nav-number">1.1.1.</span> <span class="nav-text">全局作用域中，用 const 和 let 声明的变量不在 window 上，那到底在哪里？如何去获取？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#箭头函数"><span class="nav-number">1.2.</span> <span class="nav-text">箭头函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用-new-生成实例，那么箭头函数可以吗？为什么？"><span class="nav-number">1.2.1.</span> <span class="nav-text">箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用 new 生成实例，那么箭头函数可以吗？为什么？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JS-垃圾回收机制"><span class="nav-number">2.</span> <span class="nav-text">JS 垃圾回收机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈垃圾回收机制的方式及内存管理？"><span class="nav-number">2.1.</span> <span class="nav-text">谈谈垃圾回收机制的方式及内存管理？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.2.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那些操作会造成内存泄漏？❌"><span class="nav-number">3.</span> <span class="nav-text">那些操作会造成内存泄漏？❌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写一个函数判断是否存在循环引用-❌"><span class="nav-number">3.1.</span> <span class="nav-text">写一个函数判断是否存在循环引用 ❌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何统计用户的点击量-❌"><span class="nav-number">3.2.</span> <span class="nav-text">如何统计用户的点击量 ❌</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -688,7 +723,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">133.7k</span>
+    <span title="Site words total count">134.4k</span>
   
 </div>
 
