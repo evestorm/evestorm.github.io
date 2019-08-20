@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-19T06:34:06.681Z">
+<meta property="og:updated_time" content="2019-08-20T13:56:51.452Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue面试题（面试系列）">
 <meta name="twitter:description" content="watch 和 computed 区别 watch 是监听动作，computed 是计算属性 computed 有缓存，只在属性变化的时候才去计算。watch 没缓存，只要数据变化就执行  讲一下 Vue 的生命周期？创建期间的生命周期函数：  beforeCreate：实例刚在内存中被创建出来，此时，还没有初始化好 data 和 methods 属性 created：实例已经在内存中创建OK，此">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  3.5k
+                  3.7k
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  13
+                  14
                 </span>
               
             </div>
@@ -479,11 +479,23 @@
 </ul>
 </li>
 </ul>
-<h2 id="v-if-vs-v-show"><a href="#v-if-vs-v-show" class="headerlink" title="v-if vs v-show"></a>v-if vs v-show</h2><ul>
+<h2 id="vue-指令"><a href="#vue-指令" class="headerlink" title="vue 指令"></a>vue 指令</h2><h3 id="能讲下-v-if-和-v-show-的区别吗？"><a href="#能讲下-v-if-和-v-show-的区别吗？" class="headerlink" title="能讲下 v-if 和 v-show 的区别吗？"></a>能讲下 v-if 和 v-show 的区别吗？</h3><ul>
 <li>v-if: 是否加载这个元素（一次性的）</li>
 <li>v-show：控制显示方式block or none（需要切换的，侧边栏）</li>
 </ul>
 <p>因此：如果需要频繁切换 v-show 较好，如果在运行时条件不大可能改变 v-if 较好</p>
+<h3 id="v-for-你使用过程中，有遇到什么问题或者关注点吗？"><a href="#v-for-你使用过程中，有遇到什么问题或者关注点吗？" class="headerlink" title="v-for 你使用过程中，有遇到什么问题或者关注点吗？"></a><code>v-for</code> 你使用过程中，有遇到什么问题或者关注点吗？</h3><ol>
+<li>避免将 <code>v-if</code> 和 <code>v-for</code> 放在同一个元素上，因为 <code>v-for</code> 优先级比 <code>v-if</code> 更高。例如要渲染 todo 列表中未完成的任务，给 li 标签同时写上 v-for 和 v-if 后会导致每次重新渲染都得遍历整个列表。优化方案是把需要遍历的 todoList 更换为在计算属性上遍历过滤。（Vue文档有详细说明，具体见下方「阅读更多」）</li>
+<li>给 <code>v-for</code> 设置键绑定键值 <code>key</code>。理由见下。</li>
+</ol>
+<h3 id="在列表组件中添加-key-属性的作用？"><a href="#在列表组件中添加-key-属性的作用？" class="headerlink" title="在列表组件中添加 key 属性的作用？"></a>在列表组件中添加 key 属性的作用？</h3><p>key的主要作用就是在更新组件时判断两个节点是否相同。相同就复用，不相同就删除旧的创建新的。这样可以更高效的更新虚拟 DOM。</p>
+<p>另外如果给列表组件设置了过渡效果，不添加key属性会导致过渡效果无法触发。</p>
+<p>阅读更多：</p>
+<ul>
+<li><a href="https://cn.vuejs.org/v2/style-guide/#%E9%81%BF%E5%85%8D-v-if-%E5%92%8C-v-for-%E7%94%A8%E5%9C%A8%E4%B8%80%E8%B5%B7-%E5%BF%85%E8%A6%81" target="_blank" rel="noopener">避免 v-if 和 v-for 用在一起</a></li>
+<li><a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/1" target="_blank" rel="noopener">写 React / Vue 项目时为什么要在列表组件中写 key，其作用是什么？</a></li>
+<li><a href="https://www.zhihu.com/question/61064119/answer/183717717" target="_blank" rel="noopener">Vue2.0 v-for 中 :key 到底有什么用？</a></li>
+</ul>
 <h2 id="数据响应式（双向绑定）怎么做到的？"><a href="#数据响应式（双向绑定）怎么做到的？" class="headerlink" title="数据响应式（双向绑定）怎么做到的？"></a>数据响应式（双向绑定）怎么做到的？</h2><p>原理：Vue 采用 <strong>数据劫持</strong> 结合 <strong>发布者-订阅者</strong> 模式的方式，通过 <code>Object.defineProperty()</code> 来劫持各个属性的 setter 以及 getter，在数据变动时发布消息给订阅者，触发相应的监听回调。</p>
 <ol>
 <li>第一步：需要 Observe 的数据对象进行递归遍历，包括子属性对象的属性，都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。</li>
@@ -579,13 +591,6 @@
 <h2 id="nextTick的更新原理"><a href="#nextTick的更新原理" class="headerlink" title="nextTick的更新原理"></a>nextTick的更新原理</h2><p>Vue 在修改数据后，视图不会立刻更新，而是等同一事件循环中的所有数据变化完成之后，再统一进行视图更新。</p>
 <p>nextTick的回调函数会等到同步任务执行完毕，DOM更新后才触发。</p>
 <p>阅读更多：<a href="https://segmentfault.com/a/1190000012861862" target="_blank" rel="noopener">Vue.nextTick 的原理和用途</a></p>
-<h2 id="在列表组件中添加-key-属性的作用？"><a href="#在列表组件中添加-key-属性的作用？" class="headerlink" title="在列表组件中添加 key 属性的作用？"></a>在列表组件中添加 key 属性的作用？</h2><p>key的主要作用就是在更新组件时判断两个节点是否相同。相同就复用，不相同就删除旧的创建新的。这样可以更高效的更新虚拟 DOM。</p>
-<p>另外如果给列表组件设置了过渡效果，不添加key属性会导致过渡效果无法触发。</p>
-<p>阅读更多：</p>
-<ul>
-<li><a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/1" target="_blank" rel="noopener">写 React / Vue 项目时为什么要在列表组件中写 key，其作用是什么？</a></li>
-<li><a href="https://www.zhihu.com/question/61064119/answer/183717717" target="_blank" rel="noopener">Vue2.0 v-for 中 :key 到底有什么用？</a></li>
-</ul>
 <h2 id="在-Vue-中，子组件为何不可以修改父组件传递的-Prop"><a href="#在-Vue-中，子组件为何不可以修改父组件传递的-Prop" class="headerlink" title="在 Vue 中，子组件为何不可以修改父组件传递的 Prop"></a>在 Vue 中，子组件为何不可以修改父组件传递的 Prop</h2><p>因为 prop 的传递是单向数据流，这样易于监测数据的流动，出现了错误可以更加迅速的定位到错误发生的位置。另外 props 传入的值如果对象的话，是可以直接在子组件里更改的，因为是同一个引用。</p>
 <h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><h3 id="谈谈你对-MVVM-开发模式的理解"><a href="#谈谈你对-MVVM-开发模式的理解" class="headerlink" title="谈谈你对 MVVM 开发模式的理解"></a>谈谈你对 MVVM 开发模式的理解</h3><ul>
 <li>Model 数据模型层，保存页面中的数据</li>
@@ -825,7 +830,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的父组件和子组件生命周期钩子执行顺序是什么"><span class="nav-number">2.1.</span> <span class="nav-text">Vue 的父组件和子组件生命周期钩子执行顺序是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.2.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#v-if-vs-v-show"><span class="nav-number">4.</span> <span class="nav-text">v-if vs v-show</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js-实现简单的双向绑定"><span class="nav-number">5.3.</span> <span class="nav-text">js 实现简单的双向绑定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的响应式原理中-Object-defineProperty-有什么缺陷？为什么在-Vue3-0-采用了-Proxy，抛弃了-Object-defineProperty？"><span class="nav-number">5.4.</span> <span class="nav-text">Vue 的响应式原理中 Object.defineProperty 有什么缺陷？为什么在 Vue3.0 采用了 Proxy，抛弃了 Object.defineProperty？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在列表组件中添加-key-属性的作用？"><span class="nav-number">10.</span> <span class="nav-text">在列表组件中添加 key 属性的作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Vue-中，子组件为何不可以修改父组件传递的-Prop"><span class="nav-number">11.</span> <span class="nav-text">在 Vue 中，子组件为何不可以修改父组件传递的 Prop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">12.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">12.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请你讲一下Vue项目中使用token登录的具体流程"><span class="nav-number">12.2.</span> <span class="nav-text">请你讲一下Vue项目中使用token登录的具体流程</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#watch-和-computed-区别"><span class="nav-number">1.</span> <span class="nav-text">watch 和 computed 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#讲一下-Vue-的生命周期？"><span class="nav-number">2.</span> <span class="nav-text">讲一下 Vue 的生命周期？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的父组件和子组件生命周期钩子执行顺序是什么"><span class="nav-number">2.1.</span> <span class="nav-text">Vue 的父组件和子组件生命周期钩子执行顺序是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多阅读"><span class="nav-number">2.2.</span> <span class="nav-text">更多阅读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件间通信"><span class="nav-number">3.</span> <span class="nav-text">组件间通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vue-指令"><span class="nav-number">4.</span> <span class="nav-text">vue 指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#能讲下-v-if-和-v-show-的区别吗？"><span class="nav-number">4.1.</span> <span class="nav-text">能讲下 v-if 和 v-show 的区别吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v-for-你使用过程中，有遇到什么问题或者关注点吗？"><span class="nav-number">4.2.</span> <span class="nav-text">v-for 你使用过程中，有遇到什么问题或者关注点吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在列表组件中添加-key-属性的作用？"><span class="nav-number">4.3.</span> <span class="nav-text">在列表组件中添加 key 属性的作用？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据响应式（双向绑定）怎么做到的？"><span class="nav-number">5.</span> <span class="nav-text">数据响应式（双向绑定）怎么做到的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追问1：那如果我要监听一个对象属性的删除或添加呢？"><span class="nav-number">5.1.</span> <span class="nav-text">追问1：那如果我要监听一个对象属性的删除或添加呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追问2：为什么对象属性的删除或添加无法触发页面更新"><span class="nav-number">5.2.</span> <span class="nav-text">追问2：为什么对象属性的删除或添加无法触发页面更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js-实现简单的双向绑定"><span class="nav-number">5.3.</span> <span class="nav-text">js 实现简单的双向绑定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-的响应式原理中-Object-defineProperty-有什么缺陷？为什么在-Vue3-0-采用了-Proxy，抛弃了-Object-defineProperty？"><span class="nav-number">5.4.</span> <span class="nav-text">Vue 的响应式原理中 Object.defineProperty 有什么缺陷？为什么在 Vue3.0 采用了 Proxy，抛弃了 Object.defineProperty？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vuex-用过吗？"><span class="nav-number">6.</span> <span class="nav-text">Vuex 用过吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter-是什么？你平常是怎么用的？"><span class="nav-number">7.</span> <span class="nav-text">VueRouter 是什么？你平常是怎么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态路由"><span class="nav-number">7.1.</span> <span class="nav-text">动态路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程式导航"><span class="nav-number">7.2.</span> <span class="nav-text">编程式导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由守卫"><span class="nav-number">7.3.</span> <span class="nav-text">路由守卫</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用"><span class="nav-number">7.3.1.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你是如何使用插槽的？"><span class="nav-number">8.</span> <span class="nav-text">你是如何使用插槽的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextTick的更新原理"><span class="nav-number">9.</span> <span class="nav-text">nextTick的更新原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Vue-中，子组件为何不可以修改父组件传递的-Prop"><span class="nav-number">10.</span> <span class="nav-text">在 Vue 中，子组件为何不可以修改父组件传递的 Prop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-number">11.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈你对-MVVM-开发模式的理解"><span class="nav-number">11.1.</span> <span class="nav-text">谈谈你对 MVVM 开发模式的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请你讲一下Vue项目中使用token登录的具体流程"><span class="nav-number">11.2.</span> <span class="nav-text">请你讲一下Vue项目中使用token登录的具体流程</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -866,7 +871,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">148.1k</span>
+    <span title="Site words total count">148.6k</span>
   
 </div>
 
