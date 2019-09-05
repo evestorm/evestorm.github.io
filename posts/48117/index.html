@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-loading-bar.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="vue,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="介绍在后台管理系统的开发中，往往不同种类的用户有不同的权限。例如 admin 用户是超管，可以访问并修改所有内容，而类似 employee 员工级别的用户，就只能访问管理系统中的部分内容，其他的一些高级功能（添加新用户，修改核心数据）则直接从导航或菜单选项中移除掉了。 所以我们的应用场景便诞生了：需要有一种方式，能根据当前用户的级别，动态生成菜单栏和路由。防止低级别用户访问或操作系统核心数据。 今">
+<meta name="keywords" content="vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态路由+路由鉴权">
+<meta property="og:url" content="https://evestorm.github.io/posts/48117/index.html">
+<meta property="og:site_name" content="EVE">
+<meta property="og:description" content="介绍在后台管理系统的开发中，往往不同种类的用户有不同的权限。例如 admin 用户是超管，可以访问并修改所有内容，而类似 employee 员工级别的用户，就只能访问管理系统中的部分内容，其他的一些高级功能（添加新用户，修改核心数据）则直接从导航或菜单选项中移除掉了。 所以我们的应用场景便诞生了：需要有一种方式，能根据当前用户的级别，动态生成菜单栏和路由。防止低级别用户访问或操作系统核心数据。 今">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://evestorm.github.io/posts/48117/images/menuList_authList.png">
+<meta property="og:updated_time" content="2019-09-05T11:57:00.396Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="动态路由+路由鉴权">
+<meta name="twitter:description" content="介绍在后台管理系统的开发中，往往不同种类的用户有不同的权限。例如 admin 用户是超管，可以访问并修改所有内容，而类似 employee 员工级别的用户，就只能访问管理系统中的部分内容，其他的一些高级功能（添加新用户，修改核心数据）则直接从导航或菜单选项中移除掉了。 所以我们的应用场景便诞生了：需要有一种方式，能根据当前用户的级别，动态生成菜单栏和路由。防止低级别用户访问或操作系统核心数据。 今">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/48117/images/menuList_authList.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://evestorm.github.io/posts/48117/">
+
+
+
+
+
+  <title>动态路由+路由鉴权 | EVE</title>
+  
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="BIAVoToLLq">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband">
+    </div>
+    <a target="_blank" href="https://github.com/evestorm" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">EVE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">EVE的个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/48117/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/kitten.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">动态路由+路由鉴权</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-16T03:44:13+08:00">
+                2019-07-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/框架/" itemprop="url" rel="index">
+                    <span itemprop="name">框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  23
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在后台管理系统的开发中，往往不同种类的用户有不同的权限。例如 admin 用户是超管，可以访问并修改所有内容，而类似 employee 员工级别的用户，就只能访问管理系统中的部分内容，其他的一些高级功能（添加新用户，修改核心数据）则直接从导航或菜单选项中移除掉了。</p>
+<p>所以我们的应用场景便诞生了：需要有一种方式，能根据当前用户的级别，动态生成菜单栏和路由。防止低级别用户访问或操作系统核心数据。</p>
+<p>今天想要分享的内容就是如何在 Vue 项目中实现这种动态路由+路由鉴权的功能。</p>
+<h2 id="最终实现的菜单列表"><a href="#最终实现的菜单列表" class="headerlink" title="最终实现的菜单列表"></a>最终实现的菜单列表</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">个人中心  Profile.vue</span><br><span class="line">商店     Shop.vue</span><br><span class="line">购物车   Cart.vue</span><br><span class="line">    └── 购物车列表    CartList.vue</span><br><span class="line">       ├── 商品      Product.vue</span><br><span class="line">       └── 彩票      Lottery.vue</span><br></pre></td></tr></table></figure>
+<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><ol>
+<li>后端返回路由权限列表（带权限标识，假定为auth）</li>
+<li>前端进行全局的路由拦截，判断自身有没有获取过后端返回的路由列表</li>
+<li>如果没有则获取数据并保存到vuex中，动态的生成菜单和路由，然后进行next跳转</li>
+<li>如果有则不再获取，直接next跳转</li>
+</ol>
+<p>其中第三步是核心点，它还可以细分为下列步骤：</p>
+<ol>
+<li>菜单栏往往有多级嵌套，所以得根据后端返回的数据进行转换，最终生成无限级菜单；并在转换过程中找到所有可以有权访问的路由名称清单（根据上文提到的auth标识寻找）</li>
+<li>前端分别保存两种路由列表，第一种是不需要权限就能访问的，例如首页；第二种是需要等级权限才能访问的路由列表，例如新增admin管理员</li>
+<li>动态生成路由列表（在第二种路由列表中，通过路由名称清单过滤）</li>
+</ol>
+<h2 id="后台返回的admin路由权限"><a href="#后台返回的admin路由权限" class="headerlink" title="后台返回的admin路由权限"></a>后台返回的admin路由权限</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;pid:-1,path:'/cart',name:'购物车',id:1,auth:'cart'&#125;,</span><br><span class="line">    &#123;pid:1,path:'/cart/cart-list',name:'购物车列表',id:4,auth:'cart-list'&#125;,</span><br><span class="line">    &#123;pid:4,path:'/cart/cart-list/lottery',auth:'lottery',id:5,name:'彩票'&#125;,</span><br><span class="line">    &#123;pid:4,path:'/cart/cart-list/product',auth:'product',id:6,name:'商品'&#125;,</span><br><span class="line">    &#123;pid:-1,path:'/shop',name:'商店',id:2,auth:'shop'&#125;,</span><br><span class="line">    &#123;pid:-1,path:'/profile',name:'个人中心',id:3,auth:'store'&#125;,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<h2 id="项目生成"><a href="#项目生成" class="headerlink" title="项目生成"></a>项目生成</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vue create menu-auth</span><br><span class="line">? Check the features needed for your project: </span><br><span class="line"> ◉ Babel</span><br><span class="line"> ◉ Router</span><br><span class="line"> ◉ Vuex</span><br><span class="line"> history mode</span><br><span class="line"> In dedicated config files</span><br><span class="line"> Save this as a preset for future projects? (y/N) n</span><br></pre></td></tr></table></figure>
+<h3 id="移除不必要的文件及其代码"><a href="#移除不必要的文件及其代码" class="headerlink" title="移除不必要的文件及其代码"></a>移除不必要的文件及其代码</h3><ul>
+<li>components/HelloWorld.vue</li>
+<li>views/About.vue</li>
+<li>views/Home.vue 中 .home 标签下所有内容，有关 HelloWorld.vue 相关代码</li>
+<li>App.vue 中 #app 下除 <code>router-view</code> 所有内容</li>
+<li>router.js 下有关 About.vue 相关代码</li>
+</ul>
+<h2 id="后端生成"><a href="#后端生成" class="headerlink" title="后端生成"></a>后端生成</h2><p>根目录下创建 <code>server.js</code> 作为我们的服务端文件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">let</span> app = express();</span><br><span class="line"><span class="comment">// 在后端配置，让所有人都可以访问api接口 跨域问题</span></span><br><span class="line">app.use(<span class="string">'*'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  res.header(<span class="string">'Access-Control-Allow-Origin'</span>, <span class="string">'*'</span>);</span><br><span class="line">  <span class="comment">// Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行</span></span><br><span class="line">  res.header(<span class="string">'Access-Control-Allow-Headers'</span>, <span class="string">'Content-Type'</span>);</span><br><span class="line">  res.header(<span class="string">'Access-Control-Allow-Methods'</span>, <span class="string">'*'</span>);</span><br><span class="line">  res.header(<span class="string">'Content-Type'</span>, <span class="string">'application/json;charset=utf-8'</span>);</span><br><span class="line">  next();</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 前端请求的路由API路径</span></span><br><span class="line">app.get(<span class="string">'/role'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  res.json(&#123;</span><br><span class="line">    <span class="comment">//假如这是后端给我们的JSON数据</span></span><br><span class="line">    menuList: [&#123;</span><br><span class="line">        pid: <span class="number">-1</span>,</span><br><span class="line">        path: <span class="string">'/cart'</span>,</span><br><span class="line">        name: <span class="string">'购物车'</span>,</span><br><span class="line">        id: <span class="number">1</span>,</span><br><span class="line">        auth: <span class="string">'cart'</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        pid: <span class="number">1</span>,</span><br><span class="line">        path: <span class="string">'/cart/cart-list'</span>,</span><br><span class="line">        name: <span class="string">'购物车列表'</span>,</span><br><span class="line">        id: <span class="number">4</span>,</span><br><span class="line">        auth: <span class="string">'cart-list'</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        pid: <span class="number">4</span>,</span><br><span class="line">        path: <span class="string">'/cart/cart-list/lottery'</span>,</span><br><span class="line">        auth: <span class="string">'lottery'</span>,</span><br><span class="line">        id: <span class="number">5</span>,</span><br><span class="line">        name: <span class="string">'彩票'</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        pid: <span class="number">4</span>,</span><br><span class="line">        path: <span class="string">'/cart/cart-list/product'</span>,</span><br><span class="line">        auth: <span class="string">'product'</span>,</span><br><span class="line">        id: <span class="number">6</span>,</span><br><span class="line">        name: <span class="string">'商品'</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        pid: <span class="number">-1</span>,</span><br><span class="line">        path: <span class="string">'/shop'</span>,</span><br><span class="line">        name: <span class="string">'商店'</span>,</span><br><span class="line">        id: <span class="number">2</span>,</span><br><span class="line">        auth: <span class="string">'shop'</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        pid: <span class="number">-1</span>,</span><br><span class="line">        path: <span class="string">'/profile'</span>,</span><br><span class="line">        name: <span class="string">'个人中心'</span>,</span><br><span class="line">        id: <span class="number">3</span>,</span><br><span class="line">        auth: <span class="string">'profile'</span></span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">    buttonAuth: &#123;</span><br><span class="line">      edit: <span class="literal">true</span>, <span class="comment">// 可编辑</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//监听3000端口</span></span><br><span class="line">app.listen(<span class="number">3000</span>)</span><br></pre></td></tr></table></figure>
+<p>终端 <code>node server.js</code> 启动，或者使用 <code>nodemon server.js</code> 热启动。</p>
+<h2 id="新建路由所需相关文件"><a href="#新建路由所需相关文件" class="headerlink" title="新建路由所需相关文件"></a>新建路由所需相关文件</h2><p>components/menu/ 文件下新建：</p>
+<blockquote>
+<p>cart-list.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    cart-list</span><br><span class="line">    <span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>cart.vue</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    cart</span><br><span class="line">    &lt;router-view&gt;<span class="xml"><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/template&gt;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">&lt;script&gt;</span></span><br><span class="line"><span class="regexp">  export default &#123;</span></span><br><span class="line"><span class="regexp">    name: 'cart'</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&lt;/</span>script&gt;</span><br><span class="line"></span><br><span class="line">&lt;style&gt;</span><br><span class="line">&lt;<span class="regexp">/style&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>lottery.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    lottery</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>product.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    product</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>profile.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    profile</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>shop.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    shop</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>最后来一个 404 页面，放在 <code>views/</code> 文件夹下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    404</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置路由"><a href="#配置路由" class="headerlink" title="配置路由"></a>配置路由</h2><p>来到 <code>router.js</code> 文件配置路由表：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> Router <span class="keyword">from</span> <span class="string">'vue-router'</span></span><br><span class="line"><span class="keyword">import</span> Home <span class="keyword">from</span> <span class="string">'./views/Home.vue'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Router)</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Router(&#123;</span><br><span class="line">  mode: <span class="string">'history'</span>,</span><br><span class="line">  base: process.env.BASE_URL,</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">//访问'/'时，重定向到home页面</span></span><br><span class="line">      path: <span class="string">'/'</span>,</span><br><span class="line">      redirect: <span class="string">'/home'</span></span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      path: <span class="string">'/home'</span>,</span><br><span class="line">      name: <span class="string">'home'</span>,</span><br><span class="line">      component: Home</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/cart'</span>,</span><br><span class="line">      name: <span class="string">'cart'</span>,</span><br><span class="line">      <span class="comment">//使用懒加载，当使用这个组件的时候再加载资源，当组件资源较大时，不建议使用，可能会出现白屏现象</span></span><br><span class="line">      <span class="comment">//而且最好使用绝对路径，@是绝对路径的意思,相当于src下</span></span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart.vue'</span>),</span><br><span class="line">      <span class="comment">//配置子路由</span></span><br><span class="line">      children: [&#123;</span><br><span class="line">        <span class="comment">//当配置子路由时，最好不要在前面加'/',比如:'/cart-list'</span></span><br><span class="line">        path: <span class="string">'cart-list'</span>,</span><br><span class="line">        name: <span class="string">'cart-list'</span>,</span><br><span class="line">        component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart-list.vue'</span>),</span><br><span class="line">        <span class="comment">//配置子路由</span></span><br><span class="line">        children: [&#123;</span><br><span class="line">            path: <span class="string">'lottery'</span>,</span><br><span class="line">            name: <span class="string">'lottery'</span>,</span><br><span class="line">            component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/lottery.vue'</span>)</span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            path: <span class="string">'product'</span>,</span><br><span class="line">            name: <span class="string">'product'</span>,</span><br><span class="line">            component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/product.vue'</span>)</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;]</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      path: <span class="string">'/profile'</span>,</span><br><span class="line">      name: <span class="string">'profile'</span>,</span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/profile.vue'</span>)</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      path: <span class="string">'/shop'</span>,</span><br><span class="line">      name: <span class="string">'shop'</span>,</span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/shop.vue'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'*'</span>,</span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/views/404.vue'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>配置完成后 <code>npm run serve</code> 跑一下项目，分别进入几个路由路径，看是否能正确打开相应页面。</p>
+<h2 id="获取后端admin权限数据"><a href="#获取后端admin权限数据" class="headerlink" title="获取后端admin权限数据"></a>获取后端admin权限数据</h2><p>为了拿到后端返回的数据，我们需要利用 axios 发起异步请求，并把响应回来的数据存放到 vuex 中去，并且还需要对后端数据做一个转换，将其转换为下面格式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 后端格式</span></span><br><span class="line">[</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'a'</span>, <span class="attr">pid</span>: <span class="number">-1</span>&#125;,</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'b'</span>, <span class="attr">pid</span>: <span class="number">-1</span>&#125;,</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">3</span>, <span class="attr">name</span>: <span class="string">'c'</span>, <span class="attr">pid</span>: <span class="number">1</span>&#125;,</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">4</span>, <span class="attr">name</span>: <span class="string">'d'</span>, <span class="attr">pid</span>: <span class="number">1</span>&#125;</span><br><span class="line">]</span><br><span class="line">↓↓↓</span><br><span class="line">[</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'a'</span>, <span class="attr">pid</span>: <span class="number">-1</span>, <span class="attr">children</span>: [</span><br><span class="line">    &#123;<span class="attr">id</span>: <span class="number">3</span>, <span class="attr">name</span>: <span class="string">'c'</span>, <span class="attr">pid</span>: <span class="number">1</span>, <span class="attr">children</span>: <span class="literal">null</span>&#125;,</span><br><span class="line">    &#123;<span class="attr">id</span>: <span class="number">4</span>, <span class="attr">name</span>: <span class="string">'d'</span>, <span class="attr">pid</span>: <span class="number">1</span>, <span class="attr">children</span>: <span class="literal">null</span>&#125;</span><br><span class="line">  ]&#125;,</span><br><span class="line">  &#123;<span class="attr">id</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'b'</span>, <span class="attr">pid</span>: <span class="number">-1</span>, <span class="attr">children</span>: <span class="literal">null</span>&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h3 id="安装-axios"><a href="#安装-axios" class="headerlink" title="安装 axios"></a>安装 axios</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install axios</span><br></pre></td></tr></table></figure>
+<h3 id="在全局路由守卫中监听是否已获取过路由权限数据"><a href="#在全局路由守卫中监听是否已获取过路由权限数据" class="headerlink" title="在全局路由守卫中监听是否已获取过路由权限数据"></a>在全局路由守卫中监听是否已获取过路由权限数据</h3><p>路由权限的数据，为了安全我们需要页面切换时就再次获取，所以可以用全局路由守卫帮助我们实现，逻辑如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只要页面切换就执行的钩子</span></span><br><span class="line">router.beforeEach(<span class="keyword">async</span> (to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 判断当前有没有获取过权限，如果获取过了，就不要再获取了</span></span><br><span class="line">  <span class="keyword">if</span> (!store.state.hasRules) &#123;</span><br><span class="line">    <span class="comment">//获取权限，调用获取权限的接口，去action中获取数据</span></span><br><span class="line">    <span class="keyword">await</span> store.dispatch(<span class="string">'getMenuList'</span>)</span><br><span class="line">    next();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//如果已经获取了权限就可以访问页面了</span></span><br><span class="line">    next()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="编写-vuex-数据转化（递归）"><a href="#编写-vuex-数据转化（递归）" class="headerlink" title="编写 vuex + 数据转化（递归）"></a>编写 vuex + 数据转化（递归）</h3><p>根据上面钩子函数中的逻辑，在 vuex 中添加相应内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> Vuex <span class="keyword">from</span> <span class="string">'vuex'</span></span><br><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Vuex)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 后端数据转化</span></span><br><span class="line"><span class="keyword">let</span> formatMenuList = <span class="function">(<span class="params">menuList</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">r</span>(<span class="params">pid</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//filter过滤数组，返回一个满足要求的数组</span></span><br><span class="line">    <span class="keyword">return</span> menuList.filter(<span class="function"><span class="params">menu</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">//格式化菜单变成我们需要的结果</span></span><br><span class="line">      <span class="keyword">if</span> (menu.pid === pid) &#123;</span><br><span class="line">        <span class="keyword">let</span> children = r(menu.id)</span><br><span class="line">        menu.children = children.length ? children : <span class="literal">null</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> r(<span class="number">-1</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store(&#123;</span><br><span class="line">  state: &#123;</span><br><span class="line">    <span class="comment">// 存放菜单权限数据</span></span><br><span class="line">    menuList: [],</span><br><span class="line">    <span class="comment">// 原本只要判断menuList.length是否不为空就能判定是否已经获取过menuList，</span></span><br><span class="line">    <span class="comment">// 但如果后台返回空数组咋办？所以此处还需要一个hasRules变量来标识是否已获取</span></span><br><span class="line">    <span class="comment">// 做法就是，获取完毕后，把hasRules改为true</span></span><br><span class="line">    hasRules: <span class="literal">false</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  mutations: &#123;</span><br><span class="line"></span><br><span class="line">  &#125;,</span><br><span class="line">  actions: &#123;</span><br><span class="line">    <span class="keyword">async</span> getMenuList() &#123;</span><br><span class="line">      <span class="keyword">let</span> &#123; data &#125; =<span class="keyword">await</span> axios.get(<span class="string">'http://localhost:3000/role'</span>)</span><br><span class="line">      <span class="keyword">let</span> menuList = data.menuList</span><br><span class="line">      menuList = formatMenuList(menuList)</span><br><span class="line">      <span class="built_in">console</span>.log(menuList)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>但目前有个小问题，即我们在 router.js 中配置了所有路由，然后根据后端返回的权限来动态展示相应菜单，从而实现跳转。但如果用户猜出了不允许他访问的路由，直接修改url跳转怎么办？那他不是也能访问了吗？</p>
+<p>所以我们需要让后端在返回的数据中，给每个路由对象添加一个 最开始提到的 auth 标识：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">pid</span>: <span class="number">-1</span>, <span class="attr">path</span>: <span class="string">'/cart'</span>, <span class="attr">name</span>: <span class="string">'购物车'</span>, <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">auth</span>: <span class="string">'cart'</span> &#125;</span><br></pre></td></tr></table></figure>
+<p>如果有 auth 标识，代表当前用户能够访问，如果没有，则表示当前用户不能访问，这样我们前端就能据此动态的删除掉不能访问的路由。</p>
+<p>回到 <code>src/store.js</code> ，我们需要把后端这个 <code>auth</code> 属性都保存起来。首先在 <code>state</code> 中加上 <code>authList</code> 属性，用来存储哪些路由能有权限访问：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">state: &#123;</span><br><span class="line">  authList: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在 <code>formatMenuList</code> 方法中，提取权限：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> formatMenuList = <span class="function">(<span class="params">menuList</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> arr = [] <span class="comment">// [cart, cart-list, profile, ...]</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">r</span>(<span class="params">pid</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//filter过滤数组，返回一个满足要求的数组</span></span><br><span class="line">    <span class="keyword">return</span> menuList.filter(<span class="function"><span class="params">menu</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">//格式化菜单变成我们需要的结果</span></span><br><span class="line">      <span class="keyword">if</span> (menu.pid === pid) &#123;</span><br><span class="line">        arr.push(menu.auth) <span class="comment">// 把后端返回的所有路径权限都放到数组中</span></span><br><span class="line">        <span class="keyword">let</span> children = r(menu.id)</span><br><span class="line">        menu.children = children.length ? children : <span class="literal">null</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> &#123; <span class="attr">menuL</span>: r(<span class="number">-1</span>), <span class="attr">authL</span>: arr &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样改造后，<code>formatMenuList</code> 方法就返回一个对象了，该对象中包含路由菜单和路由权限两个数组。</p>
+<p>相应的，我们还得改造使用了 <code>formatMenuList</code> 方法的action ——&gt; <code>getMenuList</code> ：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> getMenuList(&#123; commit &#125;) &#123;</span><br><span class="line">  <span class="keyword">let</span> &#123; data &#125; =<span class="keyword">await</span> axios.get(<span class="string">'http://localhost:3000/role'</span>)</span><br><span class="line">  <span class="keyword">let</span> &#123; menuL, authL &#125; = formatMenuList(data.menuList)</span><br><span class="line">  <span class="built_in">console</span>.log(menuL, authL)</span><br><span class="line">  commit(<span class="string">'set_menuList'</span>, menuL)</span><br><span class="line">  commit(<span class="string">'set_authList'</span>, authL)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的，编写两个 mutation ：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">set_menuList(state, m) &#123;</span><br><span class="line">  state.menuList = m</span><br><span class="line">&#125;,</span><br><span class="line">set_authList(state, a) &#123;</span><br><span class="line">  state.authList = a</span><br><span class="line">  state.hasRules = <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>保存后 console.log 一下，menuList 和 authList 分别如下：</p>
+<p><img src="./images/menuList_authList.png" alt="menuList_authList"></p>
+<h2 id="渲染无限菜单"><a href="#渲染无限菜单" class="headerlink" title="渲染无限菜单"></a>渲染无限菜单</h2><h3 id="配置-element-ui"><a href="#配置-element-ui" class="headerlink" title="配置 element-ui"></a>配置 element-ui</h3><p>安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install element-ui</span><br></pre></td></tr></table></figure>
+<p><code>main.js</code> 中进行配置：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ElementUI <span class="keyword">from</span> <span class="string">'element-ui'</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">'element-ui/lib/theme-chalk/index.css'</span></span><br><span class="line">Vue.use(ElementUI)</span><br></pre></td></tr></table></figure>
+<h3 id="在-Home-vue-页面中引入静态菜单"><a href="#在-Home-vue-页面中引入静态菜单" class="headerlink" title="在 Home.vue 页面中引入静态菜单"></a>在 Home.vue 页面中引入静态菜单</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"home"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-menu</span> <span class="attr">default-active</span>=<span class="string">"2"</span> <span class="attr">class</span>=<span class="string">"el-menu-vertical-demo"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>导航一<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1-1"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>选项1-1<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-1"</span>&gt;</span>选项1-1-1<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-2"</span>&gt;</span>选项1-1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-2"</span>&gt;</span>选项1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"2"</span>&gt;</span></span><br><span class="line">        导航二</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"3"</span>&gt;</span></span><br><span class="line">        导航三</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"4"</span>&gt;</span></span><br><span class="line">        导航四</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-menu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>刷新页面后就能显示静态的Element菜单了。但点击某个菜单选项后浏览器无法跳转，所以我们还得给 <code>&lt;el-menu&gt;&lt;/el-menu&gt;</code> 标签设置个 <code>router</code> 属性为 true ，这样就能根据菜单的 <code>index</code> 属性进行路由跳转了：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"home"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-menu</span> <span class="attr">default-active</span>=<span class="string">"2"</span> <span class="attr">class</span>=<span class="string">"el-menu-vertical-demo"</span> <span class="attr">:router</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>导航一<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1-1"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>选项1-1<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-1"</span>&gt;</span>选项1-1-1<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-2"</span>&gt;</span>选项1-1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-2"</span>&gt;</span>选项1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"2"</span>&gt;</span></span><br><span class="line">        导航二</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"3"</span>&gt;</span></span><br><span class="line">        导航三</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"4"</span>&gt;</span></span><br><span class="line">        导航四</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-menu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="静态转动态菜单"><a href="#静态转动态菜单" class="headerlink" title="静态转动态菜单"></a>静态转动态菜单</h3><p>最后利用后端获取的admin权限数据将静态菜单改为动态菜单：</p>
+<blockquote>
+<p>src/views/Home.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"home"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-menu</span> <span class="attr">default-active</span>=<span class="string">"2"</span> <span class="attr">class</span>=<span class="string">"el-menu-vertical-demo"</span> <span class="attr">:router</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-for</span>=<span class="string">"m in menuList"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1-1"</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">v-if</span>=<span class="string">"m.children"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>&#123;&#123;m.name&#125;&#125;<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-1"</span>&gt;</span>选项1-1-1<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-2"</span>&gt;</span>选项1-1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-2"</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">v-else</span>&gt;</span>&#123;&#123;m.name&#125;&#125;<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- &lt;el-submenu index="1"&gt;</span></span><br><span class="line"><span class="comment">        &lt;template slot="title"&gt;导航一&lt;/template&gt;</span></span><br><span class="line"><span class="comment">        &lt;el-submenu index="1-1"&gt;</span></span><br><span class="line"><span class="comment">          &lt;template slot="title"&gt;选项1-1&lt;/template&gt;</span></span><br><span class="line"><span class="comment">          &lt;el-menu-item index="1-1-1"&gt;选项1-1-1&lt;/el-menu-item&gt;</span></span><br><span class="line"><span class="comment">          &lt;el-menu-item index="1-1-2"&gt;选项1-1-2&lt;/el-menu-item&gt;</span></span><br><span class="line"><span class="comment">        &lt;/el-submenu&gt;</span></span><br><span class="line"><span class="comment">        &lt;el-menu-item index="1-2"&gt;选项1-2&lt;/el-menu-item&gt;</span></span><br><span class="line"><span class="comment">      &lt;/el-submenu&gt;</span></span><br><span class="line"><span class="comment">      &lt;el-menu-item index="2"&gt;</span></span><br><span class="line"><span class="comment">        导航二</span></span><br><span class="line"><span class="comment">      &lt;/el-menu-item&gt;</span></span><br><span class="line"><span class="comment">      &lt;el-menu-item index="3"&gt;</span></span><br><span class="line"><span class="comment">        导航三</span></span><br><span class="line"><span class="comment">      &lt;/el-menu-item&gt;</span></span><br><span class="line"><span class="comment">      &lt;el-menu-item index="4"&gt;</span></span><br><span class="line"><span class="comment">        导航四</span></span><br><span class="line"><span class="comment">      &lt;/el-menu-item&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-menu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">import</span> &#123; mapState &#125; <span class="keyword">from</span> <span class="string">'vuex'</span></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    name: <span class="string">'home'</span>,</span></span><br><span class="line"><span class="undefined">    computed: &#123;</span></span><br><span class="line"><span class="javascript">      ...mapState([<span class="string">'menuList'</span>])</span></span><br><span class="line"><span class="undefined">    &#125;,</span></span><br><span class="line"><span class="undefined">  &#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="无限菜单"><a href="#无限菜单" class="headerlink" title="无限菜单"></a>无限菜单</h3><p>仔细观察上方的菜单格式，会发现下面这段代码会重复出现：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 带有子菜单的 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">index</span>=<span class="string">"1-1"</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">v-if</span>=<span class="string">"m.children"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span>&#123;&#123;m.name&#125;&#125;<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-1"</span>&gt;</span>选项1-1-1<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-1-2"</span>&gt;</span>选项1-1-2<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 不带有子菜单的 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">index</span>=<span class="string">"1-2"</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">v-else</span>&gt;</span>&#123;&#123;m.name&#125;&#125;<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>所以我们把它提取出去单独渲染，这样就能实现无限菜单了：</p>
+<blockquote>
+<p>新建 <code>src/views/ReSubMenu.vue</code></p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 封装递归组件 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-submenu</span> <span class="attr">:index</span>=<span class="string">"data.path"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 子菜单标题 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">"title"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">router-link</span> <span class="attr">:to</span>=<span class="string">"data.path"</span>&gt;</span>&#123;&#123;data.name&#125;&#125;<span class="tag">&lt;/<span class="name">router-link</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-for</span>=<span class="string">"c in data.children"</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 若子菜单还有children，继续递归自己 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">ReSubMenu</span> <span class="attr">:key</span>=<span class="string">"c.auth"</span> <span class="attr">v-if</span>=<span class="string">"data.children"</span> <span class="attr">:data</span>=<span class="string">"c"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">ReSubMenu</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 没有则直接显示 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">:key</span>=<span class="string">"c.auth"</span> <span class="attr">v-else</span> <span class="attr">:index</span>=<span class="string">"c.path"</span>&gt;</span></span><br><span class="line">        &#123;&#123;c.name&#125;&#125;</span><br><span class="line">      <span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-submenu</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    name: <span class="string">"ReSubMenu"</span>,</span></span><br><span class="line"><span class="undefined">    props: &#123;</span></span><br><span class="line"><span class="undefined">      data: &#123;</span></span><br><span class="line"><span class="javascript">        type: <span class="built_in">Object</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="function"><span class="params">()</span> =&gt;</span> (&#123;&#125;)</span></span><br><span class="line"><span class="undefined">      &#125;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined">  &#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>然后在父组件 <code>Home.vue</code> 中使用：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-menu</span> <span class="attr">default-active</span>=<span class="string">"2"</span> <span class="attr">class</span>=<span class="string">"el-menu-vertical-demo"</span> <span class="attr">:router</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-for</span>=<span class="string">"m in menuList"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 递归组件 --&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 判断条件：有children的就是带有子菜单的，使用递归组件 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ReSubMenu</span> <span class="attr">:data</span>=<span class="string">"m"</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">v-if</span>=<span class="string">"m.children"</span>&gt;</span><span class="tag">&lt;/<span class="name">ReSubMenu</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 没有children的情况 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">el-menu-item</span> <span class="attr">v-else</span> <span class="attr">:key</span>=<span class="string">"m.auth"</span> <span class="attr">:index</span>=<span class="string">"m.path"</span>&gt;</span>&#123;&#123;m.name&#125;&#125;<span class="tag">&lt;/<span class="name">el-menu-item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-menu</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="comment">//导入vuex中的方法，具体参考我的文章</span></span></span><br><span class="line"><span class="javascript">  <span class="keyword">import</span> &#123;</span></span><br><span class="line"><span class="undefined">    mapState</span></span><br><span class="line"><span class="javascript">  &#125; <span class="keyword">from</span> <span class="string">"vuex"</span>;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">import</span> ReSubMenu <span class="keyword">from</span> <span class="string">"./ReSubMenu"</span>;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    name: <span class="string">"home"</span>,</span></span><br><span class="line"><span class="undefined">    computed: &#123;</span></span><br><span class="line"><span class="javascript">      <span class="comment">//根据后端传过来的数据来渲染Home</span></span></span><br><span class="line"><span class="javascript">      ...mapState([<span class="string">"menuList"</span>])</span></span><br><span class="line"><span class="undefined">    &#125;,</span></span><br><span class="line"><span class="undefined">    components: &#123;</span></span><br><span class="line"><span class="undefined">      ReSubMenu</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined">  &#125;;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="根据权限动态添加路由"><a href="#根据权限动态添加路由" class="headerlink" title="根据权限动态添加路由"></a>根据权限动态添加路由</h2><p>实现了无限菜单后，我们接下来就要根据之前保存的 <code>authList</code> 实现动态路由了。</p>
+<p>第一步就是把 <code>router.js</code> 中的路由列表分成两部分，一部分是不需要权限就能访问的，另一部分是需要根据权限列表动态生成的，我们首先来抽离之前在 routes 中的路由列表，拷贝一份后存到两个变量中，其中 <code>authRoutes</code> 需要 export 导出，等会 <code>store.js</code> 中匹配用户权限时需要使用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认路由列表：不需要权限就能访问的</span></span><br><span class="line"><span class="keyword">let</span> defaultRoutes = [&#123;</span><br><span class="line">    path: <span class="string">'/'</span>,</span><br><span class="line">    redirect: <span class="string">'/home'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/home'</span>,</span><br><span class="line">    name: <span class="string">'home'</span>,</span><br><span class="line">    component: Home</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'*'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/views/404.vue'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要权限才能访问的路由列表</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">let</span> authRoutes = [&#123;</span><br><span class="line">    path: <span class="string">'/cart'</span>,</span><br><span class="line">    name: <span class="string">'cart'</span>,</span><br><span class="line">    <span class="comment">//使用懒加载，当使用这个组件的时候再加载资源，当组件资源较大时，不建议使用，可能会出现白屏现象</span></span><br><span class="line">    <span class="comment">//而且最好使用绝对路径，@是绝对路径的意思,相当于src下</span></span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart.vue'</span>),</span><br><span class="line">    <span class="comment">//配置子路由</span></span><br><span class="line">    children: [&#123;</span><br><span class="line">      <span class="comment">//当配置子路由时，最好不要在前面加'/',比如:'/cart-list'</span></span><br><span class="line">      path: <span class="string">'cart-list'</span>,</span><br><span class="line">      name: <span class="string">'cart-list'</span>,</span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart-list.vue'</span>),</span><br><span class="line">      <span class="comment">//配置子路由</span></span><br><span class="line">      children: [&#123;</span><br><span class="line">          path: <span class="string">'lottery'</span>,</span><br><span class="line">          name: <span class="string">'lottery'</span>,</span><br><span class="line">          component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/lottery.vue'</span>)</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          path: <span class="string">'product'</span>,</span><br><span class="line">          name: <span class="string">'product'</span>,</span><br><span class="line">          component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/product.vue'</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/profile'</span>,</span><br><span class="line">    name: <span class="string">'profile'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/profile.vue'</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/shop'</span>,</span><br><span class="line">    name: <span class="string">'shop'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/shop.vue'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>然后把原本 <code>routes</code> 列表中的数组删除，改为 <code>defaultRoutes</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> Router <span class="keyword">from</span> <span class="string">'vue-router'</span></span><br><span class="line"><span class="keyword">import</span> Home <span class="keyword">from</span> <span class="string">'./views/Home.vue'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Router)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 默认路由列表：不需要权限就能访问的</span></span><br><span class="line"><span class="keyword">let</span> defaultRoutes = [&#123;</span><br><span class="line">    path: <span class="string">'/'</span>,</span><br><span class="line">    redirect: <span class="string">'/home'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/home'</span>,</span><br><span class="line">    name: <span class="string">'home'</span>,</span><br><span class="line">    component: Home</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'*'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/views/404.vue'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要权限才能访问的路由列表</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">let</span> authRoutes = [&#123;</span><br><span class="line">    path: <span class="string">'/cart'</span>,</span><br><span class="line">    name: <span class="string">'cart'</span>,</span><br><span class="line">    <span class="comment">//使用懒加载，当使用这个组件的时候再加载资源，当组件资源较大时，不建议使用，可能会出现白屏现象</span></span><br><span class="line">    <span class="comment">//而且最好使用绝对路径，@是绝对路径的意思,相当于src下</span></span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart.vue'</span>),</span><br><span class="line">    <span class="comment">//配置子路由</span></span><br><span class="line">    children: [&#123;</span><br><span class="line">      <span class="comment">//当配置子路由时，最好不要在前面加'/',比如:'/cart-list'</span></span><br><span class="line">      path: <span class="string">'cart-list'</span>,</span><br><span class="line">      name: <span class="string">'cart-list'</span>,</span><br><span class="line">      component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/cart-list.vue'</span>),</span><br><span class="line">      <span class="comment">//配置子路由</span></span><br><span class="line">      children: [&#123;</span><br><span class="line">          path: <span class="string">'lottery'</span>,</span><br><span class="line">          name: <span class="string">'lottery'</span>,</span><br><span class="line">          component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/lottery.vue'</span>)</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          path: <span class="string">'product'</span>,</span><br><span class="line">          name: <span class="string">'product'</span>,</span><br><span class="line">          component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/product.vue'</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/profile'</span>,</span><br><span class="line">    name: <span class="string">'profile'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/profile.vue'</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/shop'</span>,</span><br><span class="line">    name: <span class="string">'shop'</span>,</span><br><span class="line">    component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'@/components/menu/shop.vue'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要查看当前用户权限来动态添加路由</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Router(&#123;</span><br><span class="line">  mode: <span class="string">'history'</span>,</span><br><span class="line">  base: process.env.BASE_URL,</span><br><span class="line">  <span class="comment">// 默认所有用户可访问的路由，其他需要权限的动态在 main.js 中动态装载给当前router对象</span></span><br><span class="line">  routes: defaultRoutes</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>再回到 <code>main.js</code> 中的全局钩子函数，我们需要创建一个 <code>action</code> 来动态生成需要权限才能访问的路由：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只要页面切换就执行的钩子</span></span><br><span class="line">router.beforeEach(<span class="keyword">async</span> (to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 判断当前有没有获取过权限，如果获取过了，就不要再获取了</span></span><br><span class="line">  <span class="keyword">if</span> (!store.state.hasRules) &#123;</span><br><span class="line">    <span class="comment">//获取权限，调用获取权限的接口，去action中获取数据</span></span><br><span class="line">    <span class="keyword">await</span> store.dispatch(<span class="string">'getMenuList'</span>)</span><br><span class="line">    <span class="comment">// 拿到动态生成的路由列表</span></span><br><span class="line">    <span class="keyword">let</span> r = <span class="keyword">await</span> store.dispatch(<span class="string">'getAuthRoute'</span>)</span><br><span class="line">    <span class="comment">// 添加到当前路由中</span></span><br><span class="line">    router.addRoutes(r)</span><br><span class="line">    next()</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//如果已经获取了权限就可以访问页面了</span></span><br><span class="line">    next()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>最后在 <code>store.js</code> 中实现 <code>getAuthRoute</code> 这个 action：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment">// 首先导入router中完整的权限路由列表</span></span><br><span class="line"><span class="keyword">import</span> &#123; authRoutes &#125; <span class="keyword">from</span> <span class="string">'./router'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Vuex)</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"><span class="comment">// 然后在router的所有权限列表中，匹配当前用户可以访问的权限列表</span></span><br><span class="line"><span class="comment">// 生成动态路由</span></span><br><span class="line"><span class="keyword">let</span> getNeedRoutes = <span class="function">(<span class="params">auth</span>) =&gt;</span> &#123; <span class="comment">//['cart','cart-list'....]</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">r</span>(<span class="params">authRoutes</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> authRoutes.filter(<span class="function"><span class="params">route</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (auth.includes(route.name)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (route.children) &#123; <span class="comment">//如果有儿子</span></span><br><span class="line">          <span class="comment">//找到儿子继续看子路由的权限</span></span><br><span class="line">          route.children = r(route.children)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">//有权限就返回</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> r(authRoutes);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store(&#123;</span><br><span class="line">  ...</span><br><span class="line">  actions: &#123;</span><br><span class="line">    ..</span><br><span class="line">    <span class="keyword">async</span> getAuthRoute(&#123; commit, state &#125;) &#123;</span><br><span class="line">      <span class="comment">// 最后把当前需要动态添加的路由返回出去</span></span><br><span class="line">      <span class="keyword">let</span> r = getNeedRoutes(state.authList)</span><br><span class="line">      <span class="keyword">return</span> r</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>到此为止就实现了一套 <code>动态路由 + 路由鉴权</code> 功能。</p>
+<h2 id="配套代码"><a href="#配套代码" class="headerlink" title="配套代码"></a>配套代码</h2><p><a href="https://github.com/evestorm/front-end-playground/tree/master/vue/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%2B%E8%B7%AF%E7%94%B1%E9%89%B4%E6%9D%83/menu-auth" target="_blank" rel="noopener">动态路由+路由鉴权</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Lance 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Lance 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vue/" rel="tag"><i class="fa fa-tag"></i> vue</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/23904/" rel="next" title="Vue组件开发——无限菜单">
+                <i class="fa fa-chevron-left"></i> Vue组件开发——无限菜单
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/47143/" rel="prev" title="web性能优化-实践(转载)">
+                web性能优化-实践(转载) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/kitten.jpeg" alt="Lance">
+            
+              <p class="site-author-name" itemprop="name">Lance</p>
+              <p class="site-description motion-element" itemprop="description">前端笔记和心得，包括但不限于：HTML5 CSS3 JavaScript ES6 Vue Webpack...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终实现的菜单列表"><span class="nav-number">2.</span> <span class="nav-text">最终实现的菜单列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本思路"><span class="nav-number">3.</span> <span class="nav-text">基本思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后台返回的admin路由权限"><span class="nav-number">4.</span> <span class="nav-text">后台返回的admin路由权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目生成"><span class="nav-number">5.</span> <span class="nav-text">项目生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#移除不必要的文件及其代码"><span class="nav-number">5.1.</span> <span class="nav-text">移除不必要的文件及其代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后端生成"><span class="nav-number">6.</span> <span class="nav-text">后端生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建路由所需相关文件"><span class="nav-number">7.</span> <span class="nav-text">新建路由所需相关文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置路由"><span class="nav-number">8.</span> <span class="nav-text">配置路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取后端admin权限数据"><span class="nav-number">9.</span> <span class="nav-text">获取后端admin权限数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-axios"><span class="nav-number">9.1.</span> <span class="nav-text">安装 axios</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在全局路由守卫中监听是否已获取过路由权限数据"><span class="nav-number">9.2.</span> <span class="nav-text">在全局路由守卫中监听是否已获取过路由权限数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写-vuex-数据转化（递归）"><span class="nav-number">9.3.</span> <span class="nav-text">编写 vuex + 数据转化（递归）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#渲染无限菜单"><span class="nav-number">10.</span> <span class="nav-text">渲染无限菜单</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-element-ui"><span class="nav-number">10.1.</span> <span class="nav-text">配置 element-ui</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在-Home-vue-页面中引入静态菜单"><span class="nav-number">10.2.</span> <span class="nav-text">在 Home.vue 页面中引入静态菜单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态转动态菜单"><span class="nav-number">10.3.</span> <span class="nav-text">静态转动态菜单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无限菜单"><span class="nav-number">10.4.</span> <span class="nav-text">无限菜单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#根据权限动态添加路由"><span class="nav-number">11.</span> <span class="nav-text">根据权限动态添加路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配套代码"><span class="nav-number">12.</span> <span class="nav-text">配套代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">157.5k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      人阅读
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@3.12.0/dist/av-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/valine@1.3.6/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: true,
+        notify: true,
+        appId: 'eMlA1yfOVSu3St1f6l2XzQqC-gzGzoHsz',
+        appKey: 'TOv5VcioO0ijgjrHfGILweOR',
+        placeholder: '欢迎交流讨论...',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'15' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <!-- 代码块复制功能 -->
+  <script type="text/javascript" src="/js/src/clipboard.min.js"></script>  
+  <script type="text/javascript" src="/js/src/clipboard-use.js"></script>
+</body>
+</html>
