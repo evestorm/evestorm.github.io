@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Tree-Shaking性能优化实践(笔记)]]></title>
+    <url>%2Fposts%2F64509%2F</url>
+    <content type="text"><![CDATA[何为 Tree-Shaking前端中的tree-shaking可以理解为通过工具”摇”我们的JS文件，将其中用不到的代码”摇”掉，是一个性能优化的范畴。具体来说，在 webpack 项目中，有一个入口文件，相当于一棵树的主干，入口文件有很多依赖的模块，相当于树枝。实际情况中，虽然依赖了某个模块，但其实只使用其中的某些功能。通过 tree-shaking，将没有使用的模块摇掉，这样来达到删除无用代码的目的。 Tree-Shaking性能优化实践 - 原理篇链接：掘金 - 百度外卖大前端技术团队 摇树优化实战链接：webpack4.29.x成神之路（十三） 摇树优化(tree shaking)]]></content>
+      <categories>
+        <category>前端</category>
+        <category>构建工具</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>webpack</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Uni-app踩坑日常]]></title>
     <url>%2Fposts%2F34936%2F</url>
     <content type="text"><![CDATA[Uni-app 踩坑日常【温馨提示】：如果图片不显示，可直接点击 此处 到我的 github 上看~ 1. 自定义组件 image 的 src 路径自定义组件里面使用 &lt;image&gt;时，若 src 使用相对路径可能出现路径查找失败的情况，故建议使用绝对路径。 —— uni-app 文档 image 组件 1.1 错误示范 ❌123&lt;image src="../../static/icos/star-yellow.png"&gt;&lt;/image&gt; 1.2 正确示范 ✅123&lt;image src="/static/icos/star-yellow.png"&gt;&lt;/image&gt; 2. v-show 在小程序上不起作用2.1 场景再现希望通过点击按钮来切换三行文字的显示隐藏： 代码非常简单，但有两个条件： style 标签添加上 scoped 装填文字的容器有自己的 display 属性 在此种情况下，H5的效果和预期一样，点击后三行文字都消失，再次点击三行文字都显示，如此往复。 但在微信小程序中第一行文字始终无法消失。 2.2 问题所在在小程序中， .item.data-v-xxx 的样式覆盖掉了 view[hidden] 的样式： 所以本应该默认不显示的第一行文字显示了。 而在 H5 上，uni-app 的做法是给当前标签添加上行内样式的 display: none，优先级最高： 123&lt;view v-show="show"&gt; &lt;view class="item"&gt;谁特么买小米？！&lt;/view&gt;&lt;/view&gt; 2.3 解决办法在外层包裹一个div，在上面设置 v-show 来控制元素的隐藏和显示： 3. uni-icon h5端不显示在项目中使用 uni-app 官方提供的 uniIcon 组件时，要注意现有项目中使用的是 uni-icon.vue 还是 uni-icons.vue ，前者是旧版组件，后者是新版，多了个 s 后缀。 如果使用的前者，注意在页面中导入 uni-icon 时不要起名为 uniIcon ： 1❌import uniIcon from '@/components/uni-icon/uni-icon.vue' 这样会导致 H5 端无法显示该图标。解决办法是起个别名，例如： 1✅import swIcon from '@/components/uni-icon/uni-icon.vue' 如果使用的后者，要注意使用 snippet 智能提示后，自动生成的代码 &lt;uni-icon type=&quot;&quot;&gt;&lt;/uni-icon&gt; 是有错误的，标签名最后少了个 s ，正确写法是： 1✅&lt;uni-icons class="apply" type="plusempty" size="20"&gt;&lt;/uni-icons&gt; 3.1 三种情况比较：123&lt;uni-icon type="plusempty" size="20"&gt;&lt;/uni-icon&gt;&lt;sw-icon type="plusempty" size="20"&gt;&lt;/sw-icon&gt;&lt;uni-icons type="plusempty" size="20"&gt;&lt;/uni-icons&gt; 123import uniIcon from '@/components/uni-icon/uni-icon.vue'import swIcon from '@/components/uni-icon/uni-icon.vue'import uniIcons from '@/components/uni-icons/uni-icons.vue' 3.2 插件地址：https://ext.dcloud.net.cn/plugin?id=28 4. 自定义modal弹窗uni-app 自带的 uni.showModal API的主体内容不支持添加标签，只能添加文字： 如果需要在弹窗中显示一个 input 控件或其他元素就无能为力了。 4.1 解决办法在插件市场找到了一款自定义 modal 组件： 文档：https://ext.dcloud.net.cn/plugin?id=134 5. class数组对象形式绑定非H5端不支持Vue官方文档：Class 与 Style 绑定中的classObject和styleObject语法。 —— uni-app 文档 5.1 H5 5.2 WX小程序]]></content>
