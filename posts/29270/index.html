@@ -77,7 +77,7 @@
 
 
 
-  <meta name="keywords" content="cookie,session,">
+  <meta name="keywords" content="webpack,">
 
 
 
@@ -88,21 +88,18 @@
 
 
 
-<meta name="description" content="保存状态cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：   使用方式cookie机制：  默认情况下，cookie 保存在内存中，浏览器关闭就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时">
-<meta name="keywords" content="cookie,session">
+<meta name="description" content="先举个栗子🌰假设我们一个用 webpack 打包的项目有以下场景  index.js  12345678import $ from &apos;jquery&apos;;import &amp;#123; initUI &amp;#125; from &apos;ui.js&apos;;const $div = $(&apos;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&apos;);$div.html(&apos;hello world!&apos;);$(&apos;body&apos;).appen">
+<meta name="keywords" content="webpack">
 <meta property="og:type" content="article">
-<meta property="og:title" content="cookie与session区别">
-<meta property="og:url" content="https://evestorm.github.io/posts/63891/index.html">
+<meta property="og:title" content="Webpack4-Shimming(垫片)">
+<meta property="og:url" content="https://evestorm.github.io/posts/29270/index.html">
 <meta property="og:site_name" content="EVE">
-<meta property="og:description" content="保存状态cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：   使用方式cookie机制：  默认情况下，cookie 保存在内存中，浏览器关闭就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时">
+<meta property="og:description" content="先举个栗子🌰假设我们一个用 webpack 打包的项目有以下场景  index.js  12345678import $ from &apos;jquery&apos;;import &amp;#123; initUI &amp;#125; from &apos;ui.js&apos;;const $div = $(&apos;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&apos;);$div.html(&apos;hello world!&apos;);$(&apos;body&apos;).appen">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png">
-<meta property="og:updated_time" content="2019-04-09T03:04:46.027Z">
+<meta property="og:updated_time" content="2019-11-05T14:30:34.524Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="cookie与session区别">
-<meta name="twitter:description" content="保存状态cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：   使用方式cookie机制：  默认情况下，cookie 保存在内存中，浏览器关闭就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时">
-<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png">
+<meta name="twitter:title" content="Webpack4-Shimming(垫片)">
+<meta name="twitter:description" content="先举个栗子🌰假设我们一个用 webpack 打包的项目有以下场景  index.js  12345678import $ from &apos;jquery&apos;;import &amp;#123; initUI &amp;#125; from &apos;ui.js&apos;;const $div = $(&apos;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&apos;);$div.html(&apos;hello world!&apos;);$(&apos;body&apos;).appen">
 
 
 
@@ -132,13 +129,13 @@
 
 
 
-  <link rel="canonical" href="https://evestorm.github.io/posts/63891/">
+  <link rel="canonical" href="https://evestorm.github.io/posts/29270/">
 
 
 
 
 
-  <title>cookie与session区别 | EVE</title>
+  <title>Webpack4-Shimming(垫片) | EVE</title>
   
 
 
@@ -300,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/63891/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/29270/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lance">
@@ -317,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">cookie与session区别</h1>
+          <h1 class="post-title" itemprop="name headline">Webpack4-Shimming(垫片)</h1>
         
 
         <div class="post-meta">
@@ -329,8 +326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-10T18:22:35+08:00">
-                2019-01-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-06T05:43:05+08:00">
+                2019-11-05
               </time>
             
 
@@ -363,8 +360,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/JS/" itemprop="url" rel="index">
-                    <span itemprop="name">JS</span>
+                  <a href="/categories/前端/构建工具/" itemprop="url" rel="index">
+                    <span itemprop="name">构建工具</span>
                   </a>
                 </span>
 
@@ -392,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  309
+                  332
                 </span>
               
 
@@ -429,33 +426,27 @@
       
 
       
-        <h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png" alt="cookie"></p>
-<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png" alt="session"></p>
-<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
-<ul>
-<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
-<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
-</ul>
-<p>session机制：</p>
-<ul>
-<li>每次请求，服务器会检查是否有 sessionid<ul>
-<li>有，服务器根据 id 返回对应 session 对象</li>
-<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
-</ul>
-</li>
-<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
-<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
-</ul>
-</li>
-</ul>
-<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
-<li>cookie 只能保存字符串类型，以文本的方式</li>
-<li>session 能支持任何类型的对象</li>
-</ul>
-<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
-<li>cookie单个不超过4kb</li>
-<li>session没限制</li>
+        <h2 id="先举个栗子🌰"><a href="#先举个栗子🌰" class="headerlink" title="先举个栗子🌰"></a>先举个栗子🌰</h2><p>假设我们一个用 webpack 打包的项目有以下场景</p>
+<blockquote>
+<p>index.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> $ <span class="keyword">from</span> <span class="string">'jquery'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; initUI &#125; <span class="keyword">from</span> <span class="string">'ui.js'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> $div = $(<span class="string">'&lt;div&gt;&lt;/div&gt;'</span>);</span><br><span class="line">$div.html(<span class="string">'hello world!'</span>);</span><br><span class="line">$(<span class="string">'body'</span>).append($div);</span><br><span class="line"></span><br><span class="line">initUI();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ui.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">initUI</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="string">'body'</span>).css(<span class="string">'background'</span>, <span class="string">'green'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时我们直接打包代码是不能执行的，因为 <code>ui.js</code> 中没有引入 <code>jquery</code>，所以不能使用 <code>$</code> 。</p>
+<p>按照正常思路我们会想，不是在 <code>index.js</code> 中一开始就引入了 jquery 么？为什么还会报错？这是因为 webpack 是基于模块打包的，当前模块下的变量只能在当前文件中起作用。所以引入的其他模块中如果也使用了这个变量就失效了。</p>
+<p>这种问题场景其实还不止是本地文件，有可能第三方库中也引用了jquery，但是我们直接去改库的代码是不太现实的。此时，就可以用shimming（垫片）来解决这个问题。</p>
+<h2 id="如何使用垫片插件"><a href="#如何使用垫片插件" class="headerlink" title="如何使用垫片插件"></a>如何使用垫片插件</h2><p>首先要引入webpack模块，然后配置插件</p>
+<blockquote>
+<p>webpack.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">plugins: [</span><br><span class="line">  <span class="keyword">new</span> webpack.ProvidePlugin(&#123;</span><br><span class="line">    $: <span class="string">'jquery'</span></span><br><span class="line">  &#125;)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>当我们加上这段代码后，模块在打包的时候，发现你使用了 <code>$</code> 就会在你模块顶部自动加入 <code>import $ from &#39;jquery&#39;</code> 。</p>
+<h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><ul>
+<li><a href="https://webpack.js.org/plugins/provide-plugin/" target="_blank" rel="noopener">ProvidePlugin（官网）</a></li>
+<li><a href="https://webpack.docschina.org/plugins/provide-plugin/" target="_blank" rel="noopener">ProvidePlugin（中文）</a></li>
 </ul>
 
       
@@ -503,9 +494,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/cookie/" rel="tag"><i class="fa fa-tag"></i> cookie</a>
-          
-            <a href="/tags/session/" rel="tag"><i class="fa fa-tag"></i> session</a>
+            <a href="/tags/webpack/" rel="tag"><i class="fa fa-tag"></i> webpack</a>
           
         </div>
       
@@ -518,19 +507,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/51696/" rel="next" title="<大话数据结构>笔记">
-                <i class="fa fa-chevron-left"></i> <大话数据结构>笔记
-              </大话数据结构></a>
+              <a href="/posts/64509/" rel="next" title="Tree-Shaking性能优化实践(笔记)">
+                <i class="fa fa-chevron-left"></i> Tree-Shaking性能优化实践(笔记)
+              </a>
             
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/posts/47462/" rel="prev" title="如何使用webpack4">
-                如何使用webpack4 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -660,7 +645,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#保存状态"><span class="nav-number">1.</span> <span class="nav-text">保存状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用方式"><span class="nav-number">2.</span> <span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储方式"><span class="nav-number">3.</span> <span class="nav-text">存储方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储大小"><span class="nav-number">4.</span> <span class="nav-text">存储大小</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#先举个栗子🌰"><span class="nav-number">1.</span> <span class="nav-text">先举个栗子🌰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用垫片插件"><span class="nav-number">2.</span> <span class="nav-text">如何使用垫片插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#官方文档"><span class="nav-number">3.</span> <span class="nav-text">官方文档</span></a></li></ol></div>
             
 
           </div>
