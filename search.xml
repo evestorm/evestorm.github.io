@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[移动端input类型为date的placeholder不显示]]></title>
+    <url>%2Fposts%2F23431%2F</url>
+    <content type="text"><![CDATA[起因在移动端项目开发中，DatetimePicker（时间选择器） 组件是非常常用的，并且市面上各大移动端UI框架也都帮我们封装了，然而绝大部分框架封装的该组件都是从底部弹出式滚动选择的（Android 和 iOS 真机上都如此），例如下面形式： 然而这仅针对 iOS 用户友好，但对于用惯了 Android 手机的用户来说，下面形式的时间选择才是他们熟悉的形式： 所以往往我们会放弃掉框架帮我们封装好的组件，自己用原始 input[type=date] 实现一个或者借助其他基于原始 input 标签封装的时间选择器。这里顺带提一个我感觉用起来还不错的库：flatpickr，github地址为：flatpickr/flatpickr 。 我在项目中就使用到了这个库，然而在开发中遇到了一个小问题，设计稿上要求，我们的时间选择器组件默认情况下显示一段 placeholder ，然而在真机上我发现，无论 iOS 还是 Android 下，input 始终为空，设置的 placeholder 无效。原本我以为这是 flatpickr 做了手脚，简单查看了源码后发现并不是它的锅。最后 Google 后才知道，这就是 input[type=date] 元素在手机端上的一个 feature ，（不过我感觉就是个 bug ，我设置了你凭什么不给我显示？）。 解决方案前面铺垫了这么多，其实解决方案涉及到的代码量并不多，原理就是使用 css 伪类给 input[type=date] 设置默认 content 为 placeholder ，再设置 input 状态为 focus 时移除这个 placeholder 属性，最后在触发 blur 时把 placeholder 添加回来。具体代码如下： html 1&lt;input class="text-date" type="date" placeholder="请选择日期"&gt; css 1234input[type="date"]:before &#123; content: attr(placeholder); color: #ccc;&#125; js 12345678$('text-date').focus(function() &#123; $(this).removeAttr('placeholder');&#125;);$('text-date').blur(function() &#123; if (this.value === '') &#123; $(this).attr('placeholder', '请选择日期'); &#125;&#125;)]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>兼容性</tag>
+        <tag>移动端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[使用you-get下载网站视频]]></title>
     <url>%2Fposts%2F21487%2F</url>
     <content type="text"><![CDATA[介绍you-get 是 GitHub 上的一个开源项目，可以帮助我们下载大多主流网站上的视频、图片及音频。 GitHub Repo 地址： soimort/you-get 起因有时候希望能在 B 站下载在线视频到本地，然而 B 站只支持在手机端缓存。所以 Google 了下发现了一个插件：「bilibili哔哩哔哩下载助手」（点击左侧链接在google应用商店直接下载），下载完成后打开你要下载的 B站 视频链接，右下角就会出现一个按钮： 点击后就弹出下载详情，直接按下图配置点击合并下载即可： 扯远了，其实到目前为止一切都非常顺利，但这个助手插件有个问题就是有时候下载特别快有时候又特别慢，慢起来一个200M视频要下载1两个小时。所以我又开始了找工具征程。最后就发现了今天的主角————「you-get」。 安装首先你需要安装 python3 最新版。（没有 python 的需要前往 python 官方按照教程下载）。 然后在本地安装 you-get： Windows 用户按住键盘「win+R」打开运行窗口，输入 cmd 点确定，然后键入如下命名： 123pip3 install you-getpip3 install --upgrade you-getpython -m pip install --upgrade pip 执行完上面三步并没有报错就代表安装成功了。 Mac 用户mac这边更简单，快捷键「Ctrl+空格」输入 Terminal 回车启动，键入下方命名（和 Windows 一样，前提是安装最新版 python3.7+ ）： 1pip3 install you-get 使用安装完成后咱们就能愉快的下载视频了。示例如下： 1you-get https://www.bilibili.com/video/av8106130?p=2 下载目录视频下载后存储在本地的地址就是你执行下载命名时所在的目录。]]></content>
