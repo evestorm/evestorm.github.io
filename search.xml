@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[select如何让文字右对齐]]></title>
+    <url>%2Fposts%2F40703%2F</url>
+    <content type="text"><![CDATA[最近写项目需要用到 select 元素，并把它放到手机端的导航栏右上角。但发现有的候选项内容比较长，所以就想着限制下宽度，让多出来的内容不显示。但这样一来很短的候选项内容就默认居左显示了，不太好看（因为设计稿这个 select 是靠右对齐的）。 按照正常逻辑给 select 加个 text-align: center 就好了，但这个鬼标签不按套路出牌，加了并没有任何效果。Google 了下发现 select 的对齐是用 direction 这个属性控制的，让其值为 rtl 就好，意思是「文本方向从右到左」： 123select &#123; direction: rtl;&#125;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[移动端input类型为date的placeholder不显示]]></title>
     <url>%2Fposts%2F23431%2F</url>
     <content type="text"><![CDATA[起因在移动端项目开发中，DatetimePicker（时间选择器） 组件是非常常用的，并且市面上各大移动端UI框架也都帮我们封装了，然而绝大部分框架封装的该组件都是从底部弹出式滚动选择的（Android 和 iOS 真机上都如此），例如下面形式： 然而这仅针对 iOS 用户友好，但对于用惯了 Android 手机的用户来说，下面形式的时间选择才是他们熟悉的形式： 所以往往我们会放弃掉框架帮我们封装好的组件，自己用原始 input[type=date] 实现一个或者借助其他基于原始 input 标签封装的时间选择器。这里顺带提一个我感觉用起来还不错的库：flatpickr，github地址为：flatpickr/flatpickr 。 我在项目中就使用到了这个库，然而在开发中遇到了一个小问题，设计稿上要求，我们的时间选择器组件默认情况下显示一段 placeholder ，然而在真机上我发现，无论 iOS 还是 Android 下，input 始终为空，设置的 placeholder 无效。原本我以为这是 flatpickr 做了手脚，简单查看了源码后发现并不是它的锅。最后 Google 后才知道，这就是 input[type=date] 元素在手机端上的一个 feature ，不过我感觉就是个 bug ，我设置了你凭什么不给我显示？。 解决方案前面铺垫了这么多，其实解决方案涉及到的代码量并不多，原理就是使用 css 伪类给 input[type=date] 设置默认 content 为 placeholder ，再设置 input 状态为 focus 时移除这个 placeholder 属性，最后在触发 blur 时把 placeholder 添加回来。具体代码如下： html 1&lt;input class="text-date" type="date" placeholder="请选择日期"&gt; css 1234input[type="date"]:before &#123; content: attr(placeholder); color: #ccc;&#125; js 12345678$('text-date').focus(function() &#123; $(this).removeAttr('placeholder');&#125;);$('text-date').blur(function() &#123; if (this.value === '') &#123; $(this).attr('placeholder', '请选择日期'); &#125;&#125;)]]></content>
