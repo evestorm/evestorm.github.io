@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[css扩大元素点击区域]]></title>
+    <url>%2Fposts%2F1303%2F</url>
+    <content type="text"><![CDATA[问题描述项目中遇到使用滑动条的地方，但设计稿上的按钮面积非常小，用户在手机上由于不容易精确触摸到按钮导致拖动滚动条困难： 所以就想着扩大按钮的点击区域。通常情况下想要扩大点击区域有两种方案： 增加border 添加padding 然而由于此滑动条使用的是三方库，圆形按钮的位置使用的是绝对定位，不太好改它本身的大小，因为这样要调整的css样式太多。所以上面两种方案都被毙掉了，最后 Google 到下面方案。 解决方案使用伪元素扩大可点击区域 伪元素能为其父元素捕获鼠标交互动作，因此，只需通过伪元素扩大父元素的空间大小，就能扩大可点击区域。 代码如下： 1&lt;button class="extend-via-pseudo-elem"&gt;点击&lt;/button&gt; 123456789101112.extend-via-pseudo-elem &#123; position: relative;&#125;.extend-via-pseudo-elem::before &#123; content: ''; position: absolute; top: -20px; right: -20px; bottom: -20px; left: -20px;&#125;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[select标签样式调整技巧]]></title>
     <url>%2Fposts%2F46310%2F</url>
     <content type="text"><![CDATA[重置丑陋样式项目中使用到了 select 标签，但在 Android 和 iOS 上默认展示的效果都很丑而且不一致，网上搜到一个 css 样式可以重置效果，这里记下笔记： 12345678910111213141516171819select &#123; /*移除浏览器默认特殊样式*/ appearance: none; -moz-appearance: none; -webkit-appearance: none; -ms-appearance: none; /*移除轮廓样式*/ outline: none; /*移除点击元素时出现的高亮颜色*/ -webkit-tap-highlight-color: #fff; border: rem(1) solid #EBEBEB; border: none; width: rem(100); height: rem(50); line-height: rem(50); /*设置一个块元素首行文本内容之前的缩进量，防止紧紧靠在边上*/ text-indent: rem(4); background-color: transparent;&#125; 选中项右对齐1234select &#123; direction: rtl;&#125;/* 默认左对齐属性值为 ltr */ select默认选中项原生123456789101112131415161718&lt;!DOCTYPE html&gt;&lt;html lang="en"&gt;&lt;body&gt; &lt;select name="framework" id="framework"&gt; &lt;option value="vue"&gt;VueJS&lt;/option&gt; &lt;option value="react" selected&gt;ReactJS&lt;/option&gt; &lt;option value="angular"&gt;AngularJS&lt;/option&gt; &lt;option value="jquery"&gt;jQuery&lt;/option&gt; &lt;/select&gt; &lt;script&gt; document.querySelector('#framework').addEventListener('change', function (e) &#123; console.log(e.target.value); &#125;); &lt;/script&gt;&lt;/body&gt;&lt;/html&gt; vue template 1234567&lt;template&gt; &lt;div&gt; &lt;select v-model="selected" @change="selectChange" class="select"&gt; &lt;option v-for="(search, key) in searchList" :key="key" :value="search.id"&gt;&#123;&#123;search.name&#125;&#125;&lt;/option&gt; &lt;/select&gt; &lt;/div&gt;&lt;/template&gt; js 12345678910111213141516data()&#123; return&#123; searchList:[ &#123; id:'1',name:'中国' &#125;, &#123; id:'2',name:'美国' &#125;, &#123; id:'3',name:'日本' &#125;, ], selected:'2' &#125;&#125; 在写 vue select 的时候应注意以下几点： v-model 是select 的指定显示文本，如果没有，当选中 option 中的内容时 select 标签将不会显示出文本。 @change 应尽量写在 select 标签上。 onchange 事件获取选中项的 value 和 text123456789101112131415161718192021222324252627282930313233&lt;!DOCTYPE html&gt;&lt;html lang="en"&gt;&lt;head&gt; &lt;meta charset="UTF-8"&gt; &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt; &lt;meta http-equiv="X-UA-Compatible" content="ie=edge"&gt; &lt;title&gt;Document&lt;/title&gt;&lt;/head&gt;&lt;body&gt; &lt;div class="num"&gt; &lt;select id="xuanze"&gt; &lt;option value="10"&gt;10&lt;/option&gt; &lt;option value="15"&gt;15&lt;/option&gt; &lt;option value="20"&gt;20&lt;/option&gt; &lt;option value="25"&gt;25&lt;/option&gt; &lt;option value="30"&gt;30&lt;/option&gt; &lt;option value="35"&gt;35&lt;/option&gt; &lt;option value="40"&gt;40&lt;/option&gt; &lt;/select&gt; &lt;/div&gt; &lt;script type="text/javascript"&gt; window.onload = function() &#123; var obj = document.getElementById('xuanze'); //定位id obj.addEventListener('change', () =&gt; &#123; var index = obj.selectedIndex; // 选中索引 var value = obj.options[index].value; // 选中值 var text = obj.options[index].text; // 选中展示的文字 console.log(index, value); &#125;) &#125; &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;]]></content>
