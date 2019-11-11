@@ -27,19 +27,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[【笔记】移动端移除select默认样式]]></title>
-    <url>%2Fposts%2F54784%2F</url>
-    <content type="text"><![CDATA[项目中使用到了 select 标签，但在 Android 和 iOS 上默认展示的效果都很丑而且不一致，网上搜到一个 css 样式可以重置效果，这里记下笔记： 12345678910111213141516171819select &#123; /*移除浏览器默认特殊样式*/ appearance: none; -moz-appearance: none; -webkit-appearance: none; -ms-appearance: none; /*移除轮廓样式*/ outline: none; /*移除点击元素时出现的高亮颜色*/ -webkit-tap-highlight-color: #fff; border: rem(1) solid #EBEBEB; border: none; width: rem(100); height: rem(50); line-height: rem(50); /*设置一个块元素首行文本内容之前的缩进量，防止紧紧靠在边上*/ text-indent: rem(4); background-color: transparent;&#125;]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[移动端input类型为date的placeholder不显示]]></title>
     <url>%2Fposts%2F23431%2F</url>
     <content type="text"><![CDATA[起因在移动端项目开发中，DatetimePicker（时间选择器） 组件是非常常用的，并且市面上各大移动端UI框架也都帮我们封装了，然而绝大部分框架封装的该组件都是从底部弹出式滚动选择的（Android 和 iOS 真机上都如此），例如下面形式： 然而这仅针对 iOS 用户友好，但对于用惯了 Android 手机的用户来说，下面形式的时间选择才是他们熟悉的形式： 所以往往我们会放弃掉框架帮我们封装好的组件，自己用原始 input[type=date] 实现一个或者借助其他基于原始 input 标签封装的时间选择器。这里顺带提一个我感觉用起来还不错的库：flatpickr，github地址为：flatpickr/flatpickr 。 我在项目中就使用到了这个库，然而在开发中遇到了一个小问题，设计稿上要求，我们的时间选择器组件默认情况下显示一段 placeholder ，然而在真机上我发现，无论 iOS 还是 Android 下，input 始终为空，设置的 placeholder 无效。原本我以为这是 flatpickr 做了手脚，简单查看了源码后发现并不是它的锅。最后 Google 后才知道，这就是 input[type=date] 元素在手机端上的一个 feature ，不过我感觉就是个 bug ，我设置了你凭什么不给我显示？。 解决方案前面铺垫了这么多，其实解决方案涉及到的代码量并不多，原理就是使用 css 伪类给 input[type=date] 设置默认 content 为 placeholder ，再设置 input 状态为 focus 时移除这个 placeholder 属性，最后在触发 blur 时把 placeholder 添加回来。具体代码如下： html 1&lt;input class="text-date" type="date" placeholder="请选择日期"&gt; css 1234input[type="date"]:before &#123; content: attr(placeholder); color: #ccc;&#125; js 12345678$('text-date').focus(function() &#123; $(this).removeAttr('placeholder');&#125;);$('text-date').blur(function() &#123; if (this.value === '') &#123; $(this).attr('placeholder', '请选择日期'); &#125;&#125;)]]></content>
