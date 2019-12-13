@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="什么是节流和防抖 debounce（防抖）的作用是在让在用户动作停止后延迟x ms再执行回调。 throttle（节流）的作用是在用户动作期间每隔一定时间（如200ms）执行一次回调。  如何理解防抖如果有人进电梯（触发事件），那电梯将在 10 秒钟后出发（执行事件），这时如果又有人进电梯了（在 10 秒内再次触发该事件），我们又得等 10 秒再出发（重新计时）。 节流游戏中人物的技能CD，当技能">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-12T23:40:11.028Z">
+<meta property="og:updated_time" content="2019-12-13T00:08:13.875Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="函数防抖&amp;函数节流">
 <meta name="twitter:description" content="什么是节流和防抖 debounce（防抖）的作用是在让在用户动作停止后延迟x ms再执行回调。 throttle（节流）的作用是在用户动作期间每隔一定时间（如200ms）执行一次回调。  如何理解防抖如果有人进电梯（触发事件），那电梯将在 10 秒钟后出发（执行事件），这时如果又有人进电梯了（在 10 秒内再次触发该事件），我们又得等 10 秒再出发（重新计时）。 节流游戏中人物的技能CD，当技能">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  487
+                  654
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  2
                 </span>
               
             </div>
@@ -434,16 +434,17 @@
 <h3 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h3><p>游戏中人物的技能CD，当技能处于闲置状态时，按下技能键（触发事件）能立马生效（执行事件）。生效后有技能冷却时间，期间不管你按多少下技能键（触发事件），就算把键盘按爆，都无法再次触发技能，直到冷却完毕。</p>
 <p>P.S. CD时间：Cool Down Time</p>
 <h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="防抖-1"><a href="#防抖-1" class="headerlink" title="防抖"></a>防抖</h3><ol>
-<li>表单的连续点击，防止重复提交。比如重复发送一篇文章。</li>
-<li>类百度的搜索，连续输入等输入停止后再搜索。</li>
-<li>一直拖动浏览器窗口，只想触发一次事件等。</li>
+<li>表单提交按钮的连续点击，防止重复提交。比如重复发送一篇文章。</li>
+<li>搜索查询（连续输入文字后发送 AJAX 请求进行验证，（停止输入后）验证一次就好）</li>
+<li>滚动事件scroll（只需执行触发的最后一次滚动事件的处理程序）</li>
 </ol>
 <h3 id="节流-1"><a href="#节流-1" class="headerlink" title="节流"></a>节流</h3><ol>
 <li>自动保存草稿功能，当用户在输入的时候(一直触发事件),单位时间内只保存一次草稿。</li>
 <li>上拉加载更多，防止用户暴力快速上滑。隔一段时间才能触发一次</li>
+<li>滚动事件scroll，（只要页面滚动就会间隔一段时间判断一次）</li>
 </ol>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="防抖-2"><a href="#防抖-2" class="headerlink" title="防抖"></a>防抖</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防抖（一段时间会等，然后带着一起做了）</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay=<span class="number">1000</span></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">if</span>(timer)&#123;<span class="built_in">window</span>.clearTimeout(timer)&#125;</span><br><span class="line">    timer = setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</span><br><span class="line">      fn.apply(context, <span class="built_in">arguments</span>)</span><br><span class="line">      timer = <span class="literal">null</span></span><br><span class="line">    &#125;,delay)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="节流-2"><a href="#节流-2" class="headerlink" title="节流"></a>节流</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 节流（一段时间执行一次之后，就不执行第二次）</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay=<span class="number">1000</span></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">let</span> canUse = <span class="literal">true</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">if</span>(canUse)&#123;</span><br><span class="line">      fn.apply(context, <span class="built_in">arguments</span>)</span><br><span class="line">      canUse = <span class="literal">false</span></span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>canUse = <span class="literal">true</span>, delay)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="防抖-2"><a href="#防抖-2" class="headerlink" title="防抖"></a>防抖</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @description: 防抖函数：函数被触发 n 秒后再执行回调，如果在这 n 秒内又被触发，则重新计时</span></span><br><span class="line"><span class="comment"> * @param &#123;Function&#125; fn 要执行的函数</span></span><br><span class="line"><span class="comment"> * @param &#123;Number&#125; delay  delay毫秒后执行回调</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay = <span class="number">500</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span>;</span><br><span class="line">  <span class="comment">// 为了封装，这里使用了闭包来保存局部变量=&gt;tip:  闭包保护的变量会一直保存在内存中但又不会 “污染” 全局的变量</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (timer) clearTimeout(timer);</span><br><span class="line">    timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      fn.apply(context, <span class="built_in">arguments</span>);</span><br><span class="line">      timer = <span class="literal">null</span>;</span><br><span class="line">    &#125;, delay);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="节流-2"><a href="#节流-2" class="headerlink" title="节流"></a>节流</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @description: 节流函数：规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行</span></span><br><span class="line"><span class="comment"> * @param &#123;Function&#125; fn 要执行的函数</span></span><br><span class="line"><span class="comment"> * @param &#123;Number&#125; gapTime  单位时间</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, gapTime = <span class="number">500</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> canUse = <span class="literal">true</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (canUse) &#123;</span><br><span class="line">      fn.apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>);</span><br><span class="line">      canUse = <span class="literal">false</span>;</span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> (canUse = <span class="literal">true</span>), gapTime);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><iframe height="842" style="width: 100%;" scrolling="no" title="函数防抖&amp;函数节流" src="https://codepen.io/JingW/embed/yLyJPaP?height=842&theme-id=default&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"><br>  See the Pen <a href="https://codepen.io/JingW/pen/yLyJPaP" target="_blank" rel="noopener">函数防抖&amp;函数节流</a> by JingW<br>  (<a href="https://codepen.io/JingW" target="_blank" rel="noopener">@JingW</a>) on <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a>.<br></iframe>
 
       
@@ -683,7 +684,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">174.8k</span>
+    <span title="Site words total count">174.9k</span>
   
 </div>
 
