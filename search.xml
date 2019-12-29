@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[[转载]滚动视差？CSS 不在话下]]></title>
+    <url>%2Fposts%2F23837%2F</url>
+    <content type="text"><![CDATA[掘金链接：https://juejin.im/post/5b6d0756e51d4562b31ad23c github链接：https://github.com/chokcoco/iCSS/issues/37]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[uniapp吸顶效果]]></title>
     <url>%2Fposts%2F7733%2F</url>
     <content type="text"><![CDATA[场景 案例 See the Pen 列表标题吸顶效果 by JingW (@JingW) on CodePen. uni-app 写法 template 结构 1234567891011121314151617181920212223242526&lt;!-- 运营概况 --&gt;&lt;view class="main"&gt; &lt;view class="main-title" ref="operationRef" data-id="operationRef"&gt; &lt;text class="left"&gt;运营概况&lt;/text&gt; &lt;view class="right"&gt; &lt;view&gt;我的&lt;/view&gt;&lt;view&gt;全店&lt;/view&gt; &lt;/view&gt; &lt;/view&gt; &lt;!-- ================== 主体内容 =================== --&gt; &lt;view class="overview-com"&gt; ... &lt;/view&gt;&lt;/view&gt;&lt;!-- 运营概况 --&gt;&lt;view class="main"&gt; &lt;view class="main-title" ref="operationRef" data-id="operationRef"&gt; &lt;text class="left"&gt;宴会概况&lt;/text&gt; &lt;view class="right"&gt; &lt;view&gt;我的&lt;/view&gt;&lt;view&gt;全店&lt;/view&gt; &lt;/view&gt; &lt;/view&gt; &lt;!-- ================== 主体内容 =================== --&gt; &lt;view class="overview-com"&gt; ... &lt;/view&gt;&lt;/view&gt; js 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960export default &#123; data() &#123; return &#123; ..., mainTitleEles: [], // 所有mainTitle标题对象集合 mainEles: [], // 所有板块对象集合 ot: [], //存储每个标题的offsetTop len: 0, // 标题的个数 searchBottomY: 0, // 搜索view底部距离页面顶部的距离 selectorQuery: &#123;&#125;, // Uniapp SelectorQuery 对象实例 &#125; &#125;, mounted() &#123; // 获取 SelectorQuery 对象实例。可以在这个实例上使用 select 等方法选择节点 this.selectorQuery = uni.createSelectorQuery().in(this); this.initFixedTop(); &#125;, methods: &#123; // --------------- 监听 mescroll 页面滚动 ------------------------ // 初始化吸顶标题的工作 initFixedTop() &#123; // 获取所有需要吸顶效果的标题 this.mainTitle = this.selectorQuery.selectAll('.main-title'); uni.createSelectorQuery().selectAll('.main-title').fields(&#123; rect: true, dataset: true &#125;, res =&gt; &#123; this.mainTitleEles = res; // 标题的个数 this.len = this.mainTitleEles.length; for (let i = 0; i &lt; this.len; i++) &#123; this.ot.push(this.mainTitleEles[i].top); //获取每个标题的offsetTop &#125; // 获取所有需要吸顶的板块 uni.createSelectorQuery().selectAll('.main').fields(&#123; rect: true, dataset: true, size: true &#125;, res =&gt; &#123; this.mainEles = res; // 存储每个标题的offsetTop（只读属性，返回当前元素相对于其 offsetParent 元素的顶部内边距的距离） // 加上 最后一个吸顶板块的高度. 解决滚动到最后一个标题（i）时，无法获取（i+1）的offsetTop this.ot.push(this.mainEles[this.len - 1].top + this.mainEles[this.len - 1].height); &#125;).exec(); &#125;).exec(); &#125;, onScroll(mescroll) &#123; // 获取滚动的高度 const st = mescroll.scrollTop; for (let i = 0; i &lt; this.len; i++) &#123; // 滚动时监听位置，为标题的吸顶设置一个显示范围 if (st &gt; this.ot[i] &amp;&amp; st &lt; this.ot[i + 1]) &#123; this.$refs[this.mainTitleEles[i].dataset.id].$el.className = 'main-title fixed'; &#125; else &#123; this.$refs[this.mainTitleEles[i].dataset.id].$el.className = 'main-title'; &#125; &#125; &#125;, &#125;&#125;; uni-app 思路和案例demo一样，所以就不贴代码的样式了，唯一要注意的一点就是dom属性的获取是通过 uni-app 相关 API 实现的： 参考 uni-app获取dom元素到顶部的距离以及操作dom元素的一些样式 uni.createSelectorQuery() 实现多个标题的吸顶效果]]></content>
