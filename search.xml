@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Vue组件化常用技术总结(笔记)]]></title>
+    <url>%2Fposts%2F27829%2F</url>
+    <content type="text"><![CDATA[组件化常用技术组件传值、通信父组件 =&gt; 子组件 属性props 12345// childprops: &#123; msg: String &#125;// parent&lt;HelloWorld msg="Welcome to Your Vue.js App"/&gt; 引用refs 1234567891011// parent&lt;HelloWorld ref="hw"/&gt;this.$refs.hw.xx// P.S.• 如果ref放在了原生DOM元素上，获取的数据就是原生DOM对象 - 可以直接操作• 如果ref放在了组件对象上，获取的就是组件对象 - 可以获取到组件内data、methods，通过 this.$refs.refName.data名称/method名称 - 可以获取到DOM对象，通过 this.$refs.refName.$el进行操作 子组件 =&gt; 父组件：自定义事件123456// childprops: &#123; add: Function &#125;this.$emit('add', good)// parent&lt;Cart @add="cartAdd($event)"&gt;&lt;/Cart&gt; 兄弟组件：通过共同祖辈组件通过共同的祖辈组件搭桥，$parent 或 $root。 12345// brother1this.$parent.$on('foo', handle)// brother2this.$parent.$emit('foo') 祖先和后代之间 provide/inject：能够实现祖先给后代传值 1234567// ancestorprovide() &#123; return &#123;foo: 'foo'&#125;&#125;// descendantinject: ['foo'] dispatch：后代给祖先传值 1234567891011121314151617// 定义一个dispatch方法，指定要派发事件名称和数据function dispatch(eventName, data) &#123; let parent = this.$parent // 只要还存在父元素就继续往上查找 while (parent) &#123; // 父元素用$emit触发 parent.$emit(eventName,data) // 递归查找父元素 parent = parent.$parent &#125;&#125;// 使用，HelloWorld.vue&lt;h1 @click="dispatch('hello', 'hello,world')"&gt;&#123;&#123; msg &#125;&#125;&lt;/h1&gt;// App.vuethis.$on('hello', this.sayHello) 任意两个组件之间：事件总线 或 vuex 事件总线：创建一个Bus类负责事件派发、监听和回调管理 1234567891011121314151617181920212223242526// 自定义Bus：事件派发、监听和回调管理class Bus &#123; constructor()&#123; // &#123; // eventName1:[fn1,fn2], // eventName2:[fn3,fn4], // &#125; this.callbacks = &#123;&#125; &#125; $on(name, fn)&#123; this.callbacks[name] = this.callbacks[name] || [] this.callbacks[name].push(fn) &#125; $emit(name, args)&#123; if(this.callbacks[name])&#123; this.callbacks[name].forEach(cb =&gt; cb(args)) &#125; &#125;&#125;// main.jsVue.prototype.$bus = new Bus()// child1this.$bus.$on('foo', handle)// child2this.$bus.$emit('foo') 123456789101112131415161718// 封装 vueEvent.jsimport Vue from 'vue';var VueEvent = new Vue();export default VueEvent;// 使用// 广播者import VueEvent from '../model/VueEvent.js';methods: &#123; emitNews() &#123; VueEvent.$emit('to-news', this.msg) &#125;&#125;// 监听者import VueEvent from '../model/VueEvent.js';mounted() &#123; VueEvent.$on('to-news', function(data) &#123;...接收到了data...&#125;)&#125; Vuex：创建唯一的全局数据管理者store，通过它管理数据并通知组件状态变更 插槽 Vue 2.6.0之后采用全新v-slot语法取代之前的slot、slot-scope 匿名插槽1234567// comp1&lt;div&gt; &lt;slot&gt;&lt;/slot&gt;&lt;/div&gt;// parent&lt;comp&gt;hello&lt;/comp&gt; 具名插槽12345678910111213// comp2&lt;div&gt; &lt;slot&gt;&lt;/slot&gt; &lt;slot name="content"&gt;&lt;/slot&gt;&lt;/div&gt;// parent&lt;Comp2&gt; &lt;!-- 默认插槽用default做参数 --&gt; &lt;template v-slot:default&gt;具名插槽&lt;/template&gt; &lt;!-- 具名插槽用插槽名做参数 --&gt; &lt;template v-slot:content&gt;内容...&lt;/template&gt;&lt;/Comp2&gt; 作用域插槽123456789101112// comp3&lt;div&gt; &lt;slot :foo="foo"&gt;&lt;/slot&gt;&lt;/div&gt;// parent&lt;Comp3&gt; &lt;!-- 把v-slot的值指定为作用域上下文对象(e.g. &#123;foo: foo&#125;) --&gt; &lt;template v-slot:default="ctx"&gt; 来自子组件数据：&#123;&#123;ctx.foo&#125;&#125; &lt;/template&gt;&lt;/Comp3&gt;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[使用lorem在HTML中生成随机文本]]></title>
     <url>%2Fposts%2F22606%2F</url>
     <content type="text"><![CDATA[看b站视频偶尔知道的这个功能，VSCode可以自动生成随机文本。这样平常就不用在编写前端页面时重复copy文字用来占位了。 使用方法： 1lorem + 单词数量 扩展Lorem ipsum Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字 来自百度百科]]></content>
@@ -660,8 +673,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>axios</tag>
         <tag>跨域</tag>
+        <tag>axios</tag>
       </tags>
   </entry>
   <entry>
@@ -673,9 +686,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
         <tag>cors</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
