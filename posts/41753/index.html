@@ -77,7 +77,7 @@
 
 
 
-  <meta name="keywords" content="vue,">
+  <meta name="keywords" content="转载,技巧,性能优化,">
 
 
 
@@ -88,18 +88,27 @@
 
 
 
-<meta name="description" content="创建期间的生命周期函数beforeCreate实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。 作用执行 loading 动画。 created实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻还没有开始编译模板。 作用 结束掉 loading 动画 做一些初始化工作，比如函数自执行，发起异步请求获取数据  beforeMount">
-<meta name="keywords" content="vue">
+<meta name="description" content="来源：高性能前端架构解决方案 这篇文章介绍了一些使前端应用程序加载更快并提供良好用户体验的技术。 我们将研究前端的总体架构，如何首先加载必需的资源，并最大化资源缓存的概率。 无论你的页面是否需要成为客户端应用程序，还是如何优化应用程序的渲染时间，我都不会说太多后端如何传递资源。 总览我将把应用程序加载分为三个不同的阶段：  初始渲染 – 用户看到任何东西之前需要多长时间？ 应用程序加载 – 用户可">
+<meta name="keywords" content="转载,技巧,性能优化">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Vue的生命周期函数">
-<meta property="og:url" content="https://evestorm.github.io/posts/33186/index.html">
+<meta property="og:title" content="[转载]高性能前端架构解决方案">
+<meta property="og:url" content="https://evestorm.github.io/posts/41753/index.html">
 <meta property="og:site_name" content="EVE">
-<meta property="og:description" content="创建期间的生命周期函数beforeCreate实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。 作用执行 loading 动画。 created实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻还没有开始编译模板。 作用 结束掉 loading 动画 做一些初始化工作，比如函数自执行，发起异步请求获取数据  beforeMount">
+<meta property="og:description" content="来源：高性能前端架构解决方案 这篇文章介绍了一些使前端应用程序加载更快并提供良好用户体验的技术。 我们将研究前端的总体架构，如何首先加载必需的资源，并最大化资源缓存的概率。 无论你的页面是否需要成为客户端应用程序，还是如何优化应用程序的渲染时间，我都不会说太多后端如何传递资源。 总览我将把应用程序加载分为三个不同的阶段：  初始渲染 – 用户看到任何东西之前需要多长时间？ 应用程序加载 – 用户可">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-05-19T15:12:13.991Z">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223114.jpeg">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223159.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223158.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223164.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223220.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223167.png">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/aDoYvepE5x2ARc7svq6qBxYOpNv4Zs5kVXGYZdG6mbED2saF1AX7pLJ8usR9I8iaqpZpv4iaCU3sooRZgFt6sRlg/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1">
+<meta property="og:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223217.png">
+<meta property="og:updated_time" content="2020-03-22T12:24:22.416Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Vue的生命周期函数">
-<meta name="twitter:description" content="创建期间的生命周期函数beforeCreate实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。 作用执行 loading 动画。 created实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻还没有开始编译模板。 作用 结束掉 loading 动画 做一些初始化工作，比如函数自执行，发起异步请求获取数据  beforeMount">
+<meta name="twitter:title" content="[转载]高性能前端架构解决方案">
+<meta name="twitter:description" content="来源：高性能前端架构解决方案 这篇文章介绍了一些使前端应用程序加载更快并提供良好用户体验的技术。 我们将研究前端的总体架构，如何首先加载必需的资源，并最大化资源缓存的概率。 无论你的页面是否需要成为客户端应用程序，还是如何优化应用程序的渲染时间，我都不会说太多后端如何传递资源。 总览我将把应用程序加载分为三个不同的阶段：  初始渲染 – 用户看到任何东西之前需要多长时间？ 应用程序加载 – 用户可">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/41753/images/640-20200322202223114.jpeg">
 
 
 
@@ -129,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="https://evestorm.github.io/posts/33186/">
+  <link rel="canonical" href="https://evestorm.github.io/posts/41753/">
 
 
 
 
 
-  <title>Vue的生命周期函数 | EVE</title>
+  <title>[转载]高性能前端架构解决方案 | EVE</title>
   
 
 
@@ -297,7 +306,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/33186/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/41753/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lance">
@@ -314,7 +323,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Vue的生命周期函数</h1>
+          <h1 class="post-title" itemprop="name headline">[转载]高性能前端架构解决方案</h1>
         
 
         <div class="post-meta">
@@ -326,8 +335,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-23T18:12:40+08:00">
-                2019-02-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-23T04:21:47+08:00">
+                2020-03-22
               </time>
             
 
@@ -360,8 +369,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/框架/" itemprop="url" rel="index">
-                    <span itemprop="name">框架</span>
+                  <a href="/categories/前端/性能优化/" itemprop="url" rel="index">
+                    <span itemprop="name">性能优化</span>
                   </a>
                 </span>
 
@@ -389,7 +398,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  475
+                  3.6k
                 </span>
               
 
@@ -405,7 +414,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  12
                 </span>
               
             </div>
@@ -426,24 +435,124 @@
       
 
       
-        <h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
-<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
-<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
-<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>结束掉 loading 动画</li>
-<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
+        <p>来源：<a href="https://mp.weixin.qq.com/s/C4izhX-vMnw_dpUZ1uDM0A" target="_blank" rel="noopener">高性能前端架构解决方案</a></p>
+<p>这篇文章介绍了一些使前端应用程序加载更快并提供良好用户体验的技术。</p>
+<p>我们将研究前端的总体架构，如何首先加载必需的资源，并最大化资源缓存的概率。</p>
+<p>无论你的页面是否需要成为客户端应用程序，还是如何优化应用程序的渲染时间，我都不会说太多后端如何传递资源。</p>
+<h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>我将把应用程序加载分为三个不同的阶段：</p>
+<ul>
+<li>初始渲染 – 用户看到任何东西之前需要多长时间？</li>
+<li>应用程序加载 – 用户可以使用该应用程序需要多长时间？</li>
+<li>下一页 – 导航到下一页需要多长时间？</li>
 </ul>
-<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似  的语法还没有被替换成真正的数据。</p>
-<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
-<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
-<li>此函数中也能发起异步请求</li>
+<p><img src="images/640-20200322202223114.jpeg" alt="img"></p>
+<h2 id="初始渲染"><a href="#初始渲染" class="headerlink" title="初始渲染"></a>初始渲染</h2><p>在浏览器的初始渲染之前，用户看不到任何东西。渲染页面至少需要加载 <code>HTML</code> 文件，但是大多数时候需要加载其他资源，例如 <code>CSS</code> 和 <code>JavaScript</code> 文件。一旦这些都加载完毕，浏览器就可以开始在屏幕上渲染。</p>
+<p>在本文中，我将使用 <code>WebPageTest</code> 瀑布图。你网站的请求瀑布可能看起来像这样。</p>
+<p><img src="images/640-20200322202223159.png" alt="img"></p>
+<p><code>HTML</code> 文档将加载一堆其他文件，并在这些文件加载后渲染页面。请注意， <code>CSS</code> 文件是并行加载的，因此每个其他请求不会增加明显的延迟。</p>
+<p>（备注：<code>gov.uk</code> 启用了 <code>HTTP/2</code>，因此资产域可以重新使用与 <code>www.gov.uk</code> 的现有连接！我将在下面详细讨论服务器连接。）</p>
+<h3 id="减少渲染阻塞的请求"><a href="#减少渲染阻塞的请求" class="headerlink" title="减少渲染阻塞的请求"></a>减少渲染阻塞的请求</h3><p><code>css</code> 和（默认情况下） <code>script</code> 文件会阻止其下方的任何内容渲染。</p>
+<p>你可以通过以下几种方法来解决此问题：</p>
+<ul>
+<li>将脚本标签放在 <code>body</code> 标签的底部</li>
+<li>使用 <code>async</code> 异步加载 <code>script</code></li>
+<li>内联使用小型的 <code>JS</code> 或 <code>CSS</code> 代码段（如果需要同步加载）</li>
 </ul>
-<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
-<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
-<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
-<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
-<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
+<h3 id="避免顺序渲染阻塞请求链"><a href="#避免顺序渲染阻塞请求链" class="headerlink" title="避免顺序渲染阻塞请求链"></a>避免顺序渲染阻塞请求链</h3><p>让你的网站变慢的不一定是阻止渲染的请求数量。更重要的是每种资源的下载大小，以及浏览器发现需要加载资源的时间。</p>
+<p>如果浏览器仅在另一个请求完成后才发现需要加载文件，则可以获取同步请求链。发生这种情况可能有多种原因：</p>
+<ul>
+<li><code>CSS</code> 中的 <code>@import</code> 规则</li>
+<li><code>CSS</code> 文件中引用的 <code>Webfonts</code></li>
+<li><code>JavaScript</code> 注入链接或脚本标签</li>
+</ul>
+<p>看一下这个例子：</p>
+<p><img src="images/640-20200322202223158.png" alt="img"></p>
+<p>这个网站在它的某个 <code>CSS</code> 文件中使用 <code>@import</code> 加载 <code>Google Fonts</code>。这意味着浏览器需要一个接一个地发出这些请求：</p>
+<ul>
+<li>文件 <code>HTML</code></li>
+<li>应用程序的 <code>CSS</code></li>
+<li><code>Google</code> 字体 <code>CSS</code></li>
+<li><code>Google Font Woff</code>文件（在瀑布图中未显示）</li>
+</ul>
+<p>要解决这个问题，首先需要将 <code>Google Fonts</code> 的 <code>CSS</code> 请求从 <code>@import</code> 移动到 <code>HTML</code> 中的 <code>link</code> 标记，这就切断了请求链条上的一个环节。</p>
+<p>为了进一步加快速度，建议直接在 <code>HTML</code> 或 <code>CSS</code> 文件中内联 <code>Google Fonts CSS</code> 文件。</p>
+<p>(记住，来自 <code>Google Fonts</code> 的 <code>CSS</code> 响应取决于用户代理。如果你用 <code>IE8</code> 发出请求，CSS会引用一个 <code>EOT</code> 文件，<code>IE11</code> 会得到一个 <code>woff</code> 文件，而现在的浏览器会得到一个 <code>woff2</code> 文件。但是如果你不介意旧的浏览器使用系统字体，那么你可以复制粘贴 <code>CSS</code> 文件的内容。)</p>
+<p>即使页面开始呈现后，用户仍可能无法对该页面执行任何操作，因为在加载字体之前，不会显示任何文本。可以通过 <code>font-display swap</code> 来避免这种情况，现在 <code>Google Fonts</code> 默认情况下已经开始支持。</p>
+<p>有时，消除请求链是不可行的。在这些情况下，可以考虑使用 <code>preload</code> 或 <code>preconnect</code> 标记。例如，在实际的 <code>CSS</code> 请求发出之前，上面的网站可以连接到 <code>fonts.googleapis.com</code>。</p>
+<h3 id="重复使用服务器连接以加快请求"><a href="#重复使用服务器连接以加快请求" class="headerlink" title="重复使用服务器连接以加快请求"></a>重复使用服务器连接以加快请求</h3><p>建立新的服务器连接通常需要在服务器的浏览器之间进行3次往返：</p>
+<ul>
+<li><code>DNS</code> 查询</li>
+<li>建立 <code>TCP</code> 连接</li>
+<li>建立 <code>SSL</code> 连接</li>
+</ul>
+<p>连接就绪后，至少需要再进行一次往返来发送请求并下载响应。</p>
+<p>下面的瀑布显示连接已启动到四个不同的服务器：<code>hostgator.com，optimize.com，googletagmanager.com 和 googelapis.com</code>。</p>
+<p>但是，对同一服务器的后续请求可以重新使用现有连接。因此，加载 <code>base.css</code>或 <code>index1.css</code> 的速度很快，因为它们也托管在 <code>hostgator.com</code> 上。</p>
+<p><img src="images/640-20200322202223164.png" alt="img"></p>
+<h3 id="减小文件大小并使用CDN"><a href="#减小文件大小并使用CDN" class="headerlink" title="减小文件大小并使用CDN"></a>减小文件大小并使用CDN</h3><p>除了文件大小之外，还有两个其他因素会影响请求时间，这些因素都在你的控制范围内：资源大小和服务器位置。</p>
+<p>向用户发送尽可能少的数据，并确保将其压缩（例如，使用 <code>brotli</code> 或 <code>gzip</code> ）。</p>
+<p>内容交付网络在大量位置提供服务器，因此其中之一可能位于你的用户附近。用户可以连接到与其附近的 <code>CDN</code> 服务器，而不必连接到中央应用程序服务器。这意味着服务器的往返时间将大大缩短。这对于诸如 <code>CSS</code>，<code>JavaScript</code>和  <code>Image</code> 之类的静态资产特别方便，因为它们易于分发。</p>
+<h3 id="使用-service-workers-跳过网络"><a href="#使用-service-workers-跳过网络" class="headerlink" title="使用 service workers 跳过网络"></a>使用 service workers 跳过网络</h3><p><code>service workers</code> 允许你在请求进入网络之前拦截它们。这意味着你可以实现瞬时首屏渲染!</p>
+<p>当然，这只在你不需要网络发送响应时才有效。你需要已经缓存了响应，所以用户只有在第二次加载你的应用时才会受益。</p>
+<p>下面的 <code>service workers</code> 缓存呈现页面所需的HTML和CSS。当再次加载应用程序时，它会尝试为缓存的资源提供服务，如果资源不可用，则会返回到网络。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">self.addEventListener(&quot;install&quot;, async e =&gt; &#123;</span><br><span class="line"> caches.open(&quot;v1&quot;).then(function (cache) &#123;</span><br><span class="line">   return cache.addAll([&quot;/app&quot;, &quot;/app.css&quot;]);</span><br><span class="line"> &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">self.addEventListener(&quot;fetch&quot;, event =&gt; &#123;</span><br><span class="line"> event.respondWith(</span><br><span class="line">   caches.match(event.request).then(cachedResponse =&gt; &#123;</span><br><span class="line">     return cachedResponse || fetch(event.request);</span><br><span class="line">   &#125;)</span><br><span class="line"> );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="应用加载"><a href="#应用加载" class="headerlink" title="应用加载"></a>应用加载</h2><p>好的，现在用户已经可以看到一些东西，然后他们在可以使用你的应用程序之前还需要什么？</p>
+<ul>
+<li>加载应用程序代码（JS和CSS）</li>
+<li>加载页面的基本数据</li>
+<li>加载其他数据和图像</li>
+</ul>
+<p><img src="images/640-20200322202223220.png" alt="img"></p>
+<p>请注意，不仅仅是延迟从网络加载数据会延迟渲染。加载代码后，浏览器将需要解析，编译和执行它。</p>
+<h3 id="Bundle-split：仅加载必要的代码，并最大化缓存命中率"><a href="#Bundle-split：仅加载必要的代码，并最大化缓存命中率" class="headerlink" title="Bundle split：仅加载必要的代码，并最大化缓存命中率"></a>Bundle split：仅加载必要的代码，并最大化缓存命中率</h3><p><code>Bundle split</code> 允许只加载当前页面所需的代码，而不是加载整个应用程序。<code>Bundle split</code> 还意味着可以缓存其中的一部分，即使其他部分已经更改，需要重新加载。</p>
+<p>通常，代码被分成三种不同类型的文件:</p>
+<ul>
+<li>网页本身专用代码</li>
+<li>共享应用程序代码</li>
+<li>很少更改的第三方模块（非常适合缓存！）</li>
+</ul>
+<p><code>Webpack</code> 可以使用 <code>optimization.splitChunks</code> 自动拆分共享代码以减少总下载量。确保启用运行时块，以使 <code>chunk</code> 哈希稳定，并从长期缓存中受益。</p>
+<p>分离页面特定的代码不能自动完成，你需要识别可以单独加载的位。通常这是一个特定的路径或一组页面。使用动态导入来延迟加载代码。</p>
+<p><code>Bundle split</code> 会导致更多的请求被发送来加载你的应用程序。但是只要请求是并行发送的，这就不是什么大问题，特别是当你的站点开启了 <code>HTTP/2</code> 服务的时候。你可以看到在这个瀑布的前三个请求:</p>
+<p><img src="images/640-20200322202223167.png" alt="img"></p>
+<p>然而，这个瀑布图还显示了两个按顺序发出的请求。这些块只在这个页面中需要，并通过 <code>import()</code> 调用动态加载。</p>
+<p>如果你知道需要这些块，你可以通过插入预加载链接标记来解决这个问题。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/aDoYvepE5x2ARc7svq6qBxYOpNv4Zs5kVXGYZdG6mbED2saF1AX7pLJ8usR9I8iaqpZpv4iaCU3sooRZgFt6sRlg/640?wx_fmt=png&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" alt="img"></p>
+<p>但是，你会看到，与总页面加载时间相比，这样做的好处可能很小。</p>
+<p>另外，使用预加载有时会适得其反，因为加载其他更重要的文件时可能会延迟。</p>
+<h3 id="加载页面数据"><a href="#加载页面数据" class="headerlink" title="加载页面数据"></a>加载页面数据</h3><p>你的应用程序可能是用来显示一些数据的。下面是一些提示，你可以使用这些提示尽早加载数据并避免呈现延迟。</p>
+<h4 id="在开始加载数据之前不要等待包"><a href="#在开始加载数据之前不要等待包" class="headerlink" title="在开始加载数据之前不要等待包"></a>在开始加载数据之前不要等待包</h4><p>这是一个顺序请求链的特殊情况:你加载应用程序包，然后代码请求页面数据。</p>
+<p>有两种方法可以避免这种情况：</p>
+<ul>
+<li>将页面数据嵌入HTML文档中</li>
+<li>通过文档中的内联脚本启动数据请求</li>
+</ul>
+<p>将数据嵌入HTML可以确保你的应用程序不必等待数据加载。这也降低了应用程序的复杂性，因为你不必处理加载状态。</p>
+<p>但是，如果获取数据会大大延迟你的文档响应，那将不是一个好主意，因为这会延迟你的初始渲染。</p>
+<p>在这种情况下，或者如果你通过服务工作者提供缓存的HTML文档，则可以将内联脚本嵌入到HTML中以加载此数据。你可以将其作为全局 <code>promise</code> 提供，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">window.userDataPromise = fetch(&quot;/me&quot;)</span><br></pre></td></tr></table></figure>
+<p>然后，如果数据准备就绪，你的应用程序可以立即开始渲染，或者等到准备就绪。</p>
+<p>对于这两种技术，你都需要知道在应用开始呈现之前页面必须加载哪些数据。对于与用户相关的数据（用户名，通知 …），这往往很容易，但是对于特定于页面的内容，则比较棘手。考虑确定最重要的页面并为这些页面编写自定义逻辑。</p>
+<h4 id="等待非必需数据时不要阻塞渲染"><a href="#等待非必需数据时不要阻塞渲染" class="headerlink" title="等待非必需数据时不要阻塞渲染"></a>等待非必需数据时不要阻塞渲染</h4><p>有时生成页面数据需要缓慢的复杂后端逻辑。在这些情况下，如果足以使你的应用程序具有功能性和交互性，则可以首先加载较简单的数据版本。</p>
+<p>例如，分析工具可以在加载图表数据之前首先加载所有图表的列表。这使用户可以立即查找他们感兴趣的图表，还可以帮助将后端请求分散到不同的服务器上。</p>
+<p><img src="images/640-20200322202223217.png" alt="img"></p>
+<h4 id="避免顺序数据请求链"><a href="#避免顺序数据请求链" class="headerlink" title="避免顺序数据请求链"></a>避免顺序数据请求链</h4><p>这可能与我先前关于在第二个请求中加载非必需数据的观点相冲突，但是如果每个完成的请求都不会导致向用户显示更多信息，则避免顺序请求链。</p>
+<p>与其先发出关于用户登录身份的请求，然后再请求其所属团队的列表，不如在用户信息旁边返回团队列表。你可以使用 <code>GraphQL</code> ，但自定义用户呢? <code>includeTeams=true endpoint</code> 也很有用。</p>
+<p>与其首先请求用户登录为谁，然后请求他们所属的团队列表，</p>
+<h3 id="服务端端渲染"><a href="#服务端端渲染" class="headerlink" title="服务端端渲染"></a>服务端端渲染</h3><p>服务端端渲染意味着在服务器上预渲染你的应用程序，并使用整页HTML响应文档请求。这意味着客户端可以看到完全呈现的页面，而不必等待加载其他代码或数据！</p>
+<p>由于服务器只是将静态HTML发送给客户端，因此你的应用尚无法进行交互。需要加载应用程序，它需要重新运行呈现逻辑，然后将必要的事件侦听器附加到DOM。</p>
+<p>如果看到非交互式内容很有价值，请使用服务器呈现。如果你能够将呈现的HTML缓存在服务器上并将其提供给所有用户而又不会延迟初始文档请求，那么它也将有所帮助。例如，如果你使用 <code>React</code> 来渲染博客文章，则服务器渲染非常合适。</p>
+<h2 id="下一页"><a href="#下一页" class="headerlink" title="下一页"></a>下一页</h2><p>在某个时候，用户将与你的应用进行交互并转到下一页。打开初始页面后，你可以控制浏览器中发生的事情，因此你可以准备进行下一次交互。</p>
+<h3 id="预取资源"><a href="#预取资源" class="headerlink" title="预取资源"></a>预取资源</h3><p>如果你预加载了下一页所需的代码，则可以消除用户启动导航时的延迟。使用 <code>prefetch</code> 标记，或 <code>webpackPrefetch</code> 用于动态导入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import(</span><br><span class="line">    /* webpackPrefetch: true, webpackChunkName: &quot;todo-list&quot; */&quot;./TodoList&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>注意你使用了多少用户数据和带宽，特别是当他们使用移动连接时。如果他们使用的是你网站的移动版本，或者他们启用了保存数据模式，你可以减少预加载。</p>
+<p>对于用户最可能需要的应用程序部分，要有策略。</p>
+<h3 id="重用已经加载的数据"><a href="#重用已经加载的数据" class="headerlink" title="重用已经加载的数据"></a>重用已经加载的数据</h3><p>在应用程序中本地缓存 <code>Ajax</code> 数据，并使用它来避免未来的请求。如果用户从团队列表导航到“编辑团队”页面，你可以通过重用已经获取的数据来立即进行转换。</p>
+<p>请注意，如果你的实体经常被其他用户编辑，并且你下载的数据可能已经过期，那么这种方法将不起作用。在这些情况下，在获取最新数据时，请首先考虑以只读方式显示现有数据。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文介绍了许多因素，这些因素可能会在加载过程的不同时刻使你的页面速度减慢。使用 <code>Chrome DevTools</code>，<code>WebPageTest</code>和<code>Lighthouse</code>之类的工具来确定其中哪些适用于你的应用程序。</p>
+<p>实际上，你几乎不可能在所有方面进行优化。找出对用户有最大影响的因素，并专注于此。</p>
+<p>我在写这篇文章时意识到的一件事是，我根深蒂固地相信，发出许多单独的请求对性能不利。过去，当每个请求都需要一个单独的连接时，Thas就是这样，而浏览器每个域只允许几个连接。但是，使用 <code>HTTP/2</code> 和现代浏览器已不再是这种情况。</p>
+<p>并且有强烈的理由支持拆分请求。它允许仅加载必要的资源，并可以更好地利用缓存的内容，因为仅需要重新加载已更改的文件。</p>
 
       
     </div>
@@ -490,7 +599,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/vue/" rel="tag"><i class="fa fa-tag"></i> vue</a>
+            <a href="/tags/转载/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
+          
+            <a href="/tags/技巧/" rel="tag"><i class="fa fa-tag"></i> 技巧</a>
+          
+            <a href="/tags/性能优化/" rel="tag"><i class="fa fa-tag"></i> 性能优化</a>
           
         </div>
       
@@ -503,8 +616,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/13167/" rel="next" title="transition过渡（二）">
-                <i class="fa fa-chevron-left"></i> transition过渡（二）
+              <a href="/posts/51473/" rel="next" title="小程序引入百度地图提示 https://api.map.baidu.com 不在以下 request 合法域名列表中">
+                <i class="fa fa-chevron-left"></i> 小程序引入百度地图提示 https://api.map.baidu.com 不在以下 request 合法域名列表中
               </a>
             
           </div>
@@ -512,10 +625,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/posts/59937/" rel="prev" title="常见排序算法">
-                常见排序算法 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -645,7 +754,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建期间的生命周期函数"><span class="nav-number">1.</span> <span class="nav-text">创建期间的生命周期函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beforeCreate"><span class="nav-number">1.1.</span> <span class="nav-text">beforeCreate</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#作用"><span class="nav-number">1.1.1.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#created"><span class="nav-number">1.2.</span> <span class="nav-text">created</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#作用-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#beforeMount"><span class="nav-number">1.3.</span> <span class="nav-text">beforeMount</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mounted"><span class="nav-number">1.4.</span> <span class="nav-text">mounted</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#作用-2"><span class="nav-number">1.4.1.</span> <span class="nav-text">作用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行期间的生命周期函数"><span class="nav-number">2.</span> <span class="nav-text">运行期间的生命周期函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beforeUpdate"><span class="nav-number">2.1.</span> <span class="nav-text">beforeUpdate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#updated"><span class="nav-number">2.2.</span> <span class="nav-text">updated</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#销毁期间的生命周期函数"><span class="nav-number">3.</span> <span class="nav-text">销毁期间的生命周期函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beforeDestroy"><span class="nav-number">3.1.</span> <span class="nav-text">beforeDestroy</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#作用-3"><span class="nav-number">3.1.1.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#destroyed"><span class="nav-number">3.2.</span> <span class="nav-text">destroyed</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#总览"><span class="nav-number">1.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始渲染"><span class="nav-number">2.</span> <span class="nav-text">初始渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#减少渲染阻塞的请求"><span class="nav-number">2.1.</span> <span class="nav-text">减少渲染阻塞的请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免顺序渲染阻塞请求链"><span class="nav-number">2.2.</span> <span class="nav-text">避免顺序渲染阻塞请求链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重复使用服务器连接以加快请求"><span class="nav-number">2.3.</span> <span class="nav-text">重复使用服务器连接以加快请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减小文件大小并使用CDN"><span class="nav-number">2.4.</span> <span class="nav-text">减小文件大小并使用CDN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-service-workers-跳过网络"><span class="nav-number">2.5.</span> <span class="nav-text">使用 service workers 跳过网络</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用加载"><span class="nav-number">3.</span> <span class="nav-text">应用加载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bundle-split：仅加载必要的代码，并最大化缓存命中率"><span class="nav-number">3.1.</span> <span class="nav-text">Bundle split：仅加载必要的代码，并最大化缓存命中率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载页面数据"><span class="nav-number">3.2.</span> <span class="nav-text">加载页面数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#在开始加载数据之前不要等待包"><span class="nav-number">3.2.1.</span> <span class="nav-text">在开始加载数据之前不要等待包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#等待非必需数据时不要阻塞渲染"><span class="nav-number">3.2.2.</span> <span class="nav-text">等待非必需数据时不要阻塞渲染</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#避免顺序数据请求链"><span class="nav-number">3.2.3.</span> <span class="nav-text">避免顺序数据请求链</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端端渲染"><span class="nav-number">3.3.</span> <span class="nav-text">服务端端渲染</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下一页"><span class="nav-number">4.</span> <span class="nav-text">下一页</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#预取资源"><span class="nav-number">4.1.</span> <span class="nav-text">预取资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重用已经加载的数据"><span class="nav-number">4.2.</span> <span class="nav-text">重用已经加载的数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>
