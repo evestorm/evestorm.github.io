@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Uni-App=>事件处理、事件绑定、事件传参(转载)]]></title>
+    <url>%2Fposts%2F37783%2F</url>
+    <content type="text"><![CDATA[uni-app 事件事件映射表，左侧为 WEB 事件，右侧为 uni-app 对应事件 12345678910111213141516171819202122&#123; click: 'tap', touchstart: 'touchstart', touchmove: 'touchmove', touchcancel: 'touchcancel', touchend: 'touchend', tap: 'tap', longtap: 'longtap', input: 'input', change: 'change', submit: 'submit', blur: 'blur', focus: 'focus', reset: 'reset', confirm: 'confirm', columnchange: 'columnchange', linechange: 'linechange', error: 'error', scrolltoupper: 'scrolltoupper', scrolltolower: 'scrolltolower', scroll: 'scroll'&#125; 在 input 和 textarea 中 change 事件会被转为 blur 事件。 踩坑注意： 上列表中没有的原生事件也可以使用，例如map组件的regionchange 事件直接在组件上写成 @regionchange,同时这个事件也非常特殊，它的 event type 有 begin 和 end 两个，导致我们无法在handleProxy 中区分到底是什么事件，所以你在监听此类事件的时候同时监听事件名和事件类型既 &lt;map @regiοnchange=&quot;functionName&quot; @end=&quot;functionName&quot; @begin=&quot;functionName&quot;&gt;&lt;map&gt;平台差异所致，bind 和 catch 事件同时绑定时候，只会触发 bind ,catch 不会被触发，要避免踩坑。 事件修饰符stop 的使用会阻止冒泡，但是同时绑定了一个非冒泡事件，会导致该元素上的 catchEventName 失效！prevent 可以直接干掉，因为uni-app里没有什么默认事件，比如 submit 并不会跳转页面self 没有可以判断的标识once 也不能做，因为uni-app没有 removeEventListener, 虽然可以直接在 handleProxy 中处理，但非常的不优雅，违背了原意，暂不考虑按键修饰符：uni-app运行在手机端，没有键盘事件，所以不支持按键修饰符。 事件绑定 @click12345678910111213141516171819202122&lt;template&gt; &lt;view class="demo" @click="clickTest" @longtap="longtap"&gt;&lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; methods:&#123; clickTest: function(e)&#123; console.log(e); console.log('click'); &#125;, longtap: function(e)&#123; console.log(e); console.log('longtap'); &#125; &#125;&#125;&lt;/script&gt;&lt;style&gt;.demo&#123;width:500px; margin:50px auto; background:#8F8F90; height:500px;&#125;&lt;/style&gt; 注意在小程序中观察对应事件对象，可以利用此对象获取更多信息。 事件传参（动态参数演示）1234567891011121314151617181920212223242526&lt;template&gt; &lt;view&gt; &lt;view v-for="(item, index) in students" class="persons" @click="menuClick" v-bind:id="index"&gt;&#123;&#123;index&#125;&#125; - &#123;&#123;item.name&#125;&#125;&lt;/view&gt; &lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; data: &#123; students : [ &#123;name : "张三", age : 18&#125;, &#123;name : "李四", age : 20&#125; ] &#125;, methods:&#123; menuClick : function(e)&#123; console.log(e); console.log(e.target.id); &#125; &#125;,&#125;&lt;/script&gt;&lt;style&gt;.persons&#123;width:750px; line-height:2.2em;&#125;&lt;/style&gt;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>小程序</category>
+      </categories>
+      <tags>
+        <tag>uni-app</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Uniapp实时监听input输入为数字]]></title>
     <url>%2Fposts%2F47344%2F</url>
     <content type="text"><![CDATA[测试要求提现的输入只能为数字+小数点，不许为其他： 解决方案 Wxml 1234567&lt;input type="number" :placeholder="placeTips" placeholder-style="font-size:24rpx" v-model="amount" @input="checkNum($event)"/&gt; JS 12345678910111213141516171819202122checkNum(e) &#123; let val = e.target.value.replace(/(^\s*)|(\s*$)/g, "") console.log(val) if (!val) &#123; this.amount = ''; return &#125; var reg = /[^\d.]/g // 只能是数字和小数点，不能是其他输入 val = val.replace(reg, "") // // 保证第一位只能是数字，不能是点 val = val.replace(/^\./g, ""); // // 小数只能出现1位 val = val.replace(".", "$#$").replace(/\./g, "").replace("$#$", "."); // // 小数点后面保留2位 val = val.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3'); console.log(val); this.$nextTick(() =&gt; &#123; this.amount = val; &#125;)&#125;,]]></content>
