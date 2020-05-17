@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[Uni-App=>事件处理、事件绑定、事件传参(转载)]]></title>
-    <url>%2Fposts%2F37783%2F</url>
-    <content type="text"><![CDATA[uni-app 事件事件映射表，左侧为 WEB 事件，右侧为 uni-app 对应事件 12345678910111213141516171819202122&#123; click: 'tap', touchstart: 'touchstart', touchmove: 'touchmove', touchcancel: 'touchcancel', touchend: 'touchend', tap: 'tap', longtap: 'longtap', input: 'input', change: 'change', submit: 'submit', blur: 'blur', focus: 'focus', reset: 'reset', confirm: 'confirm', columnchange: 'columnchange', linechange: 'linechange', error: 'error', scrolltoupper: 'scrolltoupper', scrolltolower: 'scrolltolower', scroll: 'scroll'&#125; 在 input 和 textarea 中 change 事件会被转为 blur 事件。 踩坑注意： 上列表中没有的原生事件也可以使用，例如map组件的regionchange 事件直接在组件上写成 @regionchange,同时这个事件也非常特殊，它的 event type 有 begin 和 end 两个，导致我们无法在handleProxy 中区分到底是什么事件，所以你在监听此类事件的时候同时监听事件名和事件类型既 &lt;map @regiοnchange=&quot;functionName&quot; @end=&quot;functionName&quot; @begin=&quot;functionName&quot;&gt;&lt;map&gt;平台差异所致，bind 和 catch 事件同时绑定时候，只会触发 bind ,catch 不会被触发，要避免踩坑。 事件修饰符stop 的使用会阻止冒泡，但是同时绑定了一个非冒泡事件，会导致该元素上的 catchEventName 失效！prevent 可以直接干掉，因为uni-app里没有什么默认事件，比如 submit 并不会跳转页面self 没有可以判断的标识once 也不能做，因为uni-app没有 removeEventListener, 虽然可以直接在 handleProxy 中处理，但非常的不优雅，违背了原意，暂不考虑按键修饰符：uni-app运行在手机端，没有键盘事件，所以不支持按键修饰符。 事件绑定 @click12345678910111213141516171819202122&lt;template&gt; &lt;view class="demo" @click="clickTest" @longtap="longtap"&gt;&lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; methods:&#123; clickTest: function(e)&#123; console.log(e); console.log('click'); &#125;, longtap: function(e)&#123; console.log(e); console.log('longtap'); &#125; &#125;&#125;&lt;/script&gt;&lt;style&gt;.demo&#123;width:500px; margin:50px auto; background:#8F8F90; height:500px;&#125;&lt;/style&gt; 注意在小程序中观察对应事件对象，可以利用此对象获取更多信息。 事件传参（动态参数演示）1234567891011121314151617181920212223242526&lt;template&gt; &lt;view&gt; &lt;view v-for="(item, index) in students" class="persons" @click="menuClick" v-bind:id="index"&gt;&#123;&#123;index&#125;&#125; - &#123;&#123;item.name&#125;&#125;&lt;/view&gt; &lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; data: &#123; students : [ &#123;name : "张三", age : 18&#125;, &#123;name : "李四", age : 20&#125; ] &#125;, methods:&#123; menuClick : function(e)&#123; console.log(e); console.log(e.target.id); &#125; &#125;,&#125;&lt;/script&gt;&lt;style&gt;.persons&#123;width:750px; line-height:2.2em;&#125;&lt;/style&gt;]]></content>
-      <categories>
-        <category>前端</category>
-        <category>小程序</category>
-      </categories>
-      <tags>
-        <tag>uni-app</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[Uniapp实时监听input输入为数字]]></title>
     <url>%2Fposts%2F47344%2F</url>
     <content type="text"><![CDATA[测试要求提现的输入只能为数字+小数点，不许为其他： 解决方案 Wxml 1234567&lt;input type="number" :placeholder="placeTips" placeholder-style="font-size:24rpx" v-model="amount" @input="checkNum($event)"/&gt; JS 12345678910111213141516171819202122checkNum(e) &#123; let val = e.target.value.replace(/(^\s*)|(\s*$)/g, "") console.log(val) if (!val) &#123; this.amount = ''; return &#125; var reg = /[^\d.]/g // 只能是数字和小数点，不能是其他输入 val = val.replace(reg, "") // // 保证第一位只能是数字，不能是点 val = val.replace(/^\./g, ""); // // 小数只能出现1位 val = val.replace(".", "$#$").replace(/\./g, "").replace("$#$", "."); // // 小数点后面保留2位 val = val.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3'); console.log(val); this.$nextTick(() =&gt; &#123; this.amount = val; &#125;)&#125;,]]></content>
@@ -34,8 +22,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -153,6 +141,18 @@
       </tags>
   </entry>
   <entry>
+    <title><![CDATA[Uni-App=>事件处理、事件绑定、事件传参(转载)]]></title>
+    <url>%2Fposts%2F37783%2F</url>
+    <content type="text"><![CDATA[转载来源：https://blog.csdn.net/Dream_Weave/article/details/87722578 uni-app 事件事件映射表，左侧为 WEB 事件，右侧为 uni-app 对应事件 12345678910111213141516171819202122&#123; click: 'tap', touchstart: 'touchstart', touchmove: 'touchmove', touchcancel: 'touchcancel', touchend: 'touchend', tap: 'tap', longtap: 'longtap', input: 'input', change: 'change', submit: 'submit', blur: 'blur', focus: 'focus', reset: 'reset', confirm: 'confirm', columnchange: 'columnchange', linechange: 'linechange', error: 'error', scrolltoupper: 'scrolltoupper', scrolltolower: 'scrolltolower', scroll: 'scroll'&#125; 在 input 和 textarea 中 change 事件会被转为 blur 事件。 踩坑注意： 上列表中没有的原生事件也可以使用，例如map组件的regionchange 事件直接在组件上写成 @regionchange,同时这个事件也非常特殊，它的 event type 有 begin 和 end 两个，导致我们无法在handleProxy 中区分到底是什么事件，所以你在监听此类事件的时候同时监听事件名和事件类型既 &lt;map @regiοnchange=&quot;functionName&quot; @end=&quot;functionName&quot; @begin=&quot;functionName&quot;&gt;&lt;map&gt;平台差异所致，bind 和 catch 事件同时绑定时候，只会触发 bind ,catch 不会被触发，要避免踩坑。 事件修饰符stop 的使用会阻止冒泡，但是同时绑定了一个非冒泡事件，会导致该元素上的 catchEventName 失效！prevent 可以直接干掉，因为uni-app里没有什么默认事件，比如 submit 并不会跳转页面self 没有可以判断的标识once 也不能做，因为uni-app没有 removeEventListener, 虽然可以直接在 handleProxy 中处理，但非常的不优雅，违背了原意，暂不考虑按键修饰符：uni-app运行在手机端，没有键盘事件，所以不支持按键修饰符。 事件绑定 @click12345678910111213141516171819202122&lt;template&gt; &lt;view class="demo" @click="clickTest" @longtap="longtap"&gt;&lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; methods:&#123; clickTest: function(e)&#123; console.log(e); console.log('click'); &#125;, longtap: function(e)&#123; console.log(e); console.log('longtap'); &#125; &#125;&#125;&lt;/script&gt;&lt;style&gt;.demo&#123;width:500px; margin:50px auto; background:#8F8F90; height:500px;&#125;&lt;/style&gt; 注意在小程序中观察对应事件对象，可以利用此对象获取更多信息。 事件传参（动态参数演示）1234567891011121314151617181920212223242526&lt;template&gt; &lt;view&gt; &lt;view v-for="(item, index) in students" class="persons" @click="menuClick" v-bind:id="index"&gt;&#123;&#123;index&#125;&#125; - &#123;&#123;item.name&#125;&#125;&lt;/view&gt; &lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; data: &#123; students : [ &#123;name : "张三", age : 18&#125;, &#123;name : "李四", age : 20&#125; ] &#125;, methods:&#123; menuClick : function(e)&#123; console.log(e); console.log(e.target.id); &#125; &#125;,&#125;&lt;/script&gt;&lt;style&gt;.persons&#123;width:750px; line-height:2.2em;&#125;&lt;/style&gt;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>小程序</category>
+      </categories>
+      <tags>
+        <tag>uni-app</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Grid布局入门]]></title>
     <url>%2Fposts%2F42136%2F</url>
     <content type="text"><![CDATA[介绍什么是 Grid LayoutGrid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，包含了行（row）与列（column）以及间距（gap）。下图能够很好的说明这一点（图片来自mdn）： Grid vs Flex工作中写移动端页面的朋友对 Flex 布局肯定不陌生，有些人可能更极端一点，直接 Flex 一把梭。那 Grid 和 Flex 有什么区别呢？我们仍然可以用一张图片进行举例说明： 在上图中，我们可以使用 Grid 来搭建页面的整体结构；而使用 Flex 控制 Grid 中的单个区域，例如顶部导航栏中的具体内容。 Grid vs Flex 总结 Grid 是一种二维布局方式，而 Flex 是一维的。 Grid 重点关注布局, 而 Flex 重点关注内容的流向。 Flex 适用于应用的组件，而 Grid 适用于应用本身的布局。 总的来说，Grid 擅长搭建布局结构，而 Flex 则擅长处理元素的流向。 使用行与列首先我们需要将容器的 display 属性设置为 grid，然后使用下列 CSS 属性来控制其中的行与列： grid-template-columns 用来划分列数 grid-template-rows 用来划分行数 固定宽度 &amp; 百分比宽度 See the Pen 01-grid-行与列基本使用 by JingW (@JingW) on CodePen. 重复设置通过上面demo你会发现一个问题，如果一行有3列，我们就需要定义3列各自的宽，那如果有10列，20列呢？难道都需要一个个设置，岂不是太麻烦了？所以重复设置的需求应运而生。我们可以使用 repeat 统一设置值，第一个参数为重复数量，第二个参数是重复值。下面是两个示例： See the Pen 02-grid-repeat重复 by JingW (@JingW) on CodePen. 比例划分我们还可以像 Flex 布局的 flex: 1 那样，给布局中的元素设置比例。在 Grid 中，我们使用 fr 这个单位来设置元素在空间中所占的比例。 See the Pen 03-grid-比例划分 by JingW (@JingW) on CodePen. 组合定义grid-tempalte 是 grid-template-rows、grid-template-columns、grid-template-areas 的三个属性的简写。 下面是使用 grid-template 同时声明 grid-template-rows、grid-template-columns。 1grid-template: 100px 1fr / 50px 1fr 下面是使用 grid-template 定义 grid-template-areas ，有关 grid-template-areas 的使用方法会在下面介绍： 123grid-template: "header . ." ". main ." "footer footer ."; See the Pen yLyPQjj by JingW (@JingW) on CodePen. minmax使用 minmax 方法可以设置取值范围。下面行高在 最小100px ~ 最大1fr 间取值： See the Pen 05-grid-minmax设置最大最小值 by JingW (@JingW) on CodePen. 间距行间距 See the Pen 06-grid-行间距row-gap by JingW (@JingW) on CodePen. 列间距 See the Pen 07-grid-列间距column-gap by JingW (@JingW) on CodePen. 间距简写使用 gap 规则可以一次定义行、列间距，如果间距一样可以只设置一个值： See the Pen 07-grid-间距简写gap by JingW (@JingW) on CodePen. 网格线命名通过grid-template-rows和grid-template-columns定义网格时，网格线可以被命名。网格线名称也可以设置网格项目位置 分配网格线名称必须用方括号[网格线名称]，然后后面紧跟网格轨道的尺寸值。定义网格线名称时需要避免使用规范中出现的关键词，以免导致混乱。 123grid-template-rows: [row-1-start] 1fr [row-2-start] 1fr [row-2-end];grid-template-columns: [col-1-start] 1fr [col-2-start] 1fr [col-3-start] 1fr [col-3-end]; 可以在方括号中添加多个名称来命名网格线名称，使用多外名称命名网格线名称时，名称间要用空格隔开。每一个网格线的名称可以用来定位网格项目的位置 使用网格线名称设置网格项目位置和使用网格线号码设置网格项目位置类似，引用网格线名称的时候不应该带方括号 使用repeat()函数可以给网格线分配相同的名称。这可以节省一定的时间。 123grid-template-rows: repeat(3, [row-start] 1fr [row-end]);grid-template-columns: repeat(3, [col-start] 1fr [col-end]); 使用repeat()函数可以给网格线命名，这也导致多个网格线具有相同的网格线名称。相同网格线名称指定网格线的位置和名称，也且会自动在网格线名称后面添加对应的数字，使其网格线名称也是唯一的标识符 使用相同的网格线名称可以设置网格项目的位置。网格线的名称和数字之间需要用空格分开 123grid-row: row-start 2 / row-end 3;grid-column: col-start / col-start 3; 网格区域命名像网格线名称一样，网格区域的名称可以使用grid-template-areas属性来命名。引用网格区域名称也可以设置网格项目位置。 12345grid-template-areas: "header header" "content sidebar" "footer footer";grid-template-rows: 150px 1fr 100px;grid-template-columns: 1fr 200px; 设置网格区域的名称应该放置在单引号或双引号内，每个名称由一个空格符分开。网格区域的名称，每组（单引号或双引号内的网格区域名称）定义了网格的一行，每个网格区域名称定义网格的一列 [注意]grid-template-areas: “header header” “content sidebar” “footer footer”;不可以简写为grid-template-areas: “header” “content sidebar” “footer”; grid-row-start、grid-row-end、grid-column-start和grid-column-end以及简写的grid-row、grid-column、grid-area都可以引用网格区域名称，用来设置网格项目位置 元素定位 选项 说明 grid-row-start 行开始栅格线 grid-row-end 行结束栅格线 grid-column-start 列开始栅格线 grid-column-end 列结束栅格线 根据栅格线通过设置具体的第几条栅格线来设置区域位置，设置的数值可以是正数和负数： See the Pen 09-grid-栅格线 by JingW (@JingW) on CodePen. 根据栅格命名 See the Pen 10-grid-栅格线命名 by JingW (@JingW) on CodePen. 根据偏移量使用 span 可以设置移动单元格数量，数值只能为正数。 设置在 grid-*-end 表示 grid-*-end 栅格线是从 grid-*-start 移动几个单元格 设置在 grid-*-start 表示 grid-*-start 栅格线是从 grid-*-end 移动几个单元格 See the Pen 11-grid-偏移量 by JingW (@JingW) on CodePen. [推荐]简写模式 grid-row/grid-column可以使用 grid-row 设置行开始栅格线，使用 grid-column 设置结束栅格线。 上例中的居中对齐元素，可以使用以下简写的方式声明（推荐）。 12grid-row: 2/3;grid-column: 2/3; See the Pen 12-grid-grid-row/grid-column简写形式 by JingW (@JingW) on CodePen. 简写形式 grid-areagrid-area 更加简洁是同时对 grid-row 与 grid-column 属性的组合声明。 语法结构如下： 1grid-row-start/grid-column-start/grid-row-end/grid-column-end 下面是将元素定位在中间的示例： See the Pen 13-grid-grid-area简写形式 by JingW (@JingW) on CodePen. 栅格流动在容器中设置grid-auto-flow 属性可以改变单元流动方式。 选项 说明 column 按列排序 row 按行排列 栅格流动的基本使用 See the Pen 14-grid-grid-auto-flow栅格流动 by JingW (@JingW) on CodePen. 强制填充当元素在栅格中放不下时，将会发生换行产生留白，使用grid-auto-flow: row dense; 可以执行填充空白区域操作。 See the Pen 15-grid-强制填充 by JingW (@JingW) on CodePen. 栅格对齐可以通过属性方便的定义栅格的对齐方式，可用值包括 start | end | center | stretch | space-between | space-evenly | space-around。 选项 说明 对象 align-items 栅格内所有元素的垂直排列方式 栅格容器 justify-items 栅格内所有元素的横向排列方式 栅格容器 justify-content 所有栅格在容器中的水平对齐方式，容器有额外空间时 栅格容器 align-content 所有栅格在容器中的垂直对齐方式，容器有额外空间时 栅格容器 align-self 元素在栅格中垂直对齐方式 栅格元素 justify-self 元素在栅格中水平对齐方式 栅格元素 See the Pen 16-grid-元素对齐 by JingW (@JingW) on CodePen. 组合简写 place-content用于控制栅格的对齐方式，语法如下： 1place-content: &lt;align-content&gt; &lt;justify-content&gt; 组合简写 place-items控制所有元素的对齐方式，语法结构如下： 1place-items: &lt;align-items&gt; &lt;justify-items&gt; 组合简写 place-self控制单个元素的对齐方式 1place-self: &lt;align-self&gt; &lt;justify-self&gt; 参考资料 Grid布局方式的实例详解]]></content>
@@ -212,8 +212,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -664,9 +664,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -787,9 +787,9 @@
         <category>Node</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>cors</tag>
         <tag>跨域</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
