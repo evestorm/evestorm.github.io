@@ -77,7 +77,7 @@
 
 
 
-  <meta name="keywords" content="vue,">
+  <meta name="keywords" content="Vue,">
 
 
 
@@ -89,7 +89,7 @@
 
 
 <meta name="description" content="动态路由 + 路由鉴权路由鉴权介绍一般Vue的权限控制有两种方案：  路由元信息(meta) 动态加载菜单和路由(addRoutes)  路由元信息(meta)如果一个网站有不同的角色，比如管理员和普通用户，要求不同的角色能访问的页面是不一样的 这个时候我们就可以把所有的页面都放在路由表里，只要在访问的时候判断一下角色权限。如果有权限就让访问，没有权限的话就拒绝访问，跳转到404页面。 vue-r">
-<meta name="keywords" content="vue">
+<meta name="keywords" content="Vue">
 <meta property="og:type" content="article">
 <meta property="og:title" content="动态路由+路由鉴权">
 <meta property="og:url" content="https://evestorm.github.io/posts/48117/index.html">
@@ -97,7 +97,7 @@
 <meta property="og:description" content="动态路由 + 路由鉴权路由鉴权介绍一般Vue的权限控制有两种方案：  路由元信息(meta) 动态加载菜单和路由(addRoutes)  路由元信息(meta)如果一个网站有不同的角色，比如管理员和普通用户，要求不同的角色能访问的页面是不一样的 这个时候我们就可以把所有的页面都放在路由表里，只要在访问的时候判断一下角色权限。如果有权限就让访问，没有权限的话就拒绝访问，跳转到404页面。 vue-r">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://evestorm.github.io/posts/48117/images/menuList_authList.png">
-<meta property="og:updated_time" content="2019-09-05T12:22:15.916Z">
+<meta property="og:updated_time" content="2020-05-17T02:17:43.458Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="动态路由+路由鉴权">
 <meta name="twitter:description" content="动态路由 + 路由鉴权路由鉴权介绍一般Vue的权限控制有两种方案：  路由元信息(meta) 动态加载菜单和路由(addRoutes)  路由元信息(meta)如果一个网站有不同的角色，比如管理员和普通用户，要求不同的角色能访问的页面是不一样的 这个时候我们就可以把所有的页面都放在路由表里，只要在访问的时候判断一下角色权限。如果有权限就让访问，没有权限的话就拒绝访问，跳转到404页面。 vue-r">
@@ -441,7 +441,7 @@
 <p>路由信息：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">routes: [</span><br><span class="line">    &#123;</span><br><span class="line">        path: <span class="string">'/login'</span>,</span><br><span class="line">        name: <span class="string">'login'</span>,</span><br><span class="line">        meta: &#123;</span><br><span class="line">            roles: [<span class="string">'admin'</span>, <span class="string">'user'</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'../components/Login.vue'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        path: <span class="string">'home'</span>,</span><br><span class="line">        name: <span class="string">'home'</span>,</span><br><span class="line">        meta: &#123;</span><br><span class="line">            roles: [<span class="string">'admin'</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        component: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'../views/Home.vue'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 <p>页面控制：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假设有两种角色：admin 和 user  </span></span><br><span class="line"><span class="comment">//从后台获取的用户角色</span></span><br><span class="line"><span class="keyword">const</span> role = <span class="string">'user'</span></span><br><span class="line"><span class="comment">//当进入一个页面是会触发导航守卫 router.beforeEach 事件</span></span><br><span class="line">router.beforeEach(<span class="function">(<span class="params">to,<span class="keyword">from</span>,next</span>)=&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(to.meta.roles.includes(role))&#123;</span><br><span class="line">		next()	<span class="comment">//放行</span></span><br><span class="line">	&#125;esle&#123;</span><br><span class="line">		next(&#123;<span class="attr">path</span>:<span class="string">"/404"</span>&#125;)	<span class="comment">//跳到404页面</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假设有两种角色：admin 和 user</span></span><br><span class="line"><span class="comment">//从后台获取的用户角色</span></span><br><span class="line"><span class="keyword">const</span> role = <span class="string">'user'</span></span><br><span class="line"><span class="comment">//当进入一个页面是会触发导航守卫 router.beforeEach 事件</span></span><br><span class="line">router.beforeEach(<span class="function">(<span class="params">to,<span class="keyword">from</span>,next</span>)=&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(to.meta.roles.includes(role))&#123;</span><br><span class="line">		next()	<span class="comment">//放行</span></span><br><span class="line">	&#125;esle&#123;</span><br><span class="line">		next(&#123;<span class="attr">path</span>:<span class="string">"/404"</span>&#125;)	<span class="comment">//跳到404页面</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 <p><strong>代码示例2</strong></p>
 <p>当然也可以用下面的一种方法：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// router.js</span></span><br><span class="line"><span class="comment">// 路由表元信息</span></span><br><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">''</span>,</span><br><span class="line">    redirect: <span class="string">'/home'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/home'</span>,</span><br><span class="line">    meta: &#123;</span><br><span class="line">      title: <span class="string">'Home'</span>,</span><br><span class="line">      icon: <span class="string">'home'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/userCenter'</span>,</span><br><span class="line">    meta: &#123;</span><br><span class="line">      title: <span class="string">'个人中心'</span>,</span><br><span class="line">      requireAuth: <span class="literal">true</span> <span class="comment">// 在需要登录的路由的meta中添加响应的权限标识</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在守卫中访问元信息</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">gaurd</span> (<span class="params">to, from, next</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// to.matched.some(record =&gt; record.meta.requireAuth)</span></span><br><span class="line">  <span class="comment">// 可在此处</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -478,7 +478,7 @@
 <li>动态生成路由列表（在第二种路由列表中，通过路由名称清单过滤）</li>
 </ol>
 <h2 id="后台返回的admin路由权限"><a href="#后台返回的admin路由权限" class="headerlink" title="后台返回的admin路由权限"></a>后台返回的admin路由权限</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;pid:-1,path:'/cart',name:'购物车',id:1,auth:'cart'&#125;,</span><br><span class="line">    &#123;pid:1,path:'/cart/cart-list',name:'购物车列表',id:4,auth:'cart-list'&#125;,</span><br><span class="line">    &#123;pid:4,path:'/cart/cart-list/lottery',auth:'lottery',id:5,name:'彩票'&#125;,</span><br><span class="line">    &#123;pid:4,path:'/cart/cart-list/product',auth:'product',id:6,name:'商品'&#125;,</span><br><span class="line">    &#123;pid:-1,path:'/shop',name:'商店',id:2,auth:'shop'&#125;,</span><br><span class="line">    &#123;pid:-1,path:'/profile',name:'个人中心',id:3,auth:'store'&#125;,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
-<h2 id="项目生成"><a href="#项目生成" class="headerlink" title="项目生成"></a>项目生成</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vue create menu-auth</span><br><span class="line">? Check the features needed for your project: </span><br><span class="line"> ◉ Babel</span><br><span class="line"> ◉ Router</span><br><span class="line"> ◉ Vuex</span><br><span class="line"> history mode</span><br><span class="line"> In dedicated config files</span><br><span class="line"> Save this as a preset for future projects? (y/N) n</span><br></pre></td></tr></table></figure>
+<h2 id="项目生成"><a href="#项目生成" class="headerlink" title="项目生成"></a>项目生成</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vue create menu-auth</span><br><span class="line">? Check the features needed for your project:</span><br><span class="line"> ◉ Babel</span><br><span class="line"> ◉ Router</span><br><span class="line"> ◉ Vuex</span><br><span class="line"> history mode</span><br><span class="line"> In dedicated config files</span><br><span class="line"> Save this as a preset for future projects? (y/N) n</span><br></pre></td></tr></table></figure>
 <h3 id="移除不必要的文件及其代码"><a href="#移除不必要的文件及其代码" class="headerlink" title="移除不必要的文件及其代码"></a>移除不必要的文件及其代码</h3><ul>
 <li>components/HelloWorld.vue</li>
 <li>views/About.vue</li>
@@ -619,7 +619,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/vue/" rel="tag"><i class="fa fa-tag"></i> vue</a>
+            <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
           
         </div>
       
@@ -730,7 +730,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -741,7 +741,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-count">50</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -815,7 +815,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">191.9k</span>
+    <span title="Site words total count">192.3k</span>
   
 </div>
 
