@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[uniapp路由拦截配置]]></title>
     <url>%2Fposts%2F30988%2F</url>
-    <content type="text"><![CDATA[项目的百度埋点需要做路由拦截，找了个路由插件 uni-simple-router 。下面是按照和基本使用步骤： 安装uni-simple-router插件 如果是用hbuilderX创建的项目，就在插件库中找。 如果是用cli创建的项目就如下操作： 1npm install uni-simple-router uni-read-pages App下 main.js 中引用1234567891011121314151617181920212223242526272829303132333435363738394041import Router, &#123;RouterMount&#125; from 'uni-simple-router';//---------------------------处理路由配置-------------------------------// 参考 http://hhyang.cn/src/router/api/routerInsatll.html#router-%E6%9E%84%E5%BB%BA%E9%80%89%E9%A1%B9Vue.use(Router);const router = new Router(&#123; routes:ROUTES, //路由表 h5:&#123; loading:false, &#125;, routerBeforeEach(e)&#123; &#125;, routerAfterEach(e)&#123; &#125;&#125;);// 全局路由前置守卫router.beforeEach((to, from, next) =&gt; &#123; next();&#125;)// 全局路由后置守卫router.afterEach((to, from) =&gt; &#123; // 控制页面加入百度统计 统计的需要关联当前门店的ID if(to.meta&amp;&amp;to.meta.isBaiduCount)&#123; Vue.prototype.$util.baiduPageView(to.path); &#125;&#125;)const app = new Vue(&#123; store, ...App&#125;);// #ifdef H5 RouterMount(app,'#app');// #endif// #ifndef H5 app.$mount(); //为了兼容小程序及app端必须这样写才有效果// #endif 配置 vue.config.js12345678910111213141516const TransformPages = require('uni-read-pages')const tfPages = new TransformPages(&#123; includes: ['path', 'style','meta']&#125;)module.exports = &#123; productionSourceMap: false, // 生产打包时不输出map文件，增加打包速度 configureWebpack: config =&gt; &#123; return &#123; plugins: [ new tfPages.webpack.DefinePlugin(&#123; ROUTES: JSON.stringify(tfPages.routes) &#125;) ] &#125; &#125;&#125; 对应 pages.json添加 meta1234567891011121314&#123; "pages": [&#123; "path": "pages/homePage/homePage", "style": &#123; "navigationBarTitleText": "首页", "navigationStyle": "custom" &#125;, "meta": &#123; "isBaiduCount": true &#125; &#125;, ... ],&#125;]]></content>
+    <content type="text"><![CDATA[项目的百度埋点需要做路由拦截，找了个路由插件 uni-simple-router 。下面是按照和基本使用步骤： 安装uni-simple-router插件 如果是用hbuilderX创建的项目，就在插件库中找。 如果是用cli创建的项目就如下操作： 1npm install uni-simple-router uni-read-pages App下 main.js 中引用1234567891011121314151617181920212223242526272829303132333435363738394041import Router, &#123;RouterMount&#125; from 'uni-simple-router';//---------------------------处理路由配置-------------------------------// 参考 http://hhyang.cn/src/router/api/routerInsatll.html#router-%E6%9E%84%E5%BB%BA%E9%80%89%E9%A1%B9Vue.use(Router);const router = new Router(&#123; routes:ROUTES, //路由表 h5:&#123; loading:false, &#125;, routerBeforeEach(e)&#123; &#125;, routerAfterEach(e)&#123; &#125;&#125;);// 全局路由前置守卫router.beforeEach((to, from, next) =&gt; &#123; next();&#125;)// 全局路由后置守卫router.afterEach((to, from) =&gt; &#123; // 控制页面加入百度统计 统计的需要关联当前门店的ID if(to.meta&amp;&amp;to.meta.isBaiduCount)&#123; Vue.prototype.$util.baiduPageView(to.path); &#125;&#125;)const app = new Vue(&#123; store, ...App&#125;);// #ifdef H5 RouterMount(app,'#app');// #endif// #ifndef H5 app.$mount(); //为了兼容小程序及app端必须这样写才有效果// #endif 配置 vue.config.js12345678910111213141516const TransformPages = require('uni-read-pages')const tfPages = new TransformPages(&#123; includes: ['path', 'style','meta']&#125;)module.exports = &#123; productionSourceMap: false, // 生产打包时不输出map文件，增加打包速度 configureWebpack: config =&gt; &#123; return &#123; plugins: [ new tfPages.webpack.DefinePlugin(&#123; ROUTES: JSON.stringify(tfPages.routes) &#125;) ] &#125; &#125;&#125; 对应 pages.json添加 meta1234567891011121314&#123; "pages": [&#123; "path": "pages/homePage/homePage", "style": &#123; "navigationBarTitleText": "首页", "navigationStyle": "custom" &#125;, "meta": &#123; "isBaiduCount": true &#125; &#125;, ... ],&#125; 参考 uni-simple-router uniapp H5 登录拦截—–uni-simple-router 自动构建路由表 uni-app配置路由]]></content>
       <categories>
         <category>前端</category>
         <category>小程序</category>
@@ -926,8 +926,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>axios</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -939,9 +939,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>cors</tag>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
