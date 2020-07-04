@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-loading-bar.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="技巧,转载,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="转载自：https://github.com/chenqf/frontEndBlog/issues/16 前言在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做长列表。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。 在高性能渲染十万条数据(时间分片)一文中，提到了可以使用时间分">
+<meta name="keywords" content="技巧,转载">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-如何高性能的渲染十万条数据(虚拟列表)">
+<meta property="og:url" content="https://evestorm.github.io/posts/17134/index.html">
+<meta property="og:site_name" content="EVE">
+<meta property="og:description" content="转载自：https://github.com/chenqf/frontEndBlog/issues/16 前言在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做长列表。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。 在高性能渲染十万条数据(时间分片)一文中，提到了可以使用时间分">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://camo.githubusercontent.com/f173f834362c816e830e6e4819402002b99a0bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531386636383731653663363f773d3133343526683d35343626663d67696626733d343839313733">
+<meta property="og:image" content="https://camo.githubusercontent.com/d61faea47f1a4ac913e27a1fd89e6beae18d8c3c/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393563663136613535383f773d35303626683d36343226663d706e6726733d3338343436">
+<meta property="og:image" content="https://camo.githubusercontent.com/514561569c4eb9fca1b7430ded1a87f1dc15b1e5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393763323733636264393f773d35303626683d36373726663d706e6726733d3430343030">
+<meta property="og:image" content="https://camo.githubusercontent.com/6de46560e722ff1267eea806e180c923dbfaeecc/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396133393364656532633f773d37313926683d36373726663d706e6726733d3536393032">
+<meta property="og:image" content="https://camo.githubusercontent.com/9e4848027ca8ab7b1aba84f8885a29abb47d7171/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653031376437626261333f773d3132373026683d34323726663d67696626733d393132393536">
+<meta property="og:image" content="https://camo.githubusercontent.com/cce195f0b8972685f7d6209a35f2c6d1ff8d2bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396631653132316265393f773d34313726683d37303226663d706e6726733d3431333331">
+<meta property="og:image" content="https://camo.githubusercontent.com/d6638c9f80ae834da5e3387a9749e390e2ba204f/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653936353834623639303f773d33363026683d36353526663d67696626733d31313433373239">
+<meta property="og:image" content="https://camo.githubusercontent.com/909bdbc25f9fe55bcd34b7ba7fcdc5df72f827e2/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531613539333137636165373f773d34363126683d34393326663d706e6726733d3236343633">
+<meta property="og:image" content="https://camo.githubusercontent.com/7755c7231212825c66bf314e6cbcc5854c648471/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531656530656230666338393f773d33363026683d36333626663d67696626733d31313537353835">
+<meta property="og:updated_time" content="2020-07-04T07:58:49.441Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="转载-如何高性能的渲染十万条数据(虚拟列表)">
+<meta name="twitter:description" content="转载自：https://github.com/chenqf/frontEndBlog/issues/16 前言在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做长列表。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。 在高性能渲染十万条数据(时间分片)一文中，提到了可以使用时间分">
+<meta name="twitter:image" content="https://camo.githubusercontent.com/f173f834362c816e830e6e4819402002b99a0bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531386636383731653663363f773d3133343526683d35343626663d67696626733d343839313733">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://evestorm.github.io/posts/17134/">
+
+
+
+
+
+  <title>转载-如何高性能的渲染十万条数据(虚拟列表) | EVE</title>
+  
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="BIAVoToLLq">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband">
+    </div>
+    <a target="_blank" href="https://github.com/evestorm" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">EVE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">EVE的个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/17134/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/kitten.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">转载-如何高性能的渲染十万条数据(虚拟列表)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-04T23:55:57+08:00">
+                2020-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/JS/" itemprop="url" rel="index">
+                    <span itemprop="name">JS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.7k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  14
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转载自：<a href="https://github.com/chenqf/frontEndBlog/issues/16" target="_blank" rel="noopener">https://github.com/chenqf/frontEndBlog/issues/16</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做<code>长列表</code>。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。</p>
+<p>在<a href="https://juejin.im/post/5d76f469f265da039a28aff7" target="_blank" rel="noopener">高性能渲染十万条数据(时间分片)</a>一文中，提到了可以使用<code>时间分片</code>的方式来对长列表进行渲染，但这种方式更适用于列表项的DOM结构十分简单的情况。本文会介绍使用<code>虚拟列表</code>的方式，来同时加载大量数据。</p>
+<h2 id="为什么需要使用虚拟列表"><a href="#为什么需要使用虚拟列表" class="headerlink" title="为什么需要使用虚拟列表"></a>为什么需要使用虚拟列表</h2><p>假设我们的长列表需要展示10000条记录，我们同时将10000条记录渲染到页面中，先来看看需要花费多长时间：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"button"</span>&gt;</span>button<span class="tag">&lt;/<span class="name">button</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"container"</span>&gt;</span><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">document.getElementById('button').addEventListener('click',function()&#123;</span><br><span class="line">    // 记录任务开始时间</span><br><span class="line">    let now = Date.now();</span><br><span class="line">    // 插入一万条数据</span><br><span class="line">    const total = 10000;</span><br><span class="line">    // 获取容器</span><br><span class="line">    let ul = document.getElementById('container');</span><br><span class="line">    // 将数据插入容器中</span><br><span class="line">    for (let i = 0; i <span class="tag">&lt; <span class="attr">total</span>; <span class="attr">i</span>++) &#123;</span></span><br><span class="line"><span class="tag">        <span class="attr">let</span> <span class="attr">li</span> = <span class="string">document.createElement(</span>'<span class="attr">li</span>');</span></span><br><span class="line"><span class="tag">        <span class="attr">li.innerText</span> = <span class="string">~~(Math.random()</span> * <span class="attr">total</span>)</span></span><br><span class="line"><span class="tag">        <span class="attr">ul.appendChild</span>(<span class="attr">li</span>);</span></span><br><span class="line"><span class="tag">    &#125;</span></span><br><span class="line"><span class="tag">    <span class="attr">console.log</span>('<span class="attr">JS</span>运行时间：',<span class="attr">Date.now</span>() <span class="attr">-</span> <span class="attr">now</span>);</span></span><br><span class="line"><span class="tag">    <span class="attr">setTimeout</span>(()=&gt;</span>&#123;</span><br><span class="line">      console.log('总运行时间：',Date.now() - now);</span><br><span class="line">    &#125;,0)</span><br><span class="line"></span><br><span class="line">    // print JS运行时间： 38</span><br><span class="line">    // print 总运行时间： 957</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<p>当我们点击按钮，会同时向页面中加入一万条记录，通过控制台的输出，我们可以粗略的统计到，JS的运行时间为<code>38ms</code>,但渲染完成后的总时间为<code>957ms</code>。</p>
+<p>简单说明一下，为何两次<code>console.log</code>的结果时间差异巨大，并且是如何简单来统计<code>JS运行时间</code>和<code>总渲染时间</code>：</p>
+<ul>
+<li>在 JS 的<code>Event Loop</code>中，当JS引擎所管理的执行栈中的事件以及所有微任务事件全部执行完后，才会触发渲染线程对页面进行渲染</li>
+<li>第一个<code>console.log</code>的触发时间是在页面进行渲染之前，此时得到的间隔时间为JS运行所需要的时间</li>
+<li>第二个<code>console.log</code>是放到 setTimeout 中的，它的触发时间是在渲染完成，在下一次<code>Event Loop</code>中执行的</li>
+</ul>
+<p><a href="https://juejin.im/post/5d5b4c2df265da03dd3d73e5" target="_blank" rel="noopener">关于Event Loop的详细内容请参见这篇文章–&gt;</a></p>
+<p>然后，我们通过<code>Chrome</code>的<code>Performance</code>工具来详细的分析这段代码的性能瓶颈在哪里：</p>
+<p><a href="https://camo.githubusercontent.com/f173f834362c816e830e6e4819402002b99a0bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531386636383731653663363f773d3133343526683d35343626663d67696626733d343839313733" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/f173f834362c816e830e6e4819402002b99a0bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531386636383731653663363f773d3133343526683d35343626663d67696626733d343839313733" alt="img"></a></p>
+<p>从<code>Performance</code>可以看出，代码从执行到渲染结束，共消耗了<code>960.8ms</code>,其中的主要时间消耗如下：</p>
+<ul>
+<li>Event(click) : <code>40.84ms</code></li>
+<li>Recalculate Style : <code>105.08ms</code></li>
+<li>Layout : <code>731.56ms</code></li>
+<li>Update Layer Tree : <code>58.87ms</code></li>
+<li>Paint : <code>15.32ms</code></li>
+</ul>
+<p>从这里我们可以看出，我们的代码的执行过程中，消耗时间最多的两个阶段是<code>Recalculate Style</code>和<code>Layout</code>。</p>
+<ul>
+<li><code>Recalculate Style</code>：样式计算，浏览器根据css选择器计算哪些元素应该应用哪些规则，确定每个元素具体的样式。</li>
+<li><code>Layout</code>：布局，知道元素应用哪些规则之后，浏览器开始计算它要占据的空间大小及其在屏幕的位置。</li>
+</ul>
+<p>在实际的工作中，列表项必然不会像例子中仅仅只由一个li标签组成，必然是由复杂DOM节点组成的。</p>
+<p>那么可以想象的是，当列表项数过多并且列表项结构复杂的时候，同时渲染时，会在<code>Recalculate Style</code>和<code>Layout</code>阶段消耗大量的时间。</p>
+<p>而<code>虚拟列表</code>就是解决这一问题的一种实现。</p>
+<h2 id="什么是虚拟列表"><a href="#什么是虚拟列表" class="headerlink" title="什么是虚拟列表"></a>什么是虚拟列表</h2><p><code>虚拟列表</code>其实是按需显示的一种实现，即只对<code>可见区域</code>进行渲染，对<code>非可见区域</code>中的数据不渲染或部分渲染的技术，从而达到极高的渲染性能。</p>
+<p>假设有1万条记录需要同时渲染，我们屏幕的<code>可见区域</code>的高度为<code>500px</code>,而列表项的高度为<code>50px</code>，则此时我们在屏幕中最多只能看到10个列表项，那么在首次渲染的时候，我们只需加载10条即可。</p>
+<p><a href="https://camo.githubusercontent.com/d61faea47f1a4ac913e27a1fd89e6beae18d8c3c/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393563663136613535383f773d35303626683d36343226663d706e6726733d3338343436" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/d61faea47f1a4ac913e27a1fd89e6beae18d8c3c/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393563663136613535383f773d35303626683d36343226663d706e6726733d3338343436" alt="img"></a></p>
+<p>说完首次加载，再分析一下当滚动发生时，我们可以通过计算当前滚动值得知此时在屏幕<code>可见区域</code>应该显示的列表项。</p>
+<p>假设滚动发生，滚动条距顶部的位置为<code>150px</code>,则我们可得知在<code>可见区域</code>内的列表项为<code>第4项</code>至`第13项。</p>
+<p><a href="https://camo.githubusercontent.com/514561569c4eb9fca1b7430ded1a87f1dc15b1e5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393763323733636264393f773d35303626683d36373726663d706e6726733d3430343030" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/514561569c4eb9fca1b7430ded1a87f1dc15b1e5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393763323733636264393f773d35303626683d36373726663d706e6726733d3430343030" alt="img"></a></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>虚拟列表的实现，实际上就是在首屏加载的时候，只加载<code>可视区域</code>内需要的列表项，当滚动发生时，动态通过计算获得<code>可视区域</code>内的列表项，并将<code>非可视区域</code>内存在的列表项删除。</p>
+<ul>
+<li>计算当前<code>可视区域</code>起始数据索引(<code>startIndex</code>)</li>
+<li>计算当前<code>可视区域</code>结束数据索引(<code>endIndex</code>)</li>
+<li>计算当前<code>可视区域的</code>数据，并渲染到页面中</li>
+<li>计算<code>startIndex</code>对应的数据在整个列表中的偏移位置<code>startOffset</code>并设置到列表上</li>
+</ul>
+<p><a href="https://camo.githubusercontent.com/6de46560e722ff1267eea806e180c923dbfaeecc/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396133393364656532633f773d37313926683d36373726663d706e6726733d3536393032" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/6de46560e722ff1267eea806e180c923dbfaeecc/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396133393364656532633f773d37313926683d36373726663d706e6726733d3536393032" alt="img"></a></p>
+<p>由于只是对<code>可视区域</code>内的列表项进行渲染，所以为了保持列表容器的高度并可正常的触发滚动，将Html结构设计成如下结构：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"infinite-list-container"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"infinite-list-phantom"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"infinite-list"</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- item-1 --&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- item-2 --&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- ...... --&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- item-n --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>infinite-list-container</code> 为<code>可视区域</code>的容器</li>
+<li><code>infinite-list-phantom</code> 为容器内的占位，高度为总列表高度，用于形成滚动条</li>
+<li><code>infinite-list</code> 为列表项的<code>渲染区域</code></li>
+</ul>
+<p>接着，监听<code>infinite-list-container</code>的<code>scroll</code>事件，获取滚动位置<code>scrollTop</code></p>
+<ul>
+<li>假定<code>可视区域</code>高度固定，称之为<code>screenHeight</code></li>
+<li>假定<code>列表每项</code>高度固定，称之为<code>itemSize</code></li>
+<li>假定<code>列表数据</code>称之为<code>listData</code></li>
+<li>假定<code>当前滚动位置</code>称之为<code>scrollTop</code></li>
+</ul>
+<p>则可推算出：</p>
+<ul>
+<li>列表总高度<code>listHeight</code> = listData.length * itemSize</li>
+<li>可显示的列表项数<code>visibleCount</code> = Math.ceil(screenHeight / itemSize)</li>
+<li>数据的起始索引<code>startIndex</code> = Math.floor(scrollTop / itemSize)</li>
+<li>数据的结束索引<code>endIndex</code> = startIndex + visibleCount</li>
+<li>列表显示数据为<code>visibleData</code> = listData.slice(startIndex,endIndex)</li>
+</ul>
+<p>当滚动后，由于<code>渲染区域</code>相对于<code>可视区域</code>已经发生了偏移，此时我需要获取一个偏移量<code>startOffset</code>，通过样式控制将<code>渲染区域</code>偏移至<code>可视区域</code>中。</p>
+<ul>
+<li>偏移量<code>startOffset</code> = scrollTop - (scrollTop % itemSize);</li>
+</ul>
+<p>最终的<code>简易代码</code>如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">ref</span>=<span class="string">"list"</span> <span class="attr">class</span>=<span class="string">"infinite-list-container"</span> @<span class="attr">scroll</span>=<span class="string">"scrollEvent($event)"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"infinite-list-phantom"</span> <span class="attr">:style</span>=<span class="string">"&#123; height: listHeight + 'px' &#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"infinite-list"</span> <span class="attr">:style</span>=<span class="string">"&#123; transform: getTransform &#125;"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">ref</span>=<span class="string">"items"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"infinite-list-item"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">v-for</span>=<span class="string">"item in visibleData"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">:key</span>=<span class="string">"item.id"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">:style</span>=<span class="string">"&#123; height: itemSize + 'px',lineHeight: itemSize + 'px' &#125;"</span></span></span><br><span class="line"><span class="tag">      &gt;</span>&#123;&#123; item.value &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">export default &#123;</span><br><span class="line">  name:'VirtualList',</span><br><span class="line">  props: &#123;</span><br><span class="line">    //所有列表数据</span><br><span class="line">    listData:&#123;</span><br><span class="line">      type:Array,</span><br><span class="line">      default:()=&gt;[]</span><br><span class="line">    &#125;,</span><br><span class="line">    //每项高度</span><br><span class="line">    itemSize: &#123;</span><br><span class="line">      type: Number,</span><br><span class="line">      default:200</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed:&#123;</span><br><span class="line">    //列表总高度</span><br><span class="line">    listHeight()&#123;</span><br><span class="line">      return this.listData.length * this.itemSize;</span><br><span class="line">    &#125;,</span><br><span class="line">    //可显示的列表项数</span><br><span class="line">    visibleCount()&#123;</span><br><span class="line">      return Math.ceil(this.screenHeight / this.itemSize)</span><br><span class="line">    &#125;,</span><br><span class="line">    //偏移量对应的style</span><br><span class="line">    getTransform()&#123;</span><br><span class="line">      return `translate3d(0,$&#123;this.startOffset&#125;px,0)`;</span><br><span class="line">    &#125;,</span><br><span class="line">    //获取真实显示列表数据</span><br><span class="line">    visibleData()&#123;</span><br><span class="line">      return this.listData.slice(this.start, Math.min(this.end,this.listData.length));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    this.screenHeight = this.$el.clientHeight;</span><br><span class="line">    this.start = 0;</span><br><span class="line">    this.end = this.start + this.visibleCount;</span><br><span class="line">  &#125;,</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      //可视区域高度</span><br><span class="line">      screenHeight:0,</span><br><span class="line">      //偏移量</span><br><span class="line">      startOffset:0,</span><br><span class="line">      //起始索引</span><br><span class="line">      start:0,</span><br><span class="line">      //结束索引</span><br><span class="line">      end:null,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    scrollEvent() &#123;</span><br><span class="line">      //当前滚动位置</span><br><span class="line">      let scrollTop = this.$refs.list.scrollTop;</span><br><span class="line">      //此时的开始索引</span><br><span class="line">      this.start = Math.floor(scrollTop / this.itemSize);</span><br><span class="line">      //此时的结束索引</span><br><span class="line">      this.end = this.start + this.visibleCount;</span><br><span class="line">      //此时的偏移量</span><br><span class="line">      this.startOffset = scrollTop - (scrollTop % this.itemSize);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><a href="https://codesandbox.io/s/virtuallist-1-rp8pi" target="_blank" rel="noopener">点击查看在线DEMO及完整代码</a></p>
+<p>最终效果如下：</p>
+<p><a href="https://camo.githubusercontent.com/9e4848027ca8ab7b1aba84f8885a29abb47d7171/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653031376437626261333f773d3132373026683d34323726663d67696626733d393132393536" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/9e4848027ca8ab7b1aba84f8885a29abb47d7171/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653031376437626261333f773d3132373026683d34323726663d67696626733d393132393536" alt="img"></a></p>
+<h2 id="列表项动态高度"><a href="#列表项动态高度" class="headerlink" title="列表项动态高度"></a>列表项动态高度</h2><p>在之前的实现中，列表项的高度是固定的，因为高度固定，所以可以很轻易的获取列表项的整体高度以及滚动时的显示数据与对应的偏移量。而实际应用的时候，当列表中包含文本之类的可变内容，会导致列表项的高度并不相同。</p>
+<p>比如这种情况：</p>
+<p><a href="https://camo.githubusercontent.com/cce195f0b8972685f7d6209a35f2c6d1ff8d2bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396631653132316265393f773d34313726683d37303226663d706e6726733d3431333331" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/cce195f0b8972685f7d6209a35f2c6d1ff8d2bd5/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531396631653132316265393f773d34313726683d37303226663d706e6726733d3431333331" alt="img"></a></p>
+<p>在虚拟列表中应用动态高度的解决方案一般有如下三种：</p>
+<blockquote>
+<p>1.对组件属性<code>itemSize</code>进行扩展，支持传递类型为<code>数字</code>、<code>数组</code>、<code>函 数</code></p>
+</blockquote>
+<ul>
+<li>可以是一个固定值，如 100，此时列表项是固高的</li>
+<li>可以是一个包含所有列表项高度的数据，如 [50, 20, 100, 80, …]</li>
+<li>可以是一个根据列表项索引返回其高度的函数：(index: number): number</li>
+</ul>
+<p>这种方式虽然有比较好的灵活度，但仅适用于可以预先知道或可以通过计算得知列表项高度的情况，依然无法解决列表项高度由内容撑开的情况。</p>
+<blockquote>
+<p>2.将列表项<code>渲染到屏幕外</code>，对其高度进行测量并缓存，然后再将其渲染至可视区域内。</p>
+</blockquote>
+<p>由于预先渲染至屏幕外，再渲染至屏幕内，这导致渲染成本增加一倍，这对于数百万用户在低端移动设备上使用的产品来说是不切实际的。</p>
+<blockquote>
+<p>3.以<code>预估高度</code>先行渲染，然后获取真实高度并缓存。</p>
+</blockquote>
+<p>这是我选择的实现方式，可以避免前两种方案的不足。</p>
+<p>接下来，来看如何简易的实现：</p>
+<p>定义组件属性<code>estimatedItemSize</code>,用于接收<code>预估高度</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">props: &#123;</span><br><span class="line">  <span class="comment">//预估高度</span></span><br><span class="line">  estimatedItemSize:&#123;</span><br><span class="line">    type:<span class="built_in">Number</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义<code>positions</code>，用于列表项渲染后存储<code>每一项的高度以及位置</code>信息，</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.positions = [</span><br><span class="line">  <span class="comment">// &#123;</span></span><br><span class="line">  <span class="comment">//   top:0,</span></span><br><span class="line">  <span class="comment">//   bottom:100,</span></span><br><span class="line">  <span class="comment">//   height:100</span></span><br><span class="line">  <span class="comment">// &#125;</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>并在初始时根据<code>estimatedItemSize</code>对<code>positions</code>进行初始化。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">initPositions()&#123;</span><br><span class="line">  <span class="keyword">this</span>.positions = <span class="keyword">this</span>.listData.map(<span class="function">(<span class="params">item,index</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      index,</span><br><span class="line">      height:<span class="keyword">this</span>.estimatedItemSize,</span><br><span class="line">      top:index * <span class="keyword">this</span>.estimatedItemSize,</span><br><span class="line">      bottom:(index + <span class="number">1</span>) * <span class="keyword">this</span>.estimatedItemSize</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于列表项高度不定，并且我们维护了<code>positions</code>，用于记录每一项的位置，而<code>列表高度</code>实际就等于列表中最后一项的底部距离列表顶部的位置。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//列表总高度</span></span><br><span class="line">listHeight()&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.positions[<span class="keyword">this</span>.positions.length - <span class="number">1</span>].bottom;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于需要在<code>渲染完成</code>后，获取列表每项的位置信息并缓存，所以使用钩子函数<code>updated</code>来实现：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">updated()&#123;</span><br><span class="line">  <span class="keyword">let</span> nodes = <span class="keyword">this</span>.$refs.items;</span><br><span class="line">  nodes.forEach(<span class="function">(<span class="params">node</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">let</span> rect = node.getBoundingClientRect();</span><br><span class="line">    <span class="keyword">let</span> height = rect.height;</span><br><span class="line">    <span class="keyword">let</span> index = +node.id.slice(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">let</span> oldHeight = <span class="keyword">this</span>.positions[index].height;</span><br><span class="line">    <span class="keyword">let</span> dValue = oldHeight - height;</span><br><span class="line">    <span class="comment">//存在差值</span></span><br><span class="line">    <span class="keyword">if</span>(dValue)&#123;</span><br><span class="line">      <span class="keyword">this</span>.positions[index].bottom = <span class="keyword">this</span>.positions[index].bottom - dValue;</span><br><span class="line">      <span class="keyword">this</span>.positions[index].height = height;</span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">let</span> k = index + <span class="number">1</span>;k&lt;<span class="keyword">this</span>.positions.length; k++)&#123;</span><br><span class="line">        <span class="keyword">this</span>.positions[k].top = <span class="keyword">this</span>.positions[k<span class="number">-1</span>].bottom;</span><br><span class="line">        <span class="keyword">this</span>.positions[k].bottom = <span class="keyword">this</span>.positions[k].bottom - dValue;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>滚动后获取列表<code>开始索引</code>的方法修改为通过<code>缓存</code>获取：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取列表起始索引</span></span><br><span class="line">getStartIndex(scrollTop = <span class="number">0</span>)&#123;</span><br><span class="line">  <span class="keyword">let</span> item = <span class="keyword">this</span>.positions.find(<span class="function"><span class="params">i</span> =&gt;</span> i &amp;&amp; i.bottom &gt; scrollTop);</span><br><span class="line">  <span class="keyword">return</span> item.index;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于我们的缓存数据，本身就是有顺序的，所以获取<code>开始索引</code>的方法可以考虑通过<code>二分查找</code>的方式来降低检索次数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取列表起始索引</span></span><br><span class="line">getStartIndex(scrollTop = <span class="number">0</span>)&#123;</span><br><span class="line">  <span class="comment">//二分法查找</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.binarySearch(<span class="keyword">this</span>.positions,scrollTop)</span><br><span class="line">&#125;,</span><br><span class="line"><span class="comment">//二分法查找</span></span><br><span class="line">binarySearch(list,value)&#123;</span><br><span class="line">  <span class="keyword">let</span> start = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">let</span> end = list.length - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">let</span> tempIndex = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">while</span>(start &lt;= end)&#123;</span><br><span class="line">    <span class="keyword">let</span> midIndex = <span class="built_in">parseInt</span>((start + end)/<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">let</span> midValue = list[midIndex].bottom;</span><br><span class="line">    <span class="keyword">if</span>(midValue === value)&#123;</span><br><span class="line">      <span class="keyword">return</span> midIndex + <span class="number">1</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(midValue &lt; value)&#123;</span><br><span class="line">      start = midIndex + <span class="number">1</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(midValue &gt; value)&#123;</span><br><span class="line">      <span class="keyword">if</span>(tempIndex === <span class="literal">null</span> || tempIndex &gt; midIndex)&#123;</span><br><span class="line">        tempIndex = midIndex;</span><br><span class="line">      &#125;</span><br><span class="line">      end = end - <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> tempIndex;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>滚动后将<code>偏移量</code>的获取方式变更：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">scrollEvent() &#123;</span><br><span class="line">  <span class="comment">//...省略</span></span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">this</span>.start &gt;= <span class="number">1</span>)&#123;</span><br><span class="line">    <span class="keyword">this</span>.startOffset = <span class="keyword">this</span>.positions[<span class="keyword">this</span>.start - <span class="number">1</span>].bottom</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.startOffset = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过<a href="https://github.com/marak/Faker.js/" target="_blank" rel="noopener">faker.js</a> 来创建一些<code>随机数据</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [];</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> id = <span class="number">0</span>; id &lt; <span class="number">10000</span>; id++) &#123;</span><br><span class="line">  data.push(&#123;</span><br><span class="line">    id,</span><br><span class="line">    value: faker.lorem.sentences() <span class="comment">// 长文本</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://codesandbox.io/s/virtuallist2-1bqk6" target="_blank" rel="noopener">点击查看在线DEMO及完整代码</a></p>
+<p>最终效果如下：</p>
+<p><a href="https://camo.githubusercontent.com/d6638c9f80ae834da5e3387a9749e390e2ba204f/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653936353834623639303f773d33363026683d36353526663d67696626733d31313433373239" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/d6638c9f80ae834da5e3387a9749e390e2ba204f/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531653936353834623639303f773d33363026683d36353526663d67696626733d31313433373239" alt="img"></a></p>
+<p>从演示效果上看，我们实现了基于<code>文字内容动态撑高列表项</code>情况下的<code>虚拟列表</code>，但是我们可能会发现，当滚动过快时，会出现短暂的<code>白屏现象</code>。</p>
+<p>为了使页面平滑滚动，我们还需要在<code>可见区域</code>的上方和下方渲染额外的项目，在滚动时给予一些<code>缓冲</code>，所以将屏幕分为三个区域：</p>
+<ul>
+<li>可视区域上方：<code>above</code></li>
+<li>可视区域：<code>screen</code></li>
+<li>可视区域下方：<code>below</code></li>
+</ul>
+<p><a href="https://camo.githubusercontent.com/909bdbc25f9fe55bcd34b7ba7fcdc5df72f827e2/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531613539333137636165373f773d34363126683d34393326663d706e6726733d3236343633" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/909bdbc25f9fe55bcd34b7ba7fcdc5df72f827e2/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531613539333137636165373f773d34363126683d34393326663d706e6726733d3236343633" alt="img"></a></p>
+<p>定义组件属性<code>bufferScale</code>,用于接收<code>缓冲区数据</code>与<code>可视区数据</code>的<code>比例</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">props: &#123;</span><br><span class="line">  <span class="comment">//缓冲区比例</span></span><br><span class="line">  bufferScale:&#123;</span><br><span class="line">    type:<span class="built_in">Number</span>,</span><br><span class="line">    <span class="keyword">default</span>:<span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可视区上方渲染条数<code>aboveCount</code>获取方式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aboveCount()&#123;</span><br><span class="line">  return Math.min(this.start,this.bufferScale * this.visibleCount)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可视区下方渲染条数<code>belowCount</code>获取方式如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">belowCount()&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.min(<span class="keyword">this</span>.listData.length - <span class="keyword">this</span>.end,<span class="keyword">this</span>.bufferScale * <span class="keyword">this</span>.visibleCount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>真实渲染数据<code>visibleData</code>获取方式如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">visibleData()&#123;</span><br><span class="line">  <span class="keyword">let</span> start = <span class="keyword">this</span>.start - <span class="keyword">this</span>.aboveCount;</span><br><span class="line">  <span class="keyword">let</span> end = <span class="keyword">this</span>.end + <span class="keyword">this</span>.belowCount;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>._listData.slice(start, end);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://codesandbox.io/s/virtuallist-3-i3h9v" target="_blank" rel="noopener">点击查看在线DEMO及完整代码</a></p>
+<p>最终效果如下：<br><a href="https://camo.githubusercontent.com/7755c7231212825c66bf314e6cbcc5854c648471/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531656530656230666338393f773d33363026683d36333626663d67696626733d31313537353835" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/7755c7231212825c66bf314e6cbcc5854c648471/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531656530656230666338393f773d33363026683d36333626663d67696626733d31313537353835" alt="img"></a></p>
+<blockquote>
+<p>基于这个方案，开发了一个基于Vue2.x的虚拟列表组件：<a href="https://github.com/chenqf/vue-virtual-listview" target="_blank" rel="noopener">vue-virtual-listview</a>,可<a href="https://github.com/chenqf/vue-virtual-listview" target="_blank" rel="noopener">点击查看完整代码</a>。</p>
+</blockquote>
+<h2 id="面向未来"><a href="#面向未来" class="headerlink" title="面向未来"></a>面向未来</h2><p>在前文中我们使用<code>监听scroll事件</code>的方式来触发可视区域中数据的更新，当滚动发生后，scroll事件会频繁触发，很多时候会造成<code>重复计算</code>的问题，从性能上来说无疑存在浪费的情况。</p>
+<p>可以使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver" target="_blank" rel="noopener">IntersectionObserver</a>替换监听scroll事件，<code>IntersectionObserver</code>可以监听目标元素是否出现在可视区域内，在监听的回调事件中执行可视区域数据的更新，并且<code>IntersectionObserver</code>的监听回调是异步触发，不随着目标元素的滚动而触发，性能消耗极低。</p>
+<h2 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h2><p>我们虽然实现了根据列表项动态高度下的虚拟列表，但如果列表项中包含图片，并且列表高度由图片撑开，由于图片会发送网络请求，此时无法保证我们在获取列表项真实高度时图片是否已经加载完成，从而造成计算不准确的情况。</p>
+<p>这种情况下，如果我们能监听列表项的大小变化就能获取其真正的高度了。我们可以使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/ResizeObserver" target="_blank" rel="noopener">ResizeObserver</a>来监听列表项内容区域的高度改变，从而实时获取每一列表项的高度。</p>
+<p>不过遗憾的是，在撰写本文的时候，仅有少数<a href="https://www.caniuse.com/#search=ResizeObserver" target="_blank" rel="noopener">浏览器支持</a><code>ResizeObserver</code>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/dwqs/blog/issues/70" target="_blank" rel="noopener">浅说虚拟列表的实现原理</a></li>
+<li><a href="https://github.com/dwqs/blog/issues/72" target="_blank" rel="noopener">react-virtualized组件的虚拟列表实现</a></li>
+<li><a href="https://itsze.ro/blog/2017/04/09/infinite-list-and-react.html" target="_blank" rel="noopener">React和无限列表</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/34585166" target="_blank" rel="noopener">再谈前端虚拟列表的实现</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Lance 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Lance 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技巧/" rel="tag"><i class="fa fa-tag"></i> 技巧</a>
+          
+            <a href="/tags/转载/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/45184/" rel="next" title="SourceTree识别不了新文件夹">
+                <i class="fa fa-chevron-left"></i> SourceTree识别不了新文件夹
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/kitten.jpeg" alt="Lance">
+            
+              <p class="site-author-name" itemprop="name">Lance</p>
+              <p class="site-description motion-element" itemprop="description">前端笔记和心得，包括但不限于：HTML5 CSS3 JavaScript ES6 Vue Webpack...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">127</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要使用虚拟列表"><span class="nav-number">2.</span> <span class="nav-text">为什么需要使用虚拟列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是虚拟列表"><span class="nav-number">3.</span> <span class="nav-text">什么是虚拟列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">4.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#列表项动态高度"><span class="nav-number">5.</span> <span class="nav-text">列表项动态高度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面向未来"><span class="nav-number">6.</span> <span class="nav-text">面向未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遗留问题"><span class="nav-number">7.</span> <span class="nav-text">遗留问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">210.3k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      人阅读
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@3.12.0/dist/av-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/valine@1.3.6/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: true,
+        notify: true,
+        appId: 'eMlA1yfOVSu3St1f6l2XzQqC-gzGzoHsz',
+        appKey: 'TOv5VcioO0ijgjrHfGILweOR',
+        placeholder: '欢迎交流讨论...',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'15' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <!-- 代码块复制功能 -->
+  <script type="text/javascript" src="/js/src/clipboard.min.js"></script>  
+  <script type="text/javascript" src="/js/src/clipboard-use.js"></script>
+</body>
+</html>
