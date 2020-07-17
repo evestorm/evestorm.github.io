@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Swift注入变量给前端导致的报错问题]]></title>
+    <url>%2Fposts%2F13655%2F</url>
+    <content type="text"><![CDATA[在iOS中加载H5时需要注入一些 JS 变量供前端使用，例如把App相关的信息存进 JS ，好让 JS 调用： 123456789101112131415161718// MARK: 获取App信息public func getAppInfo() -&gt; [String: String] &#123; let infoDictionary = Bundle.main.infoDictionary! let appVersion = infoDictionary["CFBundleShortVersionString"] as! String let appName = infoDictionary["CFBundleName"] as! String return ["version": appVersion, "name": appName]&#125;// 获取app信息let appInfo = getAppInfo()let scriptStr = """ window.iOS = &#123; 'getAppInfo': &#123; 'version': \(appInfo["version"]!), 'name': \(appInfo["name"]!), &#125; &#125;""" 上面的代码注入到 JS 中会导致前端无法通过 iOS.getAppInfo.name 获取到 App 的名称，明明我的 appInfo[&quot;name&quot;] 是个 String 字符串类型，为什么会拿不到了？ 通过在 Swift 打印 scriptStr 变量我发现，window.iOS 对象中的 name 属性被解析成了： 1'name': App名称 所以JS无法拿到，问题就出现在 App名称 上，这原本是个字符串，但注入到 JS 后它并没有被 双引号&quot;&quot; 或 单引号&#39;&#39; 包裹，导致 JS 会把 App名称 当做是个变量名而不是字符串。所以把上面代码改为下方形式就好了： 12345678let scriptStr = """ window.iOS = &#123; 'getAppInfo': &#123; 'version': "\(appInfo["version"]!)", 'name': "\(appInfo["name"]!)", &#125; &#125;"""]]></content>
+      <categories>
+        <category>iOS</category>
+        <category>Swift</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Safari下margin-bottom(设置了此属性的元素在页面最底部)]]></title>
     <url>%2Fposts%2F32093%2F</url>
     <content type="text"><![CDATA[问题复现Safari 下页面最底部元素的 margin-bottom 失效： See the Pen Margin not working only in Safari (element is at the bottom of the page) by JingW (@JingW) on CodePen. 解决方案底部添加一个透明颜色的div撑起高度: HTML 1&lt;div id='tr-footer'&gt;&lt;/div&gt; css 12345#tr-footer&#123; height: ?px; width: 100%; background: transparent;&#125;]]></content>
@@ -108,8 +120,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -245,9 +257,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -299,8 +311,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -513,8 +525,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -991,9 +1003,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1101,8 +1113,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>axios</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1114,9 +1126,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>cors</tag>
         <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
