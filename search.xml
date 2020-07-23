@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[阻止安卓物理返回键事件]]></title>
+    <url>%2Fposts%2F32404%2F</url>
+    <content type="text"><![CDATA[uni-app app(非h5嵌套app)生命周期函数：onBackPress https://ask.dcloud.net.cn/article/35120 注意：H5 平台，顶部导航栏返回按钮支持 onBackPress()，浏览器默认返回按键及Android手机实体返回键不支持 onBackPress() 123onBackPress() &#123; return true;&#125; H5浏览器端利用Web api: popstate https://www.cnblogs.com/linx/p/7018697.html 仅能阻止一次，按两次或多次依然返回 1234history.pushState(null, null, window.location.href)window.onpopstate = function (event) &#123; history.go(1)&#125; uni-app h5嵌套app(用于单页应用退出登陆,点击实体按钮返回会返回之前页面闪一下又跳转回登录页)（销毁掉之前的浏览记录页面 ）更改退出登录跳转方式为： 123uni.reLaunch(&#123; url: '/pages/homePageSub/login/login'&#125;)]]></content>
+      <categories>
+        <category>前端</category>
+        <category>小程序</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>uni-app</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[如何实现一个简单的骨架屏效果]]></title>
     <url>%2Fposts%2F11567%2F</url>
     <content type="text"><![CDATA[之前博客提到了如何在 Vue 中使用插件实现骨架屏效果，而且骨架屏UI素材使用的是图片。一旦我们没有设计师帮助提供图片或者插件失效就没辙了。所以这次记录下如何在不使用插件的前提下，使用HTML+CSS实现一个自定义骨架屏。 最终效果 代码文件封装组件 yyt-st-skeleton.vue 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152&lt;!-- 预定selectTable的骨架屏 --&gt;&lt;template&gt; &lt;view&gt; &lt;view class="yyt-st-skeleton" :style="&#123; top: top + 'rpx' &#125;" v-if="show"&gt; &lt;!-- 区域名称 --&gt; &lt;view class="yyt-st-area-name"&gt;&lt;/view&gt; &lt;!-- 桌台列表 --&gt; &lt;view class="yyt-st-table-list-wrapper"&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;div&gt;&lt;/div&gt; &lt;/view&gt; &lt;/view&gt; &lt;view v-else&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/view&gt; &lt;/view&gt;&lt;/template&gt;&lt;script&gt;export default &#123; name: 'yyt-st-skeleton', props: &#123; top: &#123; type: Number, default: 100, require: false &#125;, show: &#123; type: Boolean, default: true, require: true &#125; &#125;, components: &#123;&#125;, data() &#123; return &#123;&#125;; &#125;, methods: &#123;&#125;&#125;;&lt;/script&gt;&lt;style lang="less" scoped&gt;@import url('yyt-st-skeleton.less');&lt;/style&gt; yyt-st-skeleton.less 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566.bgImg &#123; background-image: linear-gradient(90deg, rgba(#fff, 0), rgba(#fff, 0.5), rgba(#fff, 0)); background-size: 40px 100%; // width of the shine background-repeat: no-repeat; // No need to repeat the shine effect background-position: left -40px top 0; // Place shine on the left side, with offset on the left based on the width of the shine - see background-size animation: shine 1s ease infinite; // increase animation time to see effect in 'slow-mo'&#125;@bg: #e6e6e6;.yyt-st-skeleton &#123; position: relative; box-sizing: border-box; width: 100vw; padding: 10rpx 20rpx; display: flex; flex-direction: column; align-items: flex-start; .yyt-st-area-name &#123; width: calc(100% / 3 - 20rpx); height: 40rpx; background-color: @bg; margin-bottom: 10rpx; margin-left: 10rpx; .bgImg(); &#125; .yyt-st-table-list-wrapper &#123; width: 100%; height: 100vh; box-sizing: border-box; margin: 10rpx; text-align: center; margin: 0 auto; display: grid; grid-template-rows: repeat(auto-fill, calc(100vw / 3 - 2 * 10rpx)); grid-template-columns: repeat(auto-fill, calc(100% / 3)); &amp; &gt; div &#123; background-color: @bg; background-clip: content-box; margin: 10rpx; .bgImg(); &#125; &#125;&#125;@keyframes shine &#123; // to &#123; // // Move shine from left to right, with offset on the right based on the width of the shine - see background-size // background-position: right -40px top 0; // &#125; 0% &#123; opacity: 1; &#125; 50% &#123; opacity: 0.6; &#125; 100% &#123; opacity: 1; &#125;&#125; 使用组件12345678910111213141516171819&lt;yyt-st-skeleton :show="!ready" :top="100"&gt; &lt;!-- 数据加载成功后被骨架屏替换掉的页面元素 --&gt;&lt;/yyt-st-skeleton&gt;export default &#123; data() &#123; return &#123; ready: false, // 页面加载成功为true，默认为false &#125; &#125;, methods: &#123; requestData() &#123; &lt;!-- 模拟数据加载 --&gt; setTimeout(() =&gt; &#123; this.ready = true; &#125;, 2000); &#125; &#125;&#125; 骨架屏原理其实很简单，它其实就是个占位组件，用简单的HTML和CSS就能实现，当页面请求时显示，请求完毕后隐藏，与此同时显示加载数据成功后的界面。 如果需要在等待期间骨架屏有动画效果，使用 CSS3 的 animation + @keyframes 就能完成。]]></content>
@@ -145,8 +158,8 @@
         <category>Swift</category>
       </categories>
       <tags>
-        <tag>iOS</tag>
         <tag>转载</tag>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -196,8 +209,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>跨域</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -462,8 +475,8 @@
         <category>工具</category>
       </categories>
       <tags>
-        <tag>Git</tag>
         <tag>笔记</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -475,8 +488,8 @@
         <category>工具</category>
       </categories>
       <tags>
-        <tag>Git</tag>
         <tag>笔记</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -1185,8 +1198,8 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>跨域</tag>
+        <tag>转载</tag>
         <tag>cors</tag>
       </tags>
   </entry>
