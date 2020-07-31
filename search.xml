@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[转载-H5移动端开发遇到的问题集合总结]]></title>
+    <url>%2Fposts%2F9479%2F</url>
+    <content type="text"><![CDATA[转载来源掘金 - 稍微整理了几个经常在H5移动端开发遇到的东西😢 弹出数字键盘12345&lt;!-- 有"#" "*"符号输入 --&gt;&lt;input type="tel"&gt;&lt;!-- 纯数字 --&gt;&lt;input pattern="\d*"&gt; 安卓跟IOS的表现形式应该不一样，大家可以自己试试。当运用了正则pattern后，就不用关注input的类型了😂 调用系统的某些功能1234567891011121314151617&lt;!-- 拨号 --&gt;&lt;a href="tel:10086"&gt;打电话给: 10086&lt;/a&gt;&lt;!-- 发送短信 --&gt;&lt;a href="sms:10086"&gt;发短信给: 10086&lt;/a&gt;&lt;!-- 发送邮件 --&gt;&lt;a href="mailto:839626987@qq.com"&gt;发邮件给：839626987@qq.com&lt;/a&gt;&lt;!-- 选择照片或者拍摄照片 --&gt;&lt;input type="file" accept="image/*"&gt;&lt;!-- 选择视频或者拍摄视频 --&gt;&lt;input type="file" accept="video/*"&gt;&lt;!-- 多选 --&gt;&lt;input type="file" multiple&gt; 同上🤦‍♂️ 打开原生应用1234&lt;a href="weixin://"&gt;打开微信&lt;/a&gt;&lt;a href="alipays://"&gt;打开支付宝&lt;/a&gt;&lt;a href="alipays://platformapi/startapp?saId=10000007"&gt;打开支付宝的扫一扫功能&lt;/a&gt;&lt;a href="alipays://platformapi/startapp?appId=60000002"&gt;打开支付宝的蚂蚁森林&lt;/a&gt; 这种方式叫做URL Scheme，是一种协议，一般用来访问APP或者APP中的某个功能/页面（如唤醒APP后打开指定页面或者使用某些功能）😒 URL Scheme的基本格式如下： 12345 行为(应用的某个功能/页面) |scheme://[path][?query] | |应用标识 功能需要的参数 一般是由APP开发者自己定义，比如规定一些参数或者路径让其他开发者来访问，就像上面的例子🍤 注意事项： 唤醒APP的条件是你的手机已经安装了该APP 某些浏览器会禁用此协议，比如微信内部浏览器（除非开了白名单） 解决active伪类失效1&lt;body ontouchstart&gt;&lt;/body&gt; 给body注册一个空事件即可😂 忽略自动识别12345&lt;!-- 忽略浏览器自动识别数字为电话号码 --&gt;&lt;meta name="format-detection" content="telephone=no"&gt;&lt;!-- 忽略浏览器自动识别邮箱账号 --&gt;&lt;meta name="format-detection" content="email=no"&gt; 当页面上的内容包含了手机号/邮箱等，会自动转换成可点击的链接😁 比如你有如下代码： 1&lt;p&gt;13192733603&lt;/P&gt; 但是有些浏览器会识别为手机，并且可以点击拨号😒 解决input失焦后页面没有回弹 一般出现在IOS设备中的微信内部浏览器，出现的条件为： 页面高度过小 聚焦时，页面需要往上移动的时候 所以一般input在页面上方或者顶部都不会出现无法回弹🤣 解决办法为，在聚焦时，获取当前滚动条高度，然后失焦时，赋值之前获取的高度： 1234567891011121314151617181920212223&lt;template&gt; &lt;input type="text" @focus="focus" @blur="blur"&gt;&lt;/template&gt;&lt;script&gt; export default &#123; data() &#123; return &#123; scrollTop: 0 &#125; &#125;, methods: &#123; focus() &#123; this.scrollTop = document.scrollingElement.scrollTop; &#125;, blur() &#123; document.scrollingElement.scrollTo(0, this.scrollTop); &#125; &#125; &#125;&lt;/script&gt; 禁止长按 以上行为可以总结成这几个（每个手机以及浏览器的表现形式不一样）：长按图片保存、长按选择文字、长按链接/手机号/邮箱时呼出菜单。 想要禁止这些浏览器的默认行为，可以使用以下CSS： 123456789101112131415// 禁止长按图片保存img &#123; -webkit-touch-callout: none; pointer-events: none; // 像微信浏览器还是无法禁止，加上这行样式即可&#125;// 禁止长按选择文字div &#123; -webkit-user-select: none;&#125;// 禁止长按呼出菜单div &#123; -webkit-touch-callout: none;&#125; 滑动不顺畅，粘手一般出现在IOS设备中，自定义盒子使用了overflow: auto || scroll后出现的情况。 优化代码： 123div &#123; -webkit-overflow-scrolling: touch;&#125; 屏幕旋转为横屏时，字体大小会变具体出现的情况不明😒，有时候有有时候没有，欢迎指出。 优化代码： 123* &#123; -webkit-text-size-adjust: 100%;&#125; 最简单的rem自适应大家都知道，rem的值是根据根元素的字体大小相对计算的，但是我们每个设备的大小不一样，所以根元素的字体大小要动态设置😂 1234567html &#123; font-size: calc(100vw / 3.75);&#125;body &#123; font-size: .14rem;&#125; 效果如下： 像我一般的话，直接搞lib-flexible、postcss-pxtorem就完事啦！ 滑动穿透当你想在出现遮罩的时候，锁住用户的滚动行为，你可以这么做。 假设HTML结构如下： 123&lt;div class="mask"&gt; &lt;div class="content"&gt;我是弹框&lt;/div&gt;&lt;/div&gt; CSS样式如下： 1234567891011121314151617.mask &#123; position: fixed; top: 0; left: 0; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; background-color: rgba($color: #333, $alpha: .6); .content &#123; padding: 20px; background-color: #fff; width: 300px; &#125;&#125; 效果如下： 可以看到，当在遮罩上滑动的时候，是会穿透到父节点的，最简单的办法就是阻住默认行为： 123456document.querySelector(".mask").addEventListener("touchmove", event =&gt; &#123; event.preventDefault(&#123; passive: false &#125;);&#125;);复制代码 如果在vue中，你可以这么写： 1&lt;div class="mask" @touchumove.prevent&gt;&lt;/div&gt; 如果.content也有滚动条，那么只要阻止遮罩本身就行： 12345document.querySelector(".mask").addEventListener("touchmove", event =&gt; &#123; if (event.target.classList.contains("mask")) event.preventDefault(&#123; passive: false &#125;);&#125;); 或者： 12&lt;div class="mask" @touchumove.self.prevent&gt;&lt;/div&gt;复制代码 这样，当出现遮罩的时候用户的滑动就会被锁住啦👌 附录 深入研究-webkit-overflow-scrolling:touch及ios滚动 -webkit-overflow-scrolling:touch属性副作用–QQ内置浏览器空白处理]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>移动端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[iOS上input输入内容拦腰截断]]></title>
     <url>%2Fposts%2F40889%2F</url>
     <content type="text"><![CDATA[问题在ios上input输入框只显示一半高度的字: 解决方案固定input输入框的高度，把input输入框写死高度: 123456/* uniapp 写法，非 uniapp 项目给 input 添加固定高度即可 */uni-input /deep/ .uni-input-form &#123; .uni-input-input &#123; height: 50rpx !important; &#125;&#125;]]></content>
@@ -197,8 +210,8 @@
         <category>Swift</category>
       </categories>
       <tags>
-        <tag>iOS</tag>
         <tag>转载</tag>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -222,8 +235,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -248,8 +261,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -359,9 +372,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -413,8 +426,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -627,8 +640,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1114,9 +1127,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1224,8 +1237,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>axios</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1237,9 +1250,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>cors</tag>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
