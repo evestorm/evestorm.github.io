@@ -100,7 +100,7 @@
 <meta property="og:image" content="https://evestorm.github.io/posts/132/attrs2.png">
 <meta property="og:image" content="https://evestorm.github.io/posts/132/listeners1.png">
 <meta property="og:image" content="https://evestorm.github.io/posts/132/listeners2.png">
-<meta property="og:updated_time" content="2020-08-01T08:06:58.762Z">
+<meta property="og:updated_time" content="2020-08-01T08:35:15.111Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue组件通讯$attrs&#x2F;$listeners">
 <meta name="twitter:description" content="$attrs 包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind=&amp;quot;$attrs&amp;quot; 传入内部组件——在创建高级别的组件时非常有用。  ——&amp;gt; Vue.js官网 - vm.$attrs 一句">
@@ -417,7 +417,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  546
+                  803
                 </span>
               
 
@@ -433,7 +433,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  3
                 </span>
               
             </div>
@@ -478,6 +478,11 @@
 <p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
 <p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
 <h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed" target="_blank" rel="noopener">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
+<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是vue 2.4 版本提供</p>
+<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过v-on=”$listeners”传入。</p>
+<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">"$attrs"</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">'primary'</span> <span class="attr">size</span>=<span class="string">'mini'</span>/&gt;</span></span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -688,7 +693,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#attrs"><span class="nav-number">1.</span> <span class="nav-text">$attrs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#listeners"><span class="nav-number">2.</span> <span class="nav-text">$listeners</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEMO"><span class="nav-number">3.</span> <span class="nav-text">DEMO</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#attrs"><span class="nav-number">1.</span> <span class="nav-text">$attrs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#listeners"><span class="nav-number">2.</span> <span class="nav-text">$listeners</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEMO"><span class="nav-number">3.</span> <span class="nav-text">DEMO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">4.</span> <span class="nav-text">应用</span></a></li></ol></div>
             
 
           </div>
@@ -729,7 +734,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">222k</span>
+    <span title="Site words total count">222.3k</span>
   
 </div>
 
