@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[iOS启动页图片无法全屏显示]]></title>
+    <url>%2Fposts%2F58404%2F</url>
+    <content type="text"><![CDATA[在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满： 解决方法设置相应约束的 FirstItem ，改 Safe Area 为 SuperView ：]]></content>
+      <categories>
+        <category>iOS</category>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>Xcode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[iOS调用微信分享]]></title>
     <url>%2Fposts%2F19541%2F</url>
     <content type="text"><![CDATA[iOS 唤起APP之Universal Link(通用链接)什么是Universal Link(通用链接)Universal Link(通用链接)是Apple在iOS9推出的一种能够方便的通过传统HTTPS链接来启动APP的功能，可以使用相同的网址打开网址和APP。当你的应用支持Universal Link(通用链接)，当用户点击一个链接是可以跳转到你的网站并获得无缝重定向到对应的APP，且不需要通过Safari浏览器。如果你的应用不支持的话，则会在Safari中打开该链接。在苹果开发者中可以看到对它的介绍是： Seamlessly link to content inside your app, or on your website in iOS 9 or later. With universal links, you can always give users the most integrated mobile experience, even when your app isn’t installed on their device. 如何理解Universal Link(通用链接)Universal Link(通用链接)：看起来就是一条普通的https链接，当然是我们在该链接域名根目录配置过的一个链接，也可以在该链接中放置对应的H5页面。当用户的点击该链接，只要手机中安装了支持该链接的APP就会直接进入到APP中。如果没有安装APP则会跳转到Safari浏览器中，展示H5页面。对用户来说则是一个无缝跳转的过程。 Universal Link(通用链接)的应用场景使用Universal Link(通用链接)可以让用户在Safari浏览器或者其他APP的webview中拉起相应的APP，也可以在APP中使用相应的功能，从而来把用户引流到APP中。比如淘宝当在Safari浏览器中进入淘宝网页点击打开APP则会使用Universal Link(通用链接)来拉起淘宝APP。 使用Universal Link(通用链接)跳转的好处 唯一性: 不像自定义的URL Scheme，因为它使用标准的HTTPS协议链接到你的web站点，所以一般不会被其它的APP所声明。另外，URL scheme因为是自定义的协议，所以在没有安装 app 的情况下是无法直接打开的(在Safari中还会出现一个不可打开的弹窗)，而Universal Link(通用链接)本身是一个HTTPS链接，所以有更好的兼容性； 安全:当用户的手机上安装了你的APP，那么系统会去你配置的网站上去下载你上传上去的说明文件(这个说明文件声明了当前该HTTPS链接可以打开那些APP)。因为只有你自己才能上传文件到你网站的根目录，所以你的网站和你的APP之间的关联是安全的； 可变:当用户手机上没有安装你的APP的时候，Universal Link(通用链接)也能够工作。如果你愿意，在没有安装你的app的时候，用户点击链接，会在safari中展示你网站的内容； 简单:一个HTTPS的链接，可以同时作用于网站和APP； 私有: 其它APP可以在不需要知道你的APP是否安装了的情况下和你的APP相互通信。 支持Universal Link(通用链接) 先决条件:必须有一个支持HTTPS的域名，并且拥有该域名下的上传到根目录的权限（为了上传Apple指定文件）。 开发者中心配置：找到对应的App ID，在Application Services列表里有Associated Domains一条，把它变为Enabled就可以了。 添加能力后，记得重新生成下描述文件，然后下载双击在Xcode中打开就好了。 Xcode工程配置： 配置指定文件：创建一个内容为json格式的文件，苹果将会在合适的时候，从我们在项目中填入的域名请求这个文件。这个文件名必须为apple-app-site-association，切记没有后缀名，文件内容大概是这样子： 123456789101112131415&#123; &quot;applinks&quot;: &#123; &quot;apps&quot;: [], &quot;details&quot;: [ &#123; &quot;appID&quot;: &quot;9JA89QQLNQ.com.apple.wwdc&quot;, &quot;paths&quot;: [ &quot;/wwdc/news/&quot;, &quot;/videos/wwdc/2015/*&quot;] &#125;, &#123; &quot;appID&quot;: &quot;ABCD1234.com.apple.wwdc&quot;, &quot;paths&quot;: [ &quot;*&quot; ] &#125; ] &#125;&#125; 说明： appID：组成方式是 teamId.yourapp’s bundle identifier。如上面的 9JA89QQLNQ就是teamId。登陆开发者中心，在Account -&gt; Membership里面可以找到Team ID。 paths：设定你的app支持的路径列表，只有这些指定的路径的链接，才能被app所处理。星号的写法代表了可识 别域名下所有链接。 上传指定文件:上传该文件到你的域名所对应的根目录或者.well-known目录下，这是为了苹果能获取到你上传的文件。上传完后,自己先访问一下,看看是否能够获取到，当你在浏览器中输入这个文件链接后，应该是直接下载apple-app-site-association文件。 微信开放平台设置开放平台创建自己的移动应用： 填写iOS相关信息： 上面 universal links 填写外界能访问到你 apple-app-site-association 文件的网址。 Xcode设置通过 CocoaPods 集成 SDK1pod &apos;WechatOpenSDK&apos; pod install 后重新打开Xcode。 Xcode 设置 URL scheme在 Xcode 中，选择你的工程设置项，选中“TARGETS”一栏，在“info”标签栏的“URL type“添加“URL scheme”为你所注册的应用程序 id（如下图所示）。 在Xcode中，选择你的工程设置项，选中“TARGETS”一栏，在 “info”标签栏的“LSApplicationQueriesSchemes“添加weixin 和weixinULAPI（如下图所示）。 新增 wechat 具体代码实现新建桥接文件 WX_Bridging-Header.h： 1234567891011121314151617181920212223//// WX_Bridging-Header.h// Created by lance on 2020/8/3.//#ifndef WX_Bridging_Header_h#define WX_Bridging_Header_h// 微信#define WX_AppID @&quot;appid&quot;#define WX_AppSecret @&quot;appsecret&quot;// 微信-通用链接 Universal Link#define WX_UNIVERSAL_LINK @&quot;Universal Link&quot;#ifdef __OBJC__// 微信授权登录#import &quot;WXApi.h&quot;#endif#endif /* WX_Bridging_Header_h */ Build Setting -&gt; 搜索 “bridging” 找到 Objective-C Bridging Header 设置引用路径:$(SRCROOT)/$(PROJECT_NAME)/WX_Bridging-Header.h 在 AppDelegate.swift or SceneDelegate.swift 中继承代理： WXApiDelegate(必须) WXApiLogDelegate(可选) 新增block，用于回到微信授权登录成功获取的code，后续利用该code获取微信用户信息。 实现代理方法：onReq、onResp、onLog(可选) 初始化微信SDK： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061//// AppDelegate.swift// YYT_iOS//// Created by evestorm on 2020/7/15.// Copyright © 2020 YYT. All rights reserved.//import UIKit@UIApplicationMainclass AppDelegate: UIResponder, UIApplicationDelegate, WXApiDelegate, WXApiLogDelegate &#123; var window: UIWindow? // block，用于回到微信授权登录成功获取的code，后续利用该code获取微信用户信息 var wechatLoginCallback: ((_ code: String) -&gt; Void)? func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool &#123; // Override point for customization after application launch. // 初始化微信SDK registerWeChat() window = UIWindow(frame: UIScreen.main.bounds) window?.rootViewController = ViewController() window?.makeKeyAndVisible() return true &#125; func applicationDidFinishLaunching(_: UIApplication) &#123;&#125; // 初始化微信SDK func registerWeChat() &#123; WXApi.startLog(by: .detail, logDelegate: self) WXApi.registerApp(WX_AppID, universalLink: WX_UNIVERSAL_LINK) &#125; // MARK: WXApiDelegate func onReq(_: BaseReq) &#123; print(&quot;=========&gt; onRep&quot;) &#125; func onResp(_ resp: BaseResp) &#123; print(&quot;========&gt; onResp&quot;) if resp.isKind(of: SendAuthResp.self) &#123; let _resp = resp as! SendAuthResp if let code = _resp.code &#123; if wechatLoginCallback != nil &#123; wechatLoginCallback!(code) &#125; &#125; else &#123; print(resp.errStr) &#125; &#125; &#125; func onLog(_ log: String, logLevel _: WXLogLevel) &#123; print(log) &#125;&#125; 资源参考iOS 唤起APP之Universal Link(通用链接) APP接入微信支付或分享完整流程 iOS接入指南]]></content>
@@ -236,8 +249,8 @@
         <category>Swift</category>
       </categories>
       <tags>
-        <tag>iOS</tag>
         <tag>转载</tag>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -261,8 +274,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -398,9 +411,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -452,8 +465,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -556,8 +569,8 @@
         <category>工具</category>
       </categories>
       <tags>
-        <tag>Git</tag>
         <tag>笔记</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -569,8 +582,8 @@
         <category>工具</category>
       </categories>
       <tags>
-        <tag>Git</tag>
         <tag>笔记</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -683,8 +696,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1175,9 +1188,9 @@
         <category>CSS</category>
       </categories>
       <tags>
+        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1301,8 +1314,8 @@
       </categories>
       <tags>
         <tag>跨域</tag>
-        <tag>cors</tag>
         <tag>转载</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
