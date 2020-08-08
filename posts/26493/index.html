@@ -96,7 +96,7 @@
 <meta property="og:site_name" content="EVE">
 <meta property="og:description" content="问题移动端上的H5页面，在拍照上传后会出现图片自动旋转90°的问题，这里记录下解决方案。 解决思路从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向： 123456789101112131415//获取照片方向角属性，用户旋转控制let Orientation = nullEXIF.getData(image, function() &amp;#123;  Orient">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-06T06:47:30.446Z">
+<meta property="og:updated_time" content="2020-08-07T05:51:12.491Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="H5在移动端上传头像图片旋转90度问题解决方案">
 <meta name="twitter:description" content="问题移动端上的H5页面，在拍照上传后会出现图片自动旋转90°的问题，这里记录下解决方案。 解决思路从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向： 123456789101112131415//获取照片方向角属性，用户旋转控制let Orientation = nullEXIF.getData(image, function() &amp;#123;  Orient">
@@ -429,6 +429,7 @@
         <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>移动端上的H5页面，在拍照上传后会出现图片自动旋转90°的问题，这里记录下解决方案。</p>
 <h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><p>从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取照片方向角属性，用户旋转控制</span></span><br><span class="line"><span class="keyword">let</span> Orientation = <span class="literal">null</span></span><br><span class="line">EXIF.getData(image, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  Orientation = EXIF.getTag(<span class="keyword">this</span>, <span class="string">'Orientation'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">switch</span> (Orientation) &#123;</span><br><span class="line"> <span class="keyword">case</span> <span class="number">1</span>: <span class="comment">// 不需要选择，正常</span></span><br><span class="line">   <span class="keyword">break</span></span><br><span class="line"> <span class="keyword">case</span> <span class="number">6</span>: <span class="comment">// 需要顺时针（向左）90度旋转</span></span><br><span class="line">   <span class="keyword">break</span></span><br><span class="line"> <span class="keyword">case</span> <span class="number">8</span>: <span class="comment">// 需要逆时针（向右）90度旋转</span></span><br><span class="line">   <span class="keyword">break</span></span><br><span class="line"> <span class="keyword">case</span> <span class="number">3</span>: <span class="comment">// 需要180度旋转</span></span><br><span class="line">   <span class="keyword">break</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后用 canvas 的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage" target="_blank" rel="noopener">ctx.drawImage</a> 对图片进行绘制，最后用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLCanvasElement/toDataURL" target="_blank" rel="noopener">canvas.toDataURL</a> 将画布转为 base64 格式数据的 DataURL 传给后端。</p>
 <p>P.S. 什么是 EXIF</p>
 <p>Exif（Exchangeable image file format）是专门为数码相机拍摄的照片定义的，可以记录数码照片的属性信息和拍摄数据。<br>Exif可以附加于JPEG、TIFF、RIFF等文件之中，为其增加有关数码相机拍摄信息的内容和索引图或图像处理软件的版本信息。<br>Exif信息是可以被任意编辑的，因此只有参考的功能。Exif可能会泄露隐私信息，请选择图片查看其Exif信息。</p>
 <h2 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h2><p>引入 <code>exif.js</code> ：</p>
@@ -596,7 +597,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">153</span>
+                  <span class="site-state-item-count">154</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -692,7 +693,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">231.6k</span>
+    <span title="Site words total count">234.2k</span>
   
 </div>
 
