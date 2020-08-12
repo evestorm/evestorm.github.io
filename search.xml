@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[iOS13.4+版本h5拍照图片旋转问题的解决方案]]></title>
+    <url>%2Fposts%2F13740%2F</url>
+    <content type="text"><![CDATA[问题描述前几天刚解决完Safari上h5拍照会旋转90度的问题，今天更新完苹果系统后（13.4 ——&gt; 13.6），突然发现图片又旋转了。前几天不刚测完是好的么，怎么又出问题了。拿公司测试机12.6版本测试了下发现没毛病，就基本定位到问题所在了：iOS13.4+版本可能都存在此问题。 然后就是打断点调试，发现新系统下图片的 Orientation 仍然为 6 ，但其实照片（竖着拍）已经被苹果自动旋转回来了。然后我的代码中针对6的情况向右旋转了90度，这才导致图片又旋转回去了： 12switch (Orientation) &#123; case 6: //需要顺时针（向右）90度旋转 解决方案判断系统版本既然是iOS系统版本问题，那么最粗暴的方案就是对系统进行判断，如果高于13.4，就不去旋转。具体封装的方法代码如下： 12345678910111213141516171819202122232425// 判断是IOS13.4以上的系统 13.4以上返回true/** * @param &#123;Object&#125; file 文件资源 */detectImageAutomaticRotation(file) &#123; let u = navigator.userAgent, app = navigator.appVersion; let isAndroid = u.indexOf('Android') &gt; -1 || u.indexOf('Linux') &gt; -1; //g let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端 if (isIOS) &#123; let ver = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/); let ver1 = parseInt(ver[1]) let ver2 = parseInt(ver[2]) if (ver1 &gt;= 13 &amp;&amp; ver2 &gt;= 4) &#123; // if (file.name == 'image.jpg') &#123; //判断是拍照上传的还是相册选取的，IOS拍完照还没有确定的时候，图片的名字统一都是image.jpg // return true // &#125; return true &#125; else &#123; return false &#125; &#125; else &#123; return false; &#125;&#125;, 但这个方案有个小的隐患，就是我们无法预知今后苹果是否会把这个“自我修正”行为改回去，一旦有这种情况，我们还要重新变动代码，略显麻烦。 用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正这是网上找到的一种方案，思路就是用一张「 2x1 的 JPEG 且 EXIF Orientation 为 6」的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正，如果图片变成 1x2，说明浏览器对图片进行了回正。具体代码见下： 12345678910111213141516171819202122232425262728293031// 用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正// 方法来源: https://github.com/blueimp/JavaScript-Load-Image// 一张 2x1 的 JPEG 图片, EXIF Orientation: 6const testAutoOrientationImageURL = 'data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAA' + 'AAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA' + 'QEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE' + 'BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/x' + 'ABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAA' + 'AAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==';let isImageAutomaticRotation;export function detectImageAutomaticRotation() &#123; return new Promise((resolve) =&gt; &#123; if (isImageAutomaticRotation === undefined) &#123; const img = new Image(); img.onload = () =&gt; &#123; // 如果图片变成 1x2，说明浏览器对图片进行了回正 isImageAutomaticRotation = img.width === 1 &amp;&amp; img.height === 2; resolve(isImageAutomaticRotation); &#125;; img.src = testAutoOrientationImageURL; &#125; else &#123; resolve(isImageAutomaticRotation); &#125; &#125;);&#125; 参考链接关于 iOS 13.4.1 后照片在浏览器中旋转的兼容性处理]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>兼容性</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[使用Xcode发布iOS-ad-hoc测试版本]]></title>
     <url>%2Fposts%2F38926%2F</url>
     <content type="text"><![CDATA[必要准备开发者账号（不需要企业级别的开发账号，公司级别的也可以），Xcode 证书创建 下载证书 双击添加到钥匙串： 双击它，设置永久信任： 填写mac密码更新后就OK啦。 App ID 创建 添加好你的测试用户iPhone X的uuid 创建Ad Hoc 类型的描述文件 选择你刚创建的证书： 勾选想要测试的iPhone手机： 给描述文件起个名字： 下载到本地： 添加到Xcode打开你的Xcode，双击刚下载的描述文件，啥都没发生就说明Xcode添加成功了。 打包分发 点击 Distribute App 分发App： 选择 Ad hoc 模式： 下一步，一定要勾选第三项： 下面重点来了： 上面四项分别为： 你要打包项目所起的App名称 ipa包下载地址（必须为https） 在线图片地址57*57（必须为https） 在线图片地址512*512（必须为https） 下面选择手动设置签名： 选择刚生成的证书和描述文件： 然后点击下一步坐等： 最后需要输一次电脑开机密码，然后导出： 导出文件有这些： 然后把 manifest.plist xxx.ipa 包以及两张app的png图片上传到服务器就好了： 最后在iPhone的Safari上输入下面的模板链接就能下载到测试手机上了： 1itms-services://?action=download-manifest&amp;url=你的服务器https地址/manifest.plist 可能遇到的问题如果你访问上面地址，在确认地址无误的情况下Safari并没有下载，原因可能是服务器没有开启针对 .plist 和 .ipa 文件的访问识别。 如何判断为此种情况了？以IIS为例： 直接在浏览器输入你的 ipa 下载地址 https:XXX/yyt_test.ipa 出现下面类似截图： 就说明此文件类型没有配置 MIME 类型。我们去IIS管理器配置下就OK了： 选择添加 添加 .ipa 文件的 MIME： 文件扩展名：.ipa MIME类型：application/octet-stream.ipa 添加 .plist 文件的 MIME: 文件扩展名：.plist MIME类型：text/xml 添加完毕后再次访问，应该就OK了。 参考来源使用XCODE快速发布IOS ad hoc测试版本 IIS - 解决IPA下载报错（应用程序“DEFAULT WEB SITE”中的服务器错误）]]></content>
@@ -354,8 +367,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -491,9 +504,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -545,8 +558,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -789,8 +802,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1281,9 +1294,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1393,8 +1406,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>axios</tag>
         <tag>跨域</tag>
+        <tag>axios</tag>
       </tags>
   </entry>
   <entry>
@@ -1406,9 +1419,9 @@
         <category>Node</category>
       </categories>
       <tags>
+        <tag>cors</tag>
         <tag>跨域</tag>
         <tag>转载</tag>
-        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
