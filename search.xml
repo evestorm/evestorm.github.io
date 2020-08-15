@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[在VueCli3项目中使用Bootstrap]]></title>
+    <url>%2Fposts%2F53837%2F</url>
+    <content type="text"><![CDATA[安装1npm i bootstrap jquery popper.js --save 配置在项目根目录下新建或修改vue.config.js 12345678910111213const webpack = require("webpack");module.exports=&#123; configureWebpack:&#123; plugins: [ new webpack.ProvidePlugin(&#123; $: 'jquery', jQuery: 'jquery', 'window.jQuery': 'jquery', Popper: ['popper.js', 'default'] &#125;) ] &#125;&#125; 引入在main.js中引入 123import "bootstrap"import "bootstrap/dist/css/bootstrap.css"import 'jquery' 使用在组件模板中，可以像常规开发那样使用bootstrap 123456789101112131415161718192021&lt;template&gt; &lt;div class="container"&gt; &lt;div class="row mt-0 mt-md-2"&gt; &lt;div class="col-12 col-lg-9 px-0"&gt; &lt;/div&gt; &lt;div class="Right d-none d-lg-block col-lg-3 pl-2 p-0"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;&lt;/template&gt;&lt;script&gt; export default &#123; &#125;&lt;/script&gt;&lt;style lang="scss" scoped&gt;&lt;/style&gt;]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[postcss-px2rem-插件进行页面自适应]]></title>
+    <url>%2Fposts%2F63504%2F</url>
+    <content type="text"><![CDATA[转载自：https://blog.csdn.net/qq_24991841/article/details/88887053 1.安装 npm i postcss-px2rem -D 2.vue.config.js 文件中1234567891011121314const px2rem = require('postcss-px2rem');const postcss = px2rem(&#123; remUnit: 192 //基准大小 baseSize，需要和rem.js中相同&#125;);module.exports = &#123;// 其他内容 css: &#123; loaderOptions: &#123; postcss: &#123; plugins: [postcss] &#125; &#125; &#125;&#125;; 3.在src下创建rem.js文件夹12345678910111213141516171819202122export function setRemInit() &#123; // postcss-px2rem的内容 // 基准大小 const baseSize = 192; // 设置 rem 函数 function setRem() &#123; // 当前页面宽度相对于 1920 px(设计稿尺寸)的缩放比例，可根据自己需要修改。 const scale = document.documentElement.clientWidth / 1920; // 设置页面根节点字体大小 document.documentElement.style.fontSize = `$&#123;baseSize * scale&#125;px`; // 这个if语句代码，是用来控制屏幕的最小宽度，不需要可以可以不写 if (Number(document.documentElement.style.fontSize.slice(0, -2)) &lt;= 130) &#123; document.documentElement.style.fontSize = '130px'; &#125; &#125; // 初始化 setRem(); // 改变窗口大小时重新设置 rem window.addEventListener('resize', setRem);&#125; 4.在main.js中引用rem.js123import &#123; setRemInit &#125; from '@/rem';setRemInit(); //进行初始化立即运行 注：参数解释：baseSize是用来设置html font-size的大小 。remUnit在postcss-px2rem中对你设置px转化为rem，例如，width: 1920px, remUnit = 192 。 则页面渲染完成后，你会发现， width : 10rem; 1920/192 =10。 所以你要保证baseSize和remUnit对值始终一致，这样才能将html font-size和px建立正确对关系]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[iOS13.4+版本h5拍照图片旋转问题的解决方案]]></title>
     <url>%2Fposts%2F13740%2F</url>
     <content type="text"><![CDATA[问题描述前几天刚解决完Safari上h5拍照会旋转90度的问题，今天更新完苹果系统后（13.4 ——&gt; 13.6），突然发现图片又旋转了。前几天不刚测完是好的么，怎么又出问题了。拿公司测试机12.6版本测试了下发现没毛病，就基本定位到问题所在了：iOS13.4+版本可能都存在此问题。 然后就是打断点调试，发现新系统下图片的 Orientation 仍然为 6 ，但其实照片（竖着拍）已经被苹果自动旋转回来了。然后我的代码中针对6的情况向右旋转了90度，这才导致图片又旋转回去了： 12switch (Orientation) &#123; case 6: //需要顺时针（向右）90度旋转 解决方案判断系统版本既然是iOS系统版本问题，那么最粗暴的方案就是对系统进行判断，如果高于13.4，就不去旋转。具体封装的方法代码如下： 12345678910111213141516171819202122232425// 判断是IOS13.4以上的系统 13.4以上返回true/** * @param &#123;Object&#125; file 文件资源 */detectImageAutomaticRotation(file) &#123; let u = navigator.userAgent, app = navigator.appVersion; let isAndroid = u.indexOf('Android') &gt; -1 || u.indexOf('Linux') &gt; -1; //g let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端 if (isIOS) &#123; let ver = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/); let ver1 = parseInt(ver[1]) let ver2 = parseInt(ver[2]) if (ver1 &gt;= 13 &amp;&amp; ver2 &gt;= 4) &#123; // if (file.name == 'image.jpg') &#123; //判断是拍照上传的还是相册选取的，IOS拍完照还没有确定的时候，图片的名字统一都是image.jpg // return true // &#125; return true &#125; else &#123; return false &#125; &#125; else &#123; return false; &#125;&#125;, 但这个方案有个小的隐患，就是我们无法预知今后苹果是否会把这个“自我修正”行为改回去，一旦有这种情况，我们还要重新变动代码，略显麻烦。 用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正这是网上找到的一种方案，思路就是用一张「 2x1 的 JPEG 且 EXIF Orientation 为 6」的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正，如果图片变成 1x2，说明浏览器对图片进行了回正。具体代码见下： 12345678910111213141516171819202122232425262728293031// 用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正// 方法来源: https://github.com/blueimp/JavaScript-Load-Image// 一张 2x1 的 JPEG 图片, EXIF Orientation: 6const testAutoOrientationImageURL = 'data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAA' + 'AAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA' + 'QEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE' + 'BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/x' + 'ABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAA' + 'AAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==';let isImageAutomaticRotation;export function detectImageAutomaticRotation() &#123; return new Promise((resolve) =&gt; &#123; if (isImageAutomaticRotation === undefined) &#123; const img = new Image(); img.onload = () =&gt; &#123; // 如果图片变成 1x2，说明浏览器对图片进行了回正 isImageAutomaticRotation = img.width === 1 &amp;&amp; img.height === 2; resolve(isImageAutomaticRotation); &#125;; img.src = testAutoOrientationImageURL; &#125; else &#123; resolve(isImageAutomaticRotation); &#125; &#125;);&#125; 参考链接关于 iOS 13.4.1 后照片在浏览器中旋转的兼容性处理]]></content>
@@ -393,8 +419,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1406,8 +1432,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>axios</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1419,9 +1445,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>cors</tag>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
