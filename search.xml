@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[cnchar.js获取汉字的拼音]]></title>
+    <url>%2Fposts%2F38408%2F</url>
+    <content type="text"><![CDATA[分享一个获取汉字拼音的库： https://github.com/theajack/cnchar 几种常用方法： 123456789array:返回数组；"汉字".spell("array") =&gt;['Han','Zi']first:返回首字母 ；"汉字".spell("first") =&gt;'HZ'up:将结果全部大写；"汉字".spell("up") =&gt;'HANZI'low:将结果全部小写；"汉字".spell("low") =&gt;'hanzi'组合使用："汉字".spell("first","array",'low') =&gt;['h','z']]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Swift记录通话时间]]></title>
     <url>%2Fposts%2F32380%2F</url>
     <content type="text"><![CDATA[公司App项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。 代码如下： 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889import CallKitclass ViewController: UIViewController, WKScriptMessageHandler, WKUIDelegate, WKNavigationDelegate, MFMessageComposeViewControllerDelegate, CXCallObserverDelegate &#123; let callObserver = CXCallObserver() private var beforeDate: Date! // 注意：这里必须是全局属性，不能定义局部变量 // ----------- 打电话 -------------- // 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m public func callPhone(phoneStr: String) &#123; let phone = "telprompt://" + phoneStr if let url = NSURL(string: phone.replacingOccurrences(of: " ", with: "", options: .literal, range: nil)), UIApplication.shared.canOpenURL(url as URL) &#123; callObserver.setDelegate(self, queue: DispatchQueue.main) didDetectOutgoingCall = false // we only want to add the observer after the alert is displayed, // that's why we're using asyncAfter(deadline:) UIApplication.shared.open(url as URL, options: [:]) &#123; [weak self] success in if success &#123; DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) &#123; self?.addNotifObserver() &#125; &#125; &#125; &#125; &#125; func addNotifObserver() &#123; let selector = #selector(appDidBecomeActive) let notifName = UIApplication.didBecomeActiveNotification NotificationCenter.default.addObserver(self, selector: selector, name: notifName, object: nil) &#125; // 用户取消了打电话 @objc func appDidBecomeActive() &#123; // if callObserver(_:callChanged:) doesn't get called after a certain time, // the call dialog was not shown - so the Cancel button was pressed DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) &#123; [weak self] in if !(self?.didDetectOutgoingCall ?? true) &#123; print("Cancel button pressed") &#125; &#125; &#125; // 用户点击了呼叫 func callObserver(_: CXCallObserver, callChanged call: CXCall) &#123; /** 拨通: outgoing :1 onHold :0 hasConnected :0 hasEnded :0 拒绝: outgoing :1 onHold :0 hasConnected :0 hasEnded :1 链接: outgoing :1 onHold :0 hasConnected :1 hasEnded :0 挂断: outgoing :1 onHold :0 hasConnected :1 hasEnded :1 新来电话: outgoing :0 onHold :0 hasConnected :0 hasEnded :0 保留并接听: outgoing :1 onHold :1 hasConnected :1 hasEnded :0 另一个挂掉: outgoing :0 onHold :0 hasConnected :1 hasEnded :0 保持链接: outgoing :1 onHold :0 hasConnected :1 hasEnded :1 对方挂掉: outgoing :0 onHold :0 hasConnected :1 hasEnded :1 */ // 接通 if call.isOutgoing, call.hasConnected, !call.hasEnded &#123; // 记录当前时间 setBeginDate() &#125; // 挂断 if call.isOutgoing, call.hasConnected, call.hasEnded &#123; // 计算通话时长 let seconds = getCallPhoneTime() webView.evaluateJavaScript("callPhone(\(seconds))") &#123; _, error in print("Error : \(String(describing: error))") &#125; &#125; &#125; // 记录当前时间 func setBeginDate() &#123; beforeDate = Date() &#125; // 计算通话时长 func getCallPhoneTime() -&gt; String &#123; let dat = Date(timeInterval: 0, since: beforeDate) let a = dat.timeIntervalSinceNow let timeString = String(format: "%0.f", fabs(a)) // 转为字符型 print("\(timeString)秒") return timeString &#125;&#125;]]></content>
@@ -86,8 +98,8 @@
         <category>移动端</category>
       </categories>
       <tags>
-        <tag>css</tag>
         <tag>iOS</tag>
+        <tag>css</tag>
         <tag>移动端</tag>
       </tags>
   </entry>
@@ -431,8 +443,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -543,8 +555,8 @@
       </categories>
       <tags>
         <tag>转载</tag>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -622,8 +634,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>css</tag>
         <tag>技巧</tag>
+        <tag>css</tag>
       </tags>
   </entry>
   <entry>
@@ -1333,8 +1345,8 @@
       </categories>
       <tags>
         <tag>转载</tag>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1444,8 +1456,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>axios</tag>
         <tag>跨域</tag>
+        <tag>axios</tag>
       </tags>
   </entry>
   <entry>
@@ -1457,9 +1469,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
         <tag>cors</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1924,8 +1936,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1961,8 +1973,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
