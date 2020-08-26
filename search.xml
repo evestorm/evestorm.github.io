@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[iOS极光推送-初版]]></title>
+    <url>%2Fposts%2F15162%2F</url>
+    <content type="text"><![CDATA[苹果证书设置开启 Push Notification 功能找到你App的id: 开启消息推送： 配置消息推送 点击 Development SSL Certificate 创建证书： 上传csr文件点击继续： 开发推送证书配置完毕： 起个名字下载到本地: 相同的步骤配置正式环境的推送证书： 两个证书配置完毕后的效果： 分别双击两个证书，在“KeychainAccess”中打开，选择左侧“钥匙串”列表中“登录”，以及“种类”列表中“我的证书”，找到刚才下载的证书，并导出为 .p12 文件。 找到它并设置为总是信任： 将其导出为p12文件： 同样的方式为生产证书设置总是信任以及导出为p12证书。 重新生成一遍 Profile 文件 极光配置登录极光官网： https://www.jiguang.cn/ 认证开发者账号，此处省略。 进入开发者平台： https://www.jiguang.cn/dev2/#/newOverview?appKey= 创建应用 填写应用名称以及上传图标： 创建完毕后会自动跳转： 进入推送设置： iOS证书配置 配置完毕后点击保存： 导入极光SDK在Xcode中通过 Cocoapods 的方式导入： 1pod 'JPush', '3.3.4' 通过 pod update --no-repo-update 进行 pods 更新。 P.S. 如果你的项目不需要投送广告，可以选择无 IDFA 版本的极光SDK，集成方式如下： 12pod 'JCore', '2.3.4-noidfa'pod 'JPush', '3.3.4' 配置推送： 我的Xcode版本为11，所以要开启 Application Target 的 Capabilities-&gt; Access WIFI Infomation 选项。 还有 PushNotifications ，以及打开 Remote notifications ： 创建桥接文件 XXX_Bridging-Header.h （XXX随便设置，一般用项目名大写字母） 12345/*极光推送*/#import "JPUSHService.h"// iOS10注册APNs所需头文件//#ifdef NSFoundationVersionNumber_iOS_9_x_Max#import &lt;UserNotifications/UserNotifications.h&gt; AppDelegate.swift 中编写极光相关代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990//// AppDelegate.swiftimport UserNotifications // 本地通知相关@UIApplicationMainclass AppDelegate: UIResponder, UIApplicationDelegate, JPUSHRegisterDelegate &#123; var window: UIWindow? func application(_: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool &#123; // 注册极光推送 registerJPush(launchOptions: launchOptions) window = UIWindow(frame: UIScreen.main.bounds) window?.rootViewController = ViewController() window?.makeKeyAndVisible() return true &#125; func applicationDidFinishLaunching(_: UIApplication) &#123;&#125; // MARK: 极光推送相关 func registerJPush(launchOptions: [UIApplication.LaunchOptionsKey: Any]?) &#123; // 注册极光推送 let entiity = JPUSHRegisterEntity() entiity.types = Int(UNAuthorizationOptions.alert.rawValue | UNAuthorizationOptions.badge.rawValue | UNAuthorizationOptions.sound.rawValue) JPUSHService.register(forRemoteNotificationConfig: entiity, delegate: self) JPUSHService.setup(withOption: launchOptions, appKey: JPushAppKey, channel: "app store", apsForProduction: false) &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, willPresent notification: UNNotification!, withCompletionHandler completionHandler: ((Int) -&gt; Void)!) &#123; let userInfo = notification.request.content.userInfo if notification.request.trigger is UNPushNotificationTrigger &#123; JPUSHService.handleRemoteNotification(userInfo) &#125; // 需要执行这个方法，选择是否提醒用户，有Badge、Sound、Alert三种类型可以选择设置 completionHandler(Int(UNNotificationPresentationOptions.alert.rawValue)) &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, didReceive response: UNNotificationResponse!, withCompletionHandler completionHandler: (() -&gt; Void)!) &#123; let userInfo = response.notification.request.content.userInfo if response.notification.request.trigger is UNPushNotificationTrigger &#123; JPUSHService.handleRemoteNotification(userInfo) &#125; // 系统要求执行这个方法 completionHandler() &#125; // 点推送进来执行这个方法 func application(_: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -&gt; Void) &#123; JPUSHService.handleRemoteNotification(userInfo) completionHandler(UIBackgroundFetchResult.newData) &#125; // 系统获取Token func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) &#123; JPUSHService.registerDeviceToken(deviceToken) &#125; // 获取token 失败 func application(_: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) &#123; // 可选 print("did Fail To Register For Remote Notifications With Error: \(error)") &#125; // 后台进前台 func applicationDidEnterBackground(_: UIApplication) &#123; // 销毁通知红点 UIApplication.shared.applicationIconBadgeNumber = 0 JPUSHService.setBadge(0) let center = UNUserNotificationCenter.current() center.removeAllDeliveredNotifications() // To remove all delivered notifications center.removeAllPendingNotificationRequests() // To remove all pending notifications which are not delivered yet but scheduled. // source: https://stackoverflow.com/questions/40397552/cancelalllocalnotifications-not-working-in-ios10 &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, openSettingsFor _: UNNotification!) &#123;&#125; func jpushNotificationAuthorization(_: JPAuthorizationStatus, withInfo _: [AnyHashable: Any]!) &#123;&#125;&#125; 测试通知现在我们来测试下发个通知给所有用户： 点击确认就能够发送通知给用户啦。 参考iOS SDK 集成指南]]></content>
+      <categories>
+        <category>iOS</category>
+        <category>Swift</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[iOS版本更新后打开时提醒用户去AppStore更新]]></title>
     <url>%2Fposts%2F12210%2F</url>
     <content type="text"><![CDATA[开发环境 Xcode11 Swift5 Alamofire 5.2.1 SwiftyJSON 5.0.0 代码 AppDelegate.swift 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667import SwiftyJSONimport UIKitimport Alamofire@UIApplicationMainclass AppDelegate: UIResponder, UIApplicationDelegate, WXApiDelegate, WXApiLogDelegate &#123; var window: UIWindow? func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool &#123; // 检测App是否需要更新 checkVersion() window = UIWindow(frame: UIScreen.main.bounds) window?.rootViewController = ViewController() window?.makeKeyAndVisible() return true &#125; // MARK: App更新 // 获取版本号 func checkVersion() &#123; AF.request("https://itunes.apple.com/lookup?bundleId=App的bundleId", method: .get, parameters: [:]) .responseJSON &#123; response in print(response) if let value = response.value &#123; let json = JSON(value) self.compareVersion(appStoreVersion: json["results"][0]["version"].stringValue) &#125; &#125; &#125; // 比较版本 func compareVersion(appStoreVersion: String) &#123; print(appStoreVersion) let version: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)! if appStoreVersion == version &#123; print("当前已是最新版") &#125; else &#123; let alertC = UIAlertController(title: "有新版本", message: "前去更新版本？", preferredStyle: .alert) alertC.addAction(UIAlertAction(title: "去更新", style: .default, handler: &#123; _ in self.updateApp(appId: AppID) &#125;)) alertC.addAction(UIAlertAction(title: "下次再说", style: .cancel, handler: &#123; _ in &#125;)) UIApplication.shared.keyWindow?.rootViewController?.present(alertC, animated: true, completion: nil) &#125; &#125; // 更新App func updateApp(appId _: String) &#123; // 根据iOS系统版本，分别处理 let urlString = "itms-apps://itunes.apple.com/app/id\(AppID)" if let url = URL(string: urlString) &#123; // 根据iOS系统版本，分别处理 if #available(iOS 10, *) &#123; UIApplication.shared.open(url, options: [:], completionHandler: &#123; _ in &#125;) &#125; else &#123; UIApplication.shared.openURL(url) &#125; &#125; &#125;&#125;]]></content>
@@ -441,8 +453,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -467,8 +479,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -578,9 +590,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -632,8 +644,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -658,8 +670,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>css</tag>
         <tag>技巧</tag>
+        <tag>css</tag>
       </tags>
   </entry>
   <entry>
@@ -876,8 +888,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1368,9 +1380,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1480,8 +1492,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>跨域</tag>
         <tag>axios</tag>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -1493,9 +1505,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>cors</tag>
-        <tag>跨域</tag>
         <tag>转载</tag>
+        <tag>跨域</tag>
+        <tag>cors</tag>
       </tags>
   </entry>
   <entry>
@@ -1960,8 +1972,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1997,8 +2009,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
