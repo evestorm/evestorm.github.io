@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[WKWebView通过监听获取加载进度和标题]]></title>
+    <url>%2Fposts%2F63756%2F</url>
+    <content type="text"><![CDATA[转载：https://www.jianshu.com/p/548a772f433e WKWebView提供了可以监听页面加载进度，以及页面的标题的方法。 12345678910111213141516171819202122232425262728293031323334353637let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight - navigationHeight ), configuration: WKWebViewConfiguration())lazy private var progressView: UIProgressView = &#123; let progress = UIProgressView.init(frame: CGRect(x: CGFloat(0), y: CGFloat(0), width: UIScreen.main.bounds.width, height: 2)) progress.tintColor = UIColor.green progress.trackTintColor = UIColor.white return progress &#125;()override func viewDidLoad() &#123; webView.addObserver(self, forKeyPath: "title", options: .new, context: nil) webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)&#125;//添加观察者方法override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) &#123; //设置进度条 if keyPath == "estimatedProgress"&#123; progressView.alpha = 1.0 progressView.setProgress(Float(webView.estimatedProgress), animated: true) if webView.estimatedProgress &gt;= 1.0 &#123; UIView.animate(withDuration: 0.3, delay: 0.1, options: .curveEaseOut, animations: &#123; self.progressView.alpha = 0 &#125;, completion: &#123; (finish) in self.progressView.setProgress(0.0, animated: false) &#125;) &#125; &#125; //重设标题 else if keyPath == "title" &#123; self.title = self.webView.title &#125;&#125;]]></content>
+      <categories>
+        <category>iOS</category>
+        <category>Swift</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[swift5获取remoteNotification]]></title>
+    <url>%2Fposts%2F23085%2F</url>
+    <content type="text"><![CDATA[123456let userInfo = launchOptions?[UIApplication.LaunchOptionsKey.remoteNotification] as? [AnyHashable: Any]if userInfo != nil &#123; JPUSHService.handleRemoteNotification(userInfo) let notification = NSNotification.Name(rawValue: "jpush") NotificationCenter.default.post(name: notification, object: nil, userInfo: userInfo)&#125; 来源：https://stackoverflow.com/questions/40209234/how-to-handle-launch-options-in-swift-3-when-a-notification-is-tapped-getting-s]]></content>
+      <categories>
+        <category>iOS</category>
+        <category>Swift</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[iOS极光推送-初版]]></title>
     <url>%2Fposts%2F15162%2F</url>
     <content type="text"><![CDATA[苹果证书设置开启 Push Notification 功能找到你App的id: 开启消息推送： 配置消息推送 点击 Development SSL Certificate 创建证书： 上传csr文件点击继续： 开发推送证书配置完毕： 起个名字下载到本地: 相同的步骤配置正式环境的推送证书： 两个证书配置完毕后的效果： 分别双击两个证书，在“KeychainAccess”中打开，选择左侧“钥匙串”列表中“登录”，以及“种类”列表中“我的证书”，找到刚才下载的证书，并导出为 .p12 文件。 找到它并设置为总是信任： 将其导出为p12文件： 同样的方式为生产证书设置总是信任以及导出为p12证书。 重新生成一遍 Profile 文件 极光配置登录极光官网： https://www.jiguang.cn/ 认证开发者账号，此处省略。 进入开发者平台： https://www.jiguang.cn/dev2/#/newOverview?appKey= 创建应用 填写应用名称以及上传图标： 创建完毕后会自动跳转： 进入推送设置： iOS证书配置 配置完毕后点击保存： 导入极光SDK在Xcode中通过 Cocoapods 的方式导入： 1pod 'JPush', '3.3.4' 通过 pod update --no-repo-update 进行 pods 更新。 上架前提醒提交新版本或者初次上架之前，最后会遇到一个关于IDFA的选项。 您的 App 正在使用广告标识符 (IDFA)。您必须先提供关于 IDFA 的使用信息或将其从 App 中移除，然后再上传您的二进制文件。 记得要勾上是。否则会遇到麻烦。 P.S. 如果你的项目不需要投送广告，可以选择无 IDFA 版本的极光SDK，集成方式如下： 12pod 'JCore', '2.3.4-noidfa'pod 'JPush', '3.3.4' 配置推送： 我的Xcode版本为11，所以要开启 Application Target 的 Capabilities-&gt; Access WIFI Infomation 选项。 还有 PushNotifications ，以及打开 Remote notifications ： 创建桥接文件 XXX_Bridging-Header.h （XXX随便设置，一般用项目名大写字母） 12345/*极光推送*/#import "JPUSHService.h"// iOS10注册APNs所需头文件//#ifdef NSFoundationVersionNumber_iOS_9_x_Max#import &lt;UserNotifications/UserNotifications.h&gt; AppDelegate.swift 中编写极光相关代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990//// AppDelegate.swiftimport UserNotifications // 本地通知相关@UIApplicationMainclass AppDelegate: UIResponder, UIApplicationDelegate, JPUSHRegisterDelegate &#123; var window: UIWindow? func application(_: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool &#123; // 注册极光推送 registerJPush(launchOptions: launchOptions) window = UIWindow(frame: UIScreen.main.bounds) window?.rootViewController = ViewController() window?.makeKeyAndVisible() return true &#125; func applicationDidFinishLaunching(_: UIApplication) &#123;&#125; // MARK: 极光推送相关 func registerJPush(launchOptions: [UIApplication.LaunchOptionsKey: Any]?) &#123; // 注册极光推送 let entiity = JPUSHRegisterEntity() entiity.types = Int(UNAuthorizationOptions.alert.rawValue | UNAuthorizationOptions.badge.rawValue | UNAuthorizationOptions.sound.rawValue) JPUSHService.register(forRemoteNotificationConfig: entiity, delegate: self) JPUSHService.setup(withOption: launchOptions, appKey: JPushAppKey, channel: "app store", apsForProduction: false) &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, willPresent notification: UNNotification!, withCompletionHandler completionHandler: ((Int) -&gt; Void)!) &#123; let userInfo = notification.request.content.userInfo if notification.request.trigger is UNPushNotificationTrigger &#123; JPUSHService.handleRemoteNotification(userInfo) &#125; // 需要执行这个方法，选择是否提醒用户，有Badge、Sound、Alert三种类型可以选择设置 completionHandler(Int(UNNotificationPresentationOptions.alert.rawValue)) &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, didReceive response: UNNotificationResponse!, withCompletionHandler completionHandler: (() -&gt; Void)!) &#123; let userInfo = response.notification.request.content.userInfo if response.notification.request.trigger is UNPushNotificationTrigger &#123; JPUSHService.handleRemoteNotification(userInfo) &#125; // 系统要求执行这个方法 completionHandler() &#125; // 点推送进来执行这个方法 func application(_: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -&gt; Void) &#123; JPUSHService.handleRemoteNotification(userInfo) completionHandler(UIBackgroundFetchResult.newData) &#125; // 系统获取Token func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) &#123; JPUSHService.registerDeviceToken(deviceToken) &#125; // 获取token 失败 func application(_: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) &#123; // 可选 print("did Fail To Register For Remote Notifications With Error: \(error)") &#125; // 后台进前台 func applicationDidEnterBackground(_: UIApplication) &#123; // 销毁通知红点 UIApplication.shared.applicationIconBadgeNumber = 0 JPUSHService.setBadge(0) let center = UNUserNotificationCenter.current() center.removeAllDeliveredNotifications() // To remove all delivered notifications center.removeAllPendingNotificationRequests() // To remove all pending notifications which are not delivered yet but scheduled. // source: https://stackoverflow.com/questions/40397552/cancelalllocalnotifications-not-working-in-ios10 &#125; func jpushNotificationCenter(_: UNUserNotificationCenter!, openSettingsFor _: UNNotification!) &#123;&#125; func jpushNotificationAuthorization(_: JPAuthorizationStatus, withInfo _: [AnyHashable: Any]!) &#123;&#125;&#125; 测试通知现在我们来测试下发个通知给所有用户： 点击确认就能够发送通知给用户啦。 参考iOS SDK 集成指南]]></content>
@@ -428,8 +452,8 @@
         <category>Swift</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>iOS</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -453,8 +477,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -479,8 +503,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>跨域</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -590,9 +614,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -644,8 +668,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -888,8 +912,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1380,9 +1404,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>布局</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1505,9 +1529,9 @@
         <category>Node</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>跨域</tag>
         <tag>cors</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
