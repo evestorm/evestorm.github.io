@@ -103,7 +103,12 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/2019082016164342.gif">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/tools/copy_resource.gif">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/tools/copy_html.gif">
-<meta property="og:updated_time" content="2019-11-21T14:54:23.530Z">
+<meta property="og:image" content="https://evestorm.github.io/posts/63676/split.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/63676/chrome-split.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/63676/chrome-full.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/63676/xhr.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/63676/datauri.jpg">
+<meta property="og:updated_time" content="2020-08-27T12:28:10.384Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="chrome调试技巧-汇总">
 <meta name="twitter:description" content="温馨提醒：遇到文章中打不开的图片，右键新标签打开链接就能正常看到了~ 打印console.table使用 console.table() 可以将传入的对象，或数组以表格形式输出。适合排列整齐的元素：  让日志更易读即使 console.log 一个简单变量，你都可能会忘记（或混淆）哪一个是那个。当你有不同的变量需要打印的时候，阅读起来会更费劲。   “嗯？哪一个值对应哪一个变量来着？”  为了让它">
@@ -397,7 +402,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  522
+                  1.1k
                 </span>
               
 
@@ -413,7 +418,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  3
                 </span>
               
             </div>
@@ -454,6 +459,24 @@
 <p><img src="https://gitee.com/evestorm/various_resources/raw/master/tools/copy_html.gif" alt="copy html"></p>
 <h2 id="snippet代码块"><a href="#snippet代码块" class="headerlink" title="snippet代码块"></a>snippet代码块</h2><p>作用：Chrome开发者工具的Snippets提供了在Chrome里保存及运行或者调试一段js代码的功能<br>入口：Chrome开发者工具-Sources面板-Snippets面板</p>
 <p>直达：<a href="https://juejin.im/post/5c2653b4e51d457b8c1f5c41" target="_blank" rel="noopener">你不知道的 Chrome 调试工具技巧 第二十一天：Snippets(代码块)</a></p>
+<h2 id="在控制台中引用上一次的执行结果"><a href="#在控制台中引用上一次的执行结果" class="headerlink" title="在控制台中引用上一次的执行结果"></a>在控制台中引用上一次的执行结果</h2><p>我们常常需要在控制台中调试代码。比如你想知道如何在 JavaScript 中反转字符串，然后你在网络上搜索相关信息并找到以下代可行代码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'abcde'</span>.split(<span class="string">''</span>).reverse().join(<span class="string">''</span>)</span><br></pre></td></tr></table></figure>
+<img src="/posts/63676/split.jpg" title="split">
+<p>没问题，上面的代码确实对字符串进行了翻转。但你还想了解 split()、reverse()、join() 这些方法的作用以及运行他们的中间步骤的结果。因此，现在你想逐步执行上述代码，可能会编写如下内容：</p>
+<img src="/posts/63676/chrome-split.jpg" title="chrome-split">
+<p>好了，经过上面这些操作，我们确实知道了每个方法运行的返回值，也就了解了各个方法的作用。</p>
+<p>但是，这给人的感觉有点多此一举。上面的做法既容易出错，又难以理解。实际上，在控制台中，我们可以使用魔术变量$_引用上一次操作的结果。</p>
+<img src="/posts/63676/chrome-full.jpg" title="chrome-full">
+<p>$_是一个特殊变量，它的值始终等于控制台中上一次操作的执行结果。它可以让你更加优雅地调试代码。</p>
+<h2 id="重新发送-XHR-请求"><a href="#重新发送-XHR-请求" class="headerlink" title="重新发送 XHR 请求"></a>重新发送 XHR 请求</h2><p>XHR，即 XMLHttpRequest，是一种创建 AJAX 请求的 JavaScript API 。<br>在我们的前端项目中，我们经常需要使用 XHR 向后端发出请求来获取数据。如果你想重新发送 XHR 请求，那么该怎么办呢？<br>对于新手来说，可能会选择刷新页面，但这可能比较麻烦。实际上，我们可以直接在“网络”面板中进行调试。</p>
+<img src="/posts/63676/xhr.jpg" title="xhr">
+<h2 id="将复制图像为-Data-URI"><a href="#将复制图像为-Data-URI" class="headerlink" title="将复制图像为 Data URI"></a>将复制图像为 Data URI</h2><p>处理网页上的图像的通常有两种方法，一种是通过外部资源链接加载它们，另一种是将图像编码为 Data URI。</p>
+<blockquote>
+<p>Data URL，即前缀为data:协议的 URL，允许内容创建者在文档中嵌入小文件。在被 WHATWG 撤消该名称之前，它们被称为“Data URI”。</p>
+</blockquote>
+<p>将这些小图像编码到 Data URL 并将它们直接嵌入到我们的代码中，可以减少页面需要发出的 HTTP 请求的数量，从而加快页面加载速度。</p>
+<p>所以在 Chrome 浏览器中，我们该如何将图像转换为 Data URL 呢？可以参考下面的 gif 图像：</p>
+<img src="/posts/63676/datauri.jpg" title="datauri">
 <h2 id="参考来源"><a href="#参考来源" class="headerlink" title="参考来源"></a>参考来源</h2><ul>
 <li><a href="https://segmentfault.com/a/1190000012957199" target="_blank" rel="noopener">Javascript调试命令——你只会Console.log() ?</a></li>
 <li><a href="https://juejin.im/post/5c2653b4e51d457b8c1f5c41" target="_blank" rel="noopener">【译】你不知道的 Chrome 调试工具技巧 第二十一天：Snippets(代码块)</a></li>
@@ -660,7 +683,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#打印"><span class="nav-number">1.</span> <span class="nav-text">打印</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#console-table"><span class="nav-number">1.1.</span> <span class="nav-text">console.table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让日志更易读"><span class="nav-number">1.2.</span> <span class="nav-text">让日志更易读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#触发伪类"><span class="nav-number">2.</span> <span class="nav-text">触发伪类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ALT-单击可以展开所有子节点"><span class="nav-number">3.</span> <span class="nav-text">ALT+单击可以展开所有子节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#copy"><span class="nav-number">4.</span> <span class="nav-text">copy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拷贝资源"><span class="nav-number">4.1.</span> <span class="nav-text">拷贝资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拷贝-HTML-最快的方式"><span class="nav-number">4.2.</span> <span class="nav-text">拷贝 HTML (最快的方式)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#snippet代码块"><span class="nav-number">5.</span> <span class="nav-text">snippet代码块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考来源"><span class="nav-number">6.</span> <span class="nav-text">参考来源</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#打印"><span class="nav-number">1.</span> <span class="nav-text">打印</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#console-table"><span class="nav-number">1.1.</span> <span class="nav-text">console.table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让日志更易读"><span class="nav-number">1.2.</span> <span class="nav-text">让日志更易读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#触发伪类"><span class="nav-number">2.</span> <span class="nav-text">触发伪类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ALT-单击可以展开所有子节点"><span class="nav-number">3.</span> <span class="nav-text">ALT+单击可以展开所有子节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#copy"><span class="nav-number">4.</span> <span class="nav-text">copy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拷贝资源"><span class="nav-number">4.1.</span> <span class="nav-text">拷贝资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拷贝-HTML-最快的方式"><span class="nav-number">4.2.</span> <span class="nav-text">拷贝 HTML (最快的方式)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#snippet代码块"><span class="nav-number">5.</span> <span class="nav-text">snippet代码块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在控制台中引用上一次的执行结果"><span class="nav-number">6.</span> <span class="nav-text">在控制台中引用上一次的执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重新发送-XHR-请求"><span class="nav-number">7.</span> <span class="nav-text">重新发送 XHR 请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将复制图像为-Data-URI"><span class="nav-number">8.</span> <span class="nav-text">将复制图像为 Data URI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考来源"><span class="nav-number">9.</span> <span class="nav-text">参考来源</span></a></li></ol></div>
             
 
           </div>
@@ -701,7 +724,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">238.9k</span>
+    <span title="Site words total count">239.4k</span>
   
 </div>
 
