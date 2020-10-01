@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[VS Code配置TypeScript自动编译报错]]></title>
+    <url>%2Fposts%2F20440%2F</url>
+    <content type="text"><![CDATA[之前在 VSCode 中能通过运行任务来监听ts文件的代码变更来实时编译js。然而我今天发现这样会导致报错： 123456&gt; Executing task: tsc -p '/Users/macbook/Documents/01ts-intro/tsconfig.json' --watch &lt;env: node: No such file or directoryThe terminal process "/bin/bash '-c', 'tsc -p '/Users/macbook/Documents/01ts-intro/tsconfig.json' --watch'" failed to launch (exit code: 127).Terminal will be reused by tasks, press any key to close it. 尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下： 1tsc -p 'tsconfig.json' --watch]]></content>
+      <categories>
+        <category>前端</category>
+        <category>TS</category>
+      </categories>
+      <tags>
+        <tag>TypeScript</tag>
+        <tag>vscode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[(翻译转载)使用Object键值替换switch]]></title>
     <url>%2Fposts%2F16972%2F</url>
     <content type="text"><![CDATA[转载地址：https://www.cnblogs.com/ZerlinM/p/13595810.html原文地址：https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals 在许多编程语言中，switch语句存在 - 但是它应该更长吗？如果你是一个JavaScript程序员，你经常跳进和跳出对象，创建，实例化和操作它们。对象非常灵活，它们是JavaScript中几乎所有内容的核心，使用它们代替switch语句是我最近一直在做的事情。 什么是switch语句?如果您以前没有使用switch过或者有点不确定它是做什么的，那么让我们来看看吧。什么switch是输入并提供输出，例如正在运行的代码。让我们来看一个通常的switch陈述： 12345678910111213var type = 'coke';var drink;switch(type) &#123;case 'coke': drink = 'Coke'; break;case 'pepsi': drink = 'Pepsi'; break;default: drink = 'Unknown drink!';&#125;console.log(drink); // 'Coke' 它类似于if和else语句，但它应该评估单个值 - 在switch我们使用a case来评估每个值。当你开始看到很多else if陈述时，某些东西可能是错误的，通常你会使用类似于switch它更适合目的和意图的东西。这是一些else if滥用： 1234567891011121314151617function getDrink (type) &#123; if (type === 'coke') &#123; type = 'Coke'; &#125; else if (type === 'pepsi') &#123; type = 'Pepsi'; &#125; else if (type === 'mountain dew') &#123; type = 'Mountain Dew'; &#125; else if (type === 'lemonade') &#123; type = 'Lemonade'; &#125; else if (type === 'fanta') &#123; type = 'Fanta'; &#125; else &#123; // acts as our "default" type = 'Unknown drink!'; &#125; return 'You\'ve picked a ' + type;&#125; 这个实现太松散了，有错误的余地，加上它是一个非常冗长的语法，可以不断重复自己。还有一个黑客攻击的空间，因为你可以评估每个内部的多个表达式else if，例如else if (type === ‘coke’ &amp;&amp; somethingElse ！== ‘apples’)。这switch是该工作的最佳工具，尽管您需要不断添加break;语句以防止案件失败，这是其众多问题之一。 开关问题switch从程序控制流程到其处理代码块的非标准方式存在多个问题，其余的JavaScript使用花括号而交换机则不然。从语法上讲，它不是JavaScript的最佳选择，也不是它的设计。我们被迫break;在每个语句中手动添加语句case，这可能导致难以调试和嵌套错误，如果我们忘记了！道格拉斯·克罗克福德（Douglas Crockford）曾多次撰写和谈论过这个问题，他的建议是谨慎对待。 我们经常在JavaScript中使用Object查找，通常用于我们永远不会考虑使用的东西switch- 那么为什么不使用Object键值替换switch？对象更灵活，具有更好的可读性和可维护性，我们不需要手动break;每个“案例”。他们对新的JavaScript开发人员也很友好，因为他们是标准对象。 随着“案例”数量的增加，对象（哈希表）的性能优于交换机的平均成本（案例的顺序很重要）。对象方法是哈希表查找，并且交换机必须评估每个案例，直到它遇到匹配和中断。 对象文本查找我们一直使用对象，无论是构造函数还是文字。通常，我们将它们用于对象查找目的，以从Object属性中获取值。让我们设置一个String仅返回值的简单Object键值。 12345678910111213function getDrink (type) &#123; var drinks = &#123; 'coke': 'Coke', 'pepsi': 'Pepsi', 'lemonade': 'Lemonade', 'default': 'Default item' &#125;; return 'The drink I chose was ' + (drinks[type] || drinks['default']);&#125;var drink = getDrink('coke');// The drink I chose was Cokeconsole.log(drink); 我们从交换机中保存了几行代码，对我而言，数据在演示中更加清晰。我们甚至可以进一步简化它，没有默认情况： 1234567function getDrink (type) &#123; return 'The drink I chose was ' + &#123; 'coke': 'Coke', 'pepsi': 'Pepsi', 'lemonade': 'Lemonade' &#125;[type];&#125; 但是，我们可能需要比a更复杂的代码String，这可能会挂在函数内部。为了简洁和易于理解的示例，我将从新创建的函数返回上述字符串： 12345678910111213var type = 'coke';var drinks = &#123; 'coke': function () &#123; return 'Coke'; &#125;, 'pepsi': function () &#123; return 'Pepsi'; &#125;, 'lemonade': function () &#123; return 'Lemonade'; &#125;&#125;; 区别在于我们需要调用Object文字的函数： 1drinks[type](); 更具可维护性和可读性。我们也不必担心break;陈述和案例会失败-这只是一个普通的对象。通常，我们会switch在函数内部放入一个return值，因此在这里做同样的事情，然后将对象文字查找转换为可用的函数： 123456789101112131415161718function getDrink (type) &#123; var drinks = &#123; 'coke': function () &#123; return 'Coke'; &#125;, 'pepsi': function () &#123; return 'Pepsi'; &#125;, 'lemonade': function () &#123; return 'Lemonade'; &#125; &#125;; return drinks[type]();&#125;// let's call itvar drink = getDrink('coke');console.log(drink); // 'Coke' 不错，很容易，但这并不能满足“ default”的要求case，因此我们可以轻松创建它： 123456789101112131415161718192021222324252627282930313233function getDrink (type) &#123; var fn; var drinks = &#123; 'coke': function () &#123; return 'Coke'; &#125;, 'pepsi': function () &#123; return 'Pepsi'; &#125;, 'lemonade': function () &#123; return 'Lemonade'; &#125;, 'default': function () &#123; return 'Default item'; &#125; &#125;; // if the drinks Object contains the type // passed in, let's use it if (drinks[type]) &#123; fn = drinks[type]; &#125; else &#123; // otherwise we'll assign the default // also the same as drinks.default // it's just a little more consistent using square // bracket notation everywhere fn = drinks['default']; &#125; return fn();&#125;// called with "dr pepper"var drink = getDrink('dr pepper');console.log(drink); // 'Default item' 我们可以简化上面的内容，if并在表达式中else使用or ||运算符： 1234567891011121314151617function getDrink (type) &#123; var drinks = &#123; 'coke': function () &#123; return 'Coke'; &#125;, 'pepsi': function () &#123; return 'Pepsi'; &#125;, 'lemonade': function () &#123; return 'Lemonade'; &#125;, 'default': function () &#123; return 'Default item'; &#125; &#125;; return (drinks[type] || drinks['default'])();&#125; 这会将两个对象查找包装在括号内( )，将它们视为表达式。然后调用表达式的结果。如果drinks[type]在查找中未找到，则默认为drinks[‘default’]，简单！我们不具备总是return里面的函数或者，我们可以改变引用任何变量然后返回它： 123456789101112131415161718192021222324252627function getDrink (type) &#123; var drink; var drinks = &#123; 'coke': function () &#123; drink = 'Coke'; &#125;, 'pepsi': function () &#123; drink = 'Pepsi'; &#125;, 'lemonade': function () &#123; drink = 'Lemonade'; &#125;, 'default': function () &#123; drink = 'Default item'; &#125; &#125;; // invoke it (drinks[type] || drinks['default'])(); // return a String with chosen drink return 'The drink I chose was ' + drink;&#125;var drink = getDrink('coke');// The drink I chose was Cokeconsole.log(drink); 这些是非常基本的解决方案，而Object字面量包含一个function返回a的值String，在您只需要a的情况下String，可以将a String用作键的值-在某些情况下，该函数将包含逻辑，该逻辑将从该函数返回。如果您要混合使用函数和字符串，则始终可以使用函数来保存查找type和调用（如果是函数）会更容易-我们不想尝试调用String。 对象字面量“告吹”对于switch案例，我们可以让它们失败（这意味着一个以上的案例可以应用于特定的代码段）： 123456789101112131415var type = 'coke';var snack;switch(type) &#123; case 'coke': case 'pepsi': snack = 'Drink'; break; case 'cookies': case 'crisps': snack = 'Food'; break; default: drink = 'Unknown type!';&#125;console.log(snack); // 'Drink' 让我们coke和pepsi“贯穿”以不添加break语句。为Object Literals执行此操作非常简单且更具说明性 - 并且不易出错。我们的代码突然变得更加结构化，可读性和可重用性： 12345678910111213141516171819function getSnack (type) &#123; var snack; function isDrink () &#123; return snack = 'Drink'; &#125; function isFood () &#123; return snack = 'Food'; &#125; var snacks = &#123; 'coke': isDrink, 'pepsi': isDrink, 'cookies': isFood, 'crisps': isFood, &#125;; return snacks[type]();&#125;var snack = getSnack('coke');console.log(snack); // 'Drink' 总结Object键值是JavaScript中流动的一种更自然的控制，switch有点陈旧和笨重，并且容易出现调试错误。对象更具可扩展性，可维护性，我们可以更好地测试它们。它们也是设计模式的一部分，在日常的其他编程任务中非常常用。对象键值可以包含函数以及任何其他对象类型，这使它们非常灵活！键值中的每个函数也都有函数作用域，因此我们可以从我们调用的父函数getDrink返回闭包（在这种情况下返回闭包）。]]></content>
@@ -9,8 +22,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -22,8 +35,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>CSS</tag>
         <tag>技巧</tag>
+        <tag>CSS</tag>
       </tags>
   </entry>
   <entry>
@@ -482,8 +495,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>CSS</tag>
         <tag>技巧</tag>
+        <tag>CSS</tag>
       </tags>
   </entry>
   <entry>
@@ -546,8 +559,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -683,9 +696,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
         <tag>CSS3</tag>
       </tags>
   </entry>
@@ -737,8 +750,8 @@
         <category>性能优化</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>性能优化</tag>
       </tags>
   </entry>
@@ -981,8 +994,8 @@
         <category>代码片段</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
+        <tag>技巧</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1276,8 +1289,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>CSS</tag>
         <tag>技巧</tag>
+        <tag>CSS</tag>
       </tags>
   </entry>
   <entry>
@@ -1473,9 +1486,9 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>转载</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2065,8 +2078,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2102,8 +2115,8 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
