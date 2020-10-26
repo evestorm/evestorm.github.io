@@ -100,9 +100,9 @@
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/token/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A12.png">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/token/token%E7%AE%97%E6%B3%95.png">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/token/token%E9%AA%8C%E8%AF%81.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29493/session.png">
 <meta property="og:image" content="https://gitee.com/evestorm/various_resources/raw/master/token/token%E6%B5%81%E7%A8%8B.png">
-<meta property="og:updated_time" content="2019-06-24T08:02:45.928Z">
+<meta property="og:updated_time" content="2020-10-26T02:29:28.962Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="彻底理解cookie-session-token(转载)">
 <meta name="twitter:description" content="发展史1、很久很久以前，Web 基本上就是文档的浏览而已， 既然是浏览，作为服务器， 不需要记录谁在某一段时间里都浏览了什么文档，每次请求都是一个新的HTTP协议， 就是请求加响应，  尤其是我不用记住是谁刚刚发了HTTP请求，   每个请求对我来说都是全新的。这段时间很嗨皮 2、但是随着交互式Web应用的兴起，像在线购物网站，需要登录的网站等等，马上就面临一个问题，那就是要管理会话，必须记住哪些">
@@ -479,7 +479,7 @@
 <h4 id="基于服务器的验证"><a href="#基于服务器的验证" class="headerlink" title="基于服务器的验证"></a>基于服务器的验证</h4><p>我们都是知道HTTP协议是无状态的，这种无状态意味着程序需要验证每一次请求，从而辨别客户端的身份。</p>
 <p>在这之前，程序都是通过在服务端存储的登录信息来辨别请求的。这种方式一般都是通过存储Session来完成。</p>
 <p>下图展示了基于服务器验证的原理</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2019/png/260235/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png" alt="session"></p>
+<img src="/posts/29493/session.png" title="session">
 <p>随着Web，应用程序，已经移动端的兴起，这种验证的方式逐渐暴露出了问题。尤其是在可扩展性方面。</p>
 <h4 id="基于服务器验证方式暴露的一些问题"><a href="#基于服务器验证方式暴露的一些问题" class="headerlink" title="基于服务器验证方式暴露的一些问题"></a>基于服务器验证方式暴露的一些问题</h4><ol>
 <li><p>Session：每次认证用户发起请求时，服务器需要去创建一个记录来存储信息。当越来越多的用户发请求时，内存的开销也会不断增加。</p>
@@ -528,7 +528,7 @@
 <p>如果我们将已验证的用户的信息保存在Session中，则每次请求都需要用户向已验证的服务器发送验证信息(称为Session亲和性)。用户量大时，可能会造成一些拥堵。</p>
 <p>但是不要着急。使用tokens之后这些问题都迎刃而解，因为tokens自己hold住了用户的验证信息。</p>
 <p><strong>安全性</strong></p>
-<p>请求中发送token而不再是发送cookie能够防止CSRF(跨站请求伪造)。即使在客户端使用cookie存储token，cookie也仅仅是一个存储机制而不是用于认证。不将信息存储在Session中，让我们少了对session操作。 </p>
+<p>请求中发送token而不再是发送cookie能够防止CSRF(跨站请求伪造)。即使在客户端使用cookie存储token，cookie也仅仅是一个存储机制而不是用于认证。不将信息存储在Session中，让我们少了对session操作。</p>
 <p>token是有时效的，一段时间之后用户需要重新验证。我们也不一定需要等到token自动失效，token有撤回的操作，通过token revocataion可以使一个特定的token或是一组有相同认证的token无效。</p>
 <p><strong>可扩展性</strong></p>
 <p>Tokens能够创建与其它程序共享权限的程序。例如，能将一个随便的社交帐号和自己的大号(Fackbook或是Twitter)联系起来。当通过服务登录Twitter(我们将这个过程Buffer)时，我们可以将这些Buffer附到Twitter的数据流上(we are allowing Buffer to post to our Twitter stream)。</p>
@@ -538,6 +538,7 @@
 <p>Having our API just serve data, we can also make the design choice to serve assets from a CDN. This eliminates the issues that CORS brings up after we set a quick header configuration for our application.</p>
 <p>只要用户有一个通过了验证的token，数据和资源就能够在任何域上被请求到。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: *</span><br></pre></td></tr></table></figure>
+<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://zhuanlan.zhihu.com/p/63061864" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/63061864</a></p>
 
       
     </div>
@@ -745,7 +746,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发展史"><span class="nav-number">1.</span> <span class="nav-text">发展史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie"><span class="nav-number">2.</span> <span class="nav-text">Cookie</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Session"><span class="nav-number">3.</span> <span class="nav-text">Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Token"><span class="nav-number">4.</span> <span class="nav-text">Token</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Token的起源"><span class="nav-number">4.1.</span> <span class="nav-text">Token的起源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于服务器的验证"><span class="nav-number">4.1.1.</span> <span class="nav-text">基于服务器的验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于服务器验证方式暴露的一些问题"><span class="nav-number">4.1.2.</span> <span class="nav-text">基于服务器验证方式暴露的一些问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于Token的验证原理"><span class="nav-number">4.1.3.</span> <span class="nav-text">基于Token的验证原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tokens的优势"><span class="nav-number">4.1.4.</span> <span class="nav-text">Tokens的优势</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发展史"><span class="nav-number">1.</span> <span class="nav-text">发展史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie"><span class="nav-number">2.</span> <span class="nav-text">Cookie</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Session"><span class="nav-number">3.</span> <span class="nav-text">Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Token"><span class="nav-number">4.</span> <span class="nav-text">Token</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Token的起源"><span class="nav-number">4.1.</span> <span class="nav-text">Token的起源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于服务器的验证"><span class="nav-number">4.1.1.</span> <span class="nav-text">基于服务器的验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于服务器验证方式暴露的一些问题"><span class="nav-number">4.1.2.</span> <span class="nav-text">基于服务器验证方式暴露的一些问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于Token的验证原理"><span class="nav-number">4.1.3.</span> <span class="nav-text">基于Token的验证原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tokens的优势"><span class="nav-number">4.1.4.</span> <span class="nav-text">Tokens的优势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#来源"><span class="nav-number">5.</span> <span class="nav-text">来源</span></a></li></ol></div>
             
 
           </div>
