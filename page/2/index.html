@@ -23,34 +23,31 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="定义先上MDN上对 BFC 的定义：  块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。  ———— BFC | MDN 不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的">
-<meta property="og:type" content="article">
-<meta property="og:title" content="BFC的理解与应用">
-<meta property="og:url" content="https://evestorm.github.io/posts/9722/index.html">
+<meta name="description" content="Front-end developer and iOS developer">
+<meta property="og:type" content="website">
+<meta property="og:title" content="EVE|暴风雨前夕">
+<meta property="og:url" content="https://evestorm.github.io/page/2/index.html">
 <meta property="og:site_name" content="EVE|暴风雨前夕">
-<meta property="og:description" content="定义先上MDN上对 BFC 的定义：  块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。  ———— BFC | MDN 不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的">
+<meta property="og:description" content="Front-end developer and iOS developer">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2018-12-02T15:26:19.000Z">
-<meta property="article:modified_time" content="2020-11-21T15:32:18.308Z">
 <meta property="article:author" content="Lance">
-<meta property="article:tag" content="布局">
-<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="hexo, 博客, 技术, 前端">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://evestorm.github.io/posts/9722/">
+<link rel="canonical" href="https://evestorm.github.io/page/2/">
 
 
 <script class="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
-    isPost : true,
+    isHome : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
-<title>BFC的理解与应用 | EVE|暴风雨前夕</title>
+<title>EVE|暴风雨前夕</title>
   
 
 
@@ -195,7 +192,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -208,7 +205,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BFC%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">BFC触发条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BFC%E5%B8%83%E5%B1%80%E7%89%B9%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">BFC布局特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">实际应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8"><span class="nav-number">5.1.</span> <span class="nav-text">清除浮动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%A4%96%E8%BE%B9%E8%B7%9D%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98"><span class="nav-number">5.2.</span> <span class="nav-text">解决外边距合并问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E6%A0%8F%E5%B8%83%E5%B1%80%EF%BC%8C%E5%8F%B3%E8%BE%B9%E5%AE%BD%E5%BA%A6%E8%87%AA%E9%80%82%E5%BA%94"><span class="nav-number">5.3.</span> <span class="nav-text">两栏布局，右边宽度自适应</span></a></li></ol></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -273,10 +269,9 @@
 </noscript>
 
 
-    <div class="main-inner post posts-expand">
+    <div class="main-inner index posts-expand">
 
-
-  
+    
 
 
 <div class="post-block">
@@ -284,7 +279,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/9722/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/43303/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
@@ -296,9 +291,9 @@
       <meta itemprop="name" content="EVE|暴风雨前夕">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          BFC的理解与应用
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/43303/" class="post-title-link" itemprop="url">使用hexo搭建个人博客</a>
+        </h2>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -308,14 +303,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2018-12-02 23:26:19" itemprop="dateCreated datePublished" datetime="2018-12-02T23:26:19+08:00">2018-12-02</time>
+      <time title="创建时间：2018-03-13 14:10:09" itemprop="dateCreated datePublished" datetime="2018-03-13T14:10:09+08:00">2018-03-13</time>
     </span>
       <span class="post-meta-item">
         <span class="post-meta-item-icon">
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-11-21 23:32:18" itemprop="dateModified" datetime="2020-11-21T23:32:18+08:00">2020-11-21</time>
+        <time title="修改时间：2020-11-21 23:30:04" itemprop="dateModified" datetime="2020-11-21T23:30:04+08:00">2020-11-21</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -323,22 +318,15 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+          <a href="/categories/%E6%95%99%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">教程</span></a>
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+          <a href="/categories/%E6%95%99%E7%A8%8B/%E5%8D%9A%E5%AE%A2/" itemprop="url" rel="index"><span itemprop="name">博客</span></a>
         </span>
     </span>
 
   
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
   
   <span class="post-meta-item">
     
@@ -348,8 +336,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/posts/9722/#SOHUCS" itemprop="discussionUrl">
-        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/9722/" itemprop="commentCount"></span>
+      <a title="changyan" href="/posts/43303/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/43303/" class="cy_cmt_count" data-xid="posts/43303/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -364,42 +352,22 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先上MDN上对 BFC 的定义：</p>
-<blockquote>
-<p>块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。</p>
-</blockquote>
-<p>———— <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">BFC | MDN</a></p>
-<p>不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的认知。</p>
-<a id="more"></a>
-
-<h2 id="理解"><a href="#理解" class="headerlink" title="理解"></a>理解</h2><p>这里谈下我对BFC的理解：BFC其实是一个独立的，与外界隔离了的容器，容器里面的子元素不会影响到外面的元素，外面的也同样不会影响到容器内部的元素。我们可以利用这个特性，来解决一些布局上的问题。</p>
-<h2 id="BFC触发条件"><a href="#BFC触发条件" class="headerlink" title="BFC触发条件"></a>BFC触发条件</h2><p>BFC的触发条件有很多，想要知道所有细节可以移步上面给出的 MDN 链接。这里我只列出一些常见触发条件：</p>
+          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>利用 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a> 在 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/github/10145341?fr=aladdin">GitHub</a> 上搭建个人博客。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>你的电脑需要安装下面两个应用程序：</p>
 <ul>
-<li>根元素（HTML元素）</li>
-<li>浮动元素（float不为none）</li>
-<li>绝对定位元素（position 为 absolute 或 fixed）</li>
-<li>display 为 block, inline-block, flex, inline-flex, list-item, table</li>
-<li>overflow 值不为 visible 的块元素</li>
+<li>NodeJS <a target="_blank" rel="noopener" href="http://www.runoob.com/nodejs/nodejs-install-setup.html">如何安装</a></li>
+<li>Git <a target="_blank" rel="noopener" href="http://www.runoob.com/git/git-install-setup.html">如何安装</a></li>
 </ul>
-<h2 id="BFC布局特性"><a href="#BFC布局特性" class="headerlink" title="BFC布局特性"></a>BFC布局特性</h2><p>对于一个BFC容器来说：</p>
-<ul>
-<li>内部相邻的两个元素垂直方向上的 margin 会发生重叠</li>
-<li>不会与外界的浮动元素产生交集，而是紧贴浮动元素的边缘</li>
-<li>元素从容器的顶端开始垂直地一个接一个地排列</li>
-<li>每一个元素的左外边缘（margin-left）会触碰到容器的左边缘（border-left）（如果设置了容器内部的元素从右到左的格式排布，则触碰的是右边缘）</li>
-<li>在计算它的高度时，还会检测内部浮动或者定位元素的高度</li>
-</ul>
-<h2 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h2><h3 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a>清除浮动</h3><p>利用BFC “在计算它的高度时，还会检测内部浮动或者定位元素的高度” 这条特性，我们可以触发父元素的BFC来清除子元素浮动带来的影响。常见的用法是给父元素设置 <code>overflow: hidden</code> 样式（如果考虑IE6版本，还需设置 <code>zoom: 1</code>，因为IE6不支持 <code>overflow: hidden</code> 来清除浮动）：</p>
-<iframe height="265" scrolling="no" title="利用BFC清除浮动" src="https://codepen.io/JingW/embed/BbxEGP/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="解决外边距合并问题"><a href="#解决外边距合并问题" class="headerlink" title="解决外边距合并问题"></a>解决外边距合并问题</h3><p>如果看上面标题不知道在说什么，请很戳<a target="_blank" rel="noopener" href="http://www.w3school.com.cn/css/css_margin_collapsing.asp">这里</a>了解详情。由于属于同一个BFC的两个相邻盒子的垂直margin会发生重叠，那么我们可以隔离开这两个元素，让它们不属于同一个BFC，这样就不会发生margin重叠了。</p>
-<iframe height="265" scrolling="no" title="解决外边距合并问题" src="https://codepen.io/JingW/embed/YgLbzY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="两栏布局，右边宽度自适应"><a href="#两栏布局，右边宽度自适应" class="headerlink" title="两栏布局，右边宽度自适应"></a>两栏布局，右边宽度自适应</h3><p>我们常常在开发中有这样类似的需求：两栏布局，左边定宽，右边自适应。<br>这时我们就可以利用BFC特性来实现需求：左边设置定宽+左浮动；右边给自己加上 <code>overflow: hidden</code> 。<br>原理就是：给元素设置BFC后，为了和浮动元素不产生任何交集，它会顺着浮动元素的边缘形成自己的封闭上下文。直接上代码看效果：</p>
-<iframe height="265" scrolling="no" title="利用BFC实现两栏布局" src="https://codepen.io/JingW/embed/MxGdEe/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<p>以上是我对BFC的一些理解以及实际应用，希望能够帮助大家了解BFC这个听起来摸不着头脑的东西。</p>
-
+<p>或者直接查看hexo的<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90">官方文档</a>查看安装教程。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/43303/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
     </div>
 
     
@@ -407,25 +375,8 @@
     
 
     <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E5%B8%83%E5%B1%80/" rel="tag"># 布局</a>
-              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/posts/10370/" rel="prev" title="三栏布局方案(圣杯_双飞翼)">
-                  <i class="fa fa-chevron-left"></i> 三栏布局方案(圣杯_双飞翼)
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/posts/12906/" rel="next" title="如何清除浮动">
-                  如何清除浮动 <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
-          </div>
+        <div class="post-eof"></div>
+      
     </footer>
   </article>
 </div>
@@ -433,13 +384,10 @@
 
 
 
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
-
-    
-  <div class="comments">
-    <div id="SOHUCS"></div>
-  </div>
-  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -522,17 +470,8 @@
 
 
 
-  <script>
-  NexT.utils.loadComments('#SOHUCS', () => {
-    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
-      window.changyan.api.config({
-        appid: 'cyvaqAKVv',
-        conf : 'c7535289deb20d0d9235ebae6a69b912'
-      });
-    });
-  });
-  </script>
-  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cyvaqAKVv"></script>
+
 
 </body>
 </html>
