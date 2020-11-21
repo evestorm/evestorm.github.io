@@ -23,6 +23,8 @@ Promise 是一种异步编程的解决方案，比传统的异步解决方案【
 
 {% asset_img 8144ca8cgw1f2wc9ed35zj218g0p0tey.jpg 行为艺术 %}
 
+<!-- more -->
+
 ## Promise的三种状态
 
 - pedding 等待（默认状态。异步代码执行完毕后会转换为以下两种状态）
