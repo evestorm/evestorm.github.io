@@ -214,10 +214,12 @@
     <url>/posts/7878/</url>
     <content><![CDATA[<h2 id="Promise是什么"><a href="#Promise是什么" class="headerlink" title="Promise是什么"></a>Promise是什么</h2><p>Promise 是一种异步编程的解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。</p>
 <h2 id="诞生的原因"><a href="#诞生的原因" class="headerlink" title="诞生的原因"></a>诞生的原因</h2><p>异步网络请求的<strong>回调地狱</strong>，而且我们还得对每次请求的结果进行一些处理，代码会更加臃肿。一张图完美诠释：</p>
-<img src="/posts/undefined/call-back-hello.jpg" class="" title="回调地狱">
+<img src="/posts/7878/call-back-hello.jpg" class="" title="回调地狱">
 
 <p>不够？再加一张：</p>
-<img src="/posts/undefined/8144ca8cgw1f2wc9ed35zj218g0p0tey.jpg" class="" title="行为艺术">
+<img src="/posts/7878/8144ca8cgw1f2wc9ed35zj218g0p0tey.jpg" class="" title="行为艺术">
+
+<a id="more"></a>
 
 <h2 id="Promise的三种状态"><a href="#Promise的三种状态" class="headerlink" title="Promise的三种状态"></a>Promise的三种状态</h2><ul>
 <li>pedding 等待（默认状态。异步代码执行完毕后会转换为以下两种状态）</li>
@@ -880,6 +882,32 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>布局</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决0.1+0.2不等于0.3的问题</title>
+    <url>/posts/21245/</url>
+    <content><![CDATA[<h2 id="为何会出现此问题？"><a href="#为何会出现此问题？" class="headerlink" title="为何会出现此问题？"></a>为何会出现此问题？</h2><p>总结一句话：这是因为二进制模拟十进制进行运算时的精度问题。</p>
+<p>具体可查看 <a href="https://juejin.im/post/5b90e00e6fb9a05cf9080dff">0.1 + 0.2不等于0.3？为什么JavaScript有这种“骚”操作？</a> 这篇掘金文章。</p>
+<h2 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h2><h3 id="Number-EPSILON"><a href="#Number-EPSILON" class="headerlink" title="Number.EPSILON"></a>Number.EPSILON</h3><p>第一种方法是利用 <code>Number.EPSILON</code> ，这个值无限接近于0。0.1+0.2的精度误差在这个值的范围内：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">numbersEqual</span>(<span class="params">a,b</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.abs(a-b)&lt;<span class="built_in">Number</span>.EPSILON;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a=<span class="number">0.1</span>+<span class="number">0.2</span>， b=<span class="number">0.3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(numbersEqual(a,b));    <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="内置函数toFixed"><a href="#内置函数toFixed" class="headerlink" title="内置函数toFixed"></a>内置函数toFixed</h3><p>利用 <code>parseFloat</code> + 内置函数toFixed：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatNum</span>(<span class="params">num, fixed = <span class="number">10</span></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// a.toFixed(fixed) 先转为小数点10位的字符串 &quot;0.3000000000&quot;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">parseFloat</span>(a.toFixed(fixed)) <span class="comment">// 然后通过parseFloat转为浮点数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">0.1</span> + <span class="number">0.2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(formatNum(a)); <span class="comment">//0.3</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="内置函数toPrecision"><a href="#内置函数toPrecision" class="headerlink" title="内置函数toPrecision"></a>内置函数toPrecision</h3><p>我平常用此函数来计算精度，具体可参考 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/toPrecision">Number.prototype.toPrecision() | MDN</a>：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数toPrecision(中文：精确，精度)</span></span><br><span class="line"><span class="comment">// 参数是精度.比如5.1234，传2返回5.1，传1返回5；0.2+0.1传2返回0.30</span></span><br><span class="line">(<span class="number">0.1</span> + <span class="number">0.2</span>).toPrecision(<span class="number">10</span>) == <span class="number">0.3</span> <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
         <tag>技巧</tag>
       </tags>
   </entry>
