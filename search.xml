@@ -1,29 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>JS中如何实现继承</title>
-    <url>/posts/2751/</url>
-    <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="寄生组合继承（组合继承升级版）"><a href="#寄生组合继承（组合继承升级版）" class="headerlink" title="寄生组合继承（组合继承升级版）"></a>寄生组合继承（组合继承升级版）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  F.prototype = o;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prototype = object(superType.prototype); <span class="comment">// 创建了父类原型的浅复制</span></span><br><span class="line">    prototype.constructor = subType;             <span class="comment">// 修正原型的构造函数</span></span><br><span class="line">    subType.prototype = prototype;               <span class="comment">// 将子类的原型替换为这个原型</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.colors = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;green&quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>, name);</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费</span></span><br><span class="line">inheritPrototype(SubType, SuperType);</span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ES6继承写法"><a href="#ES6继承写法" class="headerlink" title="ES6继承写法"></a>ES6继承写法</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age</span>)</span> &#123;<span class="built_in">this</span>.name=name;<span class="built_in">this</span>.age=age&#125;</span><br><span class="line">  <span class="function"><span class="title">sayHi</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age, weight</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(name, age); <span class="built_in">this</span>.weight = weight;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">run</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？"><a href="#在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？" class="headerlink" title="在原型链继承时，为什么不直接 Student.prototype = Person.prototype ？"></a>在原型链继承时，为什么不直接 <code>Student.prototype = Person.prototype</code> ？</h2><p>因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。</p>
-<h2 id="组合继承的缺点"><a href="#组合继承的缺点" class="headerlink" title="组合继承的缺点"></a>组合继承的缺点</h2><p>缺点就是调用了两次父类的构造函数。<br>第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = <span class="string">&#x27;parent&#x27;</span>;</span><br><span class="line">    <span class="built_in">this</span>.arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;this is parent&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>) <span class="comment">// 第二次调用SuperType</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用SuperType</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>继承</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>BFC的理解与应用</title>
     <url>/posts/9722/</url>
     <content><![CDATA[<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先上MDN上对 BFC 的定义：</p>
@@ -72,45 +49,27 @@
       </tags>
   </entry>
   <entry>
-    <title>null 和 undefined 的区别</title>
-    <url>/posts/63928/</url>
-    <content><![CDATA[<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><ul>
-<li>null 表示一个对象是“没有值”的值，也就是值为“空”</li>
-<li>undefined 表示一个变量声明了没有初始化(赋值)</li>
-</ul>
-<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
-<li>undefined 的类型(typeof)是 undefined</li>
-<li>null 的类型(typeof)是 object</li>
-</ul>
+    <title>JS中如何实现继承</title>
+    <url>/posts/2751/</url>
+    <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
+
 <a id="more"></a>
 
-<h2 id="双等三等"><a href="#双等三等" class="headerlink" title="双等三等"></a>双等三等</h2><p>另外，在验证 null 时，一定要使用 <code>===</code> ，因为 <code>==</code> 无法分辨 null 和 undefined ：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copynull &#x3D;&#x3D; undefined &#x2F;&#x2F; true </span><br><span class="line">null &#x3D;&#x3D;&#x3D; undefined &#x2F;&#x2F; false</span><br></pre></td></tr></table></figure>
+<h2 id="寄生组合继承（组合继承升级版）"><a href="#寄生组合继承（组合继承升级版）" class="headerlink" title="寄生组合继承（组合继承升级版）"></a>寄生组合继承（组合继承升级版）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  F.prototype = o;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prototype = object(superType.prototype); <span class="comment">// 创建了父类原型的浅复制</span></span><br><span class="line">    prototype.constructor = subType;             <span class="comment">// 修正原型的构造函数</span></span><br><span class="line">    subType.prototype = prototype;               <span class="comment">// 将子类的原型替换为这个原型</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.colors = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;green&quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>, name);</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费</span></span><br><span class="line">inheritPrototype(SubType, SuperType);</span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<h2 id="ES6继承写法"><a href="#ES6继承写法" class="headerlink" title="ES6继承写法"></a>ES6继承写法</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age</span>)</span> &#123;<span class="built_in">this</span>.name=name;<span class="built_in">this</span>.age=age&#125;</span><br><span class="line">  <span class="function"><span class="title">sayHi</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age, weight</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(name, age); <span class="built_in">this</span>.weight = weight;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">run</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="undefined"><a href="#undefined" class="headerlink" title="undefined"></a>undefined</h3><ol>
-<li>变量提升：只声明未定义默认值就是 undefined</li>
-<li>严格模式下：没有明确的执行主体，this 就是 undefined</li>
-<li>对象没有这个属性名，属性值是 undefined</li>
-<li>函数定义形参不传值，默认就是 undefined</li>
-<li>函数没有返回值（没有 return 或者 return; ），默认返回的就是 undefined</li>
-<li>数组越界取值也是 undefined （arr=[1,2]; arr[10] =&gt; undefined）</li>
-<li>…</li>
-</ol>
-<h3 id="null"><a href="#null" class="headerlink" title="null"></a>null</h3><ol>
-<li>手动设置变量的值或者对象某个属性值为null（此时不赋值，后面会赋值）</li>
-<li>在 JS 的 DOM 元素获取中，如果没有获取到指定的元素对象，结果一般都是null</li>
-<li>Object.prototype.<strong>proto</strong> 的值也是 null</li>
-<li>正则捕获的时候，如果没有捕获到结果，默认也是null</li>
-<li>…</li>
-</ol>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Javascript会将未赋值的变量默认值设为undefined；Javascript从来不会将变量设为null。它是用来让程序员表明某个用var声明的变量时没有值的。</p>
+<h2 id="在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？"><a href="#在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？" class="headerlink" title="在原型链继承时，为什么不直接 Student.prototype = Person.prototype ？"></a>在原型链继承时，为什么不直接 <code>Student.prototype = Person.prototype</code> ？</h2><p>因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。</p>
+<h2 id="组合继承的缺点"><a href="#组合继承的缺点" class="headerlink" title="组合继承的缺点"></a>组合继承的缺点</h2><p>缺点就是调用了两次父类的构造函数。<br>第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = <span class="string">&#x27;parent&#x27;</span>;</span><br><span class="line">    <span class="built_in">this</span>.arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;this is parent&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>) <span class="comment">// 第二次调用SuperType</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用SuperType</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>前端</category>
         <category>JS</category>
       </categories>
+      <tags>
+        <tag>继承</tag>
+      </tags>
   </entry>
   <entry>
     <title>JS数组有哪些常用方法</title>
@@ -244,6 +203,132 @@
 </ol>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a=[<span class="string">&#x27;OB&#x27;</span>,<span class="string">&#x27;Koro1&#x27;</span>,<span class="number">1</span>,<span class="literal">NaN</span>];</span><br><span class="line"><span class="comment">// let b=a.includes(NaN); // true 识别NaN</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,100); // false 超过数组长度 不搜索</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-3);  // true 从倒数第三个元素开始搜索 </span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-100);  // true 负值绝对值超过数组长度，搜索整个数组</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Promise用法</title>
+    <url>/posts/7878/</url>
+    <content><![CDATA[<h2 id="Promise是什么"><a href="#Promise是什么" class="headerlink" title="Promise是什么"></a>Promise是什么</h2><p>Promise 是一种异步编程的解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。</p>
+<h2 id="诞生的原因"><a href="#诞生的原因" class="headerlink" title="诞生的原因"></a>诞生的原因</h2><p>异步网络请求的<strong>回调地狱</strong>，而且我们还得对每次请求的结果进行一些处理，代码会更加臃肿。一张图完美诠释：</p>
+<img src="/posts/undefined/call-back-hello.jpg" class="" title="回调地狱">
+
+<p>不够？再加一张：</p>
+<img src="/posts/undefined/8144ca8cgw1f2wc9ed35zj218g0p0tey.jpg" class="" title="行为艺术">
+
+<h2 id="Promise的三种状态"><a href="#Promise的三种状态" class="headerlink" title="Promise的三种状态"></a>Promise的三种状态</h2><ul>
+<li>pedding 等待（默认状态。异步代码执行完毕后会转换为以下两种状态）</li>
+<li>resolve 成功</li>
+<li>reject 失败</li>
+</ul>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><ul>
+<li>Promise:<ul>
+<li>构造函数</li>
+<li>接受一个参数：callback，我们把要执行的异步任务放置在这个callback中</li>
+</ul>
+</li>
+<li>then:<ul>
+<li>Promise对象下的一个方法：该方法在Promise对象的状态发生改变的时候触发then的回调</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//defined Promise async function</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asyncFun</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">            resolve(<span class="comment">/*resolve parameter*/</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            reject(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="comment">/*Error*/</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//use Promise&amp;then</span></span><br><span class="line">asyncFun().then(<span class="comment">/*function*/</span>).then(<span class="comment">/*function*/</span>)...</span><br></pre></td></tr></table></figure>
+
+<h2 id="Promise特性"><a href="#Promise特性" class="headerlink" title="Promise特性"></a>Promise特性</h2><h3 id="立即执行"><a href="#立即执行" class="headerlink" title="立即执行"></a>立即执行</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 当Promise被实例化的时候，callback的异步任务就会被执行</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;一个Promise对象被创建出来&quot;</span>);</span><br><span class="line">    resolve(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;flag&quot;</span>);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// 一个Promise对象被创建出来</span></span><br><span class="line"><span class="comment">// flag</span></span><br><span class="line"><span class="comment">// success</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="状态不可逆"><a href="#状态不可逆" class="headerlink" title="状态不可逆"></a>状态不可逆</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    resolve(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">    reject(<span class="string">&quot;reject&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// success</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="链式调用"><a href="#链式调用" class="headerlink" title="链式调用"></a>链式调用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 通过传入的resolve, reject，去改变当前Promise任务的状态</span></span><br><span class="line">    <span class="comment">// resolve, reject 是两个函数，调用 resolve ，会把状态改成 resolved ，调用 reject 函数会把状态改成 rejected</span></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">        reject();</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// then接受两个参数：这两个参数都是回调，当对应的 promise 对象的状态变成了resolved，那么 then 的第一个 callback 就会被执行，如果状态变成了 rejected ，那么 then 的第二个 callback 就会被执行</span></span><br><span class="line">p.then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;成功&#x27;</span>);</span><br><span class="line">&#125;, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;失败&#x27;</span>);</span><br><span class="line">&#125; );</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="comment">// 失败</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="then的回调异步性"><a href="#then的回调异步性" class="headerlink" title="then的回调异步性"></a>then的回调异步性</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;我是Promise的callback中的代码&quot;</span>);</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        resolve(<span class="string">&quot;我1s后才会被执行&quot;</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;我是主线程中的同步代码&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// 我是Promise的callback中的代码</span></span><br><span class="line"><span class="comment">// 我是主线程中的同步代码</span></span><br><span class="line"><span class="comment">// 我1s后才会被执行</span></span><br></pre></td></tr></table></figure>
+
+<p>解释：Promise 的 callback 回调函数中的代码是立即执行的（setTimeout 这个定时器也是立即执行的，只是函数内的 resolve 被延迟1s执行，跟 Promise 本身的立即执行没关系），但 then 方法中的回调函数执行则是异步的，因此，<code>&quot;我1s后才会被执行&quot;</code> 会在最后输出。</p>
+<h3 id="异常的捕获"><a href="#异常的捕获" class="headerlink" title="异常的捕获"></a>异常的捕获</h3><p>Promise的异常有两种方法可以捕获，一种是 then 的第二个回调；一种 <code>.catch()</code> 来捕获前一个 Promise 抛出的错误。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    reject(<span class="string">&quot;error&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;success&quot;</span>)</span><br><span class="line">&#125;, <span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// error</span></span><br><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    reject(<span class="string">&quot;error&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;success&quot;</span>)</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;catch:&quot;</span> + error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行结果：</span></span><br><span class="line"><span class="comment">// catch:error</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Promise-all-和-Promise-race"><a href="#Promise-all-和-Promise-race" class="headerlink" title="Promise.all 和 Promise.race"></a>Promise.all 和 Promise.race</h2><h3 id="Promise-all"><a href="#Promise-all" class="headerlink" title="Promise.all"></a>Promise.all</h3><p>Promise.all 接收一个参数，它必须是可以迭代的，例如数组。<br>它通常用来处理一些并发的异步操作，即它们的结果互不干扰，但是又需要异步执行。当所有 Promise 都成功的时候，整个 Promise.all 才成功。成功调用后返回一个数组，数组的值是有序的，顺序就是传入参数的数组顺序：</p>
+<blockquote>
+<p>成功的情况</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"><span class="keyword">let</span> tasks = arr.map(<span class="function"><span class="params">num</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        resolve(num * <span class="number">5</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all(tasks).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 有序输出</span></span><br><span class="line">    <span class="built_in">console</span>.log(arr); <span class="comment">// [1, 2, 3]</span></span><br><span class="line">    <span class="built_in">console</span>.log(data); <span class="comment">// [5, 10, 15]</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>失败的情况</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"><span class="keyword">let</span> tasks = arr.map(<span class="function"><span class="params">num</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (num === <span class="number">3</span>) &#123;</span><br><span class="line">            reject(<span class="string">&#x27;rejected&#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        resolve(num * <span class="number">5</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all(tasks).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 这里不会执行</span></span><br><span class="line">    <span class="built_in">console</span>.log(arr);</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(err); <span class="comment">// rejected</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Promise-race"><a href="#Promise-race" class="headerlink" title="Promise.race"></a>Promise.race</h3><p>Promise.race 和 Promise.all 类似，都接收一个可以迭代的参数，但是不同之处是 Promise.race 的状态变化不是全部受参数内的状态影响，一旦参数内有一个值的状态发生的改变，那么该 Promise 的状态就是改变的状态。就跟 race 单词的字面意思一样，谁跑的快谁赢。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> p1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(resolve, <span class="number">300</span>, <span class="string">&#x27;p1 doned&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(resolve, <span class="number">50</span>, <span class="string">&#x27;p2 doned&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p3 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(reject, <span class="number">100</span>, <span class="string">&#x27;p3 rejected&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.race([p1, p2, p3]).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 显然p2更快，所以状态变成了fulfilled</span></span><br><span class="line">    <span class="comment">// 如果p3更快，那么状态就会变成rejected</span></span><br><span class="line">    <span class="built_in">console</span>.log(data); <span class="comment">// p2 doned</span></span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(err); <span class="comment">// 不执行</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>Promise</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>let和const和var的区别</title>
+    <url>/posts/37021/</url>
+    <content><![CDATA[<h2 id="const-和-let-异同"><a href="#const-和-let-异同" class="headerlink" title="const 和 let 异同"></a>const 和 let 异同</h2><h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><ul>
+<li>let 定义变量可以只声明不赋值</li>
+<li>const 定义常量声明时必须赋值，一旦定义不可轻易改变</li>
+</ul>
+<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>解决 var 没有块作用域,、变量提升、可以重复声明的问题。 let 和 const 有自己的块作用域, 不存在变量提升问题, 同一块作用域中不可重复声明（会报错）。</p>
+<h2 id="let-const-和-var-区别"><a href="#let-const-和-var-区别" class="headerlink" title="let/const 和 var 区别"></a>let/const 和 var 区别</h2><ul>
+<li>var 有变量提升，let/const 没有</li>
+<li>let/const 的作用域是块，而 var 的作用域是函数</li>
+<li>let/const 有暂时性死区，只要 let/const 声明的变量，在未声明之前使用或者赋值都会报错（ReferenceError）</li>
+<li>let/const 不能被重复定义</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>null 和 undefined 的区别</title>
+    <url>/posts/63928/</url>
+    <content><![CDATA[<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><ul>
+<li>null 表示一个对象是“没有值”的值，也就是值为“空”</li>
+<li>undefined 表示一个变量声明了没有初始化(赋值)</li>
+</ul>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>undefined 的类型(typeof)是 undefined</li>
+<li>null 的类型(typeof)是 object</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="双等三等"><a href="#双等三等" class="headerlink" title="双等三等"></a>双等三等</h2><p>另外，在验证 null 时，一定要使用 <code>===</code> ，因为 <code>==</code> 无法分辨 null 和 undefined ：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copynull &#x3D;&#x3D; undefined &#x2F;&#x2F; true </span><br><span class="line">null &#x3D;&#x3D;&#x3D; undefined &#x2F;&#x2F; false</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="undefined"><a href="#undefined" class="headerlink" title="undefined"></a>undefined</h3><ol>
+<li>变量提升：只声明未定义默认值就是 undefined</li>
+<li>严格模式下：没有明确的执行主体，this 就是 undefined</li>
+<li>对象没有这个属性名，属性值是 undefined</li>
+<li>函数定义形参不传值，默认就是 undefined</li>
+<li>函数没有返回值（没有 return 或者 return; ），默认返回的就是 undefined</li>
+<li>数组越界取值也是 undefined （arr=[1,2]; arr[10] =&gt; undefined）</li>
+<li>…</li>
+</ol>
+<h3 id="null"><a href="#null" class="headerlink" title="null"></a>null</h3><ol>
+<li>手动设置变量的值或者对象某个属性值为null（此时不赋值，后面会赋值）</li>
+<li>在 JS 的 DOM 元素获取中，如果没有获取到指定的元素对象，结果一般都是null</li>
+<li>Object.prototype.<strong>proto</strong> 的值也是 null</li>
+<li>正则捕获的时候，如果没有捕获到结果，默认也是null</li>
+<li>…</li>
+</ol>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Javascript会将未赋值的变量默认值设为undefined；Javascript从来不会将变量设为null。它是用来让程序员表明某个用var声明的变量时没有值的。</p>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -566,6 +651,41 @@
       </tags>
   </entry>
   <entry>
+    <title>函数中的rest参数</title>
+    <url>/posts/29820/</url>
+    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
+<blockquote>
+<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+<ul>
+<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
+</li>
+<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
+</li>
+<li><pre><code>arguments
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+callee</code></pre>
+<p>属性）。</p>
+<ul>
+<li>arguments.callee 属性包含当前正在执行的函数。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端vscode插件配置</title>
     <url>/posts/11039/</url>
     <content><![CDATA[<h3 id="外观配置"><a href="#外观配置" class="headerlink" title="外观配置"></a>外观配置</h3><ul>
@@ -706,6 +826,64 @@
       </tags>
   </entry>
   <entry>
+    <title>如何清除浮动</title>
+    <url>/posts/12906/</url>
+    <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
+<p>由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。</p>
+<a id="more"></a>
+
+<h2 id="clear"><a href="#clear" class="headerlink" title="clear"></a>clear</h2><p>清除浮动的核心css属性是 clear ，基本语法如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">选择器: &#123;</span><br><span class="line">    <span class="attribute">clear</span>: 属性值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">属性值</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">left</td>
+<td align="left">不允许左侧有浮动元素（清除左侧浮动的影响）</td>
+</tr>
+<tr>
+<td align="left">right</td>
+<td align="left">不允许右侧有浮动元素（清除右侧浮动的影响）</td>
+</tr>
+<tr>
+<td align="left">both</td>
+<td align="left">同时清除左右两侧浮动的影响</td>
+</tr>
+</tbody></table>
+<h2 id="清除浮动常见方案"><a href="#清除浮动常见方案" class="headerlink" title="清除浮动常见方案"></a>清除浮动常见方案</h2><h3 id="额外标记法"><a href="#额外标记法" class="headerlink" title="额外标记法"></a>额外标记法</h3><p>在浮动元素后面添加一个空标签，例如：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;float: left;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;clear: both;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>优点：通俗易懂，书写方便<br>缺点：加入了过多的没有实际含义的额外标签，结构化差。</p>
+<h3 id="父元素添加overflow"><a href="#父元素添加overflow" class="headerlink" title="父元素添加overflow"></a>父元素添加overflow</h3><p>通过触发BFC达到清除浮动的效果。（p.s. 对bfc不了解可以看<a href="https://evestorm.github.io/posts/9722/">这篇</a>文章）</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.parent</span> &#123;</span><br><span class="line">    <span class="attribute">overflow</span>: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：代码简洁<br>缺点：超出的内容会被隐藏</p>
+<h3 id="before和after双伪元素方案"><a href="#before和after双伪元素方案" class="headerlink" title="before和after双伪元素方案"></a>before和after双伪元素方案</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:before</span>,</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123; </span><br><span class="line">    <span class="attribute">content</span>:<span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: table;  <span class="comment">/* 触发BFC清除浮动 */</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：代码简洁<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code></p>
+<h3 id="使用after伪元素（我平常使用的）"><a href="#使用after伪元素（我平常使用的）" class="headerlink" title="使用after伪元素（我平常使用的）"></a>使用after伪元素（我平常使用的）</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;  </span><br><span class="line">    <span class="attribute">content</span>: <span class="string">&quot;.&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: block;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">visibility</span>: hidden;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;   <span class="comment">/* IE6、7 专有 */</span></span><br></pre></td></tr></table></figure>
+
+<p>使用方式：给浮动元素的父元素添加一个class类：<code>clearfix</code><br>优点：一次书写多处使用，并且符合闭合浮动思想，结构语义化正确<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code><br>注意：<code>content:&quot;.&quot;</code> 内容尽量不为空，可以跟一个小点，否则在firefox 7.0前的版本会生成空格</p>
+<h2 id="after-和-after-的区别"><a href="#after-和-after-的区别" class="headerlink" title=":after 和 ::after 的区别"></a>:after 和 ::after 的区别</h2><p>:before、:after 在旧版本里是伪元素，CSS3的规范里 “:” 用来表示伪类，”::” 用来表示伪元素，但是在高版本浏览器下 :before、:after 会被自动识别为 ::before、::after ，这样做的目的是用来做兼容处理。</p>
+<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>伪类对象，用来设置对象前的内容<br>:before 和 ::before 写法是等效的</p>
+<h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><p>:before 是 css2 的写法，::before 是 css3 的写法<br>:before 兼容性比 ::before要好</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>伪类元素必须要配合 content 属性一起使用，否则无效<br>伪类元素是css渲染层加入的，不能通过js来操作</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>对HTML语义化的理解</title>
     <url>/posts/2906/</url>
     <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
@@ -821,64 +999,6 @@
       </categories>
       <tags>
         <tag>闭包</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何清除浮动</title>
-    <url>/posts/12906/</url>
-    <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
-<p>由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。</p>
-<a id="more"></a>
-
-<h2 id="clear"><a href="#clear" class="headerlink" title="clear"></a>clear</h2><p>清除浮动的核心css属性是 clear ，基本语法如下：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">选择器: &#123;</span><br><span class="line">    <span class="attribute">clear</span>: 属性值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<table>
-<thead>
-<tr>
-<th align="left">属性值</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">left</td>
-<td align="left">不允许左侧有浮动元素（清除左侧浮动的影响）</td>
-</tr>
-<tr>
-<td align="left">right</td>
-<td align="left">不允许右侧有浮动元素（清除右侧浮动的影响）</td>
-</tr>
-<tr>
-<td align="left">both</td>
-<td align="left">同时清除左右两侧浮动的影响</td>
-</tr>
-</tbody></table>
-<h2 id="清除浮动常见方案"><a href="#清除浮动常见方案" class="headerlink" title="清除浮动常见方案"></a>清除浮动常见方案</h2><h3 id="额外标记法"><a href="#额外标记法" class="headerlink" title="额外标记法"></a>额外标记法</h3><p>在浮动元素后面添加一个空标签，例如：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;float: left;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;clear: both;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>优点：通俗易懂，书写方便<br>缺点：加入了过多的没有实际含义的额外标签，结构化差。</p>
-<h3 id="父元素添加overflow"><a href="#父元素添加overflow" class="headerlink" title="父元素添加overflow"></a>父元素添加overflow</h3><p>通过触发BFC达到清除浮动的效果。（p.s. 对bfc不了解可以看<a href="https://evestorm.github.io/posts/9722/">这篇</a>文章）</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.parent</span> &#123;</span><br><span class="line">    <span class="attribute">overflow</span>: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>优点：代码简洁<br>缺点：超出的内容会被隐藏</p>
-<h3 id="before和after双伪元素方案"><a href="#before和after双伪元素方案" class="headerlink" title="before和after双伪元素方案"></a>before和after双伪元素方案</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:before</span>,</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123; </span><br><span class="line">    <span class="attribute">content</span>:<span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: table;  <span class="comment">/* 触发BFC清除浮动 */</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>优点：代码简洁<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code></p>
-<h3 id="使用after伪元素（我平常使用的）"><a href="#使用after伪元素（我平常使用的）" class="headerlink" title="使用after伪元素（我平常使用的）"></a>使用after伪元素（我平常使用的）</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;  </span><br><span class="line">    <span class="attribute">content</span>: <span class="string">&quot;.&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: block;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">visibility</span>: hidden;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;   <span class="comment">/* IE6、7 专有 */</span></span><br></pre></td></tr></table></figure>
-
-<p>使用方式：给浮动元素的父元素添加一个class类：<code>clearfix</code><br>优点：一次书写多处使用，并且符合闭合浮动思想，结构语义化正确<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code><br>注意：<code>content:&quot;.&quot;</code> 内容尽量不为空，可以跟一个小点，否则在firefox 7.0前的版本会生成空格</p>
-<h2 id="after-和-after-的区别"><a href="#after-和-after-的区别" class="headerlink" title=":after 和 ::after 的区别"></a>:after 和 ::after 的区别</h2><p>:before、:after 在旧版本里是伪元素，CSS3的规范里 “:” 用来表示伪类，”::” 用来表示伪元素，但是在高版本浏览器下 :before、:after 会被自动识别为 ::before、::after ，这样做的目的是用来做兼容处理。</p>
-<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>伪类对象，用来设置对象前的内容<br>:before 和 ::before 写法是等效的</p>
-<h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><p>:before 是 css2 的写法，::before 是 css3 的写法<br>:before 兼容性比 ::before要好</p>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>伪类元素必须要配合 content 属性一起使用，否则无效<br>伪类元素是css渲染层加入的，不能通过js来操作</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
