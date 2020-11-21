@@ -1,8 +1,11 @@
 ---
 title: 前端vscode插件配置
-date: 2020-11-21 12:14:33
 tags: VSCode
-categories: IDE
+categories:
+- 工具
+- IDE
+abbrlink: 11039
+date: 2018-05-06 12:14:33
 ---
 
 ### 外观配置
@@ -11,9 +14,10 @@ categories: IDE
 - **图标**：[VSCode Great Icons](https://marketplace.visualstudio.com/items?itemName=emmanuelbeziat.vscode-great-icons)
 - **字体**：[Fira Code](https://github.com/tonsky/FiraCode/wiki)
 
+<!-- more -->
+
 #### 预览
 
-<!-- [![UI Show](前端vscode插件配置/163001_02d3ddb2_1203301.png)](https://gitee.com/uploads/images/2018/0510/163001_02d3ddb2_1203301.png) -->
 {% asset_img 163001_02d3ddb2_1203301.png UI-Show %}
 
 
