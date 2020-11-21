@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JS中如何实现继承</title>
+    <url>/posts/2751/</url>
+    <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="寄生组合继承（组合继承升级版）"><a href="#寄生组合继承（组合继承升级版）" class="headerlink" title="寄生组合继承（组合继承升级版）"></a>寄生组合继承（组合继承升级版）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  F.prototype = o;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prototype = object(superType.prototype); <span class="comment">// 创建了父类原型的浅复制</span></span><br><span class="line">    prototype.constructor = subType;             <span class="comment">// 修正原型的构造函数</span></span><br><span class="line">    subType.prototype = prototype;               <span class="comment">// 将子类的原型替换为这个原型</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.colors = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;green&quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>, name);</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费</span></span><br><span class="line">inheritPrototype(SubType, SuperType);</span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ES6继承写法"><a href="#ES6继承写法" class="headerlink" title="ES6继承写法"></a>ES6继承写法</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age</span>)</span> &#123;<span class="built_in">this</span>.name=name;<span class="built_in">this</span>.age=age&#125;</span><br><span class="line">  <span class="function"><span class="title">sayHi</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age, weight</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(name, age); <span class="built_in">this</span>.weight = weight;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">run</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？"><a href="#在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？" class="headerlink" title="在原型链继承时，为什么不直接 Student.prototype = Person.prototype ？"></a>在原型链继承时，为什么不直接 <code>Student.prototype = Person.prototype</code> ？</h2><p>因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。</p>
+<h2 id="组合继承的缺点"><a href="#组合继承的缺点" class="headerlink" title="组合继承的缺点"></a>组合继承的缺点</h2><p>缺点就是调用了两次父类的构造函数。<br>第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = <span class="string">&#x27;parent&#x27;</span>;</span><br><span class="line">    <span class="built_in">this</span>.arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;this is parent&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>) <span class="comment">// 第二次调用SuperType</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用SuperType</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>继承</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>BFC的理解与应用</title>
     <url>/posts/9722/</url>
     <content><![CDATA[<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先上MDN上对 BFC 的定义：</p>
@@ -47,6 +70,47 @@
         <tag>布局</tag>
         <tag>技巧</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>null 和 undefined 的区别</title>
+    <url>/posts/63928/</url>
+    <content><![CDATA[<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><ul>
+<li>null 表示一个对象是“没有值”的值，也就是值为“空”</li>
+<li>undefined 表示一个变量声明了没有初始化(赋值)</li>
+</ul>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>undefined 的类型(typeof)是 undefined</li>
+<li>null 的类型(typeof)是 object</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="双等三等"><a href="#双等三等" class="headerlink" title="双等三等"></a>双等三等</h2><p>另外，在验证 null 时，一定要使用 <code>===</code> ，因为 <code>==</code> 无法分辨 null 和 undefined ：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copynull &#x3D;&#x3D; undefined &#x2F;&#x2F; true </span><br><span class="line">null &#x3D;&#x3D;&#x3D; undefined &#x2F;&#x2F; false</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="undefined"><a href="#undefined" class="headerlink" title="undefined"></a>undefined</h3><ol>
+<li>变量提升：只声明未定义默认值就是 undefined</li>
+<li>严格模式下：没有明确的执行主体，this 就是 undefined</li>
+<li>对象没有这个属性名，属性值是 undefined</li>
+<li>函数定义形参不传值，默认就是 undefined</li>
+<li>函数没有返回值（没有 return 或者 return; ），默认返回的就是 undefined</li>
+<li>数组越界取值也是 undefined （arr=[1,2]; arr[10] =&gt; undefined）</li>
+<li>…</li>
+</ol>
+<h3 id="null"><a href="#null" class="headerlink" title="null"></a>null</h3><ol>
+<li>手动设置变量的值或者对象某个属性值为null（此时不赋值，后面会赋值）</li>
+<li>在 JS 的 DOM 元素获取中，如果没有获取到指定的元素对象，结果一般都是null</li>
+<li>Object.prototype.<strong>proto</strong> 的值也是 null</li>
+<li>正则捕获的时候，如果没有捕获到结果，默认也是null</li>
+<li>…</li>
+</ol>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Javascript会将未赋值的变量默认值设为undefined；Javascript从来不会将变量设为null。它是用来让程序员表明某个用var声明的变量时没有值的。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
   </entry>
   <entry>
     <title>JS数组有哪些常用方法</title>
@@ -180,47 +244,6 @@
 </ol>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a=[<span class="string">&#x27;OB&#x27;</span>,<span class="string">&#x27;Koro1&#x27;</span>,<span class="number">1</span>,<span class="literal">NaN</span>];</span><br><span class="line"><span class="comment">// let b=a.includes(NaN); // true 识别NaN</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,100); // false 超过数组长度 不搜索</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-3);  // true 从倒数第三个元素开始搜索 </span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-100);  // true 负值绝对值超过数组长度，搜索整个数组</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>null 和 undefined 的区别</title>
-    <url>/posts/63928/</url>
-    <content><![CDATA[<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><ul>
-<li>null 表示一个对象是“没有值”的值，也就是值为“空”</li>
-<li>undefined 表示一个变量声明了没有初始化(赋值)</li>
-</ul>
-<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
-<li>undefined 的类型(typeof)是 undefined</li>
-<li>null 的类型(typeof)是 object</li>
-</ul>
-<a id="more"></a>
-
-<h2 id="双等三等"><a href="#双等三等" class="headerlink" title="双等三等"></a>双等三等</h2><p>另外，在验证 null 时，一定要使用 <code>===</code> ，因为 <code>==</code> 无法分辨 null 和 undefined ：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copynull &#x3D;&#x3D; undefined &#x2F;&#x2F; true </span><br><span class="line">null &#x3D;&#x3D;&#x3D; undefined &#x2F;&#x2F; false</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="undefined"><a href="#undefined" class="headerlink" title="undefined"></a>undefined</h3><ol>
-<li>变量提升：只声明未定义默认值就是 undefined</li>
-<li>严格模式下：没有明确的执行主体，this 就是 undefined</li>
-<li>对象没有这个属性名，属性值是 undefined</li>
-<li>函数定义形参不传值，默认就是 undefined</li>
-<li>函数没有返回值（没有 return 或者 return; ），默认返回的就是 undefined</li>
-<li>数组越界取值也是 undefined （arr=[1,2]; arr[10] =&gt; undefined）</li>
-<li>…</li>
-</ol>
-<h3 id="null"><a href="#null" class="headerlink" title="null"></a>null</h3><ol>
-<li>手动设置变量的值或者对象某个属性值为null（此时不赋值，后面会赋值）</li>
-<li>在 JS 的 DOM 元素获取中，如果没有获取到指定的元素对象，结果一般都是null</li>
-<li>Object.prototype.<strong>proto</strong> 的值也是 null</li>
-<li>正则捕获的时候，如果没有捕获到结果，默认也是null</li>
-<li>…</li>
-</ol>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Javascript会将未赋值的变量默认值设为undefined；Javascript从来不会将变量设为null。它是用来让程序员表明某个用var声明的变量时没有值的。</p>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -683,6 +706,124 @@
       </tags>
   </entry>
   <entry>
+    <title>对HTML语义化的理解</title>
+    <url>/posts/2906/</url>
+    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
+<ol>
+<li>利与开发：方便代码的阅读和维护</li>
+<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
+<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
+
+
+<p>元素细节：</p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
+</ul>
+<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>对this指向的判定</title>
+    <url>/posts/33207/</url>
+    <content><![CDATA[<h2 id="对-this-的理解"><a href="#对-this-的理解" class="headerlink" title="对 this 的理解"></a>对 this 的理解</h2><p>对于this指向的判定，时刻记住下面两点就好：</p>
+<ul>
+<li>普通函数的 this 指向是在函数的执行期间绑定的，换句话说 this 总是指向函数的<strong>直接</strong>调用者</li>
+<li>箭头函数的 this 指向是在函数创建期间就绑定好了的，指向的是创建该箭头函数所在的作用域对象</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="普通函数中的this"><a href="#普通函数中的this" class="headerlink" title="普通函数中的this"></a>普通函数中的this</h2><p>这里直接引用 <a href="https://github.com/getify/You-Dont-Know-JS">You-Dont-Know-JS</a> 中对 this 的判定步骤：</p>
+<ol>
+<li>函数是通过 <code>new</code> 被调用的吗（<strong>new 绑定</strong>）？如果是，<code>this</code> 就是新构建的对象。<br><code>var bar = new foo()</code></li>
+<li>函数是通过 <code>call</code> 或 <code>apply</code> 被调用（<strong>明确绑定</strong>），甚至是隐藏在 <code>bind</code> <em>硬绑定</em> 之中吗？如果是，<code>this</code> 就是那个被明确指定的对象。<br><code>var bar = foo.call( obj2 )</code></li>
+<li>函数是通过环境对象（也称为拥有者或容器对象）被调用的吗（<strong>隐含绑定</strong>）？如果是，<code>this</code> 就是那个环境对象。<br><code>var bar = obj1.foo()</code></li>
+<li>否则，使用默认的 <code>this</code>（<strong>默认绑定</strong>）。如果在 <code>strict mode</code> 下，就是 <code>undefined</code>，否则是 <code>global</code> 对象。<br><code>var bar = foo()</code></li>
+</ol>
+<h2 id="常见this指向"><a href="#常见this指向" class="headerlink" title="常见this指向"></a>常见this指向</h2><ul>
+<li>普通函数中this ——&gt; window</li>
+<li>构造函数中this ——&gt; new出来的实例对象</li>
+<li>方法中的this ——&gt; 实例对象</li>
+<li>原型中的方法中的this ——&gt; 实例对象</li>
+<li>定时器中的this ——&gt; window</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>this</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>对闭包的理解</title>
+    <url>/posts/29980/</url>
+    <content><![CDATA[<h2 id="什么是闭包"><a href="#什么是闭包" class="headerlink" title="什么是闭包"></a>什么是闭包</h2><p>我一直认为，MDN是前端学习的在线指南。只要有不懂的语法，或者不懂的概念，查找资料的首选就应该是它。虽然早些年做iOS开发的时候就就接触过闭包，但如今已经忘得一干二净，所以在想要了解闭包的时候，第一件事就是在MDN中搜索。<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Closures">其中</a>给到了一个闭包的例子：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeFunc</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name = <span class="string">&quot;Mozilla&quot;</span>;    <span class="comment">// name 是一个被 init 创建的局部变量</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">displayName</span>(<span class="params"></span>) </span>&#123; <span class="comment">// displayName() 是内部函数,一个闭包</span></span><br><span class="line">        alert(name);         <span class="comment">// 使用了父函数中声明的变量</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> displayName;      <span class="comment">// 返回 displayName 这个函数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myFunc = makeFunc();</span><br><span class="line">myFunc(); <span class="comment">// 当执行myFunc时，其实调用了displayName，会弹窗显示&quot;Mozilla&quot;</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>在上面这个例子中，一个函数套了一个函数，且这个内部函数使用到了外部函数中的变量，这个时候就形成了闭包。有什么用呢？其中一个用处就如上面代码所示，能够让 makeFunc 函数外面也能访问 name 这个局部变量。换句话说，闭包缓存了数据，延长了作用域链。</p>
+<p>Kyle Simpson编写的<a href="https://github.com/getify/You-Dont-Know-JS">You-Dont-Know-JS</a>中对闭包的总结我觉得很精髓：</p>
+<blockquote>
+<p>闭包就是当一个函数即使是在它的词法作用域之外被调用时，也可以记住并访问它的词法作用域。</p>
+</blockquote>
+<h2 id="闭包的特性"><a href="#闭包的特性" class="headerlink" title="闭包的特性"></a>闭包的特性</h2><ol>
+<li>函数内再嵌套函数</li>
+<li>内部函数可以引用外层的参数和变量</li>
+<li>参数和变量不会被垃圾回收机制回收</li>
+</ol>
+<h2 id="闭包的用途"><a href="#闭包的用途" class="headerlink" title="闭包的用途"></a>闭包的用途</h2><h3 id="读取正确的值"><a href="#读取正确的值" class="headerlink" title="读取正确的值"></a>读取正确的值</h3><p>一个经典的例子，给 ul&gt;li 下面的每个 li 节点添加点击事件，让其弹出当前 li 元素的索引：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;ul id=<span class="string">&quot;testUL&quot;</span>&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">0</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">1</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">2</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">3</span>&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line">&lt;script type=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><br><span class="line">    <span class="keyword">var</span> nodes = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;li&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nodes.length; i += <span class="number">1</span>) &#123;</span><br><span class="line">        nodes[i].onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>运行上述代码后就会发现，每次打印的结果都显示为4，而不是真正的索引值。这是因为点击事件的匿名函数发生在for循环之后，而for循环执行完毕时 i 的值就为4，所以点谁都是同样的结果。那么这个时候就能通过<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F">立即执行函数</a> + <strong>闭包</strong>的方法解决此问题：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> nodes = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;li&quot;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nodes.length; i += <span class="number">1</span>) &#123;</span></span><br><span class="line"><span class="javascript">        nodes[i].onclick = (<span class="function"><span class="keyword">function</span> (<span class="params">i</span>) </span>&#123; <span class="comment">// 1. IIFE创建一个函数作用域</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; <span class="comment">// 4. 返回这个匿名函数，延长作用域链</span></span></span><br><span class="line"><span class="javascript">                <span class="comment">// 3. 内部嵌套的匿名函数使用到了IIFE的参数i，形成闭包</span></span></span><br><span class="line"><span class="javascript">                <span class="built_in">console</span>.log(i);</span></span><br><span class="line">            &#125;</span><br><span class="line"><span class="javascript">        &#125;)(i); <span class="comment">// 2. 给IIFE传递每次for循环的i</span></span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这个时候触发click事件，打印的值就是li元素的索引了。</p>
+<h3 id="高级排他"><a href="#高级排他" class="headerlink" title="高级排他"></a>高级排他</h3><p>这个例子有点像上面的，现在我们要个需求：在一个 <code>ul li</code> 列表中，鼠标移入时高亮当前li标签，移除之前li标签的高亮状态。</p>
+<p>常规写法如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 假设给li添加active类可以让标签高亮</span></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> list = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;li&#x27;</span>)</span><br><span class="line">    <span class="comment">// 遍历每个标签</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> li = list[i]</span><br><span class="line">      li.onmouseover = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// mouseover触发后遍历整个列表，将所有标签class设为空</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; list.length; j++) &#123;</span><br><span class="line">          list[j].className = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 最后给当前li标签添加active</span></span><br><span class="line">        <span class="built_in">this</span>.className = <span class="string">&#x27;active&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码能够实现功能，然而一旦列表非常长性能就不高，所以可以利用闭包来缓存li标签的索引，使其与标签一一对应：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> list = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;li&#x27;</span>)</span><br><span class="line">  <span class="comment">// 记录上一次选中的li标签的对应索引</span></span><br><span class="line">  <span class="keyword">let</span> preActiveIndex = <span class="number">0</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params">j</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> li = list[i]</span><br><span class="line">      li.onmouseover = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// 清除上次li标签的高亮</span></span><br><span class="line">        list[preActiveIndex].className = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="comment">// 设置当前位高亮</span></span><br><span class="line">        <span class="built_in">this</span>.className = <span class="string">&#x27;active&#x27;</span></span><br><span class="line">        <span class="comment">// 赋值</span></span><br><span class="line">        preActiveIndex = j</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)(i)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="模块化开发"><a href="#模块化开发" class="headerlink" title="模块化开发"></a>模块化开发</h3><p>在团队开发中，为了避免命名冲突通常不同成员会把自己的代码单独封装起来，最后return一个对象出去，挂载到window上。这样其他人也可以使用，而且能在一定程度上避免命名冲突：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params">w</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> money = <span class="number">1000</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    money *= <span class="number">10</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;赚了一笔钱，总资产：&quot;</span> + money + <span class="string">&quot;元&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">send</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    money--</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;花了一笔钱，总资产：&quot;</span> + money + <span class="string">&quot;元&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 向外暴露对象</span></span><br><span class="line">  w.myTools = &#123;</span><br><span class="line">    get,</span><br><span class="line">    set</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)(<span class="built_in">window</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="函数节流防抖"><a href="#函数节流防抖" class="headerlink" title="函数节流防抖"></a>函数节流防抖</h3><p>在日常开发中，我们也经常用到函数节流与防抖，通常我们会将它们封装为函数，这样可以在需要的地方直接调用使用，还不会污染全局：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>防抖节流<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">&quot;input&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 函数防抖 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> timer = <span class="literal">null</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> ctx = <span class="built_in">this</span>,</span></span><br><span class="line"><span class="javascript">            args = <span class="built_in">arguments</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (timer) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">window</span>.clearTimeout(timer)</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        timer = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line">          fn.apply(ctx, args)</span><br><span class="line"><span class="javascript">          timer = <span class="literal">null</span></span></span><br><span class="line">        &#125;, delay);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 搜索框做函数防抖避免用户高频输入内容</span></span></span><br><span class="line"><span class="javascript">    input.addEventListener(<span class="string">&#x27;input&#x27;</span>, debounce(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">console</span>.log(e.target.value)</span></span><br><span class="line">    &#125;, 500))</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 函数节流 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> canUse = <span class="literal">true</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> ctx = <span class="built_in">this</span>,</span></span><br><span class="line"><span class="javascript">            args = <span class="built_in">arguments</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (canUse) &#123;</span></span><br><span class="line">          fn.apply(ctx, args)</span><br><span class="line"><span class="javascript">          canUse = <span class="literal">false</span></span></span><br><span class="line"><span class="javascript">          <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            canUse = <span class="literal">true</span></span></span><br><span class="line">          &#125;, delay);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 对于像onresize这样的高频事件，可以使用函数节流让其回调函数中的代码隔一段时间再次执行</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.onresize = throttle(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      input.value = <span class="built_in">Math</span>.random() * <span class="number">100</span></span></span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h2><p>其实闭包并不会造成内存泄漏，现在的垃圾回收机制已经很成熟了。但早期的IE（ie4-ie6）版本里，对宿主对象（也就是document对象）采用是引用计数的<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management">垃圾回收机制</a>，闭包导致内存泄漏的一个原因就是这个算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而js对象之间即使形成循环引用，也不会产生内存泄漏，因为对js对象的回收算法不是计数的方式：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);<span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">    oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        alert(<span class="string">&#x27;oDiv.innerHTML&#x27;</span>);<span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少 div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">    oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        alert(test);</span><br><span class="line">    &#125;;</span><br><span class="line">    oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
+
+<p>所以我们要保持良好的编程习惯，在使用完闭包后记得释放内存：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">9999999999999</span>)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">fn2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(arr)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> fn2</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> f = fn1()</span><br><span class="line">f() <span class="comment">// 调用完后没有释放，arr就会一直在内存中占着，导致内存泄漏</span></span><br><span class="line"><span class="comment">// 记得释放</span></span><br><span class="line">f = <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>闭包</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何清除浮动</title>
     <url>/posts/12906/</url>
     <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
@@ -741,85 +882,70 @@
       </tags>
   </entry>
   <entry>
-    <title>对闭包的理解</title>
-    <url>/posts/29980/</url>
-    <content><![CDATA[<h2 id="什么是闭包"><a href="#什么是闭包" class="headerlink" title="什么是闭包"></a>什么是闭包</h2><p>我一直认为，MDN是前端学习的在线指南。只要有不懂的语法，或者不懂的概念，查找资料的首选就应该是它。虽然早些年做iOS开发的时候就就接触过闭包，但如今已经忘得一干二净，所以在想要了解闭包的时候，第一件事就是在MDN中搜索。<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Closures">其中</a>给到了一个闭包的例子：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeFunc</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name = <span class="string">&quot;Mozilla&quot;</span>;    <span class="comment">// name 是一个被 init 创建的局部变量</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">displayName</span>(<span class="params"></span>) </span>&#123; <span class="comment">// displayName() 是内部函数,一个闭包</span></span><br><span class="line">        alert(name);         <span class="comment">// 使用了父函数中声明的变量</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> displayName;      <span class="comment">// 返回 displayName 这个函数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myFunc = makeFunc();</span><br><span class="line">myFunc(); <span class="comment">// 当执行myFunc时，其实调用了displayName，会弹窗显示&quot;Mozilla&quot;</span></span><br></pre></td></tr></table></figure>
-
+    <title>数组的遍历方法</title>
+    <url>/posts/64478/</url>
+    <content><![CDATA[<p>下面是总结的数组遍历的常见方法</p>
+<h2 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h2><ul>
+<li>标准for循环</li>
+<li>forEach((当前值, 当前索引, 当前数组) =&gt; {…}, [, 绑定的this])`<ul>
+<li>无法中途退出循环，只能用 return 退出本次回调，进行下一次回调</li>
+<li>它总是返回 undefined 值，即使你 return 了一个值</li>
+</ul>
+</li>
+<li>for…in（不推荐）会把继承链的对象属性都会遍历一遍，而且数组遍历不一定按次序<ul>
+<li>for-in 循环返回的是所有能通过对象访问的、可枚举的属性</li>
+</ul>
+</li>
+<li>for (variable of iterable)（ES6）可迭代Array，Map，Set，String等（迭代的是值value）<ul>
+<li>在 for..of 中如果遍历中途要退出，可以使用 break 退出循环</li>
+</ul>
+</li>
+</ul>
 <a id="more"></a>
 
-<p>在上面这个例子中，一个函数套了一个函数，且这个内部函数使用到了外部函数中的变量，这个时候就形成了闭包。有什么用呢？其中一个用处就如上面代码所示，能够让 makeFunc 函数外面也能访问 name 这个局部变量。换句话说，闭包缓存了数据，延长了作用域链。</p>
-<p>Kyle Simpson编写的<a href="https://github.com/getify/You-Dont-Know-JS">You-Dont-Know-JS</a>中对闭包的总结我觉得很精髓：</p>
-<blockquote>
-<p>闭包就是当一个函数即使是在它的词法作用域之外被调用时，也可以记住并访问它的词法作用域。</p>
-</blockquote>
-<h2 id="闭包的特性"><a href="#闭包的特性" class="headerlink" title="闭包的特性"></a>闭包的特性</h2><ol>
-<li>函数内再嵌套函数</li>
-<li>内部函数可以引用外层的参数和变量</li>
-<li>参数和变量不会被垃圾回收机制回收</li>
-</ol>
-<h2 id="闭包的用途"><a href="#闭包的用途" class="headerlink" title="闭包的用途"></a>闭包的用途</h2><h3 id="读取正确的值"><a href="#读取正确的值" class="headerlink" title="读取正确的值"></a>读取正确的值</h3><p>一个经典的例子，给 ul&gt;li 下面的每个 li 节点添加点击事件，让其弹出当前 li 元素的索引：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;ul id=<span class="string">&quot;testUL&quot;</span>&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">0</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">1</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">2</span>&lt;/li&gt;</span><br><span class="line">    &lt;li&gt; index = <span class="number">3</span>&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line">&lt;script type=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><br><span class="line">    <span class="keyword">var</span> nodes = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;li&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nodes.length; i += <span class="number">1</span>) &#123;</span><br><span class="line">        nodes[i].onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="ES5"><a href="#ES5" class="headerlink" title="ES5"></a>ES5</h2><ul>
+<li><p>map (不改变原数组) 会给原数组中的每个元素都按顺序调用一次 callback 函数</p>
+</li>
+<li><p>reduce (不改变原数组) 数组中的前项和后项做某种计算,并累计最终值。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法：</span></span><br><span class="line"><span class="comment">// arr.reduce(function(total, currentValue, currentIndex, arr), initialValue)</span></span><br><span class="line"><span class="comment">// callback 参数</span></span><br><span class="line"><span class="comment">// (累积器, 当前元素, 当前元素索引, 当前数组)</span></span><br><span class="line"><span class="comment">// initialValue:指定第一次回调 的第一个参数</span></span><br><span class="line"><span class="keyword">var</span> wallets = [<span class="number">4</span>, <span class="number">7.8</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">var</span> totalMoney = wallets.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">countedMoney, curMoney</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> countedMoney + curMoney;</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>filter (不改变原数组)</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line"><span class="keyword">var</span> morearr = arr.filter(<span class="function"><span class="keyword">function</span> (<span class="params">number</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> number &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// [4,5,6]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>every (不改变原数组) 测试数组的所有元素是否都通过了指定函数的测试</p>
+<ul>
+<li>如果数组中检测到有一个元素不满足，则整个表达式返回 false ，且剩余的元素不会再进行检测</li>
+<li>如果所有元素都满足条件，则返回 true</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.every(<span class="function"><span class="keyword">function</span> (<span class="params">item, index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">2</span></span><br><span class="line">&#125;) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>some (不改变原数组) 测试是否至少有一个元素通过 callback 中的条件。对于放在空数组上的任何条件，此方法返回 false</p>
+<ul>
+<li>如果有一个元素满足条件，则表达式返回true, 剩余的元素不会再执行检测</li>
+<li>如果没有满足条件的元素，则返回false</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// some(callback, thisArg)</span></span><br><span class="line"><span class="comment">// callback:</span></span><br><span class="line"><span class="comment">//    (当前元素, 当前索引, 调用some的数组)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.some(<span class="function"><span class="keyword">function</span> (<span class="params">item,index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 
-
-
-<p>运行上述代码后就会发现，每次打印的结果都显示为4，而不是真正的索引值。这是因为点击事件的匿名函数发生在for循环之后，而for循环执行完毕时 i 的值就为4，所以点谁都是同样的结果。那么这个时候就能通过<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F">立即执行函数</a> + <strong>闭包</strong>的方法解决此问题：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> nodes = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;li&quot;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nodes.length; i += <span class="number">1</span>) &#123;</span></span><br><span class="line"><span class="javascript">        nodes[i].onclick = (<span class="function"><span class="keyword">function</span> (<span class="params">i</span>) </span>&#123; <span class="comment">// 1. IIFE创建一个函数作用域</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; <span class="comment">// 4. 返回这个匿名函数，延长作用域链</span></span></span><br><span class="line"><span class="javascript">                <span class="comment">// 3. 内部嵌套的匿名函数使用到了IIFE的参数i，形成闭包</span></span></span><br><span class="line"><span class="javascript">                <span class="built_in">console</span>.log(i);</span></span><br><span class="line">            &#125;</span><br><span class="line"><span class="javascript">        &#125;)(i); <span class="comment">// 2. 给IIFE传递每次for循环的i</span></span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>这个时候触发click事件，打印的值就是li元素的索引了。</p>
-<h3 id="高级排他"><a href="#高级排他" class="headerlink" title="高级排他"></a>高级排他</h3><p>这个例子有点像上面的，现在我们要个需求：在一个 <code>ul li</code> 列表中，鼠标移入时高亮当前li标签，移除之前li标签的高亮状态。</p>
-<p>常规写法如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 假设给li添加active类可以让标签高亮</span></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> list = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;li&#x27;</span>)</span><br><span class="line">    <span class="comment">// 遍历每个标签</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> li = list[i]</span><br><span class="line">      li.onmouseover = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// mouseover触发后遍历整个列表，将所有标签class设为空</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; list.length; j++) &#123;</span><br><span class="line">          list[j].className = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 最后给当前li标签添加active</span></span><br><span class="line">        <span class="built_in">this</span>.className = <span class="string">&#x27;active&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的代码能够实现功能，然而一旦列表非常长性能就不高，所以可以利用闭包来缓存li标签的索引，使其与标签一一对应：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> list = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;li&#x27;</span>)</span><br><span class="line">  <span class="comment">// 记录上一次选中的li标签的对应索引</span></span><br><span class="line">  <span class="keyword">let</span> preActiveIndex = <span class="number">0</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params">j</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> li = list[i]</span><br><span class="line">      li.onmouseover = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// 清除上次li标签的高亮</span></span><br><span class="line">        list[preActiveIndex].className = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="comment">// 设置当前位高亮</span></span><br><span class="line">        <span class="built_in">this</span>.className = <span class="string">&#x27;active&#x27;</span></span><br><span class="line">        <span class="comment">// 赋值</span></span><br><span class="line">        preActiveIndex = j</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)(i)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="模块化开发"><a href="#模块化开发" class="headerlink" title="模块化开发"></a>模块化开发</h3><p>在团队开发中，为了避免命名冲突通常不同成员会把自己的代码单独封装起来，最后return一个对象出去，挂载到window上。这样其他人也可以使用，而且能在一定程度上避免命名冲突：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params">w</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> money = <span class="number">1000</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    money *= <span class="number">10</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;赚了一笔钱，总资产：&quot;</span> + money + <span class="string">&quot;元&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">send</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    money--</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;花了一笔钱，总资产：&quot;</span> + money + <span class="string">&quot;元&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 向外暴露对象</span></span><br><span class="line">  w.myTools = &#123;</span><br><span class="line">    get,</span><br><span class="line">    set</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)(<span class="built_in">window</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="函数节流防抖"><a href="#函数节流防抖" class="headerlink" title="函数节流防抖"></a>函数节流防抖</h3><p>在日常开发中，我们也经常用到函数节流与防抖，通常我们会将它们封装为函数，这样可以在需要的地方直接调用使用，还不会污染全局：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>防抖节流<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">&quot;input&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 函数防抖 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> timer = <span class="literal">null</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> ctx = <span class="built_in">this</span>,</span></span><br><span class="line"><span class="javascript">            args = <span class="built_in">arguments</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (timer) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">window</span>.clearTimeout(timer)</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        timer = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line">          fn.apply(ctx, args)</span><br><span class="line"><span class="javascript">          timer = <span class="literal">null</span></span></span><br><span class="line">        &#125;, delay);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 搜索框做函数防抖避免用户高频输入内容</span></span></span><br><span class="line"><span class="javascript">    input.addEventListener(<span class="string">&#x27;input&#x27;</span>, debounce(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">console</span>.log(e.target.value)</span></span><br><span class="line">    &#125;, 500))</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 函数节流 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> canUse = <span class="literal">true</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> ctx = <span class="built_in">this</span>,</span></span><br><span class="line"><span class="javascript">            args = <span class="built_in">arguments</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (canUse) &#123;</span></span><br><span class="line">          fn.apply(ctx, args)</span><br><span class="line"><span class="javascript">          canUse = <span class="literal">false</span></span></span><br><span class="line"><span class="javascript">          <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            canUse = <span class="literal">true</span></span></span><br><span class="line">          &#125;, delay);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 对于像onresize这样的高频事件，可以使用函数节流让其回调函数中的代码隔一段时间再次执行</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.onresize = throttle(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      input.value = <span class="built_in">Math</span>.random() * <span class="number">100</span></span></span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h2><p>其实闭包并不会造成内存泄漏，现在的垃圾回收机制已经很成熟了。但早期的IE（ie4-ie6）版本里，对宿主对象（也就是document对象）采用是引用计数的<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management">垃圾回收机制</a>，闭包导致内存泄漏的一个原因就是这个算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而js对象之间即使形成循环引用，也不会产生内存泄漏，因为对js对象的回收算法不是计数的方式：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);<span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">    oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        alert(<span class="string">&#x27;oDiv.innerHTML&#x27;</span>);<span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少 div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">    oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        alert(test);</span><br><span class="line">    &#125;;</span><br><span class="line">    oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
-
-<p>所以我们要保持良好的编程习惯，在使用完闭包后记得释放内存：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">9999999999999</span>)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">fn2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(arr)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> fn2</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> f = fn1()</span><br><span class="line">f() <span class="comment">// 调用完后没有释放，arr就会一直在内存中占着，导致内存泄漏</span></span><br><span class="line"><span class="comment">// 记得释放</span></span><br><span class="line">f = <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h2><ul>
+<li><p>find() &amp; findIndex() 根据条件找到数组成员</p>
+<ul>
+<li>find 定义：用于找出第一个符合条件的数组成员，并返回该成员，如果没有符合条件的成员，则返回 undefined</li>
+<li>findIndex 定义：返回第一个符合条件的数组成员的位置，如果所有成员都不符合条件，则返回-1</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line"><span class="keyword">let</span> new_array = arr.find(<span class="function"><span class="keyword">function</span>(<span class="params">currentValue, index, arr</span>), <span class="title">thisArg</span>)</span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">new_array</span> = <span class="title">arr</span>.<span class="title">findIndex</span>(<span class="params"><span class="keyword">function</span>(currentValue, index, arr), thisArg</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// 这两个方法都可以识别<span class="title">NaN</span>,弥补了<span class="title">indexOf</span>的不足</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">find</span></span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">a</span> = [1, 4, -5, 10].<span class="title">find</span>(<span class="params">(n) =&gt; n &lt; <span class="number">0</span></span>)</span>; <span class="comment">// 返回元素-5</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].find(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回元素NaN</span></span><br><span class="line"><span class="comment">// findIndex</span></span><br><span class="line"><span class="keyword">let</span> a = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> n &lt; <span class="number">0</span>); <span class="comment">// 返回索引2</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回索引4</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>keys() &amp; values() &amp; entries() 遍历键名、遍历键值、遍历键名+键值</p>
+<ul>
+<li>三个方法都返回一个新的 Array Iterator 对象，对象根据方法不同包含不同的值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line">array.keys()   array.values()   array.entries()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].keys()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> elem <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].values()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// &#x27;a&#x27;</span></span><br><span class="line"><span class="comment">// &#x27;b&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> [index, elem] <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].entries()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index, elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0 &quot;a&quot;</span></span><br><span class="line"><span class="comment">// 1 &quot;b&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
 ]]></content>
       <categories>
         <category>前端</category>
         <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>对HTML语义化的理解</title>
-    <url>/posts/2906/</url>
-    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
-<ol>
-<li>利与开发：方便代码的阅读和维护</li>
-<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
-</ol>
-<a id="more"></a>
-
-<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
-<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
-
-
-<p>元素细节：</p>
-<ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
-</ul>
-<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>HTML</category>
       </categories>
   </entry>
 </search>
