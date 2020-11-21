@@ -308,8 +308,8 @@ themes\next\layout\_third-party\analytics\busuanzi-counter.swig
 
 修改script链接为：
 
-```
-copy<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+```html
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 ```
 
 ### 评论功能：ChangYan
