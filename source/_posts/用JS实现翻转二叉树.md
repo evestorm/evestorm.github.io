@@ -1,10 +1,11 @@
 ---
 title: 用JS实现翻转二叉树
+categories:
+  - 后端
+  - 算法
+abbrlink: 50491
 date: 2019-02-27 09:45:39
 tags:
-categories:
-- 后端
-- 算法
 ---
 
 ## 简介
