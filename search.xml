@@ -323,6 +323,132 @@
       </tags>
   </entry>
   <entry>
+    <title>animation动画（一）</title>
+    <url>/posts/57136/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
+<p>CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。</p>
+</blockquote>
+<p>———— 出自 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations | MDN</a></p>
+<a id="more"></a>
+
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 简写 */</span></span><br><span class="line"><span class="selector-tag">animation</span>: 动画名称，一个周期所花费的时间，运动曲线（默认<span class="selector-tag">ease</span>），</span><br><span class="line">           动画延迟（默认0），播放次数（默认1），</span><br><span class="line">           是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br></pre></td></tr></table></figure>
+
+<p>就像在介绍中写到的那样，整个 animations 是个模块，包含很多属性来定义动画，比方说 <code>animation-name</code> 、<code>animation-duration</code> 和 <code>animation-delay</code> 等等。但本着快速上手的目的，第一篇文章主要围绕 <code>animation</code> 这个简写属性来讲，因为用它最直观，而且就经验来讲，日常使用最多的也是这个属性。</p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>一个CSS3动画由两个基本项组成：</p>
+<ol>
+<li>关键帧（Keyforames） - 用来定义动画的阶段和样式。</li>
+<li>动画属性 - 分配关键帧（@keyframes）到一个特定的css元素，来定义它的动画方式。</li>
+</ol>
+<p>我们围绕这两项讨论，并在这个过程中实现一个按钮不断放大缩小的动画效果：</p>
+<img src="/posts/undefined/shrink.gif" class="" title="shrink">
+
+<h3 id="keyframes"><a href="#keyframes" class="headerlink" title="keyframes"></a>keyframes</h3><p>关键帧 keyframes 定义了动画在每个阶段的动画效果。它包括：</p>
+<ul>
+<li>动画名称：定义动画的名称</li>
+<li>动画阶段：整个动画阶段用百分比来表示。0% 表示动画的开始状态。100% 表示动画的结束状态。可以在其间添加多个中间状态，比如 20%，60%…</li>
+<li>动画属性：给动画每个阶段定义的CSS属性</li>
+</ul>
+<p>现在我们来编写一段 @keyframes 。动画名称命名为 <code>shrink</code> 。它只有简单的两个阶段：</p>
+<ul>
+<li>第一阶段（0%）：元素的缩放比例为 1:1</li>
+<li>第二阶段（100%）：元素的缩放比例为 1:0.8</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> shrink &#123;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动画属性"><a href="#动画属性" class="headerlink" title="动画属性"></a>动画属性</h3><p>接着，我们给要设置动画的元素添加上动画属性。要使动画生效，我们至少要添加以下两个动画属性：</p>
+<ul>
+<li>animation-name: 动画的名称，在 @keyframes 中定义。</li>
+<li>animation-duration: 动画的持续时间，以秒为单位（例如 5s）或毫秒（例如 200ms）。</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="comment">/*  其他样式  */</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画名称: shrink  */</span></span><br><span class="line">  <span class="selector-tag">animation-name</span>: <span class="selector-tag">shrink</span>;</span><br><span class="line">  <span class="comment">/*  动画持续时间: 0.5秒 */</span></span><br><span class="line">  <span class="selector-tag">animation-duration</span>: .5<span class="selector-tag">s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就实现页面加载后，一个按钮从开始的原始大小，经过0.5s后变成了原始大小的0.8的动画效果。然而我们希望最终的效果是一个按钮的不断放大和缩小，交替进行。这就得添加 <code>animation-iteration-count</code> 和 <code>animation-direction</code> 两个动画属性了，它们一个用来定义元素动画的循环次数，一个用来定义动画在循环过程中是否反向运动：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画的循环次数: 无限次  */</span></span><br><span class="line">  <span class="selector-tag">animation-iteration-count</span>: <span class="selector-tag">infinite</span>;</span><br><span class="line">  <span class="comment">/*  循环是否反向：先正向后反向  */</span></span><br><span class="line">  <span class="selector-tag">animation-direction</span>: <span class="selector-tag">alternate</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终的简写形式如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="selector-tag">animation</span>: <span class="selector-tag">shrink</span> .5<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整效果：</p>
+<iframe height="265" scrolling="no" title="animation-shrink" src="https://codepen.io/JingW/embed/MRaJrz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="资源-📚"><a href="#资源-📚" class="headerlink" title="资源 📚"></a>资源 📚</h2><ul>
+<li><p>animation | 一个CSS3动画库</p>
+<p>【推荐】</p>
+<ul>
+<li><a href="https://daneden.github.io/animate.css/">点我查看效果</a></li>
+</ul>
+</li>
+<li><p>magic | 另一个CSS3动画库</p>
+<ul>
+<li><a href="https://www.minimamente.com/example/magic_animations/">点我查看效果</a></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>animation动画（二）</title>
+    <url>/posts/20298/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
+</ul>
+<p>老规矩，二系列来谈谈具体每个动画属性的含义和用法，算是一个对知识点的总结吧。</p>
+<h2 id="animation-name-动画名称"><a href="#animation-name-动画名称" class="headerlink" title="animation-name 动画名称"></a>animation-name 动画名称</h2><p>CSS语法：<code>animation-name: shrink</code></p>
+<p>用来设置元素的动画名称。</p>
+<a id="more"></a>
+
+<h2 id="animation-duration-持续时间"><a href="#animation-duration-持续时间" class="headerlink" title="animation-duration 持续时间"></a>animation-duration 持续时间</h2><p>CSS语法：<code>animation-duration: 1s</code></p>
+<p>用来指定动画在一个周期内所花费的时间。</p>
+<h2 id="animation-timing-function-运动曲线"><a href="#animation-timing-function-运动曲线" class="headerlink" title="animation-timing-function 运动曲线"></a>animation-timing-function 运动曲线</h2><p>CSS语法：<code>animation-timing-function: ease-in-out</code></p>
+<p>用来设置元素的动画速度曲线，它的用法和 <a href="https://evestorm.github.io/posts/13167/#transition-timing-function-%E6%95%88%E6%9E%9C%E6%9B%B2%E7%BA%BF">transition-timing-function</a> 类似，想要了解详情的直接点这个链接吧。</p>
+<blockquote>
+<p>DEMO</p>
+</blockquote>
+<iframe height="521" scrolling="no" title="animation-timing-function" src="https://codepen.io/JingW/embed/qwbVgB/?height=521&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="animation-delay-动画延迟"><a href="#animation-delay-动画延迟" class="headerlink" title="animation-delay 动画延迟"></a>animation-delay 动画延迟</h2><p>CSS语法：<code>animation-delay: 1s</code></p>
+<p>用来设置动画延迟多少秒/毫秒后才开始执行。正值（例如2s）将在2s后启动动画；负值（例如-2s）将立即执行动画，但是动画会从它的动画序列中的第2s位置处立即开始。</p>
+<h2 id="animation-iteration-count-循环次数"><a href="#animation-iteration-count-循环次数" class="headerlink" title="animation-iteration-count 循环次数"></a>animation-iteration-count 循环次数</h2><p>CSS语法：<code>animation-iteration-count: 1s</code></p>
+<p>用来设置动画循环的次数，默认值是1，表示动画只播放一次。除了使用正整数来设置次数外，还可以将值设置为 <code>infinite</code> ，表示无限循环。</p>
+<h2 id="animation-direction-是否反向"><a href="#animation-direction-是否反向" class="headerlink" title="animation-direction 是否反向"></a>animation-direction 是否反向</h2><p>CSS语法：<code>animation-direction: normal | reverse | alternate | alternate-reverse</code></p>
+<p>用来设置动画在循环过程中是否反向运动，默认值为 <code>normal</code> ，即正常模式，动画会从第一帧播放到最后一帧；<code>reverse</code> 表示反向模式，动画会从最后一帧倒着播放到第一帧；<code>alternate</code> 设置动画先正向播放，第二次再从反向播放，交替进行，例如 animation 系列一中的案例；<code>alternate-reverse</code> 则是先让动画反向播放，第二次再正向播放，交替进行。</p>
+<h2 id="animation-fill-mode-动画填充模式"><a href="#animation-fill-mode-动画填充模式" class="headerlink" title="animation-fill-mode 动画填充模式"></a>animation-fill-mode 动画填充模式</h2><p>CSS语法：<code>animation-fill-mode: none | forwards | backwards | both</code></p>
+<p>用来指定在动画执行之前和之后如何给动画的目标应用样式。这个属性在我第一次接触时没太理解，直到我看了 <a href="https://segmentfault.com/">segmentfault</a> 上的 <a href="https://segmentfault.com/q/1010000003867335">这篇文章</a> 。</p>
+<p>在理解它之前，我们需要在脑海里有个概念，那就是一个动画是分为初始状态、等待期、动画执行期、完成期四个阶段的。而上面 animation-fill-mode 接收的四个值则分别对应：</p>
+<ul>
+<li>none 表示 等待期和完成期，元素样式都为初始状态样式，不受动画定义（@keyframes）的影响</li>
+<li>forwards 表示等待期保持初始样式，完成期间保持最后一帧样式</li>
+<li>backwards 表示等待期为第一帧样式，完成期跳转为初始样式</li>
+<li>both 表示 等待期样式为第一帧样式，完成期保持最后一帧样式</li>
+</ul>
+<p>单纯的文字不直观？相信下面的这个demo能让你豁然开朗：</p>
+<iframe height="435" scrolling="no" title="animation-fill-mode" src="https://codepen.io/JingW/embed/qwNLJE/?height=435&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="animation-play-state-动画播放状态"><a href="#animation-play-state-动画播放状态" class="headerlink" title="animation-play-state 动画播放状态"></a>animation-play-state 动画播放状态</h2><p>CSS语法：<code>animation-play-state: running | paused</code></p>
+<p>用来设置动画的播放或者暂停。比如希望在鼠标经过的时候，让动画先停止下来，鼠标移开之后再继续播放，就可以通过设置 <code>.element:hover &#123; animation-play-state: paused; &#125;</code> 来实现。下面是一个案例，在鼠标移入时钟后指针暂停旋转；移出后时钟继续旋转。</p>
+<iframe height="339" scrolling="no" title="animation-play-state闹钟示例" src="https://codepen.io/JingW/embed/rbMWjB/?height=339&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>cookie与session区别</title>
     <url>/posts/63891/</url>
     <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
@@ -515,11 +641,11 @@
 <p>实际体验了阶跃函数带来的效果后应该对其有个大概认知了吧。阶跃函数接收两个参数，第一个参数为<strong>正整数</strong>，指定阶跃函数的间隔数，你可以理解为把整个过渡过程拆成若干份儿；第二个参数可选，值为<code>[ start | end ]</code>，叫做跃点，指定是在每个间隔的起点还是终点发生阶跃变化，默认值为<code>end</code>。<br>查看上面案例的css代码，你会发现两种 <code>steps</code> 的简写形式：<code>step-start</code> 和 <code>step-end</code> ，它们分别等同于：<code>step-start = steps(1, start)</code> 和 <code>step-end = steps(1, end)</code> 。</p>
 <h3 id="cubic-bezier-贝塞尔曲线函数"><a href="#cubic-bezier-贝塞尔曲线函数" class="headerlink" title="cubic-bezier 贝塞尔曲线函数"></a>cubic-bezier 贝塞尔曲线函数</h3><p>贝塞尔曲线函数接收四个参数，取值范围是 0 到 1 之间的数值（包括0和1）。</p>
 <p>贝塞尔曲线函数，其实定义的是 <strong>属性状态</strong> 与 <strong>时间</strong> 的一个关系函数。如下坐标轴所示：</p>
-<img src="/posts/undefined/cubic05000510.png" class="" title="cubic-bezier">
+<img src="/posts/13167/cubic05000510.png" class="" title="cubic-bezier">
 
 <p>上图坐标轴中横坐标是时间，纵坐标是属性状态，右上角的坐标是(1,1)。在时间曲线中的每一个点，表示的就是对应时刻下属性的取值，每个点的斜率表示的就是在这个时刻属性的变化速度，因此在时间曲线中<strong>斜率越小</strong>，也就是<strong>越平缓</strong>的地方，表示<strong>属性变化速度越慢</strong>；<strong>斜率越大</strong>，也就是<strong>越陡峭</strong>的地方，表示<strong>属性变化速度越快</strong>。如上图中开始跟结束的时候，斜率都比较小，而中间的阶段，斜率比较大，因此这个曲线表示的就是在变化过程中由慢到快再到慢的一个过程。</p>
 <p>回到贝塞尔曲线函数接收的四个参数上，前两个是上图中红色点的坐标(x1,y1)，后两个是图中蓝色点的坐标(x2,y2)，也就是 <code>cubic-bezier(x1, y1, x2, y2)</code> 这样的形式。我们可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 这个工具上来调整我们独特的贝塞尔曲线，通过拖拽红色跟蓝色点，可以形成不一样的贝塞尔曲线。我们发现，其实规定取值范围在[0,1]之间，针对的是<strong>x坐标</strong>，也就是<strong>时间</strong>，因为时间如果超过了这个范围，就会出现在同一个时刻对应了两个不同的属性状态，这个是没有意义的；而y坐标是可以超过这个范围的，如下我们通过拖拽两个点形成了这样一个曲线：</p>
-<img src="/posts/undefined/cubic55465149.png" class="" title="cubic-bezier">
+<img src="/posts/13167/cubic55465149.png" class="" title="cubic-bezier">
 
 <p>它表示的是在过渡过程中属性值会超过终止状态的设定值然后再回到终点位置，表现为回弹的效果。大家可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 上自己拖动两个点尝试一下，最后点击 go 按钮查看效果。</p>
 <p>上面两个图的demo效果：</p>
@@ -1247,7 +1373,7 @@ callee</code></pre>
 <li>针对所有的元素重复以上的步骤，除了最后一个。</li>
 <li>持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</li>
 </ol>
-<h3 id="动图演示"><a href="#动图演示" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/undefined/%E5%86%92%E6%B3%A1.gif" class="" title="冒泡">
+<h3 id="动图演示"><a href="#动图演示" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/59937/%E5%86%92%E6%B3%A1.gif" class="" title="冒泡">
 
 <a id="more"></a>
 
@@ -1256,7 +1382,7 @@ callee</code></pre>
 <h3 id="代码实现（JS）"><a href="#代码实现（JS）" class="headerlink" title="代码实现（JS）"></a>代码实现（JS）</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">3</span>, <span class="number">44</span>, <span class="number">38</span>, <span class="number">5</span>, <span class="number">47</span>, <span class="number">15</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">2</span>, <span class="number">46</span>, <span class="number">4</span>, <span class="number">19</span>, <span class="number">50</span>, <span class="number">48</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myBubbleSort</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> len = arr.length, temp;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; len - <span class="number">1</span>; i++) &#123; <span class="comment">// 趟数</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; len - <span class="number">1</span> - i; j++) &#123; <span class="comment">// 当前趟要比较的次数</span></span><br><span class="line">            <span class="keyword">if</span> (arr[j] &gt; arr[j+<span class="number">1</span>]) &#123;        <span class="comment">// 相邻元素两两比较</span></span><br><span class="line">                temp = arr[j];              <span class="comment">// 元素交换</span></span><br><span class="line">                arr[j] = arr[j+<span class="number">1</span>];</span><br><span class="line">                arr[j+<span class="number">1</span>] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>代码与图片配合食用更加~</p>
-<img src="/posts/undefined/%E5%86%92%E6%B3%A12.png" class="" title="冒泡2">
+<img src="/posts/59937/%E5%86%92%E6%B3%A12.png" class="" title="冒泡2">
 
 <hr>
 <h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><p>选择排序是一种简单直观的排序算法，无论什么数据进去都是 O(n²) 的时间复杂度。所以用到它的时候，数据规模越小越好。唯一的好处可能就是不占用额外的内存空间了吧。</p>
@@ -1265,12 +1391,12 @@ callee</code></pre>
 <li>再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。</li>
 <li>重复第2步，直到所有元素均排序完毕。</li>
 </ol>
-<h3 id="动图演示-1"><a href="#动图演示-1" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/undefined/%E9%80%89%E6%8B%A9.gif" class="" title="选择">
+<h3 id="动图演示-1"><a href="#动图演示-1" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/59937/%E9%80%89%E6%8B%A9.gif" class="" title="选择">
 
 <h3 id="代码实现（JS）-1"><a href="#代码实现（JS）-1" class="headerlink" title="代码实现（JS）"></a>代码实现（JS）</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">3</span>, <span class="number">44</span>, <span class="number">38</span>, <span class="number">5</span>, <span class="number">47</span>, <span class="number">15</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">2</span>, <span class="number">46</span>, <span class="number">4</span>, <span class="number">19</span>, <span class="number">50</span>, <span class="number">48</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mySelectionSort</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> len = arr.length;</span><br><span class="line">    <span class="keyword">var</span> minIndex, temp;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; len - <span class="number">1</span>; i++) &#123;       <span class="comment">// 第 i 轮选择</span></span><br><span class="line">        minIndex = i;                         <span class="comment">// 每轮开始假设起始元素为最小值</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> j = i + <span class="number">1</span>; j &lt; len; j++) &#123;   <span class="comment">// 遍历剩余未排序元素</span></span><br><span class="line">            <span class="keyword">if</span> (arr[j] &lt; arr[minIndex]) &#123;     <span class="comment">// 寻找最小的数</span></span><br><span class="line">                minIndex = j;                 <span class="comment">// 将最小数的索引保存</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        temp = arr[i];                         <span class="comment">// 交换起始元素与真正的最小值</span></span><br><span class="line">        arr[i] = arr[minIndex];</span><br><span class="line">        arr[minIndex] = temp;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>配图：</p>
-<img src="/posts/undefined/%E9%80%89%E6%8B%A92.png" class="" title="选择2">
+<img src="/posts/59937/%E9%80%89%E6%8B%A92.png" class="" title="选择2">
 
 <hr>
 <h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><p>插入排序的原理应该是最容易理解的，因为只要你打过扑克牌就应该能秒懂。插入排序是一种最简单直观的排序算法，它的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。</p>
@@ -1282,7 +1408,7 @@ callee</code></pre>
 <li>将新元素插入到该位置后；</li>
 <li>重复步骤2~5。</li>
 </ol>
-<h3 id="动图演示-2"><a href="#动图演示-2" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/undefined/%E6%8F%92%E5%85%A5.gif" class="" title="插入">
+<h3 id="动图演示-2"><a href="#动图演示-2" class="headerlink" title="动图演示"></a>动图演示</h3><img src="/posts/59937/%E6%8F%92%E5%85%A5.gif" class="" title="插入">
 
 <h3 id="代码实现（JS）-2"><a href="#代码实现（JS）-2" class="headerlink" title="代码实现（JS）"></a>代码实现（JS）</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">3</span>, <span class="number">44</span>, <span class="number">38</span>, <span class="number">5</span>, <span class="number">47</span>, <span class="number">15</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">2</span>, <span class="number">46</span>, <span class="number">4</span>, <span class="number">19</span>, <span class="number">50</span>, <span class="number">48</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myInsertSort</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> len = arr.length;</span><br><span class="line">    <span class="keyword">var</span> insertItem; <span class="comment">// 要插入的元素</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从数组的第二个元素开始循环将数组中的元素插入</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">1</span>; i &lt; len; i++) &#123;</span><br><span class="line">        insertItem = arr[i]; <span class="comment">// 设置数组中的第2个元素为第一次遍历要插入的数据</span></span><br><span class="line">        <span class="keyword">var</span> j = i - <span class="number">1</span>;       <span class="comment">// 已排序好数组的最后一个元素的索引</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将已排好序的元素从最后一个往前依次与待插入元素比较，</span></span><br><span class="line">        <span class="keyword">while</span> (j &gt;= <span class="number">0</span> &amp;&amp; insertItem &lt; arr[j]) &#123;</span><br><span class="line">            <span class="comment">// 如果要插入的元素小于第j个元素,就将第j个元素向后移动</span></span><br><span class="line">            arr[j + <span class="number">1</span>] = arr[j];</span><br><span class="line">            j--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 直到要插入的元素不小于第j个元素,将insertNote插入到数组中</span></span><br><span class="line">        arr[j + <span class="number">1</span>] = insertItem;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 例如for循环中 i 等于 2 时，已排序完毕的元素为[3,44]，进入for循环</span></span><br><span class="line">    <span class="comment">// 待插入元素为 arr[2]，也就是38;</span></span><br><span class="line">    <span class="comment">// j=i-1也就是2-1等于1</span></span><br><span class="line">    <span class="comment">// while循环比较，待插入元素38是小于arr[j]（j=1）44 的 =&gt; 条件成立</span></span><br><span class="line">        <span class="comment">// arr[j+1]要等于arr[j] =&gt; arr[2]要等于arr[1] =&gt; arr[2]=44 =&gt; 此刻数组前三个元素：[3,44,44]</span></span><br><span class="line">        <span class="comment">// j-- =&gt; j=1-1也就是0</span></span><br><span class="line">    <span class="comment">// 再来一轮while比较，待插入元素38现在不小于arr[j] 也就是arr[0]的3，所以直接退出while循环</span></span><br><span class="line">    <span class="comment">// arr[j+1]=insertItem =&gt; arr[1]=38 =&gt; 数组前三排序完毕：[3,38,44]</span></span><br></pre></td></tr></table></figure>
 
@@ -1290,7 +1416,7 @@ callee</code></pre>
 <h2 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h2><p>希尔排序也是一种插入排序，它是简单插入排序的一个改进版，也称为缩小增量排序，同时该算法是冲破O(n2）的第一批算法之一。本文会以图解的方式详细介绍希尔排序的基本思想及其代码实现。</p>
 <p>希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰被分成一组，算法便终止。</p>
 <h3 id="算法步骤-示例"><a href="#算法步骤-示例" class="headerlink" title="算法步骤(示例)"></a>算法步骤(示例)</h3><p>在此我们选择增量 <code>gap=数组长度length/2</code>，缩小增量继续以 <code>gap = gap/2</code> 的方式，这种增量选择我们可以用一个序列来表示：<code>&#123;n/2,(n/2)/2...1&#125;</code>，称为增量序列。当然，希尔排序的增量序列有很多种，这里采用的是比较常用的一种作为示例：</p>
-<img src="/posts/undefined/%E5%B8%8C%E5%B0%94.png" class="" title="希尔排序">
+<img src="/posts/59937/%E5%B8%8C%E5%B0%94.png" class="" title="希尔排序">
 
 <p>在上面这幅图中：</p>
 <p>初始时，有一个大小为 10 的无序序列。</p>
@@ -1302,7 +1428,7 @@ callee</code></pre>
 
 <hr>
 <h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><p>归并排序是利用归并的思想实现的排序方法，该算法采用经典的分治策略（分治法将问题分成一些小的问题然后递归求解，而治的阶段则将分的阶段得到的各答案”修补”在一起，即分而治之)。</p>
-<img src="/posts/undefined/%E5%BD%92%E5%B9%B6.png" class="" title="分而治之">
+<img src="/posts/59937/%E5%BD%92%E5%B9%B6.png" class="" title="分而治之">
 
 <p>可以看到这种结构很像一棵完全二叉树，下面的归并排序代码将会采用递归去实现（你也可采用迭代的方式去实现）。<strong>分</strong>阶段可以理解为就是递归拆分子序列的过程，递归深度为logn。</p>
 <h3 id="算法步骤-3"><a href="#算法步骤-3" class="headerlink" title="算法步骤"></a>算法步骤</h3><ol>
@@ -1312,7 +1438,7 @@ callee</code></pre>
 <li>重复步骤 3 直到某一指针达到序列尾</li>
 <li>将另一序列剩下的所有元素直接复制到合并序列尾</li>
 </ol>
-<h3 id="图片演示"><a href="#图片演示" class="headerlink" title="图片演示"></a>图片演示</h3><img src="/posts/undefined/%E5%BD%92%E5%B9%B62.png" class="" title="归并排序">
+<h3 id="图片演示"><a href="#图片演示" class="headerlink" title="图片演示"></a>图片演示</h3><img src="/posts/59937/%E5%BD%92%E5%B9%B62.png" class="" title="归并排序">
 
 <p>图片来自博客<a href="https://www.cnblogs.com/chengxiao/p/6194356.html">《图解排序算法之归并排序》</a></p>
 <h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">3</span>, <span class="number">44</span>, <span class="number">38</span>, <span class="number">5</span>, <span class="number">47</span>, <span class="number">15</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">2</span>, <span class="number">46</span>, <span class="number">4</span>, <span class="number">19</span>, <span class="number">50</span>, <span class="number">48</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mergeSort</span>(<span class="params">arr</span>) </span>&#123; <span class="comment">// 采用自上而下的递归方法</span></span><br><span class="line">    <span class="keyword">var</span> len = arr.length;</span><br><span class="line">    <span class="keyword">if</span> (len &lt; <span class="number">2</span>) <span class="keyword">return</span> arr;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">var</span> middle = <span class="built_in">Math</span>.floor(len / <span class="number">2</span>), <span class="comment">// 将未排序数组拆分成两半分而治之</span></span><br><span class="line">        left = arr.slice(<span class="number">0</span>, middle),</span><br><span class="line">        right = arr.slice(middle);</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">return</span> merge(mergeSort(left), mergeSort(right));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">merge</span>(<span class="params">left, right</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> result = [];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (left.length &amp;&amp; right.length) &#123;</span><br><span class="line">      	<span class="comment">// 两边的起始元素相互比较，始终将小的一方的头元素弹出，并push到准备好的容器result中</span></span><br><span class="line">        <span class="keyword">if</span> (left[<span class="number">0</span>] &lt;= right[<span class="number">0</span>]) &#123;</span><br><span class="line">            result.push(left.shift());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            result.push(right.shift());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (left.length)</span><br><span class="line">        result.push(left.shift());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (right.length)</span><br><span class="line">        result.push(right.shift());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1322,51 +1448,51 @@ callee</code></pre>
 <h3 id="算法步骤-4"><a href="#算法步骤-4" class="headerlink" title="算法步骤"></a>算法步骤</h3><ol>
 <li>把数组中第一个元素当做一个基准值，称为“基准”（Pivot）</li>
 </ol>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%92.png" class="" title="快排">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%92.png" class="" title="快排">
 
 <ol>
 <li>重新排序数列，把所有比基准值小的元素摆放在基准前面，所有比基准值大元素摆放在基准后面。在这个分区退出之后，该基准就处于数列的中间位置。这个称为分区（partition）操作；</li>
 </ol>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%922.png" class="" title="快排2">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%922.png" class="" title="快排2">
 
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%923.png" class="" title="快排3">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%923.png" class="" title="快排3">
 
 <ol>
 <li>递归地把小于基准值元素的子数列和大于基准值元素的子数列排序；</li>
 </ol>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%924.png" class="" title="快排4">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%924.png" class="" title="快排4">
 
 <h3 id="分区（Partition）思路"><a href="#分区（Partition）思路" class="headerlink" title="分区（Partition）思路"></a>分区（Partition）思路</h3><p>首先把未排序数组的第一个（最左边）元素设置为基准，把它的位置叫做 <code>l</code> ：</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%925.png" class="" title="快排5">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%925.png" class="" title="快排5">
 
 <p>然后依次向后查看所有元素，在查看过程中，不断的调整后面元素的位置，使得后面的元素分为两部分，一部分都小于 v ；一部分都大于 v 。</p>
 <p>我们用 <code>j</code> 来不断记录这两部分的分割线位置。而 e 就是我们要判断的下一个元素，用索引 <code>i</code> 来表示，<code>i</code> 会遍历每一个元素，来看该如何调整这个元素。</p>
 <p>在下图中，我们用 <code>arr[l+1 ... j]</code> 来表示小于 v 的橙色部分，用 <code>arr[j+1 ... i-1]</code> 来表示大于 v 的紫色部分。</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%926.png" class="" title="快排6">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%926.png" class="" title="快排6">
 
 <p>接下来就要看如何来调整下一个元素 e 的位置。分情况讨论：</p>
 <p><strong>当 e 大于 v 时</strong>，我们直接让 e 融入大于 v 的部分，并让 <code>i++</code></p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%927.png" class="" title="快排7">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%927.png" class="" title="快排7">
 
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%928.png" class="" title="快排8">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%928.png" class="" title="快排8">
 
 
 <p><strong>当 e 小于 v 时</strong>，我们让 e 和大于 v 部分的第一个元素交换位置。</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%929.png" class="" title="快排9">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%929.png" class="" title="快排9">
 
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%9210.png" class="" title="快排10">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%9210.png" class="" title="快排10">
 
 <p>把 e 融入到小于 v 的部分。此时就需要让分隔线的索引位置 <code>j++</code> ，相应的，索引 <code>i</code> 的位置也要 <code>i++</code> 以便查看下一个元素。</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%9211.png" class="" title="快排11">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%9211.png" class="" title="快排11">
 
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%9212.png" class="" title="快排12">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%9212.png" class="" title="快排12">
 
 <p>以这样的步骤我们就能遍历完整个数组，如下图所示</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%9213.png" class="" title="快排13">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%9213.png" class="" title="快排13">
 
 
 <p>现在还差最后一个步骤，那就是把基准值 v ，与小于 v 部分的最后一个元素交换位置。此刻 v 左边都小于它，v 右边都大于它，而 <code>j</code> 指向的就是基准值所在的位置。这样我们就完成了分区（Partition）操作。</p>
-<img src="/posts/undefined/%E5%BF%AB%E6%8E%9214.png" class="" title="快排14">
+<img src="/posts/59937/%E5%BF%AB%E6%8E%9214.png" class="" title="快排14">
 
 <h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">3</span>, <span class="number">44</span>, <span class="number">38</span>, <span class="number">5</span>, <span class="number">47</span>, <span class="number">15</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">2</span>, <span class="number">46</span>, <span class="number">4</span>, <span class="number">19</span>, <span class="number">50</span>, <span class="number">48</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">quickSort</span>(<span class="params">arr, left, right</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> len = arr.length,</span><br><span class="line">        partitionIndex,         <span class="comment">// 分区索引</span></span><br><span class="line">        left = <span class="keyword">typeof</span> left != <span class="string">&#x27;number&#x27;</span> ? <span class="number">0</span> : left,</span><br><span class="line">        right = <span class="keyword">typeof</span> right != <span class="string">&#x27;number&#x27;</span> ? len - <span class="number">1</span> : right;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (left &gt;= right) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过分区找到分隔点，再分别快排左右两部分</span></span><br><span class="line">    partitionIndex = partition(arr, left, right);</span><br><span class="line">    quickSort(arr, left, partitionIndex - <span class="number">1</span>);</span><br><span class="line">    quickSort(arr, partitionIndex + <span class="number">1</span>, right);</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">partition</span>(<span class="params">arr, left, right</span>) </span>&#123; <span class="comment">// 分区操作</span></span><br><span class="line">    <span class="keyword">var</span> v = left,   <span class="comment">// 设定基准值（pivot）</span></span><br><span class="line">        j = left;  <span class="comment">// arr[l+1...j] ; arr[j+1...i]</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = j + <span class="number">1</span>; i &lt;= right; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; arr[v]) &#123; <span class="comment">// 当前要判断元素 小于 基准元素时</span></span><br><span class="line">            j++; <span class="comment">// 分隔点右移</span></span><br><span class="line">            swap(arr, i, j);   <span class="comment">// 让 当前元素 与大于 v 部分的第一个元素交换位置</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 此处不用写 else ，因为当大于基准元素时，直接i++就好，</span></span><br><span class="line">        <span class="comment">// 而i++，for循环已经帮我们做了</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 循环完毕后，交换基准值和小于v部分的最后一个元素的位置</span></span><br><span class="line">    swap(arr, v, j);</span><br><span class="line">    <span class="keyword">return</span> j;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">swap</span>(<span class="params">arr, i, j</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> temp = arr[i];</span><br><span class="line">    arr[i] = arr[j];</span><br><span class="line">    arr[j] = temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(quickSort(arr, <span class="number">0</span>, arr.length));</span><br></pre></td></tr></table></figure>
 
@@ -1451,6 +1577,205 @@ callee</code></pre>
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>有序表查找之二分查找</title>
+    <url>/posts/39853/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>二分查找又名折半查找。它的前提是所操作的数据集是一个有序的数据集。它的基本思想是：开始时，先找出有序集合中间的那个元素。如果此元素比要查找的元素大，就接着在较小的一个半区进行查找；反之，如果此元素比要找的元素小，就在较大的一个半区进行查找。在每个更小的数据集中重复这个查找过程，直到找到要查找的元素或者数据集不能再分割。</p>
+<h2 id="图解"><a href="#图解" class="headerlink" title="图解"></a>图解</h2><img src="/posts/undefined/1556938076685-7ebcf60f-aaf7-4f4c-ba78-0f4d7b9a3099.png" class="" title="二分查找">
+
+<a id="more"></a>
+
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p>二分查找可以应用于任何类型的数据，但前提是这些数据是按某种规则进行排序的。这使得它在处理那些频繁插入和删除操作的数据集时不太高效。因为执行完插入和删除操作后，无法保证数据集的有序性，在查找前还得先维护一个有序数据集，从而导致查找过程代价太高。此外，元素必须存储在连续的空间中。</p>
+<p>因此，当待搜索的集合是相对静态的数据集时，此时使用二分查找是最好的选择。</p>
+<h2 id="代码示例（JS）"><a href="#代码示例（JS）" class="headerlink" title="代码示例（JS）"></a>代码示例（JS）</h2><blockquote>
+<p>非递归实现</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">4</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">15</span>, <span class="number">33</span>, <span class="number">46</span>, <span class="number">49</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">101</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binary_search</span>(<span class="params">arr, target</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> min = <span class="number">0</span>,</span><br><span class="line">        max = arr.length;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">        <span class="keyword">var</span> mid = <span class="built_in">parseInt</span>((min + max) / <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (target === arr[mid]) &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (target &gt; arr[mid]) &#123;</span><br><span class="line">            min = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            max = mid - <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(binary_search(arr, <span class="number">33</span>));</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>递归实现</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">4</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">15</span>, <span class="number">33</span>, <span class="number">46</span>, <span class="number">49</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">101</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binary_search</span>(<span class="params">arr, min, max, target</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (min &gt; max) &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> mid = <span class="built_in">parseInt</span>((min + max) / <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (target === arr[mid]) &#123;</span><br><span class="line">        <span class="keyword">return</span> mid;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (target &gt; arr[mid]) &#123;</span><br><span class="line">        min = mid + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        max = mid - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(binary_search(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>, <span class="number">33</span>));</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>算法</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>用JS实现翻转二叉树</title>
+    <url>/posts/50491/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
+<p>输入</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>输出</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>算法</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Sequelize框架入门</title>
+    <url>/posts/1183/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>平常写前端项目时，为了更方便的获取“真实”的动态数据，也会新建几个数据库表来作支撑。但每每需要用Node搭建后端服务时，数据库的查询真的让人头疼，难倒不难，就是特别繁琐，即使封装了个查询sql用工具模块，在遇到稍复杂的查询语句时还是得写完整SQL。</p>
+<p>我又是个比较懒的人，在经历了几次痛苦折磨后，我开始google有没有谁帮我们解决了数据库表字段与对象之间的关系映射。也就是我们通常所说的 <a href="https://baike.baidu.com/item/ORM/3583252?fr=aladdin">ORM</a> 。经过几番搜索，我找到了 <a href="http://docs.sequelizejs.com/">Sequelize</a> 框架。在了解它之前，我们先简单介绍下什么是 <code>ORM</code> ：（我知道不少人是不会点击上面链接查看详情的 :)）</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="ORM"><a href="#ORM" class="headerlink" title="ORM"></a>ORM</h3><p>ORM 全称 Object Relational Mapping，翻译成中文就是 <code>对象关系映射</code> 。是对 SQL 查询语句的封装，让我们可以用面向对象的方式操作数据库，来更加优雅的生成安全、可维护的 SQL 代码。说白了，就是通过对象来映射和操作数据库。</p>
+<h3 id="Sequelize"><a href="#Sequelize" class="headerlink" title="Sequelize"></a>Sequelize</h3><p>而今天的主角 <code>Sequelize</code> 则是一个基于 promise 的 Node.js 异步ORM框架。它能够支持多种数据库，包含但不限于 PostgreSQL, MySQL 和 MSSQL 。</p>
+<blockquote>
+<p>官网地址：<a href="http://docs.sequelizejs.com/">http://docs.sequelizejs.com/</a><br>github：<a href="https://github.com/sequelize/sequelize">https://github.com/sequelize/sequelize</a></p>
+</blockquote>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="起步"><a href="#起步" class="headerlink" title="起步"></a>起步</h3><p>在本地新建文件夹，例如 <code>sequelize-demo</code> ，然后在项目根目录下运行命令行命名 <code>npm init -y</code>。运行完该命令后项目tree如下：</p>
+<img src="/posts/undefined/npminit-y.png" class="" title="npminit-y">
+
+<p>接着使用 npm 安装 <code>sequelize</code>：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm i sequelize</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a>连接数据库</h3><p>完成上述步骤以后，我们在根目录下新建一个 <code>app.js</code> 文件来使用 <code>sequelize</code> ，代码如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 导入 sequelize</span></span><br><span class="line"><span class="keyword">const</span> Sequelize = <span class="built_in">require</span>(<span class="string">&#x27;sequelize&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新建 sequelize 实例</span></span><br><span class="line"><span class="keyword">const</span> sequelize = <span class="keyword">new</span> Sequelize(<span class="string">&#x27;数据库名称&#x27;</span>, <span class="string">&#x27;数据库用户名&#x27;</span>, <span class="string">&#x27;数据库密码&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 其他的数据库连接配置</span></span><br><span class="line">    host: <span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="comment">// 主机，默认 localhost</span></span><br><span class="line">    port: <span class="number">8889</span>,        <span class="comment">// 端口，默认 3306</span></span><br><span class="line">    dialect: <span class="string">&#x27;mysql&#x27;</span>,  <span class="comment">// 数据库类型， 默认 mysql 【必填】</span></span><br><span class="line">    timezone: <span class="string">&#x27;+08:00&#x27;</span> <span class="comment">// 时区，默认会根据系统当前所在时区进行设置，格式：&#x27;+08:00&#x27; 或字符串格式 &#x27;Asia/Shanghai&#x27; 参考：http://php.net/manual/zh/timezones.php 【使用场景：一般情况下默认配置就好，但如果服务器在美国，但想存储中国时区，就需要明确指定 &#x27;+08:00&#x27; 了】</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试数据库的连接（返回的是一个Promise，记得 catch 捕获错误）</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    sequelize.authenticate();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;数据库连接成功!&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;连接失败&#x27;</span>);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时你可以尝试运行 <code>app.js</code> 文件，即在根目录下运行 <code>node app.js</code> 命令。正常情况下你会收到报错信息，类似这样：</p>
+<img src="/posts/undefined/error-mysql2.png" class="" title="mysql2">
+
+<p>意思是你需要安装 <code>mysql2</code> ，这是因为 <code>sequelize</code> 虽然依赖了 <code>mysql2</code> ，但却没有内置安装。所以接下来你得在项目根目录下运行如下代码来安装 <code>mysql2</code>：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm i mysql2</span><br></pre></td></tr></table></figure>
+
+
+
+<p>安装完毕后再次运行 <code>app.js</code> ，就能连接数据库成功了：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">node app.js</span><br><span class="line">Executing (default): SELECT 1+1 AS result</span><br><span class="line">数据库连接成功!</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="定义模型（Model）"><a href="#定义模型（Model）" class="headerlink" title="定义模型（Model）"></a>定义模型（Model）</h3><blockquote>
+<p>所谓模型，就是用来描述数据库表字段信息的对象，每一个模型对象表示数据库中的一个表，后续对数据库的操作都是用过对应的模型对象来完成的。</p>
+</blockquote>
+<p>接下来我们就要定义数据的模型了。在此之前，你还需要做一些准备工作。以我为例，我在数据库中新建了一个 <code>users</code> 表，表字段和类型如下：</p>
+<img src="/posts/undefined/table-property.png" class="" title="表字段">
+
+<p>然后定义出对应此表的数据模型：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 定义模型（用对象的方式来描述数据库中的表）</span></span><br><span class="line"><span class="keyword">const</span> UserModel = sequelize.define(<span class="string">&#x27;User&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 描述表中对应的字段信息</span></span><br><span class="line">    id: &#123; <span class="comment">// 每一个字段的信息</span></span><br><span class="line">        type: Sequelize.INTEGER(<span class="number">11</span>), <span class="comment">// 字段类型</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,            <span class="comment">// 不允许为空</span></span><br><span class="line">        autoIncrement: <span class="literal">true</span>,         <span class="comment">// id自增长</span></span><br><span class="line">        primaryKey: <span class="literal">true</span>,            <span class="comment">// 设为主键</span></span><br><span class="line">    &#125;,</span><br><span class="line">    username: &#123;</span><br><span class="line">        type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;&#x27;</span>,            <span class="comment">// 设置字段默认值</span></span><br><span class="line">    &#125;,</span><br><span class="line">    age: &#123;</span><br><span class="line">        type: Sequelize.TINYINT(<span class="number">3</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    gender: &#123;</span><br><span class="line">        type: Sequelize.ENUM([<span class="string">&#x27;men&#x27;</span>, <span class="string">&#x27;women&#x27;</span>, <span class="string">&#x27;other&#x27;</span>]), <span class="comment">// 这是个枚举类型字段，表示性别只能为“男”，“女”，“保密”中的其中一个，传入 ENUM 中的可以是逗号隔开的字符串，也可以是个数组：ENUM([&#x27;men&#x27;, &#x27;women&#x27;]) or ENUM(&#x27;men&#x27;, &#x27;women&#x27;, &#x27;other&#x27;)</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;men&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;, &#123; <span class="comment">// 用来设置字段以外的其他信息</span></span><br><span class="line">    timestamps: <span class="literal">false</span>, <span class="comment">// 是否给每条记录添加 createAt 和 updateAt 字段，并在添加新数据和更新数据的时候自动设置这两个字段的值，默认为 true</span></span><br><span class="line">    tableName: <span class="string">&#x27;users&#x27;</span>, <span class="comment">// 该模型映射的真实表名</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>注意：</strong>在定义模型时，字段名称可以和数据库表中的字段名称不相同，但如果你想另起一个别名，则需要在字段信息设置中加入 <code>field</code> 来关联真正的表字段名称。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">userName: &#123; <span class="comment">// &lt;-- 你起的别名</span></span><br><span class="line">    type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">    allowNull: <span class="literal">false</span>,</span><br><span class="line">    field: <span class="string">&#x27;username&#x27;</span>, <span class="comment">// 关联数据库表中真正的字段名</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h3><h4 id="查询所有"><a href="#查询所有" class="headerlink" title="查询所有"></a>查询所有</h4><p>完成表模型的定义以后，我们就可以通过 <code>findAll</code> 来查询表数据了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 查询 users 表中所有数据</span></span><br><span class="line">UserModel.findAll().then(<span class="function"><span class="params">users</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 返回的 users 是个数组</span></span><br><span class="line">    users.forEach(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 循环的每个 user 都是个 Model 实例</span></span><br><span class="line">        <span class="comment">// 该 Model 实例包含 get 方法，我们能通过它获取 username</span></span><br><span class="line">        <span class="built_in">console</span>.log(user.get(<span class="string">&#x27;username&#x27;</span>));</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(err);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>写完上面代码后，再次运行 <code>app.js</code> ，你就应该能够查询到数据了~<br>p.s. 查询之前别忘了在数据库中插入一些数据。</p>
+<h4 id="条件查询"><a href="#条件查询" class="headerlink" title="条件查询"></a>条件查询</h4><p>除了查询全部数据，我们还可以使用 <code>where</code> 查询指定的数据：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 这次不用 .then 形式，而采用 async + await</span></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找 username 为 &#x27;李元芳&#x27; 的唯一数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findOne(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            username: <span class="string">&#x27;李元芳&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="built_in">console</span>.dir(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>而类似大于小于这样的查询会稍显麻烦一点。例如我们来编写查询 users 表中年龄大于某个值的代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找满足 age &gt; 24 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            age: &#123;</span><br><span class="line">                [Sequelize.Op.gt]: <span class="number">24</span>,</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="多条件查询"><a href="#多条件查询" class="headerlink" title="多条件查询"></a>多条件查询</h4><p>除了单一条件查询，我们还可以通过嵌套 or 或 and 运算符的集合来生成复杂条件语句。例如我们来查询 <code>年龄小于25 或者 性别为男</code> 的所有数据：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; Op &#125; = Sequelize;</span><br><span class="line">    <span class="comment">// 查找满足 age &lt; 25 或 gender = &#x27;men&#x27; 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            [Op.or]: [</span><br><span class="line">                &#123;</span><br><span class="line">                    age: &#123;</span><br><span class="line">                        [Sequelize.Op.lt]: <span class="number">25</span>,</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>从上面几组查询语句我们可以看出，<code>where</code> 通常用 <code>attribute: value</code> 键值对获取一个对象，其中 <code>value</code> 可以是匹配等式的<strong>数据</strong>或其他运算符的<strong>键值对象</strong>。更多查询语法可在下方链接查询：</p>
+<ul>
+<li><a href="http://docs.sequelizejs.com/manual/querying.html">Sequelize - Querying</a></li>
+<li><a href="https://demopark.github.io/sequelize-docs-Zh-CN/querying.html">Sequelize - Querying（中文文档）</a></li>
+</ul>
+<h4 id="查询限制-limit-offset"><a href="#查询限制-limit-offset" class="headerlink" title="查询限制 limit, offset"></a>查询限制 limit, offset</h4><p>我们还能限制查询的数量：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 只从表中查询两条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>跳过前2条数据：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>跳过前2条数据并获取3条：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">        limit: <span class="number">3</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="查询排序"><a href="#查询排序" class="headerlink" title="查询排序"></a>查询排序</h4><p>我们还可以将查询数据进行排序：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        order: [</span><br><span class="line">            [<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;desc&#x27;</span>]</span><br><span class="line">        ]</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="查询记录"><a href="#查询记录" class="headerlink" title="查询记录"></a>查询记录</h4><p>有些时候我们可能只是想单纯的查询数据表中有多少条数据，这时可以用 <code>count()</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="comment">// 查询 users 表中有多少条数据</span></span><br><span class="line">  <span class="keyword">let</span> count = <span class="keyword">await</span> UserModel.count();</span><br><span class="line">  <span class="built_in">console</span>.log(count);</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者使用 `findAndCountAll()` 方法在数据库中搜索多条记录，它能返回给我们**数据和总计数**：</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中的前两条数据，并返回 users 表中总记录数</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAndCountAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>查询结果的格式如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123; </span><br><span class="line">    count: 总记录数,</span><br><span class="line">    rows: [ </span><br><span class="line">        &#123;第一条记录&#125;, &#123;第二条记录&#125;, ...</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这个方法对我们为前端提供分页功能很方便，count是符合条件的总记录数，而rows中可以是当前页数下的记录数。</p>
+<h3 id="数据增加"><a href="#数据增加" class="headerlink" title="数据增加"></a>数据增加</h3><p>既然能查，当然就能往数据库插入数据，在 <code>sequelize</code> 中，插入数据可以用 <code>build</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 新建一条数据（除了build外，还可以通过 new UserModel(&#123;&#125;) 的形式创建一条记录）</span></span><br><span class="line"><span class="keyword">let</span> wangwu = UserModel.build(&#123;</span><br><span class="line">    username: <span class="string">&#x27;王五&#x27;</span>,</span><br><span class="line">    age: <span class="number">22</span>,</span><br><span class="line">    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// **注意：** 通过 new 或 build 出来的对象不会立即同步到数据库中，</span></span><br><span class="line"><span class="comment">// 需要使用后续的一些方法（例如 save ）来同步</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 你还可以修改这条数据</span></span><br><span class="line">wangwu.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最后别忘了保存才能成功插入数据</span></span><br><span class="line">wangwu.save();</span><br></pre></td></tr></table></figure>
+
+
+<p>如果运行后没报错，去数据库刷新表吧，数据已经成功的插入到 <code>users</code> 表了~</p>
+<h3 id="数据修改"><a href="#数据修改" class="headerlink" title="数据修改"></a>数据修改</h3><p>实际开发中修改数据是再平常不过的了，比如修改一篇博客，更新自己的个人信息… 在 <code>sequelize</code> 中，我们这样修改数据：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 查询id为2的用户数据</span></span><br><span class="line">UserModel.findByPk(<span class="number">2</span>).then(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 查询到以后修改其 age 字段为 99</span></span><br><span class="line">    user.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">99</span>);</span><br><span class="line">    <span class="comment">// 修改后别忘了保存</span></span><br><span class="line">    user.save();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>注意：</strong> 在 Sequelize v5 版本以前，通过id查询数据的方法名为 <code>findById</code> ，从 v5 版本开始，更改为 <code>findByPk</code> 。其实想一下这样非常合理，以前的 <code>findById</code> 太主观了，要知道不一定每个表的主键都为 id ，所以更改为 <code>findByPk</code> 后，表示通过<strong>主键（Pk -&gt; PrimaryKey）</strong>查找，<code>sequelize</code> 会自动通过你在创建表模型时定义的主键字段查找。例如我们一开始在定义 <code>User</code> 模型时，就给 <code>id</code> 字段添加了 <code>primaryKey: true,</code> 属性。</p>
+<p>除了 set + update 来更新数据以外，还可以使用 <code>update()</code> 方法做相同的事情：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> xiaohong = <span class="keyword">await</span> UserModel.findByPk(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">// update方法相当于 set + save</span></span><br><span class="line">    <span class="keyword">await</span> xiaohong.update(&#123;</span><br><span class="line">        age: <span class="number">22</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数据删除"><a href="#数据删除" class="headerlink" title="数据删除"></a>数据删除</h3><p>如果想要删除一条数据，可以使用 <code>destroy</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> wangwu = <span class="keyword">await</span> UserModel.findByPk(<span class="number">4</span>);</span><br><span class="line">    <span class="comment">// 对查询到的数据进行删除</span></span><br><span class="line">    wangwu.destroy();</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> Sequelize = <span class="built_in">require</span>(<span class="string">&#x27;sequelize&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> sequelize = <span class="keyword">new</span> Sequelize(<span class="string">&quot;miaov&quot;</span>, <span class="string">&quot;root&quot;</span>, <span class="string">&quot;root&quot;</span>, &#123;</span><br><span class="line">  <span class="comment">// 其他的数据库连接配置</span></span><br><span class="line">  host: <span class="string">&quot;127.0.0.1&quot;</span>, <span class="comment">// 主机</span></span><br><span class="line">  port: <span class="number">8889</span>, <span class="comment">// 端口</span></span><br><span class="line">  dialect: <span class="string">&quot;mysql&quot;</span> <span class="comment">// 数据库类型</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试连接</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    sequelize.authenticate();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;数据库连接成功!&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;连接失败&#x27;</span>);    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义模型（用对象的方式来描述数据库中的表）</span></span><br><span class="line"><span class="keyword">const</span> UserModel = sequelize.define(<span class="string">&#x27;User&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 定义字段</span></span><br><span class="line">    id: &#123; <span class="comment">// 对字段属性的定义</span></span><br><span class="line">        type: Sequelize.INTEGER(<span class="number">11</span>), <span class="comment">// 字段类型</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,            <span class="comment">// 不允许为空</span></span><br><span class="line">        autoIncrement: <span class="literal">true</span>,         <span class="comment">// id自增长</span></span><br><span class="line">        primaryKey: <span class="literal">true</span>,            <span class="comment">// 设为主键</span></span><br><span class="line">    &#125;,</span><br><span class="line">    username: &#123;</span><br><span class="line">        type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;&#x27;</span>,            <span class="comment">// 设置字段默认值</span></span><br><span class="line">    &#125;,</span><br><span class="line">    age: &#123;</span><br><span class="line">        type: Sequelize.TINYINT(<span class="number">3</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    gender: &#123;</span><br><span class="line">        type: Sequelize.ENUM([<span class="string">&#x27;men&#x27;</span>, <span class="string">&#x27;women&#x27;</span>, <span class="string">&#x27;other&#x27;</span>]),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;men&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;, &#123; <span class="comment">// 用来设置字段以外的其他信息</span></span><br><span class="line">    timestamps: <span class="literal">false</span>,  <span class="comment">// 是否给每条记录添加 createAt 和 updateAt 字段，并在添加新数据和更新数据的时候自动设置这两个字段的值，默认为 true</span></span><br><span class="line">    tableName: <span class="string">&#x27;users&#x27;</span>, <span class="comment">// 该模型映射的真实表名</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 为了方便学习，使用一个函数包裹一组代码</span></span><br><span class="line"><span class="comment">// 这样代码就不会运行了，从而避免干扰其他代码的执行</span></span><br><span class="line"><span class="comment">// 如果想要此函数中代码执行，添加 `()` 就好</span></span><br><span class="line"><span class="comment">// (function()&#123;...&#125;)();  &lt;-- 加上括号</span></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中所有数据</span></span><br><span class="line">    UserModel.findAll().then(<span class="function"><span class="params">users</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 返回的 users 是个数组</span></span><br><span class="line">        users.forEach(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 循环的每个 user 都是个 Model 实例</span></span><br><span class="line">            <span class="comment">// 该 Model 实例包含 get 方法，我们能通过它获取 username</span></span><br><span class="line">            <span class="built_in">console</span>.log(user.get(<span class="string">&#x27;username&#x27;</span>));</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(err);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 新建一条数据（除了build外，还可以通过 new UserModel() 的形式创建一条记录）</span></span><br><span class="line">    <span class="keyword">let</span> liyuanfang = UserModel.build(&#123;</span><br><span class="line">        username: <span class="string">&#x27;李元芳&#x27;</span>,</span><br><span class="line">        age: <span class="number">09</span>,</span><br><span class="line">        gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 修改数据</span></span><br><span class="line">    liyuanfang.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">25</span>);</span><br><span class="line">    <span class="comment">// 别忘了保存</span></span><br><span class="line">    <span class="keyword">await</span> liyuanfang.save();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查询id为2的用户数据</span></span><br><span class="line">    UserModel.findByPk(<span class="number">2</span>).then(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 查询到以后修改其 age 字段为 99</span></span><br><span class="line">        user.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">99</span>);</span><br><span class="line">        <span class="comment">// 修改后别忘了保存</span></span><br><span class="line">        user.save();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> xiaohong = <span class="keyword">await</span> UserModel.findByPk(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">// update方法相当于 set + save</span></span><br><span class="line">    <span class="keyword">await</span> xiaohong.update(&#123;</span><br><span class="line">        age: <span class="number">18</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> wangwu = <span class="keyword">await</span> UserModel.findByPk(<span class="number">4</span>);</span><br><span class="line">    <span class="comment">// 对查询到的数据进行删除</span></span><br><span class="line">    wangwu.destroy();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找 username 为 &#x27;李元芳&#x27; 的唯一数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findOne(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            username: <span class="string">&#x27;李元芳&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="built_in">console</span>.dir(res);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找满足 age &gt; 24 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            age: &#123;</span><br><span class="line">                [Sequelize.Op.gt]: <span class="number">24</span>,</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; Op &#125; = Sequelize;</span><br><span class="line">    <span class="comment">// 查找满足 age &lt; 25 或 gender = &#x27;men&#x27; 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            [Op.or]: [</span><br><span class="line">                &#123;</span><br><span class="line">                    age: &#123;</span><br><span class="line">                        [Sequelize.Op.lt]: <span class="number">25</span>,</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 只从表中查询两条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 跳过前2条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 跳过前2条数据并获取3条</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">        limit: <span class="number">3</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        order: [</span><br><span class="line">            [<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;desc&#x27;</span>]</span><br><span class="line">        ]</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> count = <span class="keyword">await</span> UserModel.count();</span><br><span class="line">    <span class="built_in">console</span>.log(count);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中的前两条数据，并返回 users 表中总记录数</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAndCountAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><p>安装的 sequelize 和 mysql2 的版本为：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;mysql2&quot;</span>: <span class="string">&quot;^1.6.5&quot;</span>,</span><br><span class="line">    <span class="string">&quot;sequelize&quot;</span>: <span class="string">&quot;^5.3.1&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a href="http://docs.sequelizejs.com/">Sequelize Docs</a></li>
+<li><a href="https://demopark.github.io/sequelize-docs-Zh-CN/">Sequelize Docs 中文版</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>SQL</category>
+      </categories>
+      <tags>
+        <tag>Sequelize</tag>
+      </tags>
   </entry>
   <entry>
     <title>&lt;大话数据结构&gt;笔记</title>
