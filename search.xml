@@ -88,6 +88,52 @@
       </tags>
   </entry>
   <entry>
+    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
+    <url>/posts/8214/</url>
+    <content><![CDATA[<blockquote>
+<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
+</blockquote>
+<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
+<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
+<a id="more"></a>
+
+<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
+<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
+<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
+<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
+<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
+<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
+<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
+<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
+
+<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
+<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
+<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
+
+<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
+<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
+<blockquote>
+<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
+</blockquote>
+<p>微软也开始为此优化它们的语法分析器：</p>
+<blockquote>
+<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
+</blockquote>
+<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>构建工具</category>
+      </categories>
+      <tags>
+        <tag>翻译</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JS数组有哪些常用方法</title>
     <url>/posts/21501/</url>
     <content><![CDATA[<h2 id="改变原数组的方法"><a href="#改变原数组的方法" class="headerlink" title="改变原数组的方法"></a>改变原数组的方法</h2><h3 id="splice-添加-删除数组元素"><a href="#splice-添加-删除数组元素" class="headerlink" title="splice() 添加/删除数组元素"></a>splice() 添加/删除数组元素</h3><blockquote>
@@ -224,52 +270,6 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
-  </entry>
-  <entry>
-    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
-    <url>/posts/8214/</url>
-    <content><![CDATA[<blockquote>
-<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
-</blockquote>
-<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
-<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
-<a id="more"></a>
-
-<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
-<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
-<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
-
-<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
-<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
-<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
-<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
-<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
-<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
-
-<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
-<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
-<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
-
-<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
-<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
-<blockquote>
-<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
-</blockquote>
-<p>微软也开始为此优化它们的语法分析器：</p>
-<blockquote>
-<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
-</blockquote>
-<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>构建工具</category>
-      </categories>
-      <tags>
-        <tag>翻译</tag>
-      </tags>
   </entry>
   <entry>
     <title>Promise用法</title>
@@ -412,7 +412,7 @@
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>, <span class="comment">// 编辑器字体大小</span></span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="comment">// 允许异步</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>,</span><br><span class="line">    quotes: [<span class="number">1</span>],</span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭===校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    indent: <span class="string">&#x27;off&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="string">&#x27;smart-tabs&#x27;</span> <span class="comment">// 当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
@@ -426,6 +426,39 @@
       </categories>
       <tags>
         <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue的生命周期函数</title>
+    <url>/posts/33186/</url>
+    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
+<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
+<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
+<a id="more"></a>
+
+<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>结束掉 loading 动画</li>
+<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
+</ul>
+<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
+<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
+<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
+<li>此函数中也能发起异步请求</li>
+</ul>
+<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
+<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
+<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
+<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
+<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -546,39 +579,6 @@
       </categories>
       <tags>
         <tag>Vuex</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue的生命周期函数</title>
-    <url>/posts/33186/</url>
-    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
-<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
-<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
-<a id="more"></a>
-
-<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>结束掉 loading 动画</li>
-<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
-</ul>
-<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
-<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
-<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
-<li>此函数中也能发起异步请求</li>
-</ul>
-<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
-<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
-<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
-<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
-<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -739,6 +739,47 @@
       </tags>
   </entry>
   <entry>
+    <title>cookie与session区别</title>
+    <url>/posts/63891/</url>
+    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
+<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
+
+<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
+
+<a id="more"></a>
+
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
+<ul>
+<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
+<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
+</ul>
+<p>session机制：</p>
+<ul>
+<li>每次请求，服务器会检查是否有 sessionid<ul>
+<li>有，服务器根据 id 返回对应 session 对象</li>
+<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
+</ul>
+</li>
+<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
+<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
+</ul>
+</li>
+</ul>
+<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
+<li>cookie 只能保存字符串类型，以文本的方式</li>
+<li>session 能支持任何类型的对象</li>
+</ul>
+<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
+<li>cookie单个不超过4kb</li>
+<li>session没限制</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
     <title>animation动画（二）</title>
     <url>/posts/20298/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -788,47 +829,6 @@
       <tags>
         <tag>CSS3</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>cookie与session区别</title>
-    <url>/posts/63891/</url>
-    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
-<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
-
-<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
-
-<a id="more"></a>
-
-<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
-<ul>
-<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
-<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
-</ul>
-<p>session机制：</p>
-<ul>
-<li>每次请求，服务器会检查是否有 sessionid<ul>
-<li>有，服务器根据 id 返回对应 session 对象</li>
-<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
-</ul>
-</li>
-<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
-<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
-</ul>
-</li>
-</ul>
-<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
-<li>cookie 只能保存字符串类型，以文本的方式</li>
-<li>session 能支持任何类型的对象</li>
-</ul>
-<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
-<li>cookie单个不超过4kb</li>
-<li>session没限制</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
   </entry>
   <entry>
     <title>let和const和var的区别</title>
@@ -1013,6 +1013,87 @@
       </tags>
   </entry>
   <entry>
+    <title>三栏布局方案(圣杯_双飞翼)</title>
+    <url>/posts/10370/</url>
+    <content><![CDATA[<h2 id="圣杯布局"><a href="#圣杯布局" class="headerlink" title="圣杯布局"></a>圣杯布局</h2><h3 id="步骤一-HTML框架搭建-amp-初始化CSS"><a href="#步骤一-HTML框架搭建-amp-初始化CSS" class="headerlink" title="步骤一 - HTML框架搭建 &amp; 初始化CSS"></a>步骤一 - HTML框架搭建 &amp; 初始化CSS</h3><p>首先把基本框架搭起来（注意中间部分放最前面）：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;center&quot;</span>&gt;</span>我是中间<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;left&quot;</span>&gt;</span>我是左边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;right&quot;</span>&gt;</span>我是右边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>接下来是初始化样式。left, right宽度分别设置为100px和200px；然后设置container的 <code>padding-left: 100px</code> + <code>padding-right: 200px</code> 来占据两侧填充；center宽度设为100%，这样能够自适应剩下的宽度。再让所有子元素左浮动。代码如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>; <span class="comment">/* 左边100， 右边200*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>; <span class="comment">/* 为了看效果，给个300px把高度撑起来 */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span>, <span class="selector-class">.center</span>, <span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">float</span>: left;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>; <span class="comment">/* 占据父元素剩下的宽度*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时的页面效果：</p>
+<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep1.png" class="" title="圣杯step1">
+
+<h3 id="步骤二-让left占据最左列"><a href="#步骤二-让left占据最左列" class="headerlink" title="步骤二 - 让left占据最左列"></a>步骤二 - 让left占据最左列</h3><p>为了让left能越过center，我们先给它设置一个 -100% 的左边距。这个100%是在container中的宽度，也就是center的宽度：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="comment">/*为了看left和center的重叠效果，暂时bgc设为半透明*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: <span class="built_in">rgba</span>(<span class="number">255</span>,<span class="number">204</span>,<span class="number">204</span>,.<span class="number">6</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>页面效果：</p>
+<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep2.png" class="" title="圣杯step2">
+
+<p>此时，我们已经让left从“第二行”升到了“第一行”，为了让它靠到最左侧，不与center重叠，可以给它设置相对定位，然后给个 <code>left: -100px</code> ，让它定位到container最左侧：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="comment">/* 设置相对定位 */</span> </span><br><span class="line">    <span class="attribute">position</span>: relative;</span><br><span class="line">    <span class="comment">/* 靠到最左侧 */</span></span><br><span class="line">    <span class="attribute">left</span>: -<span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>页面效果：</p>
+<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep3.png" class="" title="圣杯step3">
+
+<h3 id="步骤三-让right占据最右列"><a href="#步骤三-让right占据最右列" class="headerlink" title="步骤三 - 让right占据最右列"></a>步骤三 - 让right占据最右列</h3><p>定位好了left，也是时候让right呆在最右边来填充位置了，我们继续使用负margin：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">margin-right</span>: -<span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>页面效果：</p>
+<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep4.png" class="" title="圣杯step4">
+
+<h3 id="步骤四-给container设置min-width"><a href="#步骤四-给container设置min-width" class="headerlink" title="步骤四 - 给container设置min-width"></a>步骤四 - 给container设置min-width</h3><p>看起来已经实现了不是吗？但我们还差最后一步，给container设置一个 <code>min-width: 100px</code> （就是左列的宽度），否则当浏览器缩小到一定程度时，这个布局可能会被破坏。原因简单来讲就是：“由于设置了相对定位，所以当left原来的位置和right的位置产生重叠时，由于浮动的原因一行放不下就会换行”。所以布局就被打乱了。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">min-width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整代码-最终效果"><a href="#完整代码-最终效果" class="headerlink" title="完整代码 + 最终效果"></a>完整代码 + 最终效果</h3><p>这样，我们就实现了圣杯布局，完整代码和效果见下：</p>
+<iframe height="265" scrolling="no" title="三栏布局 - 圣杯布局" src="https://codepen.io/JingW/embed/VRXYmz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="双飞翼布局"><a href="#双飞翼布局" class="headerlink" title="双飞翼布局"></a>双飞翼布局</h2><p>如果上面圣杯布局你已经理解并自己实践了一遍，那么这里的双飞翼布局你也应该不再话下。跟着我一起撸一遍代码吧。</p>
+<h3 id="步骤一-HTML框架搭建-amp-初始化CSS-1"><a href="#步骤一-HTML框架搭建-amp-初始化CSS-1" class="headerlink" title="步骤一 - HTML框架搭建 &amp; 初始化CSS"></a>步骤一 - HTML框架搭建 &amp; 初始化CSS</h3><p>首先搭建html，仔细观察下方代码你会发现，双飞翼布局在html上面有一点和圣杯布局有差别，那就是双飞翼在center里又套了一个div。到后面你就会知道这样设置的目的。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;center&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">div</span>&gt;</span>我是中间<span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;left&quot;</span>&gt;</span>我是左边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;right&quot;</span>&gt;</span>我是右边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后编写初始样式。left定宽100；right定宽200；left, right, center全部设置左浮动。其他例如设置颜色高度等等直接看下方代码：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span>, <span class="selector-class">.center</span>, <span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">float</span>: left;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep1.png" class="" title="双飞翼step1">
+
+<h3 id="步骤二-设置center为100-宽"><a href="#步骤二-设置center为100-宽" class="headerlink" title="步骤二 - 设置center为100%宽"></a>步骤二 - 设置center为100%宽</h3><p>将center的宽度设为100%，这样会把left，right“挤”到第二行：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep2.png" class="" title="双飞翼step2">
+
+<h3 id="步骤三-分别让left-right回到最左边和最右边"><a href="#步骤三-分别让left-right回到最左边和最右边" class="headerlink" title="步骤三 - 分别让left,right回到最左边和最右边"></a>步骤三 - 分别让left,right回到最左边和最右边</h3><p>接着，给left设置 <code>margin-left: -100%</code> 回到最左边，给right设置 <code>margin-left: -200px</code> 回到最右边。此时center和left,right都有重叠区域，为了看效果，设置了半透明背景颜色。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep3.png" class="" title="双飞翼step3">
+
+<h3 id="步骤四-给center的子div设置左右margin"><a href="#步骤四-给center的子div设置左右margin" class="headerlink" title="步骤四 - 给center的子div设置左右margin"></a>步骤四 - 给center的子div设置左右margin</h3><p>其实上面的效果图已经实现了三栏布局中间自适应。但有个问题是center左右部分区域会被遮挡，这个时候在步骤一提到的center子div的作用就体现出来了，我们可以给它设置一个左右的margin值，分别等于left的宽和right的宽，消除掉重叠的副作用。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.center</span> <span class="selector-tag">div</span> &#123;</span><br><span class="line">    <span class="comment">/* 左margin100，右margin200 */</span></span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep4.png" class="" title="双飞翼step4">
+
+<h3 id="步骤五-给container设置min-width"><a href="#步骤五-给container设置min-width" class="headerlink" title="步骤五 - 给container设置min-width"></a>步骤五 - 给container设置min-width</h3><p>最后，给container设置一个min-width，让container最小宽度不小于left宽+right宽</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">min-width</span>: <span class="number">300px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大功告成~</p>
+<h3 id="完整代码-最终效果-1"><a href="#完整代码-最终效果-1" class="headerlink" title="完整代码 + 最终效果"></a>完整代码 + 最终效果</h3><iframe height="265" scrolling="no" title="三栏布局 - 双飞翼布局" src="https://codepen.io/JingW/embed/wOmBoY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【转载】彻底理解cookie-session-token</title>
     <url>/posts/44111/</url>
     <content><![CDATA[<h2 id="发展史"><a href="#发展史" class="headerlink" title="发展史"></a>发展史</h2><p>1、很久很久以前，Web 基本上就是文档的浏览而已， 既然是浏览，作为服务器， 不需要记录谁在某一段时间里都浏览了什么文档，每次请求都是一个新的HTTP协议， 就是请求加响应， 尤其是我不用记住是谁刚刚发了HTTP请求， 每个请求对我来说都是全新的。这段时间很嗨皮</p>
@@ -1123,87 +1204,6 @@
       </tags>
   </entry>
   <entry>
-    <title>三栏布局方案(圣杯_双飞翼)</title>
-    <url>/posts/10370/</url>
-    <content><![CDATA[<h2 id="圣杯布局"><a href="#圣杯布局" class="headerlink" title="圣杯布局"></a>圣杯布局</h2><h3 id="步骤一-HTML框架搭建-amp-初始化CSS"><a href="#步骤一-HTML框架搭建-amp-初始化CSS" class="headerlink" title="步骤一 - HTML框架搭建 &amp; 初始化CSS"></a>步骤一 - HTML框架搭建 &amp; 初始化CSS</h3><p>首先把基本框架搭起来（注意中间部分放最前面）：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;center&quot;</span>&gt;</span>我是中间<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;left&quot;</span>&gt;</span>我是左边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;right&quot;</span>&gt;</span>我是右边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<p>接下来是初始化样式。left, right宽度分别设置为100px和200px；然后设置container的 <code>padding-left: 100px</code> + <code>padding-right: 200px</code> 来占据两侧填充；center宽度设为100%，这样能够自适应剩下的宽度。再让所有子元素左浮动。代码如下：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>; <span class="comment">/* 左边100， 右边200*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>; <span class="comment">/* 为了看效果，给个300px把高度撑起来 */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span>, <span class="selector-class">.center</span>, <span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">float</span>: left;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>; <span class="comment">/* 占据父元素剩下的宽度*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>此时的页面效果：</p>
-<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep1.png" class="" title="圣杯step1">
-
-<h3 id="步骤二-让left占据最左列"><a href="#步骤二-让left占据最左列" class="headerlink" title="步骤二 - 让left占据最左列"></a>步骤二 - 让left占据最左列</h3><p>为了让left能越过center，我们先给它设置一个 -100% 的左边距。这个100%是在container中的宽度，也就是center的宽度：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="comment">/*为了看left和center的重叠效果，暂时bgc设为半透明*/</span></span><br><span class="line">    <span class="attribute">background-color</span>: <span class="built_in">rgba</span>(<span class="number">255</span>,<span class="number">204</span>,<span class="number">204</span>,.<span class="number">6</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>页面效果：</p>
-<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep2.png" class="" title="圣杯step2">
-
-<p>此时，我们已经让left从“第二行”升到了“第一行”，为了让它靠到最左侧，不与center重叠，可以给它设置相对定位，然后给个 <code>left: -100px</code> ，让它定位到container最左侧：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="comment">/* 设置相对定位 */</span> </span><br><span class="line">    <span class="attribute">position</span>: relative;</span><br><span class="line">    <span class="comment">/* 靠到最左侧 */</span></span><br><span class="line">    <span class="attribute">left</span>: -<span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>页面效果：</p>
-<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep3.png" class="" title="圣杯step3">
-
-<h3 id="步骤三-让right占据最右列"><a href="#步骤三-让right占据最右列" class="headerlink" title="步骤三 - 让right占据最右列"></a>步骤三 - 让right占据最右列</h3><p>定位好了left，也是时候让right呆在最右边来填充位置了，我们继续使用负margin：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">margin-right</span>: -<span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>页面效果：</p>
-<img src="/posts/10370/%E5%9C%A3%E6%9D%AFstep4.png" class="" title="圣杯step4">
-
-<h3 id="步骤四-给container设置min-width"><a href="#步骤四-给container设置min-width" class="headerlink" title="步骤四 - 给container设置min-width"></a>步骤四 - 给container设置min-width</h3><p>看起来已经实现了不是吗？但我们还差最后一步，给container设置一个 <code>min-width: 100px</code> （就是左列的宽度），否则当浏览器缩小到一定程度时，这个布局可能会被破坏。原因简单来讲就是：“由于设置了相对定位，所以当left原来的位置和right的位置产生重叠时，由于浮动的原因一行放不下就会换行”。所以布局就被打乱了。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">min-width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="完整代码-最终效果"><a href="#完整代码-最终效果" class="headerlink" title="完整代码 + 最终效果"></a>完整代码 + 最终效果</h3><p>这样，我们就实现了圣杯布局，完整代码和效果见下：</p>
-<iframe height="265" scrolling="no" title="三栏布局 - 圣杯布局" src="https://codepen.io/JingW/embed/VRXYmz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="双飞翼布局"><a href="#双飞翼布局" class="headerlink" title="双飞翼布局"></a>双飞翼布局</h2><p>如果上面圣杯布局你已经理解并自己实践了一遍，那么这里的双飞翼布局你也应该不再话下。跟着我一起撸一遍代码吧。</p>
-<h3 id="步骤一-HTML框架搭建-amp-初始化CSS-1"><a href="#步骤一-HTML框架搭建-amp-初始化CSS-1" class="headerlink" title="步骤一 - HTML框架搭建 &amp; 初始化CSS"></a>步骤一 - HTML框架搭建 &amp; 初始化CSS</h3><p>首先搭建html，仔细观察下方代码你会发现，双飞翼布局在html上面有一点和圣杯布局有差别，那就是双飞翼在center里又套了一个div。到后面你就会知道这样设置的目的。</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;center&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">div</span>&gt;</span>我是中间<span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;left&quot;</span>&gt;</span>我是左边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;right&quot;</span>&gt;</span>我是右边<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后编写初始样式。left定宽100；right定宽200；left, right, center全部设置左浮动。其他例如设置颜色高度等等直接看下方代码：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.left</span>, <span class="selector-class">.center</span>, <span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">float</span>: left;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>效果如下：</p>
-<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep1.png" class="" title="双飞翼step1">
-
-<h3 id="步骤二-设置center为100-宽"><a href="#步骤二-设置center为100-宽" class="headerlink" title="步骤二 - 设置center为100%宽"></a>步骤二 - 设置center为100%宽</h3><p>将center的宽度设为100%，这样会把left，right“挤”到第二行：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.center</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: lightblue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>效果如下：</p>
-<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep2.png" class="" title="双飞翼step2">
-
-<h3 id="步骤三-分别让left-right回到最左边和最右边"><a href="#步骤三-分别让left-right回到最左边和最右边" class="headerlink" title="步骤三 - 分别让left,right回到最左边和最右边"></a>步骤三 - 分别让left,right回到最左边和最右边</h3><p>接着，给left设置 <code>margin-left: -100%</code> 回到最左边，给right设置 <code>margin-left: -200px</code> 回到最右边。此时center和left,right都有重叠区域，为了看效果，设置了半透明背景颜色。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.left</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: pink;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.right</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">margin-left</span>: -<span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>效果如下：</p>
-<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep3.png" class="" title="双飞翼step3">
-
-<h3 id="步骤四-给center的子div设置左右margin"><a href="#步骤四-给center的子div设置左右margin" class="headerlink" title="步骤四 - 给center的子div设置左右margin"></a>步骤四 - 给center的子div设置左右margin</h3><p>其实上面的效果图已经实现了三栏布局中间自适应。但有个问题是center左右部分区域会被遮挡，这个时候在步骤一提到的center子div的作用就体现出来了，我们可以给它设置一个左右的margin值，分别等于left的宽和right的宽，消除掉重叠的副作用。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.center</span> <span class="selector-tag">div</span> &#123;</span><br><span class="line">    <span class="comment">/* 左margin100，右margin200 */</span></span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span> <span class="number">200px</span> <span class="number">0</span> <span class="number">100px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>效果如下：</p>
-<img src="/posts/10370/%E5%8F%8C%E9%A3%9E%E7%BF%BCstep4.png" class="" title="双飞翼step4">
-
-<h3 id="步骤五-给container设置min-width"><a href="#步骤五-给container设置min-width" class="headerlink" title="步骤五 - 给container设置min-width"></a>步骤五 - 给container设置min-width</h3><p>最后，给container设置一个min-width，让container最小宽度不小于left宽+right宽</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">min-width</span>: <span class="number">300px</span>;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#e1e1e1</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>大功告成~</p>
-<h3 id="完整代码-最终效果-1"><a href="#完整代码-最终效果-1" class="headerlink" title="完整代码 + 最终效果"></a>完整代码 + 最终效果</h3><iframe height="265" scrolling="no" title="三栏布局 - 双飞翼布局" src="https://codepen.io/JingW/embed/wOmBoY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>两栏布局方案汇总</title>
     <url>/posts/44541/</url>
     <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
@@ -1282,6 +1282,41 @@
       </categories>
       <tags>
         <tag>Jekyll</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>函数中的rest参数</title>
+    <url>/posts/29820/</url>
+    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
+<blockquote>
+<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+<ul>
+<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
+</li>
+<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
+</li>
+<li><pre><code>arguments
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+callee</code></pre>
+<p>属性）。</p>
+<ul>
+<li>arguments.callee 属性包含当前正在执行的函数。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
       </tags>
   </entry>
   <entry>
@@ -1438,38 +1473,39 @@
       </tags>
   </entry>
   <entry>
-    <title>函数中的rest参数</title>
-    <url>/posts/29820/</url>
-    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
-<blockquote>
-<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
-</blockquote>
+    <title>去除图片上下左右间隙</title>
+    <url>/posts/31251/</url>
+    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
+<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
 <a id="more"></a>
 
-<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
-<ul>
-<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
+<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
+<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
+<li>移除上下间隙：<ul>
+<li>img本身设置 <code>display: block;</code></li>
+<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
+<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
+</ul>
 </li>
-<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
-</li>
-<li><pre><code>arguments
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-callee</code></pre>
-<p>属性）。</p>
-<ul>
-<li>arguments.callee 属性包含当前正在执行的函数。</li>
+<li>移除左右间距：<ul>
+<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
+<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
+<li>父元素 <code>font-size: 0</code></li>
 </ul>
 </li>
 </ul>
 ]]></content>
       <categories>
         <category>前端</category>
-        <category>JS</category>
+        <category>CSS</category>
       </categories>
       <tags>
-        <tag>ES6</tag>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1529,42 +1565,6 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>去除图片上下左右间隙</title>
-    <url>/posts/31251/</url>
-    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
-<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<a id="more"></a>
-
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
-<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
-<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
-</ul>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
-<li>移除上下间隙：<ul>
-<li>img本身设置 <code>display: block;</code></li>
-<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
-<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
-</ul>
-</li>
-<li>移除左右间距：<ul>
-<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
-<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
-<li>父元素 <code>font-size: 0</code></li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
