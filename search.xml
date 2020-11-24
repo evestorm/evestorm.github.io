@@ -88,52 +88,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
-    <url>/posts/8214/</url>
-    <content><![CDATA[<blockquote>
-<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
-</blockquote>
-<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
-<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
-<a id="more"></a>
-
-<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
-<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
-<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
-
-<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
-<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
-<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
-<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
-<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
-<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
-
-<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
-<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
-<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
-
-<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
-<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
-<blockquote>
-<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
-</blockquote>
-<p>微软也开始为此优化它们的语法分析器：</p>
-<blockquote>
-<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
-</blockquote>
-<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>构建工具</category>
-      </categories>
-      <tags>
-        <tag>翻译</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JS数组有哪些常用方法</title>
     <url>/posts/21501/</url>
     <content><![CDATA[<h2 id="改变原数组的方法"><a href="#改变原数组的方法" class="headerlink" title="改变原数组的方法"></a>改变原数组的方法</h2><h3 id="splice-添加-删除数组元素"><a href="#splice-添加-删除数组元素" class="headerlink" title="splice() 添加/删除数组元素"></a>splice() 添加/删除数组元素</h3><blockquote>
@@ -272,6 +226,52 @@
       </categories>
   </entry>
   <entry>
+    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
+    <url>/posts/8214/</url>
+    <content><![CDATA[<blockquote>
+<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
+</blockquote>
+<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
+<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
+<a id="more"></a>
+
+<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
+<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
+<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
+<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
+<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
+<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
+<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
+<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
+
+<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
+<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
+<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
+
+<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
+<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
+<blockquote>
+<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
+</blockquote>
+<p>微软也开始为此优化它们的语法分析器：</p>
+<blockquote>
+<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
+</blockquote>
+<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>构建工具</category>
+      </categories>
+      <tags>
+        <tag>翻译</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Promise用法</title>
     <url>/posts/7878/</url>
     <content><![CDATA[<h2 id="Promise是什么"><a href="#Promise是什么" class="headerlink" title="Promise是什么"></a>Promise是什么</h2><p>Promise 是一种异步编程的解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。</p>
@@ -336,6 +336,43 @@
       </tags>
   </entry>
   <entry>
+    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
+    <url>/posts/22469/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
+<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
+<li>文件——&gt;首选项——&gt;设置</li>
+<li>Ctrl+P 搜索 settings.json</li>
+</ol>
+<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
+<p>有注释的才需要添加，其他没注释的可以不用管</p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>, <span class="comment">// 编辑器字体大小</span></span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="number">0</span>, <span class="comment">// 忽略强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-tabs&#x27;</span>: <span class="number">0</span>, <span class="comment">// 忽略tab检查</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="number">0</span> <span class="comment">// 忽略检查当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Sequelize框架进阶</title>
     <url>/posts/3278/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -389,76 +426,6 @@
       </categories>
       <tags>
         <tag>Sequelize</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
-    <url>/posts/22469/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
-<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
-</ul>
-<a id="more"></a>
-
-<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
-<li>文件——&gt;首选项——&gt;设置</li>
-<li>Ctrl+P 搜索 settings.json</li>
-</ol>
-<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
-<p>有注释的才需要添加，其他没注释的可以不用管</p>
-</blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>, <span class="comment">// 编辑器字体大小</span></span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="string">&#x27;smart-tabs&#x27;</span> <span class="comment">// 当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue的生命周期函数</title>
-    <url>/posts/33186/</url>
-    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
-<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
-<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
-<a id="more"></a>
-
-<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>结束掉 loading 动画</li>
-<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
-</ul>
-<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
-<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
-<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
-<li>此函数中也能发起异步请求</li>
-</ul>
-<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
-<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
-<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
-<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
-<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -579,6 +546,39 @@
       </categories>
       <tags>
         <tag>Vuex</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue的生命周期函数</title>
+    <url>/posts/33186/</url>
+    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
+<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
+<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
+<a id="more"></a>
+
+<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>结束掉 loading 动画</li>
+<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
+</ul>
+<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
+<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
+<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
+<li>此函数中也能发起异步请求</li>
+</ul>
+<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
+<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
+<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
+<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
+<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -739,47 +739,6 @@
       </tags>
   </entry>
   <entry>
-    <title>cookie与session区别</title>
-    <url>/posts/63891/</url>
-    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
-<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
-
-<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
-
-<a id="more"></a>
-
-<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
-<ul>
-<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
-<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
-</ul>
-<p>session机制：</p>
-<ul>
-<li>每次请求，服务器会检查是否有 sessionid<ul>
-<li>有，服务器根据 id 返回对应 session 对象</li>
-<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
-</ul>
-</li>
-<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
-<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
-</ul>
-</li>
-</ul>
-<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
-<li>cookie 只能保存字符串类型，以文本的方式</li>
-<li>session 能支持任何类型的对象</li>
-</ul>
-<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
-<li>cookie单个不超过4kb</li>
-<li>session没限制</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>animation动画（二）</title>
     <url>/posts/20298/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -829,6 +788,47 @@
       <tags>
         <tag>CSS3</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>cookie与session区别</title>
+    <url>/posts/63891/</url>
+    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
+<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
+
+<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
+
+<a id="more"></a>
+
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
+<ul>
+<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
+<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
+</ul>
+<p>session机制：</p>
+<ul>
+<li>每次请求，服务器会检查是否有 sessionid<ul>
+<li>有，服务器根据 id 返回对应 session 对象</li>
+<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
+</ul>
+</li>
+<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
+<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
+</ul>
+</li>
+</ul>
+<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
+<li>cookie 只能保存字符串类型，以文本的方式</li>
+<li>session 能支持任何类型的对象</li>
+</ul>
+<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
+<li>cookie单个不超过4kb</li>
+<li>session没限制</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
   </entry>
   <entry>
     <title>let和const和var的区别</title>
@@ -1094,116 +1094,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【转载】彻底理解cookie-session-token</title>
-    <url>/posts/44111/</url>
-    <content><![CDATA[<h2 id="发展史"><a href="#发展史" class="headerlink" title="发展史"></a>发展史</h2><p>1、很久很久以前，Web 基本上就是文档的浏览而已， 既然是浏览，作为服务器， 不需要记录谁在某一段时间里都浏览了什么文档，每次请求都是一个新的HTTP协议， 就是请求加响应， 尤其是我不用记住是谁刚刚发了HTTP请求， 每个请求对我来说都是全新的。这段时间很嗨皮</p>
-<p>2、但是随着交互式Web应用的兴起，像在线购物网站，需要登录的网站等等，马上就面临一个问题，那就是要管理会话，必须记住哪些人登录系统， 哪些人往自己的购物车中放商品， 也就是说我必须把每个人区分开，这就是一个不小的挑战，因为HTTP请求是无状态的，所以想出的办法就是给大家发一个会话标识(session id), 说白了就是一个随机的字串，每个人收到的都不一样， 每次大家向我发起HTTP请求的时候，把这个字符串给一并捎过来， 这样我就能区分开谁是谁了</p>
-<p>3、这样大家很嗨皮了，可是服务器就不嗨皮了，每个人只需要保存自己的session id，而服务器要保存所有人的session id ！ 如果访问服务器多了， 就得由成千上万，甚至几十万个。</p>
-<p>这对服务器说是一个巨大的开销 ， 严重的限制了服务器扩展能力， 比如说我用两个机器组成了一个集群， 小F通过机器A登录了系统， 那session id会保存在机器A上， 假设小F的下一次请求被转发到机器B怎么办？ 机器B可没有小F的 session id啊。</p>
-<p>有时候会采用一点小伎俩： session sticky ， 就是让小F的请求一直粘连在机器A上， 但是这也不管用， 要是机器A挂掉了， 还得转到机器B去。</p>
-<p>那只好做session 的复制了， 把session id 在两个机器之间搬来搬去， 快累死了。</p>
-<a id="more"></a>
-
-<img src="/posts/44111/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A11.png" class="" title="负载均衡1">
-
-<p>后来有个叫Memcached的支了招： 把session id 集中存储到一个地方， 所有的机器都来访问这个地方的数据， 这样一来，就不用复制了， 但是增加了单点失败的可能性， 要是那个负责session 的机器挂了， 所有人都得重新登录一遍， 估计得被人骂死。</p>
-<img src="/posts/44111/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A12.png" class="" title="负载均衡2">
-
-<p>也尝试把这个单点的机器也搞出集群，增加可靠性， 但不管如何， 这小小的session 对我来说是一个沉重的负担</p>
-<p>4、于是有人就一直在思考， 我为什么要保存这可恶的session呢， 只让每个客户端去保存该多好？</p>
-<p>可是如果不保存这些session id , 怎么验证客户端发给我的session id 的确是我生成的呢？ 如果不去验证，我们都不知道他们是不是合法登录的用户， 那些不怀好意的家伙们就可以伪造session id , 为所欲为了。</p>
-<p>嗯，对了，关键点就是验证 ！</p>
-<p>比如说， 小F已经登录了系统， 我给他发一个令牌(token)， 里边包含了小F的 user id， 下一次小F 再次通过Http 请求访问我的时候， 把这个token 通过Http header 带过来不就可以了。</p>
-<p>不过这和session id没有本质区别啊， 任何人都可以可以伪造， 所以我得想点儿办法， 让别人伪造不了。</p>
-<p>那就对数据做一个签名吧， 比如说我用HMAC-SHA256 算法，加上一个只有我才知道的密钥， 对数据做一个签名， 把这个签名和数据一起作为token ， 由于密钥别人不知道， 就无法伪造token了。</p>
-<img src="/posts/44111/token%E7%AE%97%E6%B3%95.png" class="" title="token算法">
-
-<p>这个token 我不保存， 当小F把这个token 给我发过来的时候，我再用同样的HMAC-SHA256 算法和同样的密钥，对数据再计算一次签名， 和token 中的签名做个比较， 如果相同， 我就知道小F已经登录过了，并且可以直接取到小F的user id , 如果不相同， 数据部分肯定被人篡改过， 我就告诉发送者： 对不起，没有认证。</p>
-<img src="/posts/44111/token%E9%AA%8C%E8%AF%81.png" class="" title="token验证">
-
-<p>Token 中的数据是明文保存的（虽然我会用Base64做下编码， 但那不是加密）， 还是可以被别人看到的， 所以我不能在其中保存像密码这样的敏感信息。</p>
-<p>当然， 如果一个人的token 被别人偷走了， 那我也没办法， 我也会认为小偷就是合法用户， 这其实和一个人的session id 被别人偷走是一样的。</p>
-<p>这样一来， 我就不保存session id 了， 我只是生成token , 然后验证token ， 我用我的CPU计算时间获取了我的session 存储空间 ！</p>
-<p>解除了session id这个负担， 可以说是无事一身轻， 我的机器集群现在可以轻松地做水平扩展， 用户访问量增大， 直接加机器就行。 这种无状态的感觉实在是太好了！</p>
-<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p>cookie 是一个非常具体的东西，指的就是浏览器里面能永久存储的一种数据，仅仅是浏览器实现的一种数据存储功能。</p>
-<p>cookie由服务器生成，发送给浏览器，浏览器把cookie以kv形式保存到某个目录下的文本文件内，下一次请求同一网站时会把该cookie发送给服务器。由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。</p>
-<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><p>session 从字面上讲，就是会话。这个就类似于你和一个人交谈，你怎么知道当前和你交谈的是张三而不是李四呢？对方肯定有某种特征（长相等）表明他就是张三。</p>
-<p>session 也是类似的道理，服务器要知道当前发请求给自己的是谁。为了做这种区分，服务器就要给每个客户端分配不同的“身份标识”，然后客户端每次向服务器发请求的时候，都带上这个“身份标识”，服务器就知道这个请求来自于谁了。至于客户端怎么保存这个“身份标识”，可以有很多种方式，对于浏览器客户端，大家都默认采用 cookie 的方式。</p>
-<p>服务器使用session把用户的信息临时保存在了服务器上，用户离开网站后session会被销毁。这种用户信息存储方式相对cookie来说更安全，可是session有一个缺陷：如果web服务器做了负载均衡，那么下一个操作请求到了另一台服务器的时候session会丢失。</p>
-<h2 id="Token"><a href="#Token" class="headerlink" title="Token"></a>Token</h2><p>在Web领域基于Token的身份验证随处可见。在大多数使用Web API的互联网公司中，tokens 是多用户下处理认证的最佳方式。</p>
-<p>以下几点特性会让你在程序中使用基于Token的身份验证</p>
-<ol>
-<li>无状态、可扩展</li>
-<li>支持移动设备</li>
-<li>跨程序调用</li>
-<li>安全</li>
-</ol>
-<p>那些使用基于Token的身份验证的大佬们</p>
-<p>大部分你见到过的API和Web应用都使用tokens。例如Facebook, Twitter, Google+, GitHub等。</p>
-<h3 id="Token的起源"><a href="#Token的起源" class="headerlink" title="Token的起源"></a>Token的起源</h3><p>在介绍基于Token的身份验证的原理与优势之前，不妨先看看之前的认证都是怎么做的。</p>
-<h4 id="基于服务器的验证"><a href="#基于服务器的验证" class="headerlink" title="基于服务器的验证"></a>基于服务器的验证</h4><p>我们都是知道HTTP协议是无状态的，这种无状态意味着程序需要验证每一次请求，从而辨别客户端的身份。</p>
-<p>在这之前，程序都是通过在服务端存储的登录信息来辨别请求的。这种方式一般都是通过存储Session来完成。</p>
-<p>下图展示了基于服务器验证的原理</p>
-<img src="/posts/44111/session.png" class="" title="session">
-
-<p>随着Web，应用程序，已经移动端的兴起，这种验证的方式逐渐暴露出了问题。尤其是在可扩展性方面。</p>
-<h4 id="基于服务器验证方式暴露的一些问题"><a href="#基于服务器验证方式暴露的一些问题" class="headerlink" title="基于服务器验证方式暴露的一些问题"></a>基于服务器验证方式暴露的一些问题</h4><ol>
-<li>Session：每次认证用户发起请求时，服务器需要去创建一个记录来存储信息。当越来越多的用户发请求时，内存的开销也会不断增加。</li>
-<li>可扩展性：在服务端的内存中使用Seesion存储登录信息，伴随而来的是可扩展性问题。</li>
-<li>CORS(跨域资源共享)：当我们需要让数据跨多台移动设备上使用时，跨域资源的共享会是一个让人头疼的问题。在使用Ajax抓取另一个域的资源，就可以会出现禁止请求的情况。</li>
-<li>CSRF(跨站请求伪造)：用户在访问银行网站时，他们很容易受到跨站请求伪造的攻击，并且能够被利用其访问其他的网站。</li>
-</ol>
-<p>在这些问题中，可扩展行是最突出的。因此我们有必要去寻求一种更有行之有效的方法。</p>
-<h4 id="基于Token的验证原理"><a href="#基于Token的验证原理" class="headerlink" title="基于Token的验证原理"></a>基于Token的验证原理</h4><p>基于Token的身份验证是无状态的，我们不将用户信息存在服务器或Session中。</p>
-<p>这种概念解决了在服务端存储信息时的许多问题</p>
-<p>NoSession意味着你的程序可以根据需要去增减机器，而不用去担心用户是否登录。</p>
-<p>基于Token的身份验证的过程如下:</p>
-<ol>
-<li>用户通过用户名和密码发送请求。</li>
-<li>程序验证。</li>
-<li>程序返回一个签名的token 给客户端。</li>
-<li>客户端储存token,并且每次用于每次发送请求。</li>
-<li>服务端验证token并返回数据。</li>
-</ol>
-<p>每一次请求都需要token。token应该在HTTP的头部发送从而保证了Http请求无状态。我们同样通过设置服务器属性Access-Control-Allow-Origin: *，让服务器能接受到来自所有域的请求。需要主要的是，在ACAO头部标明(designating)*时，不得带有像HTTP认证，客户端SSL证书和cookies的证书。</p>
-<p>实现思路：</p>
-<img src="/posts/44111/token%E6%B5%81%E7%A8%8B.png" class="" title="token流程">
-
-<ol>
-<li>用户登录校验，校验成功后就返回Token给客户端。</li>
-<li>客户端收到数据后保存在客户端</li>
-<li>客户端每次访问API是携带Token到服务器端。</li>
-<li>服务器端采用filter过滤器校验。校验成功则返回请求数据，校验失败则返回错误码</li>
-</ol>
-<p>当我们在程序中认证了信息并取得token之后，我们便能通过这个Token做许多的事情。</p>
-<p>我们甚至能基于创建一个基于权限的token传给第三方应用程序，这些第三方程序能够获取到我们的数据（当然只有在我们允许的特定的token）</p>
-<h4 id="Tokens的优势"><a href="#Tokens的优势" class="headerlink" title="Tokens的优势"></a>Tokens的优势</h4><p><strong>无状态、可扩展</strong></p>
-<p>在客户端存储的Tokens是无状态的，并且能够被扩展。基于这种无状态和不存储Session信息，负载负载均衡器能够将用户信息从一个服务传到其他服务器上。</p>
-<p>如果我们将已验证的用户的信息保存在Session中，则每次请求都需要用户向已验证的服务器发送验证信息(称为Session亲和性)。用户量大时，可能会造成一些拥堵。</p>
-<p>但是不要着急。使用tokens之后这些问题都迎刃而解，因为tokens自己hold住了用户的验证信息。</p>
-<p><strong>安全性</strong></p>
-<p>请求中发送token而不再是发送cookie能够防止CSRF(跨站请求伪造)。即使在客户端使用cookie存储token，cookie也仅仅是一个存储机制而不是用于认证。不将信息存储在Session中，让我们少了对session操作。</p>
-<p>token是有时效的，一段时间之后用户需要重新验证。我们也不一定需要等到token自动失效，token有撤回的操作，通过token revocataion可以使一个特定的token或是一组有相同认证的token无效。</p>
-<p><strong>可扩展性</strong></p>
-<p>Tokens能够创建与其它程序共享权限的程序。例如，能将一个随便的社交帐号和自己的大号(Fackbook或是Twitter)联系起来。当通过服务登录Twitter(我们将这个过程Buffer)时，我们可以将这些Buffer附到Twitter的数据流上(we are allowing Buffer to post to our Twitter stream)。</p>
-<p>使用tokens时，可以提供可选的权限给第三方应用程序。当用户想让另一个应用程序访问它们的数据，我们可以通过建立自己的API，得出特殊权限的tokens。</p>
-<p><strong>多平台跨域</strong></p>
-<p>我们提前先来谈论一下CORS(跨域资源共享)，对应用程序和服务进行扩展的时候，需要介入各种各种的设备和应用程序。</p>
-<p>Having our API just serve data, we can also make the design choice to serve assets from a CDN. This eliminates the issues that CORS brings up after we set a quick header configuration for our application.</p>
-<p>只要用户有一个通过了验证的token，数据和资源就能够在任何域上被请求到。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Access-Control-Allow-Origin: *</span><br></pre></td></tr></table></figure>
-
-<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://zhuanlan.zhihu.com/p/63061864">https://zhuanlan.zhihu.com/p/63061864</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>缓存</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>两栏布局方案汇总</title>
     <url>/posts/44541/</url>
     <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
@@ -1282,41 +1172,6 @@
       </categories>
       <tags>
         <tag>Jekyll</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>函数中的rest参数</title>
-    <url>/posts/29820/</url>
-    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
-<blockquote>
-<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
-</blockquote>
-<a id="more"></a>
-
-<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
-<ul>
-<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
-</li>
-<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
-</li>
-<li><pre><code>arguments
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-callee</code></pre>
-<p>属性）。</p>
-<ul>
-<li>arguments.callee 属性包含当前正在执行的函数。</li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>ES6</tag>
       </tags>
   </entry>
   <entry>
@@ -1473,39 +1328,148 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>去除图片上下左右间隙</title>
-    <url>/posts/31251/</url>
-    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
-<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
+    <title>函数中的rest参数</title>
+    <url>/posts/29820/</url>
+    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
+<blockquote>
+<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
+</blockquote>
 <a id="more"></a>
 
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
-<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
-<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
-</ul>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
-<li>移除上下间隙：<ul>
-<li>img本身设置 <code>display: block;</code></li>
-<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
-<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
-</ul>
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+<ul>
+<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
 </li>
-<li>移除左右间距：<ul>
-<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
-<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
-<li>父元素 <code>font-size: 0</code></li>
+<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
+</li>
+<li><pre><code>arguments
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+callee</code></pre>
+<p>属性）。</p>
+<ul>
+<li>arguments.callee 属性包含当前正在执行的函数。</li>
 </ul>
 </li>
 </ul>
 ]]></content>
       <categories>
         <category>前端</category>
-        <category>CSS</category>
+        <category>JS</category>
       </categories>
       <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【转载】彻底理解cookie-session-token</title>
+    <url>/posts/44111/</url>
+    <content><![CDATA[<h2 id="发展史"><a href="#发展史" class="headerlink" title="发展史"></a>发展史</h2><p>1、很久很久以前，Web 基本上就是文档的浏览而已， 既然是浏览，作为服务器， 不需要记录谁在某一段时间里都浏览了什么文档，每次请求都是一个新的HTTP协议， 就是请求加响应， 尤其是我不用记住是谁刚刚发了HTTP请求， 每个请求对我来说都是全新的。这段时间很嗨皮</p>
+<p>2、但是随着交互式Web应用的兴起，像在线购物网站，需要登录的网站等等，马上就面临一个问题，那就是要管理会话，必须记住哪些人登录系统， 哪些人往自己的购物车中放商品， 也就是说我必须把每个人区分开，这就是一个不小的挑战，因为HTTP请求是无状态的，所以想出的办法就是给大家发一个会话标识(session id), 说白了就是一个随机的字串，每个人收到的都不一样， 每次大家向我发起HTTP请求的时候，把这个字符串给一并捎过来， 这样我就能区分开谁是谁了</p>
+<p>3、这样大家很嗨皮了，可是服务器就不嗨皮了，每个人只需要保存自己的session id，而服务器要保存所有人的session id ！ 如果访问服务器多了， 就得由成千上万，甚至几十万个。</p>
+<p>这对服务器说是一个巨大的开销 ， 严重的限制了服务器扩展能力， 比如说我用两个机器组成了一个集群， 小F通过机器A登录了系统， 那session id会保存在机器A上， 假设小F的下一次请求被转发到机器B怎么办？ 机器B可没有小F的 session id啊。</p>
+<p>有时候会采用一点小伎俩： session sticky ， 就是让小F的请求一直粘连在机器A上， 但是这也不管用， 要是机器A挂掉了， 还得转到机器B去。</p>
+<p>那只好做session 的复制了， 把session id 在两个机器之间搬来搬去， 快累死了。</p>
+<a id="more"></a>
+
+<img src="/posts/44111/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A11.png" class="" title="负载均衡1">
+
+<p>后来有个叫Memcached的支了招： 把session id 集中存储到一个地方， 所有的机器都来访问这个地方的数据， 这样一来，就不用复制了， 但是增加了单点失败的可能性， 要是那个负责session 的机器挂了， 所有人都得重新登录一遍， 估计得被人骂死。</p>
+<img src="/posts/44111/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A12.png" class="" title="负载均衡2">
+
+<p>也尝试把这个单点的机器也搞出集群，增加可靠性， 但不管如何， 这小小的session 对我来说是一个沉重的负担</p>
+<p>4、于是有人就一直在思考， 我为什么要保存这可恶的session呢， 只让每个客户端去保存该多好？</p>
+<p>可是如果不保存这些session id , 怎么验证客户端发给我的session id 的确是我生成的呢？ 如果不去验证，我们都不知道他们是不是合法登录的用户， 那些不怀好意的家伙们就可以伪造session id , 为所欲为了。</p>
+<p>嗯，对了，关键点就是验证 ！</p>
+<p>比如说， 小F已经登录了系统， 我给他发一个令牌(token)， 里边包含了小F的 user id， 下一次小F 再次通过Http 请求访问我的时候， 把这个token 通过Http header 带过来不就可以了。</p>
+<p>不过这和session id没有本质区别啊， 任何人都可以可以伪造， 所以我得想点儿办法， 让别人伪造不了。</p>
+<p>那就对数据做一个签名吧， 比如说我用HMAC-SHA256 算法，加上一个只有我才知道的密钥， 对数据做一个签名， 把这个签名和数据一起作为token ， 由于密钥别人不知道， 就无法伪造token了。</p>
+<img src="/posts/44111/token%E7%AE%97%E6%B3%95.png" class="" title="token算法">
+
+<p>这个token 我不保存， 当小F把这个token 给我发过来的时候，我再用同样的HMAC-SHA256 算法和同样的密钥，对数据再计算一次签名， 和token 中的签名做个比较， 如果相同， 我就知道小F已经登录过了，并且可以直接取到小F的user id , 如果不相同， 数据部分肯定被人篡改过， 我就告诉发送者： 对不起，没有认证。</p>
+<img src="/posts/44111/token%E9%AA%8C%E8%AF%81.png" class="" title="token验证">
+
+<p>Token 中的数据是明文保存的（虽然我会用Base64做下编码， 但那不是加密）， 还是可以被别人看到的， 所以我不能在其中保存像密码这样的敏感信息。</p>
+<p>当然， 如果一个人的token 被别人偷走了， 那我也没办法， 我也会认为小偷就是合法用户， 这其实和一个人的session id 被别人偷走是一样的。</p>
+<p>这样一来， 我就不保存session id 了， 我只是生成token , 然后验证token ， 我用我的CPU计算时间获取了我的session 存储空间 ！</p>
+<p>解除了session id这个负担， 可以说是无事一身轻， 我的机器集群现在可以轻松地做水平扩展， 用户访问量增大， 直接加机器就行。 这种无状态的感觉实在是太好了！</p>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p>cookie 是一个非常具体的东西，指的就是浏览器里面能永久存储的一种数据，仅仅是浏览器实现的一种数据存储功能。</p>
+<p>cookie由服务器生成，发送给浏览器，浏览器把cookie以kv形式保存到某个目录下的文本文件内，下一次请求同一网站时会把该cookie发送给服务器。由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。</p>
+<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><p>session 从字面上讲，就是会话。这个就类似于你和一个人交谈，你怎么知道当前和你交谈的是张三而不是李四呢？对方肯定有某种特征（长相等）表明他就是张三。</p>
+<p>session 也是类似的道理，服务器要知道当前发请求给自己的是谁。为了做这种区分，服务器就要给每个客户端分配不同的“身份标识”，然后客户端每次向服务器发请求的时候，都带上这个“身份标识”，服务器就知道这个请求来自于谁了。至于客户端怎么保存这个“身份标识”，可以有很多种方式，对于浏览器客户端，大家都默认采用 cookie 的方式。</p>
+<p>服务器使用session把用户的信息临时保存在了服务器上，用户离开网站后session会被销毁。这种用户信息存储方式相对cookie来说更安全，可是session有一个缺陷：如果web服务器做了负载均衡，那么下一个操作请求到了另一台服务器的时候session会丢失。</p>
+<h2 id="Token"><a href="#Token" class="headerlink" title="Token"></a>Token</h2><p>在Web领域基于Token的身份验证随处可见。在大多数使用Web API的互联网公司中，tokens 是多用户下处理认证的最佳方式。</p>
+<p>以下几点特性会让你在程序中使用基于Token的身份验证</p>
+<ol>
+<li>无状态、可扩展</li>
+<li>支持移动设备</li>
+<li>跨程序调用</li>
+<li>安全</li>
+</ol>
+<p>那些使用基于Token的身份验证的大佬们</p>
+<p>大部分你见到过的API和Web应用都使用tokens。例如Facebook, Twitter, Google+, GitHub等。</p>
+<h3 id="Token的起源"><a href="#Token的起源" class="headerlink" title="Token的起源"></a>Token的起源</h3><p>在介绍基于Token的身份验证的原理与优势之前，不妨先看看之前的认证都是怎么做的。</p>
+<h4 id="基于服务器的验证"><a href="#基于服务器的验证" class="headerlink" title="基于服务器的验证"></a>基于服务器的验证</h4><p>我们都是知道HTTP协议是无状态的，这种无状态意味着程序需要验证每一次请求，从而辨别客户端的身份。</p>
+<p>在这之前，程序都是通过在服务端存储的登录信息来辨别请求的。这种方式一般都是通过存储Session来完成。</p>
+<p>下图展示了基于服务器验证的原理</p>
+<img src="/posts/44111/session.png" class="" title="session">
+
+<p>随着Web，应用程序，已经移动端的兴起，这种验证的方式逐渐暴露出了问题。尤其是在可扩展性方面。</p>
+<h4 id="基于服务器验证方式暴露的一些问题"><a href="#基于服务器验证方式暴露的一些问题" class="headerlink" title="基于服务器验证方式暴露的一些问题"></a>基于服务器验证方式暴露的一些问题</h4><ol>
+<li>Session：每次认证用户发起请求时，服务器需要去创建一个记录来存储信息。当越来越多的用户发请求时，内存的开销也会不断增加。</li>
+<li>可扩展性：在服务端的内存中使用Seesion存储登录信息，伴随而来的是可扩展性问题。</li>
+<li>CORS(跨域资源共享)：当我们需要让数据跨多台移动设备上使用时，跨域资源的共享会是一个让人头疼的问题。在使用Ajax抓取另一个域的资源，就可以会出现禁止请求的情况。</li>
+<li>CSRF(跨站请求伪造)：用户在访问银行网站时，他们很容易受到跨站请求伪造的攻击，并且能够被利用其访问其他的网站。</li>
+</ol>
+<p>在这些问题中，可扩展行是最突出的。因此我们有必要去寻求一种更有行之有效的方法。</p>
+<h4 id="基于Token的验证原理"><a href="#基于Token的验证原理" class="headerlink" title="基于Token的验证原理"></a>基于Token的验证原理</h4><p>基于Token的身份验证是无状态的，我们不将用户信息存在服务器或Session中。</p>
+<p>这种概念解决了在服务端存储信息时的许多问题</p>
+<p>NoSession意味着你的程序可以根据需要去增减机器，而不用去担心用户是否登录。</p>
+<p>基于Token的身份验证的过程如下:</p>
+<ol>
+<li>用户通过用户名和密码发送请求。</li>
+<li>程序验证。</li>
+<li>程序返回一个签名的token 给客户端。</li>
+<li>客户端储存token,并且每次用于每次发送请求。</li>
+<li>服务端验证token并返回数据。</li>
+</ol>
+<p>每一次请求都需要token。token应该在HTTP的头部发送从而保证了Http请求无状态。我们同样通过设置服务器属性Access-Control-Allow-Origin: *，让服务器能接受到来自所有域的请求。需要主要的是，在ACAO头部标明(designating)*时，不得带有像HTTP认证，客户端SSL证书和cookies的证书。</p>
+<p>实现思路：</p>
+<img src="/posts/44111/token%E6%B5%81%E7%A8%8B.png" class="" title="token流程">
+
+<ol>
+<li>用户登录校验，校验成功后就返回Token给客户端。</li>
+<li>客户端收到数据后保存在客户端</li>
+<li>客户端每次访问API是携带Token到服务器端。</li>
+<li>服务器端采用filter过滤器校验。校验成功则返回请求数据，校验失败则返回错误码</li>
+</ol>
+<p>当我们在程序中认证了信息并取得token之后，我们便能通过这个Token做许多的事情。</p>
+<p>我们甚至能基于创建一个基于权限的token传给第三方应用程序，这些第三方程序能够获取到我们的数据（当然只有在我们允许的特定的token）</p>
+<h4 id="Tokens的优势"><a href="#Tokens的优势" class="headerlink" title="Tokens的优势"></a>Tokens的优势</h4><p><strong>无状态、可扩展</strong></p>
+<p>在客户端存储的Tokens是无状态的，并且能够被扩展。基于这种无状态和不存储Session信息，负载负载均衡器能够将用户信息从一个服务传到其他服务器上。</p>
+<p>如果我们将已验证的用户的信息保存在Session中，则每次请求都需要用户向已验证的服务器发送验证信息(称为Session亲和性)。用户量大时，可能会造成一些拥堵。</p>
+<p>但是不要着急。使用tokens之后这些问题都迎刃而解，因为tokens自己hold住了用户的验证信息。</p>
+<p><strong>安全性</strong></p>
+<p>请求中发送token而不再是发送cookie能够防止CSRF(跨站请求伪造)。即使在客户端使用cookie存储token，cookie也仅仅是一个存储机制而不是用于认证。不将信息存储在Session中，让我们少了对session操作。</p>
+<p>token是有时效的，一段时间之后用户需要重新验证。我们也不一定需要等到token自动失效，token有撤回的操作，通过token revocataion可以使一个特定的token或是一组有相同认证的token无效。</p>
+<p><strong>可扩展性</strong></p>
+<p>Tokens能够创建与其它程序共享权限的程序。例如，能将一个随便的社交帐号和自己的大号(Fackbook或是Twitter)联系起来。当通过服务登录Twitter(我们将这个过程Buffer)时，我们可以将这些Buffer附到Twitter的数据流上(we are allowing Buffer to post to our Twitter stream)。</p>
+<p>使用tokens时，可以提供可选的权限给第三方应用程序。当用户想让另一个应用程序访问它们的数据，我们可以通过建立自己的API，得出特殊权限的tokens。</p>
+<p><strong>多平台跨域</strong></p>
+<p>我们提前先来谈论一下CORS(跨域资源共享)，对应用程序和服务进行扩展的时候，需要介入各种各种的设备和应用程序。</p>
+<p>Having our API just serve data, we can also make the design choice to serve assets from a CDN. This eliminates the issues that CORS brings up after we set a quick header configuration for our application.</p>
+<p>只要用户有一个通过了验证的token，数据和资源就能够在任何域上被请求到。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Access-Control-Allow-Origin: *</span><br></pre></td></tr></table></figure>
+
+<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://zhuanlan.zhihu.com/p/63061864">https://zhuanlan.zhihu.com/p/63061864</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>缓存</tag>
       </tags>
   </entry>
   <entry>
@@ -1565,6 +1529,42 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>去除图片上下左右间隙</title>
+    <url>/posts/31251/</url>
+    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
+<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
+<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
+<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
+<li>移除上下间隙：<ul>
+<li>img本身设置 <code>display: block;</code></li>
+<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
+<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
+</ul>
+</li>
+<li>移除左右间距：<ul>
+<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
+<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
+<li>父元素 <code>font-size: 0</code></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
