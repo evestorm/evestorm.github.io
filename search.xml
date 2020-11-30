@@ -1039,6 +1039,149 @@
       </tags>
   </entry>
   <entry>
+    <title>【转载】20个ChromeDevTools调试技巧</title>
+    <url>/posts/709/</url>
+    <content><![CDATA[<p><strong>译者按：</strong> Chrome DevTools 很强大，甚至可以替代 IDE 了！</p>
+<ul>
+<li>原文: <a href="https://medium.com/frontmen/art-of-debugging-with-chrome-devtools-ab7b5fd8e0b4">Art of debugging with Chrome DevTools</a></li>
+<li>译者: <a href="https://www.fundebug.com/">Fundebug</a></li>
+</ul>
+<p><strong>为了保证可读性，本文采用意译而非直译。另外，本文版权归原作者所有，翻译仅用于学习。</strong></p>
+<p><strong>小编推荐：<a href="https://www.fundebug.com/">Fundebug</a>专注于 JavaScript、微信小程序、微信小游戏，Node.js 和 Java 线上 bug 实时监控。真的是一个很好用的 bug 监控服务，众多大佬公司都在使用。</strong></p>
+<p>谷歌开发者工具提供了一系列的功能来帮助开发者高效 Debug 网页应用，让他们可以更快地查找和修复 bug。在谷歌的开发者工具中，有非常多有用的小工具，但是很多开发者并不知道。通过这篇文章，我把我常用的那些高效 Debug 的 Chrome 开发者工具的功能分享给大家。</p>
+<p>_简洁起见，接下来我会使用<code>开发者工具</code>来指代<code>谷歌开发者工具</code>_。</p>
+<p>在我们开始之前，你需要做一些准备工作。</p>
+<h3 id="使用金丝雀版"><a href="#使用金丝雀版" class="headerlink" title="使用金丝雀版"></a><strong>使用金丝雀版</strong></h3><p>如果你想使用谷歌最新的版本和开发者工具，你可以下载<a href="https://www.google.com/chrome/canary/">金丝雀版本</a>，甚至把它设置为开发默认打开的浏览器。金丝雀版本旨在为早期接受者提供最新的更新。它可能不稳定，但是大多数时候是没问题的。你要习惯去使用最新最强的谷歌浏览器。</p>
+<p><strong>1. 开启开发者工具的实验性功能</strong></p>
+<p>你可以到<code>chrome://flags</code>页面，然后开启<code>Developer Tools experiments</code>选项。</p>
+<p>当开启后，在开发者工具的设置页面，可以发现多了一个<code>Experiments</code>选项。如果我使用的一些功能你没有看到，那么请到<code>Experiments</code>窗口打开。</p>
+<p><strong>2.超级实验性功能</strong></p>
+<p>如果我使用到的功能在<code>Experiments</code>列表没有，那么它可能是一个 WIP 功能(WIP 指 working in progress)。你可以这样开启：页面处在<code>Experiments</code>界面，连续敲击<code>shift</code>键 6 次来开启 WIP 功能。</p>
+<img src="/posts/undefined/Experiments.gif" class="" title="Experiments">
+
+<h3 id="Console"><a href="#Console" class="headerlink" title="Console"></a><strong>Console</strong></h3><p>当 Debug 的时候，我们绝大部分时间是在和 Console 打交道。我们往往在代码中插入很多 Console logs，通过打印变量值来 debug。鉴于 Console 对于我们这么重要，很有必要了解所有开发者工具提供的相关的 APIs 和快捷键。</p>
+<p><strong>3. 总是打印对象</strong></p>
+<p>我的第一个建议其实和开发者工具没有关系，而是我一直使用的一个技巧。在使用<code>console.log();</code>的时候，不仅仅打印变量，而是要打印对象，用大括号(<code>&#123;&#125;</code>)将变量包围起来。这样的优点是不仅会把变量的值打印，同时还会将变量名打印出来。</p>
+<img src="/posts/undefined/log.png" class="" title="log">
+<img src="/posts/undefined/superlog.png" class="" title="superlog">
+
+<p><strong>4. 使用 console.table 来打印多条目数据</strong></p>
+<p>如果你要打印的变量是一个数组，每一个元素都是一个对象。我建议你使用<code>console.table</code>来打印，其表格化的呈现更加美观易读。</p>
+<img src="/posts/undefined/logtable.png" class="" title="logtable">
+
+<p><strong>5. 给 log 加点颜色</strong></p>
+<p>log 有时候变得非常多，包含你自己的、一些第三方扩展或者浏览器的 logs。除了使用过滤器(filter)以外，你还可以使用颜色来更好地区分。</p>
+<img src="/posts/undefined/logcolor.png" class="" title="logcolor">
+
+<p><strong>6. $ 和 $$</strong></p>
+<p>如果你在 console 下没有任何库使用<code>$</code>和<code>$$</code>，那么你可以使用它们分别作为<code>document.querySelector()</code> 和 <code>document.querySelectorAll()</code>的快捷键。</p>
+<p>除了提供了一个更加快捷的方式外，还有一个好处，<code>$$</code>返回一个数组，而不是<a href="http://2ality.com/2013/05/quirk-array-like-objects.html">array-like</a>的<a href="https://developer.mozilla.org/en-US/docs/Web/API/NodeList">NodeList</a>. 所以你可以直接使用<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce">reduce</a>和<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">filter</a> 函数。</p>
+<p>你可以使用<code>$$</code>检查页面中的无效链接：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all(</span><br><span class="line">  $$(<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">    .map(<span class="function"><span class="params">link</span> =&gt;</span> link.href)</span><br><span class="line">    .map(<span class="function"><span class="params">href</span> =&gt;</span> fetch(href))</span><br><span class="line">)</span><br><span class="line">  .then(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;All links working&#x27;</span>))</span><br><span class="line">  .catch(<span class="function">() =&gt;</span> <span class="built_in">console</span>.error(<span class="string">&#x27;Some links are broken&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>7. $0</strong></p>
+<p>如果你想引用某个 DOM 元素，使用<code>$0</code>。<code>$0</code>指向你当前在 Element 中选中的元素。如果指定了<code>$0</code>，<code>$1</code>指向之前选中的元素。以此类推，直到<code>$4</code>都可以使用。</p>
+<p><strong>8. $_</strong></p>
+<p><code>$_</code>记录了最后一次在 Console 计算的表达式。</p>
+<p><strong>9. getEventListeners()</strong></p>
+<p><code>getEventListeners(domElement)</code> 返回在 DOM 元素上注册的所有的事件。请看下面的例子：</p>
+<img src="/posts/undefined/getEventListeners.gif" class="" title="getEventListeners">
+
+<p>你也许注意到了，当我在 console 里输入表达式的时候，其结果立即被计算出来了。你可以看到我并没有敲击 Enter 键，而结果已经显示出来。这个是金丝雀版本的一个新功能，叫做”Eager Evaluation”。</p>
+<img src="/posts/undefined/EagerEvaluation.png" class="" title="EagerEvaluation">
+
+<p><strong>10. debug(fn)</strong></p>
+<p>在上面的例子中，如果你想在点击按钮后的执行过程中暂停，你可以使用<code>debug</code>函数。<code>debug(fn)</code>接收一个函数作为参数，当每次该函数被调用时，Debugger 就会在该函数的第一行中断执行。</p>
+<p>想象一下你要 debug 一个按钮的问题，但是你不知道这个按钮对应的事件函数在代码中什么位置。除了去大量的源代码中慢慢寻找之外，还有一个巧妙的方法。使用<code>getEventListeners</code>函数，然后将<code>debug</code>方法注入进去。这样，当你点击按钮的时候，就会在该函数的第一行停下来。</p>
+<p><strong>11. copy(obj)</strong></p>
+<p><code>copy(anything)</code> 是一个很有用的工具函数方便你将任何东西拷贝到系统的粘贴板暂存。</p>
+<p>给<code>copy</code>函数传入一个没有格式的 JSON，会返回格式化的结果：</p>
+<img src="/posts/undefined/copy.gif" class="" title="copy">
+
+<p><strong>12. Top-level await</strong></p>
+<p><code>async/await</code> 使得异步操作变得更加容易和可读。唯一的问题在于<code>await</code>需要在 async 函数中使用。如果我们要在 DevTools 的控制台使用，需要一些特殊的处理，使用<strong>I</strong>mmediately <strong>I</strong>nvoked <strong>A</strong>sync <strong>F</strong>unction <strong>E</strong>xpression (IIAFE). 一点都不方便。好在 DevTools 已经支持直接使用 await 了。</p>
+<img src="/posts/undefined/await.png" class="" title="await">
+
+<h3 id="Debugging-in-the-Sources-panel"><a href="#Debugging-in-the-Sources-panel" class="headerlink" title="Debugging in the Sources panel"></a>Debugging in the Sources panel</h3><p>在 source 面板，使用 breakpoints，stepping-into, stepping-over 等方式，你可以很好地掌控程序的执行状态，来发现代码问题。接下里我不会介绍大家都知道的基础内容，而是一些我经常使用的建议和技巧。</p>
+<p><strong>13. 开启 auto-pretty print</strong></p>
+<p>在金丝雀版本的实验模式下，你可以开启自动美化代码模式。</p>
+<img src="/posts/undefined/autopre.png" class="" title="autopre">
+
+<p><strong>14. 使用条件断点在生产环境中注入 console logs</strong></p>
+<p>断点是一个很棒的功能。但还有一个更棒的：条件断点。只有当设定的条件满足的时候，中断才会执行。也就是说 DevTools 并不会每次都中断程序的执行，而只是在你想要它中断的时候才中断。想了解更多：查看<a href="https://developers.google.com/web/updates/2015/07/set-a-breakpoint-based-on-a-certain-condition">这里</a>.</p>
+<p>在生产环境下，因为不能修改源代码，我喜欢使用条件断点来注入 console.log。如果我的断点仅仅是一个 console.log，DevTools 不会中断，因为 console.log 返回 undefined,，是一个 false 的值。但是它会执行我注入的表达式，可以看到输出结果。</p>
+<p><a href="https://gitee.com/evestorm/various_resources/raw/master/tools/insertlog.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/insertlog.gif" alt="img"></a></p>
+<img src="/posts/undefined/insertlog.gif" class="" title="insertlog">
+
+<p>为什么不直接使用普通的断点，并且查看变量呢？有时候我并不想这样做。比如，当我在分析那些频繁执行的操作，例如触摸或则滑动。我并不想每一次都导致 Debugger 触发程序中断，但是我想看到程序输出的结果。</p>
+<p><strong>15. 暂停 UI 在 Hover 状态下的展示结果</strong></p>
+<p>我们很难去检查一个只有在 Hover 状态下展示的元素。比如，如何去检查一个 tooltip？如果你右键并选择检查，元素已经消失了。那么有办法吗？</p>
+<p>我是这么操作的：</p>
+<ol>
+<li>打开 sources 面板</li>
+<li>显示 tooltip</li>
+<li>使用快捷键来暂停脚本执行(将鼠标停留在暂停的图标上查看快捷键)</li>
+<li>回到 Elements 面板，然后像通常一样去检查元素</li>
+</ol>
+<p><a href="https://gitee.com/evestorm/various_resources/raw/master/tools/tooltips.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/tooltips.gif" alt="img"></a></p>
+<img src="/posts/undefined/tooltips.gif" class="" title="tooltips">
+
+<p><strong>16. XHR breakpoints</strong></p>
+<p>如果想要理解一个请求是如何执行的，可以使用 sources 面板的 XHR breakpoints。</p>
+<p><strong>17. 使用 DevTools 作为 IDE</strong></p>
+<p>DevTools 的 source 面板可以说相当强大。你可以快速查找，跳转到某一行，某个函数，执行一段代码，使用多行光标等等。这些功能在<a href="https://medium.com/google-developers/devtools-tips-for-sublime-text-users-cdd559ee80f8">这篇 medium 文章中有详细描述</a>。</p>
+<p>既然如此，为啥不把整个开发都搬到这里呢。这样就不需要浪费时间切换 IDE 和浏览器了。</p>
+<p>如果你有一个使用<a href="https://github.com/facebook/create-react-app">create-react-app</a>或则<a href="https://github.com/vuejs/vue-cli">vue-cli</a>构建的项目，你可以直接把整个文件夹拖到 Sources 面板下。DevTools 会自动对所有文件做映射。所以，你可以在 DevTools 下修改文件并立即查看。这样，整个开发效率，特别是 Debugging 效率绝对提高了。</p>
+<img src="/posts/undefined/ide.gif" class="" title="ide">
+
+<p><strong>18. 使用 network overrides 来简单调试生产代码</strong></p>
+<p>如果你正在 Debugging 一个生产环境下面的 bug，你可以使用<code>network overrides</code>来调试，而不用在本地搭建整个配置。</p>
+<p>你可以很容易将任何远程的资源下载一份本地的版本，然后可以在 DevTools 下编辑，并且 DevTools 会更新展示你编辑后的文件。</p>
+<img src="/posts/undefined/networkoverrides.gif" class="" title="networkoverrides">
+
+<p>在生产环境下，也可以很容易 Debugging，并且做一些性能上的测试也变得容易。</p>
+<h3 id="19-Nodejs-debugging"><a href="#19-Nodejs-debugging" class="headerlink" title="19. Nodejs debugging"></a><strong>19. Nodejs debugging</strong></h3><p>如果你想使用 DevTools 的 Debugger 来 debug Node.js 应用，你可以使用<code>--inspect-brk</code> flag 来开启：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">node --inspect-brk script.js</span><br></pre></td></tr></table></figure>
+
+<p>跳转到<code>chrome://inspect</code>页面，在<code>Remote Target</code>选项，可以看到 Node 程序。</p>
+<p>并且，在 DevTools 中你会看到一个绿色的 Node 图标，点击图标会打开针对 Node 的 Chrome Debugger。</p>
+<p><a href="https://gitee.com/evestorm/various_resources/raw/master/tools/node-debuger.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/node-debuger.gif" alt="img"></a></p>
+<img src="/posts/undefined/node-debuger.gif" class="" title="node-debuger">
+
+<p>如果你想要用 DevTools Debugger 来 debug 你的单元测试，你需要这样调用：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copynode --inspect-brk .&#x2F;node_modules&#x2F;.bin&#x2F;jest</span><br></pre></td></tr></table></figure>
+
+<p>不过这样做其实很麻烦，我们需要自己找到相应的路径。 GoogleChromeLabs 最近发布了一个新的工具非常好用，叫做：<a href="https://github.com/GoogleChromeLabs/ndb">ndb</a>。使用 ndb，你只需要：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">ndb npx jest</span><br></pre></td></tr></table></figure>
+
+<p>如果你有一个自定义的脚本，你可以这样调用：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">ndb npm run unit</span><br></pre></td></tr></table></figure>
+
+<p>更妙的是，如果你在一个有配置<code>package.json</code>的项目下调用<code>ndb</code>，他甚至会自动分析 package.json 中的脚本，方便你直接使用 DevTools。</p>
+<p><strong>20. 使用 Snippets 来辅助 Debugging</strong></p>
+<p>DevTools 提供了一个可以创建和保存小段代码的工具，我很喜欢用它们来加速我的工作。比如 lodashify —  可以快速给任何应用添加 lodash。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">  &#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> element = <span class="built_in">document</span>.createElement(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line">  element.src =</span><br><span class="line">    <span class="string">&#x27;https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js&#x27;</span>;</span><br><span class="line">  element.type = <span class="string">&#x27;text/javascript&#x27;</span>;</span><br><span class="line">  <span class="built_in">document</span>.head.appendChild(element);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<p>另一个小的工具函数式用来增强对象的属性，每次被访问或则修改，它都会提供给我充分的信息，比如谁访问了，谁更改了它。在 Debugging 的时候，非常有用。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> traceProperty = <span class="function">(<span class="params">object, property</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> value = object[property];</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(object, property, &#123;</span><br><span class="line">    <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.trace(<span class="string">`<span class="subst">$&#123;property&#125;</span> requested`</span>);</span><br><span class="line">      <span class="keyword">return</span> value;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.trace(<span class="string">`setting <span class="subst">$&#123;property&#125;</span> to `</span>, newValue);</span><br><span class="line">      value = newValue;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://gitee.com/evestorm/various_resources/raw/master/tools/methodtools.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/methodtools.gif" alt="img"></a></p>
+<img src="/posts/undefined/methodtools.gif" class="" title="methodtools">
+
+<p>还有很多非常有用的<a href="http://bgrins.github.io/devtools-snippets/">devtools 代码片段</a>，你可以直接拿去使用。</p>
+<h3 id="关于-Fundebug"><a href="#关于-Fundebug" class="headerlink" title="关于 Fundebug"></a>关于 Fundebug</h3><p><a href="https://www.fundebug.com/">Fundebug</a>专注于 JavaScript、微信小程序、微信小游戏、支付宝小程序、React Native、Node.js 和 Java 实时 BUG 监控。 自从 2016 年双十一正式上线，Fundebug 累计处理了 6 亿+错误事件，得到了 Google、360、金山软件等众多知名用户的认可。欢迎免费试用！</p>
+<p>版权声明:<br>转载时请注明作者 Fundebug 以及本文地址：<br><a href="https://blog.fundebug.com/2018/08/22/art-of-debugging-with-chrome-devtools/">https://blog.fundebug.com/2018/08/22/art-of-debugging-with-chrome-devtools/</a></p>
+]]></content>
+      <categories>
+        <category>浏览器</category>
+        <category>Chrome</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【转载】使用Object键值替换Switch</title>
     <url>/posts/10849/</url>
     <content><![CDATA[<p>转载地址：<a href="https://www.cnblogs.com/ZerlinM/p/13595810.html">https://www.cnblogs.com/ZerlinM/p/13595810.html</a><br>原文地址：<a href="https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals">https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals</a></p>
@@ -1206,6 +1349,20 @@
       </tags>
   </entry>
   <entry>
+    <title>【转载】滚动视差-CSS不在话下</title>
+    <url>/posts/56953/</url>
+    <content><![CDATA[<p>掘金链接：<a href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
+<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【转载】高性能前端架构解决方案</title>
     <url>/posts/10518/</url>
     <content><![CDATA[<p>来源：<a href="https://mp.weixin.qq.com/s/C4izhX-vMnw_dpUZ1uDM0A">高性能前端架构解决方案</a></p>
@@ -1218,11 +1375,11 @@
 <li>应用程序加载 – 用户可以使用该应用程序需要多长时间？</li>
 <li>下一页 – 导航到下一页需要多长时间？</li>
 </ul>
-<img src="/posts/undefined/640-20200322202223114.png" class="" title="640-20200322202223114">
+<img src="/posts/10518/640-20200322202223114.png" class="" title="640-20200322202223114">
 
 <h2 id="初始渲染"><a href="#初始渲染" class="headerlink" title="初始渲染"></a>初始渲染</h2><p>在浏览器的初始渲染之前，用户看不到任何东西。渲染页面至少需要加载 <code>HTML</code> 文件，但是大多数时候需要加载其他资源，例如 <code>CSS</code> 和 <code>JavaScript</code> 文件。一旦这些都加载完毕，浏览器就可以开始在屏幕上渲染。</p>
 <p>在本文中，我将使用 <code>WebPageTest</code> 瀑布图。你网站的请求瀑布可能看起来像这样。</p>
-<img src="/posts/undefined/640-20200322202223159.png" class="" title="640-20200322202223159">
+<img src="/posts/10518/640-20200322202223159.png" class="" title="640-20200322202223159">
 
 <p><code>HTML</code> 文档将加载一堆其他文件，并在这些文件加载后渲染页面。请注意， <code>CSS</code> 文件是并行加载的，因此每个其他请求不会增加明显的延迟。</p>
 <p>（备注：<code>gov.uk</code> 启用了 <code>HTTP/2</code>，因此资产域可以重新使用与 <code>www.gov.uk</code> 的现有连接！我将在下面详细讨论服务器连接。）</p>
@@ -1241,7 +1398,7 @@
 <li><code>JavaScript</code> 注入链接或脚本标签</li>
 </ul>
 <p>看一下这个例子：</p>
-<img src="/posts/undefined/640-20200322202223158.png" class="" title="640-20200322202223158">
+<img src="/posts/10518/640-20200322202223158.png" class="" title="640-20200322202223158">
 
 <p>这个网站在它的某个 <code>CSS</code> 文件中使用 <code>@import</code> 加载 <code>Google Fonts</code>。这意味着浏览器需要一个接一个地发出这些请求：</p>
 <ul>
@@ -1264,7 +1421,7 @@
 <p>连接就绪后，至少需要再进行一次往返来发送请求并下载响应。</p>
 <p>下面的瀑布显示连接已启动到四个不同的服务器：<code>hostgator.com，optimize.com，googletagmanager.com 和 googelapis.com</code>。</p>
 <p>但是，对同一服务器的后续请求可以重新使用现有连接。因此，加载 <code>base.css</code>或 <code>index1.css</code> 的速度很快，因为它们也托管在 <code>hostgator.com</code> 上。</p>
-<img src="/posts/undefined/640-20200322202223164.png" class="" title="640-20200322202223164">
+<img src="/posts/10518/640-20200322202223164.png" class="" title="640-20200322202223164">
 
 <h3 id="减小文件大小并使用-CDN"><a href="#减小文件大小并使用-CDN" class="headerlink" title="减小文件大小并使用 CDN"></a>减小文件大小并使用 CDN</h3><p>除了文件大小之外，还有两个其他因素会影响请求时间，这些因素都在你的控制范围内：资源大小和服务器位置。</p>
 <p>向用户发送尽可能少的数据，并确保将其压缩（例如，使用 <code>brotli</code> 或 <code>gzip</code> ）。</p>
@@ -1280,7 +1437,7 @@
 <li>加载页面的基本数据</li>
 <li>加载其他数据和图像</li>
 </ul>
-<img src="/posts/undefined/640-20200322202223220.png" class="" title="640-20200322202223220">
+<img src="/posts/10518/640-20200322202223220.png" class="" title="640-20200322202223220">
 
 <p>请注意，不仅仅是延迟从网络加载数据会延迟渲染。加载代码后，浏览器将需要解析，编译和执行它。</p>
 <h3 id="Bundle-split：仅加载必要的代码，并最大化缓存命中率"><a href="#Bundle-split：仅加载必要的代码，并最大化缓存命中率" class="headerlink" title="Bundle split：仅加载必要的代码，并最大化缓存命中率"></a>Bundle split：仅加载必要的代码，并最大化缓存命中率</h3><p><code>Bundle split</code> 允许只加载当前页面所需的代码，而不是加载整个应用程序。<code>Bundle split</code> 还意味着可以缓存其中的一部分，即使其他部分已经更改，需要重新加载。</p>
@@ -1293,11 +1450,11 @@
 <p><code>Webpack</code> 可以使用 <code>optimization.splitChunks</code> 自动拆分共享代码以减少总下载量。确保启用运行时块，以使 <code>chunk</code> 哈希稳定，并从长期缓存中受益。</p>
 <p>分离页面特定的代码不能自动完成，你需要识别可以单独加载的位。通常这是一个特定的路径或一组页面。使用动态导入来延迟加载代码。</p>
 <p><code>Bundle split</code> 会导致更多的请求被发送来加载你的应用程序。但是只要请求是并行发送的，这就不是什么大问题，特别是当你的站点开启了 <code>HTTP/2</code> 服务的时候。你可以看到在这个瀑布的前三个请求:</p>
-<img src="/posts/undefined/640-20200322202223167.png" class="" title="640-20200322202223167">
+<img src="/posts/10518/640-20200322202223167.png" class="" title="640-20200322202223167">
 
 <p>然而，这个瀑布图还显示了两个按顺序发出的请求。这些块只在这个页面中需要，并通过 <code>import()</code> 调用动态加载。</p>
 <p>如果你知道需要这些块，你可以通过插入预加载链接标记来解决这个问题。</p>
-<img src="/posts/undefined/640-20200322203628249.png" class="" title="640-20200322203628249">
+<img src="/posts/10518/640-20200322203628249.png" class="" title="640-20200322203628249">
 
 <p>但是，你会看到，与总页面加载时间相比，这样做的好处可能很小。</p>
 <p>另外，使用预加载有时会适得其反，因为加载其他更重要的文件时可能会延迟。</p>
@@ -1317,7 +1474,7 @@
 <p>对于这两种技术，你都需要知道在应用开始呈现之前页面必须加载哪些数据。对于与用户相关的数据（用户名，通知 …），这往往很容易，但是对于特定于页面的内容，则比较棘手。考虑确定最重要的页面并为这些页面编写自定义逻辑。</p>
 <h4 id="等待非必需数据时不要阻塞渲染"><a href="#等待非必需数据时不要阻塞渲染" class="headerlink" title="等待非必需数据时不要阻塞渲染"></a>等待非必需数据时不要阻塞渲染</h4><p>有时生成页面数据需要缓慢的复杂后端逻辑。在这些情况下，如果足以使你的应用程序具有功能性和交互性，则可以首先加载较简单的数据版本。</p>
 <p>例如，分析工具可以在加载图表数据之前首先加载所有图表的列表。这使用户可以立即查找他们感兴趣的图表，还可以帮助将后端请求分散到不同的服务器上。</p>
-<img src="/posts/undefined/640-20200322202223217.png" class="" title="640-20200322202223217">
+<img src="/posts/10518/640-20200322202223217.png" class="" title="640-20200322202223217">
 
 <h4 id="避免顺序数据请求链"><a href="#避免顺序数据请求链" class="headerlink" title="避免顺序数据请求链"></a>避免顺序数据请求链</h4><p>这可能与我先前关于在第二个请求中加载非必需数据的观点相冲突，但是如果每个完成的请求都不会导致向用户显示更多信息，则避免顺序请求链。</p>
 <p>与其先发出关于用户登录身份的请求，然后再请求其所属团队的列表，不如在用户信息旁边返回团队列表。你可以使用 <code>GraphQL</code> ，但自定义用户呢? <code>includeTeams=true endpoint</code> 也很有用。</p>
@@ -2001,6 +2158,27 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>奇妙的-webkit-background-clip</title>
+    <url>/posts/12897/</url>
+    <content><![CDATA[<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/14">https://github.com/chokcoco/iCSS/issues/14</a></p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><iframe height="1449" scrolling="no" title="existential gradient buttons" src="https://codepen.io/JingW/embed/gObGjww?height=1449&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>原特效链接：<a href="https://codepen.io/cubeghost/pen/ByJGEN">A PEN BY alex baldwin</a></p>
+<h2 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h2><ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/background-clip">MDN - background-clip</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/border-image-slice">MDN - border-image-slice</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何清除浮动</title>
     <url>/posts/12906/</url>
     <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
@@ -2085,37 +2263,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>对HTML语义化的理解</title>
-    <url>/posts/2906/</url>
-    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
-<ol>
-<li>利与开发：方便代码的阅读和维护</li>
-<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
-</ol>
-<a id="more"></a>
-
-<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
-<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
-
-
-<p>元素细节：</p>
-<ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
-</ul>
-<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>HTML</category>
-      </categories>
-  </entry>
-  <entry>
     <title>对this指向的判定</title>
     <url>/posts/33207/</url>
     <content><![CDATA[<h2 id="对-this-的理解"><a href="#对-this-的理解" class="headerlink" title="对 this 的理解"></a>对 this 的理解</h2><p>对于this指向的判定，时刻记住下面两点就好：</p>
@@ -2147,6 +2294,37 @@ callee</code></pre>
       <tags>
         <tag>this</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>对HTML语义化的理解</title>
+    <url>/posts/2906/</url>
+    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
+<ol>
+<li>利与开发：方便代码的阅读和维护</li>
+<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
+<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
+
+
+<p>元素细节：</p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
+</ul>
+<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
   </entry>
   <entry>
     <title>对闭包的理解</title>
@@ -2351,6 +2529,66 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
+    <title>【转载】常见正则表达式合集</title>
+    <url>/posts/40424/</url>
+    <content><![CDATA[<p>转载来源：<a href="http://obkoro1.com/web_accumulate/codeBlack/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B6%E9%9B%86.html#%E5%B8%B8%E8%A7%81%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%90%88%E9%9B%86">常见正则表达式合集</a></p>
+<p>为了避免用户胡乱输入就通过验证，很多时候我们都会采用正则表达式来验证一下用户输入的信息是否符合规范。这部分的内容基本上是在网上收集来的，这里跟大家一起分享一下，有需要的可以记在自己的有道云笔记里面。</p>
+<h3 id="如何验证？"><a href="#如何验证？" class="headerlink" title="如何验证？"></a>如何验证？</h3><p>验证的方式当然是很多了，这里推荐采用<a href="http://www.w3school.com.cn/js/jsref_test_regexp.asp">test()</a>方法来验证。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = RegExpObject.test(string);<span class="comment">// RegExpObject为正则 string是要检测的字符串</span></span><br><span class="line"><span class="comment">// 如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。</span></span><br><span class="line"><span class="keyword">if</span> (isTrue)&#123;</span><br><span class="line">    <span class="comment">//验证成功 do something</span></span><br><span class="line">&#125;elseP&#123;</span><br><span class="line">    <span class="comment">//验证失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="身份证号码正则表达式："><a href="#身份证号码正则表达式：" class="headerlink" title="身份证号码正则表达式："></a>身份证号码正则表达式：</h3><p>第一代身份证只有 15 位数，第二代身份证有 18 位数，各位按照需求来选择表达式。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//第二代身份证号码正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;5&#125;(18|19|20)\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d&#123;3&#125;[0-9Xx]$/</span>;</span><br><span class="line"><span class="comment">//第一代身份证正则表达式(15位)</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;7&#125;((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d&#123;3&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="手机号码正则表达式："><a href="#手机号码正则表达式：" class="headerlink" title="手机号码正则表达式："></a>手机号码正则表达式：</h3><p>时间截止为：2018 年 1 月 11 日</p>
+<ul>
+<li>移动号段：134 135 136 137 138 139 147 148 150 151 152 157 158 159 172 178 182 183 184 187 188 198</li>
+<li>联通号段：130 131 132 145 146 155 156 166 171 175 176 185 186</li>
+<li>电信号段：133 149 153 173 174 177 180 181 189 199</li>
+<li>虚拟运营商：170</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]&#123;8&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮箱正则表达式："><a href="#邮箱正则表达式：" class="headerlink" title="邮箱正则表达式："></a>邮箱正则表达式：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]&#123;2,8&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户名正则"><a href="#用户名正则" class="headerlink" title="用户名正则:"></a>用户名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用户名正则，4到16位（字母，数字，下划线，减号）</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z0-9_-]&#123;4,16&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="密码正则"><a href="#密码正则" class="headerlink" title="密码正则:"></a>密码正则:</h3><p>密码正则，以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue =^[a-zA-Z]\w&#123;<span class="number">5</span>,<span class="number">17</span>&#125;$;</span><br></pre></td></tr></table></figure>
+
+<p>强密码正则，最少 6 位，包括至少 1 个大写字母，1 个小写字母，1 个数字，1 个特殊字符</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^.*(?=.&#123;6,&#125;)(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&amp;*? ]).*$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="QQ-号码正则"><a href="#QQ-号码正则" class="headerlink" title="QQ 号码正则:"></a>QQ 号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9][0-9]&#123;4,10&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="微信号码正则"><a href="#微信号码正则" class="headerlink" title="微信号码正则:"></a>微信号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//微信号正则，6至20位，以字母开头，字母，数字，减号，下划线</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z]([-_a-zA-Z0-9]&#123;5,19&#125;)+$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊字符检测正则"><a href="#特殊字符检测正则" class="headerlink" title="特殊字符检测正则:"></a>特殊字符检测正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[&quot;&#x27;&lt;&gt;%;)(&amp;+]+-!！@#$~/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="域名正则"><a href="#域名正则" class="headerlink" title="域名正则:"></a>域名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[a-zA-Z0-<span class="number">9</span>][-a-zA-Z0-<span class="number">9</span>]&#123;<span class="number">0</span>,<span class="number">62</span>&#125;(<span class="regexp">/.[a-zA-Z0-9][-a-zA-Z0-9]&#123;0,62&#125;)+/</span>.?;</span><br></pre></td></tr></table></figure>
+
+<h3 id="车牌号码正则"><a href="#车牌号码正则" class="headerlink" title="车牌号码正则:"></a>车牌号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]&#123;1&#125;[A-Z]&#123;1&#125;[A-Z0-9]&#123;4&#125;[A-Z0-9挂学警港澳]&#123;1&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含中文正则"><a href="#包含中文正则" class="headerlink" title="包含中文正则:"></a>包含中文正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[\u4E00-\u9FA5]/</span>;</span><br><span class="line"><span class="comment">//这个可以用于验证用户的真实姓名。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="护照正则"><a href="#护照正则" class="headerlink" title="护照正则:"></a>护照正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(P\d&#123;7&#125;|G\d&#123;7,8&#125;|TH\d&#123;7,8&#125;|S\d&#123;7,8&#125;|A\d&#123;7,8&#125;|L\d&#123;7,8&#125;|\d&#123;9&#125;|D\d+|1[4,5]\d&#123;7&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="固定电话正则："><a href="#固定电话正则：" class="headerlink" title="固定电话正则："></a>固定电话正则：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=(\(\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\)|\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;-|\s)?\d&#123;<span class="number">8</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IP-地址正则"><a href="#IP-地址正则" class="headerlink" title="IP 地址正则:"></a>IP 地址正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=\d+\.\d+\.\d+\.\d+;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮政编码正则"><a href="#邮政编码正则" class="headerlink" title="邮政编码正则:"></a>邮政编码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[<span class="number">1</span>-<span class="number">9</span>]&#123;<span class="number">1</span>&#125;(\d+)&#123;<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="经纬度正则"><a href="#经纬度正则" class="headerlink" title="经纬度正则:"></a>经纬度正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//经度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)\.\d&#123;0,6&#125;)|(\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)|180\.0&#123;0,6&#125;|180)$/</span>;</span><br><span class="line"><span class="comment">//纬度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?([0-8]?\d&#123;1&#125;\.\d&#123;0,6&#125;|90\.0&#123;0,6&#125;|[0-8]?\d&#123;1&#125;|90)$/</span>;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>正则</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>数组的遍历方法</title>
     <url>/posts/64478/</url>
     <content><![CDATA[<p>下面是总结的数组遍历的常见方法</p>
@@ -2416,66 +2654,6 @@ callee</code></pre>
         <category>前端</category>
         <category>JS</category>
       </categories>
-  </entry>
-  <entry>
-    <title>【转载】常见正则表达式合集</title>
-    <url>/posts/40424/</url>
-    <content><![CDATA[<p>转载来源：<a href="http://obkoro1.com/web_accumulate/codeBlack/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B6%E9%9B%86.html#%E5%B8%B8%E8%A7%81%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%90%88%E9%9B%86">常见正则表达式合集</a></p>
-<p>为了避免用户胡乱输入就通过验证，很多时候我们都会采用正则表达式来验证一下用户输入的信息是否符合规范。这部分的内容基本上是在网上收集来的，这里跟大家一起分享一下，有需要的可以记在自己的有道云笔记里面。</p>
-<h3 id="如何验证？"><a href="#如何验证？" class="headerlink" title="如何验证？"></a>如何验证？</h3><p>验证的方式当然是很多了，这里推荐采用<a href="http://www.w3school.com.cn/js/jsref_test_regexp.asp">test()</a>方法来验证。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = RegExpObject.test(string);<span class="comment">// RegExpObject为正则 string是要检测的字符串</span></span><br><span class="line"><span class="comment">// 如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。</span></span><br><span class="line"><span class="keyword">if</span> (isTrue)&#123;</span><br><span class="line">    <span class="comment">//验证成功 do something</span></span><br><span class="line">&#125;elseP&#123;</span><br><span class="line">    <span class="comment">//验证失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="身份证号码正则表达式："><a href="#身份证号码正则表达式：" class="headerlink" title="身份证号码正则表达式："></a>身份证号码正则表达式：</h3><p>第一代身份证只有 15 位数，第二代身份证有 18 位数，各位按照需求来选择表达式。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//第二代身份证号码正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;5&#125;(18|19|20)\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d&#123;3&#125;[0-9Xx]$/</span>;</span><br><span class="line"><span class="comment">//第一代身份证正则表达式(15位)</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;7&#125;((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d&#123;3&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="手机号码正则表达式："><a href="#手机号码正则表达式：" class="headerlink" title="手机号码正则表达式："></a>手机号码正则表达式：</h3><p>时间截止为：2018 年 1 月 11 日</p>
-<ul>
-<li>移动号段：134 135 136 137 138 139 147 148 150 151 152 157 158 159 172 178 182 183 184 187 188 198</li>
-<li>联通号段：130 131 132 145 146 155 156 166 171 175 176 185 186</li>
-<li>电信号段：133 149 153 173 174 177 180 181 189 199</li>
-<li>虚拟运营商：170</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]&#123;8&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="邮箱正则表达式："><a href="#邮箱正则表达式：" class="headerlink" title="邮箱正则表达式："></a>邮箱正则表达式：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]&#123;2,8&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="用户名正则"><a href="#用户名正则" class="headerlink" title="用户名正则:"></a>用户名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用户名正则，4到16位（字母，数字，下划线，减号）</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z0-9_-]&#123;4,16&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="密码正则"><a href="#密码正则" class="headerlink" title="密码正则:"></a>密码正则:</h3><p>密码正则，以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue =^[a-zA-Z]\w&#123;<span class="number">5</span>,<span class="number">17</span>&#125;$;</span><br></pre></td></tr></table></figure>
-
-<p>强密码正则，最少 6 位，包括至少 1 个大写字母，1 个小写字母，1 个数字，1 个特殊字符</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^.*(?=.&#123;6,&#125;)(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&amp;*? ]).*$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="QQ-号码正则"><a href="#QQ-号码正则" class="headerlink" title="QQ 号码正则:"></a>QQ 号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9][0-9]&#123;4,10&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="微信号码正则"><a href="#微信号码正则" class="headerlink" title="微信号码正则:"></a>微信号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//微信号正则，6至20位，以字母开头，字母，数字，减号，下划线</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z]([-_a-zA-Z0-9]&#123;5,19&#125;)+$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="特殊字符检测正则"><a href="#特殊字符检测正则" class="headerlink" title="特殊字符检测正则:"></a>特殊字符检测正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[&quot;&#x27;&lt;&gt;%;)(&amp;+]+-!！@#$~/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="域名正则"><a href="#域名正则" class="headerlink" title="域名正则:"></a>域名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[a-zA-Z0-<span class="number">9</span>][-a-zA-Z0-<span class="number">9</span>]&#123;<span class="number">0</span>,<span class="number">62</span>&#125;(<span class="regexp">/.[a-zA-Z0-9][-a-zA-Z0-9]&#123;0,62&#125;)+/</span>.?;</span><br></pre></td></tr></table></figure>
-
-<h3 id="车牌号码正则"><a href="#车牌号码正则" class="headerlink" title="车牌号码正则:"></a>车牌号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]&#123;1&#125;[A-Z]&#123;1&#125;[A-Z0-9]&#123;4&#125;[A-Z0-9挂学警港澳]&#123;1&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="包含中文正则"><a href="#包含中文正则" class="headerlink" title="包含中文正则:"></a>包含中文正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[\u4E00-\u9FA5]/</span>;</span><br><span class="line"><span class="comment">//这个可以用于验证用户的真实姓名。</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="护照正则"><a href="#护照正则" class="headerlink" title="护照正则:"></a>护照正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(P\d&#123;7&#125;|G\d&#123;7,8&#125;|TH\d&#123;7,8&#125;|S\d&#123;7,8&#125;|A\d&#123;7,8&#125;|L\d&#123;7,8&#125;|\d&#123;9&#125;|D\d+|1[4,5]\d&#123;7&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="固定电话正则："><a href="#固定电话正则：" class="headerlink" title="固定电话正则："></a>固定电话正则：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=(\(\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\)|\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;-|\s)?\d&#123;<span class="number">8</span>&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="IP-地址正则"><a href="#IP-地址正则" class="headerlink" title="IP 地址正则:"></a>IP 地址正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=\d+\.\d+\.\d+\.\d+;</span><br></pre></td></tr></table></figure>
-
-<h3 id="邮政编码正则"><a href="#邮政编码正则" class="headerlink" title="邮政编码正则:"></a>邮政编码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[<span class="number">1</span>-<span class="number">9</span>]&#123;<span class="number">1</span>&#125;(\d+)&#123;<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="经纬度正则"><a href="#经纬度正则" class="headerlink" title="经纬度正则:"></a>经纬度正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//经度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)\.\d&#123;0,6&#125;)|(\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)|180\.0&#123;0,6&#125;|180)$/</span>;</span><br><span class="line"><span class="comment">//纬度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?([0-8]?\d&#123;1&#125;\.\d&#123;0,6&#125;|90\.0&#123;0,6&#125;|[0-8]?\d&#123;1&#125;|90)$/</span>;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>正则</category>
-      </categories>
-      <tags>
-        <tag>转载</tag>
-      </tags>
   </entry>
   <entry>
     <title>有序表查找之二分查找</title>
