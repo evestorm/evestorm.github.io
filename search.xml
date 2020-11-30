@@ -49,6 +49,31 @@
       </tags>
   </entry>
   <entry>
+    <title>CSS3伪元素实现自定义复选框</title>
+    <url>/posts/3583/</url>
+    <content><![CDATA[<p>我们都知道原生的复选框控件样式极难自定义，这对于工程师实现设计稿的难度加大了一大截。css3 的出现，增加了:checked 选择器，因此我们可以利用:checked 和 label 来实现各式各样的表单选择控件，接下来让我们来看看如何实现吧！</p>
+<p>我们来看看如何实现上述自定义的复选框：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:focus</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">box-shadow</span>: 0 0 0.6<span class="selector-tag">em</span> <span class="selector-id">#06c</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\a0&#x27;; /* 不换行空格 */</span><br><span class="line">    display: inline-block;</span><br><span class="line">    margin-right: 0.3em;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    background: gray;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\2713&#x27;; /* 对勾 */</span><br><span class="line">    background: black;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里为了隐藏原生的 checkbox 控件，我们用了 clip: rect(0,0,0,0)进行截取，然后使用 checkbox 的伪类:checked 来实现交互。</p>
+<p>接下来扩展一下，我们来实现自定义开关：</p>
+
+
+<p>这里原理是一样的，只不过样式做了改动，直接上代码：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    margin-bottom: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    width: 6em;</span><br><span class="line">    height: 3em;</span><br><span class="line">    padding: 0.3em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    border: 1px solid rgba(0, 0, 0, 0.2);</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    box-shadow: 0 1px white inset;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#ccc</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background-image</span>: <span class="selector-tag">linear-gradient</span>(<span class="selector-id">#ddd</span>, <span class="selector-id">#bbb</span>);</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    box-shadow: 0.05em 0.1em 0.2em rgba(0, 0, 0, 0.6) inset;</span><br><span class="line">    border-color: rgba(0, 0, 0, 0.3);</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#bbb</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    position: relative;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    width: 5em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 1em;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#06c</span>;</span></span><br><span class="line">    text-align: left;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    position: absolute;</span><br><span class="line">    left: 0;</span><br><span class="line">    border-radius: 100%;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;OFF&#x27;;</span><br><span class="line">    margin-left: 2.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">    left: 3em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;NO&#x27;;</span><br><span class="line">    margin-left: 0.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch-an&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-an-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-an-1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTML5的自定义属性</title>
     <url>/posts/39974/</url>
     <content><![CDATA[<blockquote>
@@ -1067,6 +1092,7 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1177,6 +1203,147 @@
       </categories>
       <tags>
         <tag>缓存</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【转载】高性能前端架构解决方案</title>
+    <url>/posts/10518/</url>
+    <content><![CDATA[<p>来源：<a href="https://mp.weixin.qq.com/s/C4izhX-vMnw_dpUZ1uDM0A">高性能前端架构解决方案</a></p>
+<p>这篇文章介绍了一些使前端应用程序加载更快并提供良好用户体验的技术。</p>
+<p>我们将研究前端的总体架构，如何首先加载必需的资源，并最大化资源缓存的概率。</p>
+<p>无论你的页面是否需要成为客户端应用程序，还是如何优化应用程序的渲染时间，我都不会说太多后端如何传递资源。</p>
+<h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>我将把应用程序加载分为三个不同的阶段：</p>
+<ul>
+<li>初始渲染 – 用户看到任何东西之前需要多长时间？</li>
+<li>应用程序加载 – 用户可以使用该应用程序需要多长时间？</li>
+<li>下一页 – 导航到下一页需要多长时间？</li>
+</ul>
+<img src="/posts/undefined/640-20200322202223114.png" class="" title="640-20200322202223114">
+
+<h2 id="初始渲染"><a href="#初始渲染" class="headerlink" title="初始渲染"></a>初始渲染</h2><p>在浏览器的初始渲染之前，用户看不到任何东西。渲染页面至少需要加载 <code>HTML</code> 文件，但是大多数时候需要加载其他资源，例如 <code>CSS</code> 和 <code>JavaScript</code> 文件。一旦这些都加载完毕，浏览器就可以开始在屏幕上渲染。</p>
+<p>在本文中，我将使用 <code>WebPageTest</code> 瀑布图。你网站的请求瀑布可能看起来像这样。</p>
+<img src="/posts/undefined/640-20200322202223159.png" class="" title="640-20200322202223159">
+
+<p><code>HTML</code> 文档将加载一堆其他文件，并在这些文件加载后渲染页面。请注意， <code>CSS</code> 文件是并行加载的，因此每个其他请求不会增加明显的延迟。</p>
+<p>（备注：<code>gov.uk</code> 启用了 <code>HTTP/2</code>，因此资产域可以重新使用与 <code>www.gov.uk</code> 的现有连接！我将在下面详细讨论服务器连接。）</p>
+<h3 id="减少渲染阻塞的请求"><a href="#减少渲染阻塞的请求" class="headerlink" title="减少渲染阻塞的请求"></a>减少渲染阻塞的请求</h3><p><code>css</code> 和（默认情况下） <code>script</code> 文件会阻止其下方的任何内容渲染。</p>
+<p>你可以通过以下几种方法来解决此问题：</p>
+<ul>
+<li>将脚本标签放在 <code>body</code> 标签的底部</li>
+<li>使用 <code>async</code> 异步加载 <code>script</code></li>
+<li>内联使用小型的 <code>JS</code> 或 <code>CSS</code> 代码段（如果需要同步加载）</li>
+</ul>
+<h3 id="避免顺序渲染阻塞请求链"><a href="#避免顺序渲染阻塞请求链" class="headerlink" title="避免顺序渲染阻塞请求链"></a>避免顺序渲染阻塞请求链</h3><p>让你的网站变慢的不一定是阻止渲染的请求数量。更重要的是每种资源的下载大小，以及浏览器发现需要加载资源的时间。</p>
+<p>如果浏览器仅在另一个请求完成后才发现需要加载文件，则可以获取同步请求链。发生这种情况可能有多种原因：</p>
+<ul>
+<li><code>CSS</code> 中的 <code>@import</code> 规则</li>
+<li><code>CSS</code> 文件中引用的 <code>Webfonts</code></li>
+<li><code>JavaScript</code> 注入链接或脚本标签</li>
+</ul>
+<p>看一下这个例子：</p>
+<img src="/posts/undefined/640-20200322202223158.png" class="" title="640-20200322202223158">
+
+<p>这个网站在它的某个 <code>CSS</code> 文件中使用 <code>@import</code> 加载 <code>Google Fonts</code>。这意味着浏览器需要一个接一个地发出这些请求：</p>
+<ul>
+<li>文件 <code>HTML</code></li>
+<li>应用程序的 <code>CSS</code></li>
+<li><code>Google</code> 字体 <code>CSS</code></li>
+<li><code>Google Font Woff</code>文件（在瀑布图中未显示）</li>
+</ul>
+<p>要解决这个问题，首先需要将 <code>Google Fonts</code> 的 <code>CSS</code> 请求从 <code>@import</code> 移动到 <code>HTML</code> 中的 <code>link</code> 标记，这就切断了请求链条上的一个环节。</p>
+<p>为了进一步加快速度，建议直接在 <code>HTML</code> 或 <code>CSS</code> 文件中内联 <code>Google Fonts CSS</code> 文件。</p>
+<p>(记住，来自 <code>Google Fonts</code> 的 <code>CSS</code> 响应取决于用户代理。如果你用 <code>IE8</code> 发出请求，CSS 会引用一个 <code>EOT</code> 文件，<code>IE11</code> 会得到一个 <code>woff</code> 文件，而现在的浏览器会得到一个 <code>woff2</code> 文件。但是如果你不介意旧的浏览器使用系统字体，那么你可以复制粘贴 <code>CSS</code> 文件的内容。)</p>
+<p>即使页面开始呈现后，用户仍可能无法对该页面执行任何操作，因为在加载字体之前，不会显示任何文本。可以通过 <code>font-display swap</code> 来避免这种情况，现在 <code>Google Fonts</code> 默认情况下已经开始支持。</p>
+<p>有时，消除请求链是不可行的。在这些情况下，可以考虑使用 <code>preload</code> 或 <code>preconnect</code> 标记。例如，在实际的 <code>CSS</code> 请求发出之前，上面的网站可以连接到 <code>fonts.googleapis.com</code>。</p>
+<h3 id="重复使用服务器连接以加快请求"><a href="#重复使用服务器连接以加快请求" class="headerlink" title="重复使用服务器连接以加快请求"></a>重复使用服务器连接以加快请求</h3><p>建立新的服务器连接通常需要在服务器的浏览器之间进行 3 次往返：</p>
+<ul>
+<li><code>DNS</code> 查询</li>
+<li>建立 <code>TCP</code> 连接</li>
+<li>建立 <code>SSL</code> 连接</li>
+</ul>
+<p>连接就绪后，至少需要再进行一次往返来发送请求并下载响应。</p>
+<p>下面的瀑布显示连接已启动到四个不同的服务器：<code>hostgator.com，optimize.com，googletagmanager.com 和 googelapis.com</code>。</p>
+<p>但是，对同一服务器的后续请求可以重新使用现有连接。因此，加载 <code>base.css</code>或 <code>index1.css</code> 的速度很快，因为它们也托管在 <code>hostgator.com</code> 上。</p>
+<img src="/posts/undefined/640-20200322202223164.png" class="" title="640-20200322202223164">
+
+<h3 id="减小文件大小并使用-CDN"><a href="#减小文件大小并使用-CDN" class="headerlink" title="减小文件大小并使用 CDN"></a>减小文件大小并使用 CDN</h3><p>除了文件大小之外，还有两个其他因素会影响请求时间，这些因素都在你的控制范围内：资源大小和服务器位置。</p>
+<p>向用户发送尽可能少的数据，并确保将其压缩（例如，使用 <code>brotli</code> 或 <code>gzip</code> ）。</p>
+<p>内容交付网络在大量位置提供服务器，因此其中之一可能位于你的用户附近。用户可以连接到与其附近的 <code>CDN</code> 服务器，而不必连接到中央应用程序服务器。这意味着服务器的往返时间将大大缩短。这对于诸如 <code>CSS</code>，<code>JavaScript</code>和 <code>Image</code> 之类的静态资产特别方便，因为它们易于分发。</p>
+<h3 id="使用-service-workers-跳过网络"><a href="#使用-service-workers-跳过网络" class="headerlink" title="使用 service workers 跳过网络"></a>使用 service workers 跳过网络</h3><p><code>service workers</code> 允许你在请求进入网络之前拦截它们。这意味着你可以实现瞬时首屏渲染!</p>
+<p>当然，这只在你不需要网络发送响应时才有效。你需要已经缓存了响应，所以用户只有在第二次加载你的应用时才会受益。</p>
+<p>下面的 <code>service workers</code> 缓存呈现页面所需的 HTML 和 CSS。当再次加载应用程序时，它会尝试为缓存的资源提供服务，如果资源不可用，则会返回到网络。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">self.addEventListener(<span class="string">&#x27;install&#x27;</span>, <span class="keyword">async</span> e =&gt; &#123;</span><br><span class="line">  caches.open(<span class="string">&#x27;v1&#x27;</span>).then(<span class="function"><span class="keyword">function</span> (<span class="params">cache</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> cache.addAll([<span class="string">&#x27;/app&#x27;</span>, <span class="string">&#x27;/app.css&#x27;</span>]);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">self.addEventListener(<span class="string">&#x27;fetch&#x27;</span>, <span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">  event.respondWith(</span><br><span class="line">    caches.match(event.request).then(<span class="function"><span class="params">cachedResponse</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> cachedResponse || fetch(event.request);</span><br><span class="line">    &#125;)</span><br><span class="line">  );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="应用加载"><a href="#应用加载" class="headerlink" title="应用加载"></a>应用加载</h2><p>好的，现在用户已经可以看到一些东西，然后他们在可以使用你的应用程序之前还需要什么？</p>
+<ul>
+<li>加载应用程序代码（JS 和 CSS）</li>
+<li>加载页面的基本数据</li>
+<li>加载其他数据和图像</li>
+</ul>
+<img src="/posts/undefined/640-20200322202223220.png" class="" title="640-20200322202223220">
+
+<p>请注意，不仅仅是延迟从网络加载数据会延迟渲染。加载代码后，浏览器将需要解析，编译和执行它。</p>
+<h3 id="Bundle-split：仅加载必要的代码，并最大化缓存命中率"><a href="#Bundle-split：仅加载必要的代码，并最大化缓存命中率" class="headerlink" title="Bundle split：仅加载必要的代码，并最大化缓存命中率"></a>Bundle split：仅加载必要的代码，并最大化缓存命中率</h3><p><code>Bundle split</code> 允许只加载当前页面所需的代码，而不是加载整个应用程序。<code>Bundle split</code> 还意味着可以缓存其中的一部分，即使其他部分已经更改，需要重新加载。</p>
+<p>通常，代码被分成三种不同类型的文件:</p>
+<ul>
+<li>网页本身专用代码</li>
+<li>共享应用程序代码</li>
+<li>很少更改的第三方模块（非常适合缓存！）</li>
+</ul>
+<p><code>Webpack</code> 可以使用 <code>optimization.splitChunks</code> 自动拆分共享代码以减少总下载量。确保启用运行时块，以使 <code>chunk</code> 哈希稳定，并从长期缓存中受益。</p>
+<p>分离页面特定的代码不能自动完成，你需要识别可以单独加载的位。通常这是一个特定的路径或一组页面。使用动态导入来延迟加载代码。</p>
+<p><code>Bundle split</code> 会导致更多的请求被发送来加载你的应用程序。但是只要请求是并行发送的，这就不是什么大问题，特别是当你的站点开启了 <code>HTTP/2</code> 服务的时候。你可以看到在这个瀑布的前三个请求:</p>
+<img src="/posts/undefined/640-20200322202223167.png" class="" title="640-20200322202223167">
+
+<p>然而，这个瀑布图还显示了两个按顺序发出的请求。这些块只在这个页面中需要，并通过 <code>import()</code> 调用动态加载。</p>
+<p>如果你知道需要这些块，你可以通过插入预加载链接标记来解决这个问题。</p>
+<img src="/posts/undefined/640-20200322203628249.png" class="" title="640-20200322203628249">
+
+<p>但是，你会看到，与总页面加载时间相比，这样做的好处可能很小。</p>
+<p>另外，使用预加载有时会适得其反，因为加载其他更重要的文件时可能会延迟。</p>
+<h3 id="加载页面数据"><a href="#加载页面数据" class="headerlink" title="加载页面数据"></a>加载页面数据</h3><p>你的应用程序可能是用来显示一些数据的。下面是一些提示，你可以使用这些提示尽早加载数据并避免呈现延迟。</p>
+<h4 id="在开始加载数据之前不要等待包"><a href="#在开始加载数据之前不要等待包" class="headerlink" title="在开始加载数据之前不要等待包"></a>在开始加载数据之前不要等待包</h4><p>这是一个顺序请求链的特殊情况:你加载应用程序包，然后代码请求页面数据。</p>
+<p>有两种方法可以避免这种情况：</p>
+<ul>
+<li>将页面数据嵌入 HTML 文档中</li>
+<li>通过文档中的内联脚本启动数据请求</li>
+</ul>
+<p>将数据嵌入 HTML 可以确保你的应用程序不必等待数据加载。这也降低了应用程序的复杂性，因为你不必处理加载状态。</p>
+<p>但是，如果获取数据会大大延迟你的文档响应，那将不是一个好主意，因为这会延迟你的初始渲染。</p>
+<p>在这种情况下，或者如果你通过服务工作者提供缓存的 HTML 文档，则可以将内联脚本嵌入到 HTML 中以加载此数据。你可以将其作为全局 <code>promise</code> 提供，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.userDataPromise = fetch(<span class="string">&#x27;/me&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然后，如果数据准备就绪，你的应用程序可以立即开始渲染，或者等到准备就绪。</p>
+<p>对于这两种技术，你都需要知道在应用开始呈现之前页面必须加载哪些数据。对于与用户相关的数据（用户名，通知 …），这往往很容易，但是对于特定于页面的内容，则比较棘手。考虑确定最重要的页面并为这些页面编写自定义逻辑。</p>
+<h4 id="等待非必需数据时不要阻塞渲染"><a href="#等待非必需数据时不要阻塞渲染" class="headerlink" title="等待非必需数据时不要阻塞渲染"></a>等待非必需数据时不要阻塞渲染</h4><p>有时生成页面数据需要缓慢的复杂后端逻辑。在这些情况下，如果足以使你的应用程序具有功能性和交互性，则可以首先加载较简单的数据版本。</p>
+<p>例如，分析工具可以在加载图表数据之前首先加载所有图表的列表。这使用户可以立即查找他们感兴趣的图表，还可以帮助将后端请求分散到不同的服务器上。</p>
+<img src="/posts/undefined/640-20200322202223217.png" class="" title="640-20200322202223217">
+
+<h4 id="避免顺序数据请求链"><a href="#避免顺序数据请求链" class="headerlink" title="避免顺序数据请求链"></a>避免顺序数据请求链</h4><p>这可能与我先前关于在第二个请求中加载非必需数据的观点相冲突，但是如果每个完成的请求都不会导致向用户显示更多信息，则避免顺序请求链。</p>
+<p>与其先发出关于用户登录身份的请求，然后再请求其所属团队的列表，不如在用户信息旁边返回团队列表。你可以使用 <code>GraphQL</code> ，但自定义用户呢? <code>includeTeams=true endpoint</code> 也很有用。</p>
+<p>与其首先请求用户登录为谁，然后请求他们所属的团队列表，</p>
+<h3 id="服务端端渲染"><a href="#服务端端渲染" class="headerlink" title="服务端端渲染"></a>服务端端渲染</h3><p>服务端端渲染意味着在服务器上预渲染你的应用程序，并使用整页 HTML 响应文档请求。这意味着客户端可以看到完全呈现的页面，而不必等待加载其他代码或数据！</p>
+<p>由于服务器只是将静态 HTML 发送给客户端，因此你的应用尚无法进行交互。需要加载应用程序，它需要重新运行呈现逻辑，然后将必要的事件侦听器附加到 DOM。</p>
+<p>如果看到非交互式内容很有价值，请使用服务器呈现。如果你能够将呈现的 HTML 缓存在服务器上并将其提供给所有用户而又不会延迟初始文档请求，那么它也将有所帮助。例如，如果你使用 <code>React</code> 来渲染博客文章，则服务器渲染非常合适。</p>
+<h2 id="下一页"><a href="#下一页" class="headerlink" title="下一页"></a>下一页</h2><p>在某个时候，用户将与你的应用进行交互并转到下一页。打开初始页面后，你可以控制浏览器中发生的事情，因此你可以准备进行下一次交互。</p>
+<h3 id="预取资源"><a href="#预取资源" class="headerlink" title="预取资源"></a>预取资源</h3><p>如果你预加载了下一页所需的代码，则可以消除用户启动导航时的延迟。使用 <code>prefetch</code> 标记，或 <code>webpackPrefetch</code> 用于动态导入：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span>(<span class="comment">/* webpackPrefetch: true, webpackChunkName: &quot;todo-list&quot; */</span> <span class="string">&#x27;./TodoList&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>注意你使用了多少用户数据和带宽，特别是当他们使用移动连接时。如果他们使用的是你网站的移动版本，或者他们启用了保存数据模式，你可以减少预加载。</p>
+<p>对于用户最可能需要的应用程序部分，要有策略。</p>
+<h3 id="重用已经加载的数据"><a href="#重用已经加载的数据" class="headerlink" title="重用已经加载的数据"></a>重用已经加载的数据</h3><p>在应用程序中本地缓存 <code>Ajax</code> 数据，并使用它来避免未来的请求。如果用户从团队列表导航到“编辑团队”页面，你可以通过重用已经获取的数据来立即进行转换。</p>
+<p>请注意，如果你的实体经常被其他用户编辑，并且你下载的数据可能已经过期，那么这种方法将不起作用。在这些情况下，在获取最新数据时，请首先考虑以只读方式显示现有数据。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文介绍了许多因素，这些因素可能会在加载过程的不同时刻使你的页面速度减慢。使用 <code>Chrome DevTools</code>，<code>WebPageTest</code>和<code>Lighthouse</code>之类的工具来确定其中哪些适用于你的应用程序。</p>
+<p>实际上，你几乎不可能在所有方面进行优化。找出对用户有最大影响的因素，并专注于此。</p>
+<p>我在写这篇文章时意识到的一件事是，我根深蒂固地相信，发出许多单独的请求对性能不利。过去，当每个请求都需要一个单独的连接时，Thas 就是这样，而浏览器每个域只允许几个连接。但是，使用 <code>HTTP/2</code> 和现代浏览器已不再是这种情况。</p>
+<p>并且有强烈的理由支持拆分请求。它允许仅加载必要的资源，并可以更好地利用缓存的内容，因为仅需要重新加载已更改的文件。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>性能优化</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1342,6 +1509,41 @@
       </tags>
   </entry>
   <entry>
+    <title>函数中的rest参数</title>
+    <url>/posts/29820/</url>
+    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
+<blockquote>
+<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+<ul>
+<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
+</li>
+<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
+</li>
+<li><pre><code>arguments
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+callee</code></pre>
+<p>属性）。</p>
+<ul>
+<li>arguments.callee 属性包含当前正在执行的函数。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用hexo搭建个人博客</title>
     <url>/posts/43303/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>利用 <a href="https://hexo.io/zh-cn/">Hexo</a> 在 <a href="https://baike.baidu.com/item/github/10145341?fr=aladdin">GitHub</a> 上搭建个人博客。</p>
@@ -1492,41 +1694,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>函数中的rest参数</title>
-    <url>/posts/29820/</url>
-    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
-<blockquote>
-<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
-</blockquote>
-<a id="more"></a>
-
-<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
-<ul>
-<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
-</li>
-<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
-</li>
-<li><pre><code>arguments
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-callee</code></pre>
-<p>属性）。</p>
-<ul>
-<li>arguments.callee 属性包含当前正在执行的函数。</li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>ES6</tag>
       </tags>
   </entry>
   <entry>
@@ -2249,6 +2416,66 @@ callee</code></pre>
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>【转载】常见正则表达式合集</title>
+    <url>/posts/40424/</url>
+    <content><![CDATA[<p>转载来源：<a href="http://obkoro1.com/web_accumulate/codeBlack/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B6%E9%9B%86.html#%E5%B8%B8%E8%A7%81%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%90%88%E9%9B%86">常见正则表达式合集</a></p>
+<p>为了避免用户胡乱输入就通过验证，很多时候我们都会采用正则表达式来验证一下用户输入的信息是否符合规范。这部分的内容基本上是在网上收集来的，这里跟大家一起分享一下，有需要的可以记在自己的有道云笔记里面。</p>
+<h3 id="如何验证？"><a href="#如何验证？" class="headerlink" title="如何验证？"></a>如何验证？</h3><p>验证的方式当然是很多了，这里推荐采用<a href="http://www.w3school.com.cn/js/jsref_test_regexp.asp">test()</a>方法来验证。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = RegExpObject.test(string);<span class="comment">// RegExpObject为正则 string是要检测的字符串</span></span><br><span class="line"><span class="comment">// 如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。</span></span><br><span class="line"><span class="keyword">if</span> (isTrue)&#123;</span><br><span class="line">    <span class="comment">//验证成功 do something</span></span><br><span class="line">&#125;elseP&#123;</span><br><span class="line">    <span class="comment">//验证失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="身份证号码正则表达式："><a href="#身份证号码正则表达式：" class="headerlink" title="身份证号码正则表达式："></a>身份证号码正则表达式：</h3><p>第一代身份证只有 15 位数，第二代身份证有 18 位数，各位按照需求来选择表达式。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//第二代身份证号码正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;5&#125;(18|19|20)\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d&#123;3&#125;[0-9Xx]$/</span>;</span><br><span class="line"><span class="comment">//第一代身份证正则表达式(15位)</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;7&#125;((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d&#123;3&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="手机号码正则表达式："><a href="#手机号码正则表达式：" class="headerlink" title="手机号码正则表达式："></a>手机号码正则表达式：</h3><p>时间截止为：2018 年 1 月 11 日</p>
+<ul>
+<li>移动号段：134 135 136 137 138 139 147 148 150 151 152 157 158 159 172 178 182 183 184 187 188 198</li>
+<li>联通号段：130 131 132 145 146 155 156 166 171 175 176 185 186</li>
+<li>电信号段：133 149 153 173 174 177 180 181 189 199</li>
+<li>虚拟运营商：170</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]&#123;8&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮箱正则表达式："><a href="#邮箱正则表达式：" class="headerlink" title="邮箱正则表达式："></a>邮箱正则表达式：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]&#123;2,8&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户名正则"><a href="#用户名正则" class="headerlink" title="用户名正则:"></a>用户名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用户名正则，4到16位（字母，数字，下划线，减号）</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z0-9_-]&#123;4,16&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="密码正则"><a href="#密码正则" class="headerlink" title="密码正则:"></a>密码正则:</h3><p>密码正则，以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue =^[a-zA-Z]\w&#123;<span class="number">5</span>,<span class="number">17</span>&#125;$;</span><br></pre></td></tr></table></figure>
+
+<p>强密码正则，最少 6 位，包括至少 1 个大写字母，1 个小写字母，1 个数字，1 个特殊字符</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^.*(?=.&#123;6,&#125;)(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&amp;*? ]).*$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="QQ-号码正则"><a href="#QQ-号码正则" class="headerlink" title="QQ 号码正则:"></a>QQ 号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9][0-9]&#123;4,10&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="微信号码正则"><a href="#微信号码正则" class="headerlink" title="微信号码正则:"></a>微信号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//微信号正则，6至20位，以字母开头，字母，数字，减号，下划线</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z]([-_a-zA-Z0-9]&#123;5,19&#125;)+$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊字符检测正则"><a href="#特殊字符检测正则" class="headerlink" title="特殊字符检测正则:"></a>特殊字符检测正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[&quot;&#x27;&lt;&gt;%;)(&amp;+]+-!！@#$~/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="域名正则"><a href="#域名正则" class="headerlink" title="域名正则:"></a>域名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[a-zA-Z0-<span class="number">9</span>][-a-zA-Z0-<span class="number">9</span>]&#123;<span class="number">0</span>,<span class="number">62</span>&#125;(<span class="regexp">/.[a-zA-Z0-9][-a-zA-Z0-9]&#123;0,62&#125;)+/</span>.?;</span><br></pre></td></tr></table></figure>
+
+<h3 id="车牌号码正则"><a href="#车牌号码正则" class="headerlink" title="车牌号码正则:"></a>车牌号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]&#123;1&#125;[A-Z]&#123;1&#125;[A-Z0-9]&#123;4&#125;[A-Z0-9挂学警港澳]&#123;1&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含中文正则"><a href="#包含中文正则" class="headerlink" title="包含中文正则:"></a>包含中文正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[\u4E00-\u9FA5]/</span>;</span><br><span class="line"><span class="comment">//这个可以用于验证用户的真实姓名。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="护照正则"><a href="#护照正则" class="headerlink" title="护照正则:"></a>护照正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(P\d&#123;7&#125;|G\d&#123;7,8&#125;|TH\d&#123;7,8&#125;|S\d&#123;7,8&#125;|A\d&#123;7,8&#125;|L\d&#123;7,8&#125;|\d&#123;9&#125;|D\d+|1[4,5]\d&#123;7&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="固定电话正则："><a href="#固定电话正则：" class="headerlink" title="固定电话正则："></a>固定电话正则：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=(\(\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\)|\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;-|\s)?\d&#123;<span class="number">8</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IP-地址正则"><a href="#IP-地址正则" class="headerlink" title="IP 地址正则:"></a>IP 地址正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=\d+\.\d+\.\d+\.\d+;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮政编码正则"><a href="#邮政编码正则" class="headerlink" title="邮政编码正则:"></a>邮政编码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[<span class="number">1</span>-<span class="number">9</span>]&#123;<span class="number">1</span>&#125;(\d+)&#123;<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="经纬度正则"><a href="#经纬度正则" class="headerlink" title="经纬度正则:"></a>经纬度正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//经度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)\.\d&#123;0,6&#125;)|(\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)|180\.0&#123;0,6&#125;|180)$/</span>;</span><br><span class="line"><span class="comment">//纬度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?([0-8]?\d&#123;1&#125;\.\d&#123;0,6&#125;|90\.0&#123;0,6&#125;|[0-8]?\d&#123;1&#125;|90)$/</span>;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>正则</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
   </entry>
   <entry>
     <title>有序表查找之二分查找</title>
