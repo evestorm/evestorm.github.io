@@ -4,8 +4,8 @@ tags:
   - 转载
   - 技巧
 categories:
+  - 前端
   - 浏览器
-  - Chrome
 abbrlink: 709
 date: 2019-11-17 15:38:03
 ---
