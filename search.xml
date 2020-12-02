@@ -377,6 +377,44 @@
       </tags>
   </entry>
   <entry>
+    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
+    <url>/posts/22469/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
+<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
+<li>文件——&gt;首选项——&gt;设置</li>
+<li>Ctrl+P 搜索 settings.json</li>
+</ol>
+<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
+<p>有注释的才需要添加，其他没注释的可以不用管</p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>,</span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;path-intellisense.mappings&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;@&quot;</span>: <span class="string">&quot;$&#123;workspaceRoot&#125;/src&quot;</span></span><br><span class="line">  &#125; <span class="comment">// Vue路径提示配置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="number">0</span>, <span class="comment">// 忽略强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-tabs&#x27;</span>: <span class="number">0</span>, <span class="comment">// 忽略tab检查</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="number">0</span> <span class="comment">// 忽略检查当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Sequelize框架进阶</title>
     <url>/posts/3278/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -430,44 +468,6 @@
       </categories>
       <tags>
         <tag>Sequelize</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
-    <url>/posts/22469/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
-<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></li>
-</ul>
-<a id="more"></a>
-
-<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
-<li>文件——&gt;首选项——&gt;设置</li>
-<li>Ctrl+P 搜索 settings.json</li>
-</ol>
-<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
-<p>有注释的才需要添加，其他没注释的可以不用管</p>
-</blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>,</span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;path-intellisense.mappings&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;@&quot;</span>: <span class="string">&quot;$&#123;workspaceRoot&#125;/src&quot;</span></span><br><span class="line">  &#125; <span class="comment">// Vue路径提示配置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="number">0</span>, <span class="comment">// 忽略强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-tabs&#x27;</span>: <span class="number">0</span>, <span class="comment">// 忽略tab检查</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="number">0</span> <span class="comment">// 忽略检查当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -873,6 +873,27 @@
       </categories>
   </entry>
   <entry>
+    <title>npm-run-build遇到Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js 14.x</title>
+    <url>/posts/7710/</url>
+    <content><![CDATA[<p>今天 <code>npm run build-prod</code> 打包项目的时候遇到如下报错信息：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js</span><br></pre></td></tr></table></figure>
+
+<p>百度了一些解决方案都没法解决问题，后来在 Stack Overflow 上看到了一种解决方案，地址：<a href="https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns">https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns</a></p>
+<ol>
+<li>install / downgrade node.js to a stable version (LTS) like <a href="https://nodejs.org/en/download/">14.15.0</a></li>
+<li>install the compatible node-sass version via <code>npm install node-sass@4.14.0</code>; you can find the list <a href="https://www.npmjs.com/package/node-sass">here</a>, or even install <code>gulp-sass</code>with <code>npm i gulp-sass --save-dev</code>.</li>
+</ol>
+]]></content>
+      <categories>
+        <category>解决方案</category>
+        <category>Node</category>
+      </categories>
+      <tags>
+        <tag>解决方案</tag>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>let和const和var的区别</title>
     <url>/posts/37021/</url>
     <content><![CDATA[<h2 id="const-和-let-异同"><a href="#const-和-let-异同" class="headerlink" title="const 和 let 异同"></a>const 和 let 异同</h2><h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><ul>
@@ -1251,7 +1272,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#x67;&#105;&#116;&#64;&#x67;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;">&#x67;&#105;&#116;&#64;&#x67;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#x67;&#105;&#116;&#64;&#x67;&#x69;&#116;&#104;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;">&#x67;&#105;&#116;&#64;&#x67;&#x69;&#116;&#104;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -1277,7 +1298,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#116;&#x40;&#103;&#105;&#x74;&#x68;&#117;&#98;&#46;&#99;&#111;&#x6d;">&#x67;&#105;&#116;&#x40;&#103;&#105;&#x74;&#x68;&#117;&#98;&#46;&#99;&#111;&#x6d;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#105;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#109;">&#103;&#105;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -1353,6 +1374,20 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【转载】滚动视差-CSS不在话下</title>
+    <url>/posts/56953/</url>
+    <content><![CDATA[<p>掘金链接：<a href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
+<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
         <tag>转载</tag>
       </tags>
   </entry>
@@ -1464,20 +1499,6 @@
       </categories>
       <tags>
         <tag>缓存</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【转载】滚动视差-CSS不在话下</title>
-    <url>/posts/56953/</url>
-    <content><![CDATA[<p>掘金链接：<a href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
-<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1703,36 +1724,6 @@
       </tags>
   </entry>
   <entry>
-    <title>两栏布局方案汇总</title>
-    <url>/posts/44541/</url>
-    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
-<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<a id="more"></a>
-
-<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用Jekyll搭建GitHubPages博客</title>
     <url>/posts/63074/</url>
     <content><![CDATA[<h2 id="安装-Jekyll"><a href="#安装-Jekyll" class="headerlink" title="安装 Jekyll"></a>安装 Jekyll</h2><p>来源：<a href="https://jekyllrb.com/docs/installation/">https://jekyllrb.com/docs/installation/</a></p>
@@ -1781,6 +1772,36 @@
       </categories>
       <tags>
         <tag>Jekyll</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>两栏布局方案汇总</title>
+    <url>/posts/44541/</url>
+    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
+<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2499,6 +2520,66 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>【转载】常见正则表达式合集</title>
+    <url>/posts/40424/</url>
+    <content><![CDATA[<p>转载来源：<a href="http://obkoro1.com/web_accumulate/codeBlack/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B6%E9%9B%86.html#%E5%B8%B8%E8%A7%81%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%90%88%E9%9B%86">常见正则表达式合集</a></p>
+<p>为了避免用户胡乱输入就通过验证，很多时候我们都会采用正则表达式来验证一下用户输入的信息是否符合规范。这部分的内容基本上是在网上收集来的，这里跟大家一起分享一下，有需要的可以记在自己的有道云笔记里面。</p>
+<h3 id="如何验证？"><a href="#如何验证？" class="headerlink" title="如何验证？"></a>如何验证？</h3><p>验证的方式当然是很多了，这里推荐采用<a href="http://www.w3school.com.cn/js/jsref_test_regexp.asp">test()</a>方法来验证。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = RegExpObject.test(string);<span class="comment">// RegExpObject为正则 string是要检测的字符串</span></span><br><span class="line"><span class="comment">// 如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。</span></span><br><span class="line"><span class="keyword">if</span> (isTrue)&#123;</span><br><span class="line">    <span class="comment">//验证成功 do something</span></span><br><span class="line">&#125;elseP&#123;</span><br><span class="line">    <span class="comment">//验证失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="身份证号码正则表达式："><a href="#身份证号码正则表达式：" class="headerlink" title="身份证号码正则表达式："></a>身份证号码正则表达式：</h3><p>第一代身份证只有 15 位数，第二代身份证有 18 位数，各位按照需求来选择表达式。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//第二代身份证号码正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;5&#125;(18|19|20)\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d&#123;3&#125;[0-9Xx]$/</span>;</span><br><span class="line"><span class="comment">//第一代身份证正则表达式(15位)</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;7&#125;((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d&#123;3&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="手机号码正则表达式："><a href="#手机号码正则表达式：" class="headerlink" title="手机号码正则表达式："></a>手机号码正则表达式：</h3><p>时间截止为：2018 年 1 月 11 日</p>
+<ul>
+<li>移动号段：134 135 136 137 138 139 147 148 150 151 152 157 158 159 172 178 182 183 184 187 188 198</li>
+<li>联通号段：130 131 132 145 146 155 156 166 171 175 176 185 186</li>
+<li>电信号段：133 149 153 173 174 177 180 181 189 199</li>
+<li>虚拟运营商：170</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]&#123;8&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮箱正则表达式："><a href="#邮箱正则表达式：" class="headerlink" title="邮箱正则表达式："></a>邮箱正则表达式：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]&#123;2,8&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户名正则"><a href="#用户名正则" class="headerlink" title="用户名正则:"></a>用户名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用户名正则，4到16位（字母，数字，下划线，减号）</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z0-9_-]&#123;4,16&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="密码正则"><a href="#密码正则" class="headerlink" title="密码正则:"></a>密码正则:</h3><p>密码正则，以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue =^[a-zA-Z]\w&#123;<span class="number">5</span>,<span class="number">17</span>&#125;$;</span><br></pre></td></tr></table></figure>
+
+<p>强密码正则，最少 6 位，包括至少 1 个大写字母，1 个小写字母，1 个数字，1 个特殊字符</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^.*(?=.&#123;6,&#125;)(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&amp;*? ]).*$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="QQ-号码正则"><a href="#QQ-号码正则" class="headerlink" title="QQ 号码正则:"></a>QQ 号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9][0-9]&#123;4,10&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="微信号码正则"><a href="#微信号码正则" class="headerlink" title="微信号码正则:"></a>微信号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//微信号正则，6至20位，以字母开头，字母，数字，减号，下划线</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z]([-_a-zA-Z0-9]&#123;5,19&#125;)+$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊字符检测正则"><a href="#特殊字符检测正则" class="headerlink" title="特殊字符检测正则:"></a>特殊字符检测正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[&quot;&#x27;&lt;&gt;%;)(&amp;+]+-!！@#$~/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="域名正则"><a href="#域名正则" class="headerlink" title="域名正则:"></a>域名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[a-zA-Z0-<span class="number">9</span>][-a-zA-Z0-<span class="number">9</span>]&#123;<span class="number">0</span>,<span class="number">62</span>&#125;(<span class="regexp">/.[a-zA-Z0-9][-a-zA-Z0-9]&#123;0,62&#125;)+/</span>.?;</span><br></pre></td></tr></table></figure>
+
+<h3 id="车牌号码正则"><a href="#车牌号码正则" class="headerlink" title="车牌号码正则:"></a>车牌号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]&#123;1&#125;[A-Z]&#123;1&#125;[A-Z0-9]&#123;4&#125;[A-Z0-9挂学警港澳]&#123;1&#125;$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含中文正则"><a href="#包含中文正则" class="headerlink" title="包含中文正则:"></a>包含中文正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[\u4E00-\u9FA5]/</span>;</span><br><span class="line"><span class="comment">//这个可以用于验证用户的真实姓名。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="护照正则"><a href="#护照正则" class="headerlink" title="护照正则:"></a>护照正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(P\d&#123;7&#125;|G\d&#123;7,8&#125;|TH\d&#123;7,8&#125;|S\d&#123;7,8&#125;|A\d&#123;7,8&#125;|L\d&#123;7,8&#125;|\d&#123;9&#125;|D\d+|1[4,5]\d&#123;7&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="固定电话正则："><a href="#固定电话正则：" class="headerlink" title="固定电话正则："></a>固定电话正则：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=(\(\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\)|\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;-|\s)?\d&#123;<span class="number">8</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IP-地址正则"><a href="#IP-地址正则" class="headerlink" title="IP 地址正则:"></a>IP 地址正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=\d+\.\d+\.\d+\.\d+;</span><br></pre></td></tr></table></figure>
+
+<h3 id="邮政编码正则"><a href="#邮政编码正则" class="headerlink" title="邮政编码正则:"></a>邮政编码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[<span class="number">1</span>-<span class="number">9</span>]&#123;<span class="number">1</span>&#125;(\d+)&#123;<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="经纬度正则"><a href="#经纬度正则" class="headerlink" title="经纬度正则:"></a>经纬度正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//经度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)\.\d&#123;0,6&#125;)|(\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)|180\.0&#123;0,6&#125;|180)$/</span>;</span><br><span class="line"><span class="comment">//纬度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?([0-8]?\d&#123;1&#125;\.\d&#123;0,6&#125;|90\.0&#123;0,6&#125;|[0-8]?\d&#123;1&#125;|90)$/</span>;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>正则</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>常见排序算法</title>
     <url>/posts/59937/</url>
     <content><![CDATA[<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><p>冒泡排序是一种交换排序，基本思想是：两两比较相邻记录的关键字，如果反序则交换，直到没有反序的记录为止。</p>
@@ -2645,66 +2726,6 @@ callee</code></pre>
         <category>后端</category>
         <category>算法</category>
       </categories>
-  </entry>
-  <entry>
-    <title>【转载】常见正则表达式合集</title>
-    <url>/posts/40424/</url>
-    <content><![CDATA[<p>转载来源：<a href="http://obkoro1.com/web_accumulate/codeBlack/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B6%E9%9B%86.html#%E5%B8%B8%E8%A7%81%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%90%88%E9%9B%86">常见正则表达式合集</a></p>
-<p>为了避免用户胡乱输入就通过验证，很多时候我们都会采用正则表达式来验证一下用户输入的信息是否符合规范。这部分的内容基本上是在网上收集来的，这里跟大家一起分享一下，有需要的可以记在自己的有道云笔记里面。</p>
-<h3 id="如何验证？"><a href="#如何验证？" class="headerlink" title="如何验证？"></a>如何验证？</h3><p>验证的方式当然是很多了，这里推荐采用<a href="http://www.w3school.com.cn/js/jsref_test_regexp.asp">test()</a>方法来验证。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = RegExpObject.test(string);<span class="comment">// RegExpObject为正则 string是要检测的字符串</span></span><br><span class="line"><span class="comment">// 如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。</span></span><br><span class="line"><span class="keyword">if</span> (isTrue)&#123;</span><br><span class="line">    <span class="comment">//验证成功 do something</span></span><br><span class="line">&#125;elseP&#123;</span><br><span class="line">    <span class="comment">//验证失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="身份证号码正则表达式："><a href="#身份证号码正则表达式：" class="headerlink" title="身份证号码正则表达式："></a>身份证号码正则表达式：</h3><p>第一代身份证只有 15 位数，第二代身份证有 18 位数，各位按照需求来选择表达式。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//第二代身份证号码正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;5&#125;(18|19|20)\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d&#123;3&#125;[0-9Xx]$/</span>;</span><br><span class="line"><span class="comment">//第一代身份证正则表达式(15位)</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9]\d&#123;7&#125;((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d&#123;3&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="手机号码正则表达式："><a href="#手机号码正则表达式：" class="headerlink" title="手机号码正则表达式："></a>手机号码正则表达式：</h3><p>时间截止为：2018 年 1 月 11 日</p>
-<ul>
-<li>移动号段：134 135 136 137 138 139 147 148 150 151 152 157 158 159 172 178 182 183 184 187 188 198</li>
-<li>联通号段：130 131 132 145 146 155 156 166 171 175 176 185 186</li>
-<li>电信号段：133 149 153 173 174 177 180 181 189 199</li>
-<li>虚拟运营商：170</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]&#123;8&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="邮箱正则表达式："><a href="#邮箱正则表达式：" class="headerlink" title="邮箱正则表达式："></a>邮箱正则表达式：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]&#123;2,8&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="用户名正则"><a href="#用户名正则" class="headerlink" title="用户名正则:"></a>用户名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用户名正则，4到16位（字母，数字，下划线，减号）</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z0-9_-]&#123;4,16&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="密码正则"><a href="#密码正则" class="headerlink" title="密码正则:"></a>密码正则:</h3><p>密码正则，以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue =^[a-zA-Z]\w&#123;<span class="number">5</span>,<span class="number">17</span>&#125;$;</span><br></pre></td></tr></table></figure>
-
-<p>强密码正则，最少 6 位，包括至少 1 个大写字母，1 个小写字母，1 个数字，1 个特殊字符</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^.*(?=.&#123;6,&#125;)(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&amp;*? ]).*$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="QQ-号码正则"><a href="#QQ-号码正则" class="headerlink" title="QQ 号码正则:"></a>QQ 号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[1-9][0-9]&#123;4,10&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="微信号码正则"><a href="#微信号码正则" class="headerlink" title="微信号码正则:"></a>微信号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//微信号正则，6至20位，以字母开头，字母，数字，减号，下划线</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[a-zA-Z]([-_a-zA-Z0-9]&#123;5,19&#125;)+$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="特殊字符检测正则"><a href="#特殊字符检测正则" class="headerlink" title="特殊字符检测正则:"></a>特殊字符检测正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[&quot;&#x27;&lt;&gt;%;)(&amp;+]+-!！@#$~/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="域名正则"><a href="#域名正则" class="headerlink" title="域名正则:"></a>域名正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[a-zA-Z0-<span class="number">9</span>][-a-zA-Z0-<span class="number">9</span>]&#123;<span class="number">0</span>,<span class="number">62</span>&#125;(<span class="regexp">/.[a-zA-Z0-9][-a-zA-Z0-9]&#123;0,62&#125;)+/</span>.?;</span><br></pre></td></tr></table></figure>
-
-<h3 id="车牌号码正则"><a href="#车牌号码正则" class="headerlink" title="车牌号码正则:"></a>车牌号码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]&#123;1&#125;[A-Z]&#123;1&#125;[A-Z0-9]&#123;4&#125;[A-Z0-9挂学警港澳]&#123;1&#125;$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="包含中文正则"><a href="#包含中文正则" class="headerlink" title="包含中文正则:"></a>包含中文正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/[\u4E00-\u9FA5]/</span>;</span><br><span class="line"><span class="comment">//这个可以用于验证用户的真实姓名。</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="护照正则"><a href="#护照正则" class="headerlink" title="护照正则:"></a>护照正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(P\d&#123;7&#125;|G\d&#123;7,8&#125;|TH\d&#123;7,8&#125;|S\d&#123;7,8&#125;|A\d&#123;7,8&#125;|L\d&#123;7,8&#125;|\d&#123;9&#125;|D\d+|1[4,5]\d&#123;7&#125;)$/</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="固定电话正则："><a href="#固定电话正则：" class="headerlink" title="固定电话正则："></a>固定电话正则：</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=(\(\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\)|\d&#123;<span class="number">3</span>,<span class="number">4</span>&#125;-|\s)?\d&#123;<span class="number">8</span>&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="IP-地址正则"><a href="#IP-地址正则" class="headerlink" title="IP 地址正则:"></a>IP 地址正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=\d+\.\d+\.\d+\.\d+;</span><br></pre></td></tr></table></figure>
-
-<h3 id="邮政编码正则"><a href="#邮政编码正则" class="headerlink" title="邮政编码正则:"></a>邮政编码正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> isTrue=[<span class="number">1</span>-<span class="number">9</span>]&#123;<span class="number">1</span>&#125;(\d+)&#123;<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="经纬度正则"><a href="#经纬度正则" class="headerlink" title="经纬度正则:"></a>经纬度正则:</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//经度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)\.\d&#123;0,6&#125;)|(\d|[1-9]\d|1[0-7]\d|0&#123;1,3&#125;)|180\.0&#123;0,6&#125;|180)$/</span>;</span><br><span class="line"><span class="comment">//纬度正则</span></span><br><span class="line"><span class="keyword">let</span> isTrue = <span class="regexp">/^(\-|\+)?([0-8]?\d&#123;1&#125;\.\d&#123;0,6&#125;|90\.0&#123;0,6&#125;|[0-8]?\d&#123;1&#125;|90)$/</span>;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>正则</category>
-      </categories>
-      <tags>
-        <tag>转载</tag>
-      </tags>
   </entry>
   <entry>
     <title>数组的遍历方法</title>
