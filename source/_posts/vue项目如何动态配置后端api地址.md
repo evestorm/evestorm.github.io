@@ -18,6 +18,8 @@ date: 2020-12-07 13:35:30
 
 利用 `generate-asset-webpack-plugin` 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。
 
+<!-- more -->
+
 ## 使用步骤
 
 ### 安装并引入 generate-asset-webpack-plugin
