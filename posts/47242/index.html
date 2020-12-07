@@ -23,21 +23,21 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="掘金链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5b6d0756e51d4562b31ad23c github 链接：https:&#x2F;&#x2F;github.com&#x2F;chokcoco&#x2F;iCSS&#x2F;issues&#x2F;37">
+<meta name="description" content="问题描述后端希望前端能动态配置 API 地址，但前端往往在 npm run build 生成 dist 后，配置就无法更改了。 解决方案利用 generate-asset-webpack-plugin 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。 使用步骤安装并引入 generate-asset-webp">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【转载】滚动视差-CSS不在话下">
-<meta property="og:url" content="https://evestorm.github.io/posts/56953/index.html">
+<meta property="og:title" content="vue项目如何动态配置后端api地址">
+<meta property="og:url" content="https://evestorm.github.io/posts/47242/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="掘金链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5b6d0756e51d4562b31ad23c github 链接：https:&#x2F;&#x2F;github.com&#x2F;chokcoco&#x2F;iCSS&#x2F;issues&#x2F;37">
+<meta property="og:description" content="问题描述后端希望前端能动态配置 API 地址，但前端往往在 npm run build 生成 dist 后，配置就无法更改了。 解决方案利用 generate-asset-webpack-plugin 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。 使用步骤安装并引入 generate-asset-webp">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2019-12-29T07:34:56.000Z">
-<meta property="article:modified_time" content="2020-11-30T07:45:30.443Z">
+<meta property="article:published_time" content="2020-12-07T05:35:30.000Z">
+<meta property="article:modified_time" content="2020-12-07T05:40:34.467Z">
 <meta property="article:author" content="Lance">
-<meta property="article:tag" content="转载">
+<meta property="article:tag" content="vue-cli">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://evestorm.github.io/posts/56953/">
+<link rel="canonical" href="https://evestorm.github.io/posts/47242/">
 
 
 <script class="page-configurations">
@@ -49,7 +49,7 @@
     lang   : 'zh-CN'
   };
 </script>
-<title>【转载】滚动视差-CSS不在话下 | EVE | 暴风雨前夕</title>
+<title>vue项目如何动态配置后端api地址 | EVE | 暴风雨前夕</title>
   
 
 
@@ -194,7 +194,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -207,6 +207,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.</span> <span class="nav-text">使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B9%B6%E5%BC%95%E5%85%A5-generate-asset-webpack-plugin"><span class="nav-number">3.1.</span> <span class="nav-text">安装并引入 generate-asset-webpack-plugin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E9%9C%80%E8%A6%81%E7%94%9F%E6%88%90%E7%9A%84%E9%85%8D%E7%BD%AE%E5%86%85%E5%AE%B9"><span class="nav-number">3.2.</span> <span class="nav-text">定义需要生成的配置内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">配置</span></a></li></ol></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -282,7 +283,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/56953/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/47242/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
@@ -295,7 +296,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          【转载】滚动视差-CSS不在话下
+          vue项目如何动态配置后端api地址
         </h1>
 
         <div class="post-meta-container">
@@ -305,16 +306,10 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
+      
 
-      <time title="创建时间：2019-12-29 15:34:56" itemprop="dateCreated datePublished" datetime="2019-12-29T15:34:56+08:00">2019-12-29</time>
+      <time title="创建时间：2020-12-07 13:35:30 / 修改时间：13:40:34" itemprop="dateCreated datePublished" datetime="2020-12-07T13:35:30+08:00">2020-12-07</time>
     </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-11-30 15:45:30" itemprop="dateModified" datetime="2020-11-30T15:45:30+08:00">2020-11-30</time>
-      </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
@@ -325,7 +320,11 @@
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
         </span>
     </span>
 
@@ -346,8 +345,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/posts/56953/#SOHUCS" itemprop="discussionUrl">
-        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/56953/" itemprop="commentCount"></span>
+      <a title="changyan" href="/posts/47242/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/47242/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -362,8 +361,23 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>掘金链接：<a target="_blank" rel="noopener" href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
-<p>github 链接：<a target="_blank" rel="noopener" href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
+<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
 
     </div>
 
@@ -373,21 +387,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/vue-cli/" rel="tag"># vue-cli</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/40424/" rel="prev" title="【转载】常见正则表达式合集">
-                  <i class="fa fa-chevron-left"></i> 【转载】常见正则表达式合集
+                <a href="/posts/9274/" rel="prev" title="字体侵权避坑指南">
+                  <i class="fa fa-chevron-left"></i> 字体侵权避坑指南
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/12897/" rel="next" title="奇妙的-webkit-background-clip">
-                  奇妙的-webkit-background-clip <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
