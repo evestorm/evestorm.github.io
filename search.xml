@@ -17,47 +17,87 @@
       </tags>
   </entry>
   <entry>
-    <title>CSS3伪元素实现自定义复选框</title>
-    <url>/posts/3583/</url>
-    <content><![CDATA[<p>我们都知道原生的复选框控件样式极难自定义，这对于工程师实现设计稿的难度加大了一大截。css3 的出现，增加了:checked 选择器，因此我们可以利用:checked 和 label 来实现各式各样的表单选择控件，接下来让我们来看看如何实现吧！</p>
-<a id="more"></a>
+    <title>AppStore审核被拒原因</title>
+    <url>/posts/36545/</url>
+    <content><![CDATA[<h2 id="Guideline-5-1-1-Legal-Privacy-Data-Collection-and-Storage"><a href="#Guideline-5-1-1-Legal-Privacy-Data-Collection-and-Storage" class="headerlink" title="Guideline 5.1.1 - Legal - Privacy - Data Collection and Storage"></a>Guideline 5.1.1 - Legal - Privacy - Data Collection and Storage</h2><p>今天 App 审核被拒了，理由如下：</p>
+<blockquote>
+<p>We noticed that your app requests the user’s consent to access their contacts, camera, and photos but does not clarify the use of the contacts, camera, and photos in the applicable purpose string.</p>
+</blockquote>
+<p>意思就是没有对请求的相关权限进行描述，或者描述的不够准确，比如使用到了定位，相册相机，通讯录等权限，要把为什么使用这些权限做下详细描述!</p>
+<p>例如一个外卖应用，获取定位后需要展示附近的美食信息。那么，相应的定位权限描述，应当是类似“获取定位信息用于为用户提供附近的美食信息”这样的描述。</p>
+<h2 id="Guideline-5-1-2-Legal-Privacy-Data-Use-and-Sharing"><a href="#Guideline-5-1-2-Legal-Privacy-Data-Use-and-Sharing" class="headerlink" title="Guideline 5.1.2 Legal: Privacy - Data Use and Sharing"></a>Guideline 5.1.2 Legal: Privacy - Data Use and Sharing</h2><p>7 月 23 日审核又被拒了，理由如下：</p>
+<blockquote>
+<p>Your app accesses user data from the device but does not have the required precautions in place.</p>
+<p>Next Steps</p>
+<p>To collect personal data with your app, you must make it clear to the user that their personal data will be uploaded to your server and you must obtain the user’s consent before the data is uploaded. You must also have a Privacy Policy URL and ensure that the URL you provide directs users to your privacy policy.</p>
+</blockquote>
+<p>搜了下被拒原因：</p>
+<p>App 申请了通讯录访问权限，所以必须向用户明确其个人数据将上传至应用的服务器，并且必须获得用户的同意才能上传数据。还必须拥有隐私政策 URL，并确保提供的 URL 将用户引导至提供的隐私政策上。</p>
+<p>修改方案：</p>
+<img src="/posts/undefined/agree.jpeg" class="" title="agree">
 
-<p>我们来看看如何实现上述自定义的复选框：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:focus</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">box-shadow</span>: 0 0 0.6<span class="selector-tag">em</span> <span class="selector-id">#06c</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\a0&#x27;; /* 不换行空格 */</span><br><span class="line">    display: inline-block;</span><br><span class="line">    margin-right: 0.3em;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    background: gray;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\2713&#x27;; /* 对勾 */</span><br><span class="line">    background: black;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<p>这里为了隐藏原生的 checkbox 控件，我们用了 clip: rect(0,0,0,0)进行截取，然后使用 checkbox 的伪类:checked 来实现交互。</p>
-<p>接下来扩展一下，我们来实现自定义开关：</p>
-
-
-<p>这里原理是一样的，只不过样式做了改动，直接上代码：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    margin-bottom: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    width: 6em;</span><br><span class="line">    height: 3em;</span><br><span class="line">    padding: 0.3em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    border: 1px solid rgba(0, 0, 0, 0.2);</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    box-shadow: 0 1px white inset;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#ccc</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background-image</span>: <span class="selector-tag">linear-gradient</span>(<span class="selector-id">#ddd</span>, <span class="selector-id">#bbb</span>);</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    box-shadow: 0.05em 0.1em 0.2em rgba(0, 0, 0, 0.6) inset;</span><br><span class="line">    border-color: rgba(0, 0, 0, 0.3);</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#bbb</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    position: relative;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    width: 5em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 1em;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#06c</span>;</span></span><br><span class="line">    text-align: left;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    position: absolute;</span><br><span class="line">    left: 0;</span><br><span class="line">    border-radius: 100%;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;OFF&#x27;;</span><br><span class="line">    margin-left: 2.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">    left: 3em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;NO&#x27;;</span><br><span class="line">    margin-left: 0.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch-an&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-an-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-an-1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>P.S. 上方点击「隐私授权协议」后，用户会跳转到我准备好的一个协议说明链接。</p>
+<h3 id="参考来源"><a href="#参考来源" class="headerlink" title="参考来源"></a>参考来源</h3><ul>
+<li><a href="http://www.jeepxie.net/article/147613.html">获取用户隐私信息，苹果审核 app 被拒（2.5.13 5.1.1 5.1.2）</a></li>
+</ul>
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>CSS</category>
+        <category>iOS</category>
+        <category>上架</category>
       </categories>
       <tags>
-        <tag>CSS3</tag>
-        <tag>转载</tag>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
-    <title>HTML5的自定义属性</title>
-    <url>/posts/39974/</url>
-    <content><![CDATA[<blockquote>
-<p>在 HTML5 中我们可以自定义属性，其格式为 <code>data-*=&quot;&quot;</code></p>
+    <title>Axios异步请求跨域解决方案</title>
+    <url>/posts/29963/</url>
+    <content><![CDATA[<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><blockquote>
+<p>后端 127.0.0.1（默认 80）；前端 127.0.0.1:8081</p>
 </blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;demo&quot;</span> <span class="attr">data-my-name</span>=<span class="string">&quot;sw&quot;</span> <span class="attr">data-age</span>=<span class="string">&quot;10&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">/*</span><br><span class="line">  Node.dataset 是以对象形式存在的，当我们为同一个 DOM 节点指定了多个自定义属性时，</span><br><span class="line">  Node.dataset 则存储了所有的自定义属性的值。</span><br><span class="line">  */</span><br><span class="line"><span class="javascript"><span class="keyword">var</span> demo = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#demo&quot;</span>);</span></span><br><span class="line"><span class="javascript"><span class="comment">//获取</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//注：当我们如下格式设置时，则需要以驼峰格式才能正确获取</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> name = demo.dataset[<span class="string">&#x27;myName&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> age = demo.dataset[<span class="string">&#x27;age&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="comment">//设置</span></span></span><br><span class="line"><span class="javascript">demo.dataset[<span class="string">&#x27;name&#x27;</span>] = <span class="string">&#x27;web developer&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml"><span class="tag">&lt;<span class="name">script</span>/&gt;</span></span></span></span><br></pre></td></tr></table></figure>
+<p>在 vue 开发过程中使用 axios 发起 POST 请求：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">&#125;).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
 
-<p><strong>资源</strong></p>
-<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/data-*">mdn - data-*</a></p>
+<p>会报跨域错误：</p>
+<p><a href="https://gitee.com/evestorm/various_resources/raw/master/ajax/%E8%B7%A8%E5%9F%9F.png"><img src="Axios%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E8%B7%A8%E5%9F%9F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E8%B7%A8%E5%9F%9F.png" alt="跨域"></a></p>
+<p>原因是浏览器同源策略，只有 <strong>同协议、同域名、同端口</strong> 三同的地址才能互相通过 AJAX 的方式请求。而上面情形虽然协议（http）和域名（127.0.0.1）都相同，但端口不同（80 和 8081），所以无法正常请求。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>服务端添加响应头，以 Koa 为例，在 <code>app.js</code> 中添加响应头：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  ctx.set(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">  <span class="keyword">await</span> next();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这样设置会允许任何来源（*）的跨域。</p>
+<p>但往往后端的某些接口是需要身份验证的，比如用户对文章、商品之类的进行评论或点赞，就需要用户登录才能操作。这种情况下就需要使用到 cookie 或者 session ，所以还得设置 <code>Access-Control-Allow-Credentials</code> 为 true ，表示在 CORS 请求中允许客户端发送 cookie 。然而一旦这样设置，<code>Access-Control-Allow-Origin</code> 就不能再是通配符 <code>*</code> ，必须指定具体的域，所以服务端最终的 header 设置为：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  ctx.set(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;http://127.0.0.1:8081&#x27;</span>);</span><br><span class="line">  ctx.set(<span class="string">&#x27;Access-Control-Allow-Credentials&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">  <span class="keyword">await</span> next();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>后端这样设置后，前端就能够实现跨域请求了。</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>如果服务端不加 <code>ctx.set(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);</code> 这一段。可以在 <code>@vue-cli</code> 中 <a href="https://cli.vuejs.org/zh/config/#devserver-proxy">配置代理</a> 。也就是 <strong>前端设置代理</strong> 的解决方案。</p>
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>利用后端不存在跨域问题，而让 vue 服务器代为获取数据。因为启动 vue 项目本质上也是用 node 启了个服务器（127.0.0.1:8080），配置了代理后，就不再是浏览器直接请求我们在 axios 中配置的 <a href="http://127.0.0.1/%EF%BC%88%E9%BB%98%E8%AE%A480%E7%AB%AF%E5%8F%A3%EF%BC%89">http://127.0.0.1/（默认80端口）</a> ，而是用 vue 启动的这个服务器去请求 <a href="http://127.0.0.1/">http://127.0.0.1/</a> 这个接口，由于后端相互之前请求不存在跨域问题，所以能获取数据，获取后给到前端。</p>
+<p>在前端项目根目录下新建 <code>vue.config.js</code> 文件：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    proxy: &#123;</span><br><span class="line">      <span class="comment">// 前端 axios 发这样的请求：http://127.0.0.1:8081/api/ (8081是启动vue项目时的端口)，会被此处捕获，然后代为请求真正的服务器API地址 `http://127.0.0.1`</span></span><br><span class="line">      <span class="string">&#x27;/api&#x27;</span>: &#123;</span><br><span class="line">        target: <span class="string">&#x27;http://127.0.0.1&#x27;</span>, <span class="comment">// 此处是服务端API接口，不写端口默认80</span></span><br><span class="line">        changeOrigin: <span class="literal">true</span>,</span><br><span class="line">        pathRewrite: &#123;</span><br><span class="line">          <span class="string">&#x27;^/api&#x27;</span>: <span class="string">&#x27;&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="前端发送-POST-跨域请求"><a href="#前端发送-POST-跨域请求" class="headerlink" title="前端发送 POST 跨域请求"></a>前端发送 POST 跨域请求</h3><p>上面也提到了，前端有时候往往不止需要发送 GET 请求，POST 请求也是常有的事儿。所以还需要对 Axios 进行如下配置：</p>
+<blockquote>
+<p>vue 项目下的 main.js 中全局配置 axios</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span><br><span class="line">axios.defaults.baseURL = <span class="string">&#x27;http://127.0.0.1&#x27;</span>;</span><br><span class="line">axios.defaults.withCredentials = <span class="literal">true</span>; <span class="comment">// 让 ajax 携带 cookie</span></span><br><span class="line">axios.defaults.headers.post[<span class="string">&#x27;Content-Type&#x27;</span>] =</span><br><span class="line">  <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>; <span class="comment">// 设置post请求的头部格式</span></span><br><span class="line"></span><br><span class="line">Vue.prototype.$ajax = axios;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>由于需要把请求时的数据序列化为 url 的形式，所以要下载 qs 包</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">npm i qs</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在具体页面中发送 POST 请求</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> loginInfo = &#123;</span><br><span class="line">    username: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    password: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line"><span class="built_in">this</span>.$ajax(&#123;(&#123;</span><br><span class="line">    method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">    url: <span class="string">&#x27;http://127.0.0.1/login&#x27;</span>,</span><br><span class="line">    data: qs.stringify(login_info),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>前端</category>
-        <category>HTML</category>
+        <category>JS</category>
       </categories>
+      <tags>
+        <tag>axios</tag>
+        <tag>跨域</tag>
+      </tags>
   </entry>
   <entry>
     <title>BFC的理解与应用</title>
@@ -108,6 +148,49 @@
       </tags>
   </entry>
   <entry>
+    <title>CSS3伪元素实现自定义复选框</title>
+    <url>/posts/3583/</url>
+    <content><![CDATA[<p>我们都知道原生的复选框控件样式极难自定义，这对于工程师实现设计稿的难度加大了一大截。css3 的出现，增加了:checked 选择器，因此我们可以利用:checked 和 label 来实现各式各样的表单选择控件，接下来让我们来看看如何实现吧！</p>
+<a id="more"></a>
+
+<p>我们来看看如何实现上述自定义的复选框：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:focus</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">box-shadow</span>: 0 0 0.6<span class="selector-tag">em</span> <span class="selector-id">#06c</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\a0&#x27;; /* 不换行空格 */</span><br><span class="line">    display: inline-block;</span><br><span class="line">    margin-right: 0.3em;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    background: gray;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\2713&#x27;; /* 对勾 */</span><br><span class="line">    background: black;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里为了隐藏原生的 checkbox 控件，我们用了 clip: rect(0,0,0,0)进行截取，然后使用 checkbox 的伪类:checked 来实现交互。</p>
+<p>接下来扩展一下，我们来实现自定义开关：</p>
+
+
+<p>这里原理是一样的，只不过样式做了改动，直接上代码：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    margin-bottom: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    width: 6em;</span><br><span class="line">    height: 3em;</span><br><span class="line">    padding: 0.3em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    border: 1px solid rgba(0, 0, 0, 0.2);</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    box-shadow: 0 1px white inset;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#ccc</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background-image</span>: <span class="selector-tag">linear-gradient</span>(<span class="selector-id">#ddd</span>, <span class="selector-id">#bbb</span>);</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    box-shadow: 0.05em 0.1em 0.2em rgba(0, 0, 0, 0.6) inset;</span><br><span class="line">    border-color: rgba(0, 0, 0, 0.3);</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#bbb</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    position: relative;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    width: 5em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 1em;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#06c</span>;</span></span><br><span class="line">    text-align: left;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    position: absolute;</span><br><span class="line">    left: 0;</span><br><span class="line">    border-radius: 100%;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;OFF&#x27;;</span><br><span class="line">    margin-left: 2.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">    left: 3em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;NO&#x27;;</span><br><span class="line">    margin-left: 0.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch-an&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-an-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-an-1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTML5的自定义属性</title>
+    <url>/posts/39974/</url>
+    <content><![CDATA[<blockquote>
+<p>在 HTML5 中我们可以自定义属性，其格式为 <code>data-*=&quot;&quot;</code></p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;demo&quot;</span> <span class="attr">data-my-name</span>=<span class="string">&quot;sw&quot;</span> <span class="attr">data-age</span>=<span class="string">&quot;10&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">/*</span><br><span class="line">  Node.dataset 是以对象形式存在的，当我们为同一个 DOM 节点指定了多个自定义属性时，</span><br><span class="line">  Node.dataset 则存储了所有的自定义属性的值。</span><br><span class="line">  */</span><br><span class="line"><span class="javascript"><span class="keyword">var</span> demo = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#demo&quot;</span>);</span></span><br><span class="line"><span class="javascript"><span class="comment">//获取</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//注：当我们如下格式设置时，则需要以驼峰格式才能正确获取</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> name = demo.dataset[<span class="string">&#x27;myName&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> age = demo.dataset[<span class="string">&#x27;age&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="comment">//设置</span></span></span><br><span class="line"><span class="javascript">demo.dataset[<span class="string">&#x27;name&#x27;</span>] = <span class="string">&#x27;web developer&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml"><span class="tag">&lt;<span class="name">script</span>/&gt;</span></span></span></span><br></pre></td></tr></table></figure>
+
+<p><strong>资源</strong></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/data-*">mdn - data-*</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
+  </entry>
+  <entry>
     <title>JS中如何实现继承</title>
     <url>/posts/2751/</url>
     <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
@@ -128,52 +211,6 @@
       </categories>
       <tags>
         <tag>继承</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
-    <url>/posts/8214/</url>
-    <content><![CDATA[<blockquote>
-<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
-</blockquote>
-<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
-<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
-<a id="more"></a>
-
-<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
-<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
-<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
-
-<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
-<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
-<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
-<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
-<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
-<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
-
-<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
-<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
-<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
-
-<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
-<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
-<blockquote>
-<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
-</blockquote>
-<p>微软也开始为此优化它们的语法分析器：</p>
-<blockquote>
-<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
-</blockquote>
-<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>构建工具</category>
-      </categories>
-      <tags>
-        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -313,6 +350,52 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
+    <url>/posts/8214/</url>
+    <content><![CDATA[<blockquote>
+<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
+</blockquote>
+<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
+<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
+<a id="more"></a>
+
+<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
+<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
+<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
+<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
+<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
+<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
+<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
+<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
+
+<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
+<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
+<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
+
+<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
+<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
+<blockquote>
+<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
+</blockquote>
+<p>微软也开始为此优化它们的语法分析器：</p>
+<blockquote>
+<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
+</blockquote>
+<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>构建工具</category>
+      </categories>
+      <tags>
+        <tag>翻译</tag>
+      </tags>
   </entry>
   <entry>
     <title>Promise用法</title>
@@ -1304,8 +1387,8 @@
         <category>浏览器</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1362,7 +1445,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;">&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#103;&#105;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#x6d;">&#103;&#105;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#x6d;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -1388,7 +1471,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#116;&#64;&#x67;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#x69;&#116;&#64;&#x67;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#105;&#x74;&#x40;&#x67;&#105;&#x74;&#x68;&#117;&#98;&#46;&#x63;&#x6f;&#109;">&#103;&#105;&#x74;&#x40;&#x67;&#105;&#x74;&#x68;&#117;&#98;&#46;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -1465,8 +1548,8 @@
         <category>JS</category>
       </categories>
       <tags>
-        <tag>转载</tag>
         <tag>技巧</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1737,52 +1820,6 @@
       </tags>
   </entry>
   <entry>
-    <title>一些有用的npm包</title>
-    <url>/posts/44396/</url>
-    <content><![CDATA[<h2 id="runjs"><a href="#runjs" class="headerlink" title="runjs"></a>runjs</h2><blockquote>
-<p>已改名为 tasksfile ，<code>npm install tasksfile</code> 代替</p>
-</blockquote>
-<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>一个小型构件工具</p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install runjs -D</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>在根项目目录中创建 <code>runfile.js</code></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; run &#125; = <span class="built_in">require</span>(<span class="string">&#x27;runjs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params">name = <span class="string">&#x27;Mysterious&#x27;</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Hello <span class="subst">$&#123;name&#125;</span>!`</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makedir</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  run(<span class="string">&#x27;mkdir somedir&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  hello,</span><br><span class="line">  makedir</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>在你的终端中执行：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> npx run hello Tommy</span></span><br><span class="line">Hello Tommy!</span><br><span class="line"><span class="meta">$</span><span class="bash"> npx run makedir</span></span><br><span class="line">mkdir somedir</span><br></pre></td></tr></table></figure>
-
-<h2 id="chalk"><a href="#chalk" class="headerlink" title="chalk"></a>chalk</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>给 <code>终端</code> 字符串设置样式</p>
-<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install chalk</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> chalk = <span class="built_in">require</span>(<span class="string">&#x27;chalk&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(chalk.blue(<span class="string">&#x27;Hello world!&#x27;</span>));</span><br></pre></td></tr></table></figure>
-
-<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>Connect 是一个可扩展的 HTTP 服务器框架，用于 node，使用称为中间件的“插件”。</p>
-<h3 id="安装-2"><a href="#安装-2" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install connect</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-2"><a href="#使用-2" class="headerlink" title="使用"></a>使用</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">var connect = require(&#x27;connect&#x27;);</span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line"></span><br><span class="line">var app = connect();</span><br><span class="line"></span><br><span class="line">// gzip/deflate outgoing responses</span><br><span class="line">var compression = require(&#x27;compression&#x27;);</span><br><span class="line">app.use(compression());</span><br><span class="line"></span><br><span class="line">// store session state in browser cookie</span><br><span class="line">var cookieSession = require(&#x27;cookie-session&#x27;);</span><br><span class="line">app.use(cookieSession(&#123;</span><br><span class="line">    keys: [&#x27;secret1&#x27;, &#x27;secret2&#x27;]</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">// parse urlencoded request bodies into req.body</span><br><span class="line">var bodyParser = require(&#x27;body-parser&#x27;);</span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended: false&#125;));</span><br><span class="line"></span><br><span class="line">// respond to all requests</span><br><span class="line">app.use(function(req, res)&#123;</span><br><span class="line">  res.end(&#x27;Hello from Connect!\n&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//create node.js http server and listen on port</span><br><span class="line">http.createServer(app).listen(3000);</span><br></pre></td></tr></table></figure>
-
-<h2 id="serve-static"><a href="#serve-static" class="headerlink" title="serve-static"></a>serve-static</h2><h3 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h3><p>一款静态资源管理器</p>
-<h3 id="安装-3"><a href="#安装-3" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install serve-static</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-3"><a href="#使用-3" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>),</span><br><span class="line">  url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>),</span><br><span class="line">  fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> serveStatic = <span class="built_in">require</span>(<span class="string">&#x27;serve-static&#x27;</span>),</span><br><span class="line">  <span class="comment">//finalhandler 是 serveStatic 的依赖，不需要特意安装。</span></span><br><span class="line">  finalhandler = <span class="built_in">require</span>(<span class="string">&#x27;finalhandler&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置静态资源服务 (&quot;要静态化的文件路径&quot;,&#123;默认主页的配置&#125;);</span></span><br><span class="line"><span class="keyword">var</span> serve = serveStatic(<span class="string">&#x27;public&#x27;</span>, &#123; <span class="attr">index</span>: [<span class="string">&#x27;index.html&#x27;</span>, <span class="string">&#x27;index.htm&#x27;</span>] &#125;);</span><br><span class="line">http</span><br><span class="line">  .createServer(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//路由清单</span></span><br><span class="line">    <span class="keyword">if</span> (req.url == <span class="string">&#x27;/music&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">//也让其显示 根目录public 下的主页</span></span><br><span class="line">      fs.readFile(<span class="string">&#x27;./public/index.html&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (err) &#123;</span><br><span class="line">          res.end(<span class="string">&#x27;没有此文件!&#x27;</span>);</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(data.toString());</span><br><span class="line">        res.end(data.toString());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="comment">//读取并呈递完毕之后,在路由中加上return,</span></span><br><span class="line">      <span class="comment">//否则下面的静态资源服务里面会一直寻找这个路由，</span></span><br><span class="line">      <span class="comment">//这个路由是虚拟出来的，因此不会呈递上面我们去读的文件</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用静态资源服务，一般放在中间件最下方，不至于遮蔽中间件的路由</span></span><br><span class="line">    serve(req, res, finalhandler(req, res));</span><br><span class="line">  &#125;)</span><br><span class="line">  .listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;ok&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h2 id="mockjs"><a href="#mockjs" class="headerlink" title="mockjs"></a>mockjs</h2><h3 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h3><p>生成随机数据，拦截 Ajax 请求</p>
-<h3 id="安装-4"><a href="#安装-4" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install mockjs</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-4"><a href="#使用-4" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 Mock</span></span><br><span class="line"><span class="keyword">var</span> Mock = <span class="built_in">require</span>(<span class="string">&#x27;mockjs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> data = Mock.mock(&#123;</span><br><span class="line">  <span class="comment">// 属性 list 的值是一个数组，其中含有 1 到 10 个元素</span></span><br><span class="line">  <span class="string">&#x27;list|1-10&#x27;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 属性 id 是一个自增数，起始值为 1，每次增 1</span></span><br><span class="line">      <span class="string">&#x27;id|+1&#x27;</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data, <span class="literal">null</span>, <span class="number">4</span>));</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>构建工具</category>
-        <category>npm</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>三栏布局方案(圣杯_双飞翼)</title>
     <url>/posts/10370/</url>
     <content><![CDATA[<h2 id="圣杯布局"><a href="#圣杯布局" class="headerlink" title="圣杯布局"></a>圣杯布局</h2><h3 id="步骤一-HTML框架搭建-amp-初始化CSS"><a href="#步骤一-HTML框架搭建-amp-初始化CSS" class="headerlink" title="步骤一 - HTML框架搭建 &amp; 初始化CSS"></a>步骤一 - HTML框架搭建 &amp; 初始化CSS</h3><p>首先把基本框架搭起来（注意中间部分放最前面）：</p>
@@ -1861,6 +1898,52 @@
       <tags>
         <tag>布局</tag>
         <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一些有用的npm包</title>
+    <url>/posts/44396/</url>
+    <content><![CDATA[<h2 id="runjs"><a href="#runjs" class="headerlink" title="runjs"></a>runjs</h2><blockquote>
+<p>已改名为 tasksfile ，<code>npm install tasksfile</code> 代替</p>
+</blockquote>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>一个小型构件工具</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install runjs -D</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>在根项目目录中创建 <code>runfile.js</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; run &#125; = <span class="built_in">require</span>(<span class="string">&#x27;runjs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params">name = <span class="string">&#x27;Mysterious&#x27;</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Hello <span class="subst">$&#123;name&#125;</span>!`</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makedir</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  run(<span class="string">&#x27;mkdir somedir&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  hello,</span><br><span class="line">  makedir</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在你的终端中执行：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> npx run hello Tommy</span></span><br><span class="line">Hello Tommy!</span><br><span class="line"><span class="meta">$</span><span class="bash"> npx run makedir</span></span><br><span class="line">mkdir somedir</span><br></pre></td></tr></table></figure>
+
+<h2 id="chalk"><a href="#chalk" class="headerlink" title="chalk"></a>chalk</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>给 <code>终端</code> 字符串设置样式</p>
+<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install chalk</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> chalk = <span class="built_in">require</span>(<span class="string">&#x27;chalk&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(chalk.blue(<span class="string">&#x27;Hello world!&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>Connect 是一个可扩展的 HTTP 服务器框架，用于 node，使用称为中间件的“插件”。</p>
+<h3 id="安装-2"><a href="#安装-2" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install connect</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-2"><a href="#使用-2" class="headerlink" title="使用"></a>使用</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">var connect = require(&#x27;connect&#x27;);</span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line"></span><br><span class="line">var app = connect();</span><br><span class="line"></span><br><span class="line">// gzip/deflate outgoing responses</span><br><span class="line">var compression = require(&#x27;compression&#x27;);</span><br><span class="line">app.use(compression());</span><br><span class="line"></span><br><span class="line">// store session state in browser cookie</span><br><span class="line">var cookieSession = require(&#x27;cookie-session&#x27;);</span><br><span class="line">app.use(cookieSession(&#123;</span><br><span class="line">    keys: [&#x27;secret1&#x27;, &#x27;secret2&#x27;]</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">// parse urlencoded request bodies into req.body</span><br><span class="line">var bodyParser = require(&#x27;body-parser&#x27;);</span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended: false&#125;));</span><br><span class="line"></span><br><span class="line">// respond to all requests</span><br><span class="line">app.use(function(req, res)&#123;</span><br><span class="line">  res.end(&#x27;Hello from Connect!\n&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//create node.js http server and listen on port</span><br><span class="line">http.createServer(app).listen(3000);</span><br></pre></td></tr></table></figure>
+
+<h2 id="serve-static"><a href="#serve-static" class="headerlink" title="serve-static"></a>serve-static</h2><h3 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h3><p>一款静态资源管理器</p>
+<h3 id="安装-3"><a href="#安装-3" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install serve-static</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-3"><a href="#使用-3" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>),</span><br><span class="line">  url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>),</span><br><span class="line">  fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> serveStatic = <span class="built_in">require</span>(<span class="string">&#x27;serve-static&#x27;</span>),</span><br><span class="line">  <span class="comment">//finalhandler 是 serveStatic 的依赖，不需要特意安装。</span></span><br><span class="line">  finalhandler = <span class="built_in">require</span>(<span class="string">&#x27;finalhandler&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置静态资源服务 (&quot;要静态化的文件路径&quot;,&#123;默认主页的配置&#125;);</span></span><br><span class="line"><span class="keyword">var</span> serve = serveStatic(<span class="string">&#x27;public&#x27;</span>, &#123; <span class="attr">index</span>: [<span class="string">&#x27;index.html&#x27;</span>, <span class="string">&#x27;index.htm&#x27;</span>] &#125;);</span><br><span class="line">http</span><br><span class="line">  .createServer(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//路由清单</span></span><br><span class="line">    <span class="keyword">if</span> (req.url == <span class="string">&#x27;/music&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">//也让其显示 根目录public 下的主页</span></span><br><span class="line">      fs.readFile(<span class="string">&#x27;./public/index.html&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (err) &#123;</span><br><span class="line">          res.end(<span class="string">&#x27;没有此文件!&#x27;</span>);</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(data.toString());</span><br><span class="line">        res.end(data.toString());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="comment">//读取并呈递完毕之后,在路由中加上return,</span></span><br><span class="line">      <span class="comment">//否则下面的静态资源服务里面会一直寻找这个路由，</span></span><br><span class="line">      <span class="comment">//这个路由是虚拟出来的，因此不会呈递上面我们去读的文件</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用静态资源服务，一般放在中间件最下方，不至于遮蔽中间件的路由</span></span><br><span class="line">    serve(req, res, finalhandler(req, res));</span><br><span class="line">  &#125;)</span><br><span class="line">  .listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;ok&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="mockjs"><a href="#mockjs" class="headerlink" title="mockjs"></a>mockjs</h2><h3 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h3><p>生成随机数据，拦截 Ajax 请求</p>
+<h3 id="安装-4"><a href="#安装-4" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install mockjs</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-4"><a href="#使用-4" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 Mock</span></span><br><span class="line"><span class="keyword">var</span> Mock = <span class="built_in">require</span>(<span class="string">&#x27;mockjs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> data = Mock.mock(&#123;</span><br><span class="line">  <span class="comment">// 属性 list 的值是一个数组，其中含有 1 到 10 个元素</span></span><br><span class="line">  <span class="string">&#x27;list|1-10&#x27;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 属性 id 是一个自增数，起始值为 1，每次增 1</span></span><br><span class="line">      <span class="string">&#x27;id|+1&#x27;</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data, <span class="literal">null</span>, <span class="number">4</span>));</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>构建工具</category>
+        <category>npm</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
