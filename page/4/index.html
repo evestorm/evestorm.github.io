@@ -220,7 +220,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-count">75</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -498,6 +498,220 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/61492/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/61492/" class="post-title-link" itemprop="url">Event Loop、计时器、nextTick（转载）</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-28 14:31:44" itemprop="dateCreated datePublished" datetime="2019-04-28T14:31:44+08:00">2019-04-28</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-14 14:33:51" itemprop="dateModified" datetime="2020-12-14T14:33:51+08:00">2020-12-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/Node/" itemprop="url" rel="index"><span itemprop="name">Node</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/61492/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/61492/" class="cy_cmt_count" data-xid="posts/61492/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>这是一篇转载文章，源地址是方应杭在掘金上发表的一篇译文：<a target="_blank" rel="noopener" href="https://juejin.im/post/5ab7677f6fb9a028d56711d0">Event Loop、计时器、nextTick</a></p>
+<p>原文：<a target="_blank" rel="noopener" href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/">https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/</a></p>
+<p>以下是译文：</p>
+<h2 id="什么是事件循环（Event-Loop，注意空格）"><a href="#什么是事件循环（Event-Loop，注意空格）" class="headerlink" title="什么是事件循环（Event Loop，注意空格）"></a>什么是事件循环（Event Loop，注意空格）</h2><p>JavaScript 是单线程的，有了 event loop 的加持，Node.js 才可以非阻塞地执行 I/O 操作，把这些操作尽量转移给操作系统来执行。</p>
+<p>我们知道大部分现代操作系统都是多线程的，这些操作系统可以在后台执行多个操作。当某个操作结束了，操作系统就会通知 Node.js，然后 Node.js 就（可能）会把对应的回调函数添加到 poll（轮询）队列，最终这些回调函数会被执行。下文中我们会阐述其细节。</p>
+<h2 id="Event-Loop-详解"><a href="#Event-Loop-详解" class="headerlink" title="Event Loop 详解"></a>Event Loop 详解</h2><p>当 Node.js 启动时，会做这几件事</p>
+<ol>
+<li>初始化 event loop</li>
+<li>开始执行脚本（或者进入 REPL，本文不涉及 REPL）。这些脚本有可能会调用一些异步 API、设定计时器或者调用 process.nextTick()</li>
+<li>开始处理 event loop</li>
+</ol>
+<p>如何处理 event loop 呢？下图给出了一个简单的概览：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   ┌───────────────────────┐</span><br><span class="line">┌─&gt;│        timers         │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     I&#x2F;O callbacks     │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     idle, prepare     │</span><br><span class="line">│  └──────────┬────────────┘      ┌───────────────┐</span><br><span class="line">│  ┌──────────┴────────────┐      │   incoming:   │</span><br><span class="line">│  │         poll          │&lt;─────┤  connections, │</span><br><span class="line">│  └──────────┬────────────┘      │   data, etc.  │</span><br><span class="line">│  ┌──────────┴────────────┐      └───────────────┘</span><br><span class="line">│  │        check          │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">└──┤    close callbacks    │</span><br><span class="line">   └───────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>其中每个方框都是 event loop 中的一个阶段。</p>
+<p>每个阶段都有一个「先入先出队列」，这个队列存有要执行的回调函数（译注：存的是函数地址）。不过每个阶段都有其特有的使命。一般来说，当 event loop 达到某个阶段时，会在这个阶段进行一些特殊的操作，然后执行这个阶段的队列里的所有回调。 什么时候停止执行这些回调呢？下列两种情况之一会停止：</p>
+<ol>
+<li>队列的操作全被执行完了</li>
+<li>执行的回调数目到达指定的最大值 然后，event loop 进入下一个阶段，然后再下一个阶段。</li>
+</ol>
+<p>一方面，上面这些操作都有可能添加计时器；另一方面，操作系统会向 poll 队列中添加新的事件，当 poll 队列中的事件被处理时可能会有新的 poll 事件进入 poll 队列。结果，耗时较长的回调函数可以让 event loop 在 poll 阶段停留很久，久到错过了计时器的触发时机。你可以在下文的 timers 章节和 poll 章节详细了解这其中的细节。</p>
+<p>注意，Windows 的实现和 Unix/Linux 的实现稍有不同，不过对本文内容影响不大。本文囊括了 event loop 最重要的部分，不同平台可能有七个或八个阶段，但是上面的几个阶段是我们真正关心的阶段，而且是 Node.js 真正用到的阶段。</p>
+<h2 id="各阶段概览"><a href="#各阶段概览" class="headerlink" title="各阶段概览"></a>各阶段概览</h2><ul>
+<li>timers 阶段：这个阶段执行 setTimeout 和 setInterval 的回调函数。</li>
+<li>I/O callbacks 阶段：不在 timers 阶段、close callbacks 阶段和 check 阶段这三个阶段执行的回调，都由此阶段负责，这几乎包含了所有回调函数。</li>
+<li>idle, prepare 阶段（译注：看起来是两个阶段，不过这不重要）：event loop 内部使用的阶段（译注：我们不用关心这个阶段）</li>
+<li>poll 阶段：获取新的 I/O 事件。在某些场景下 Node.js 会阻塞在这个阶段。</li>
+<li>check 阶段：执行 setImmediate() 的回调函数。</li>
+<li>close callbacks 阶段：执行关闭事件的回调函数，如 socket.on(‘close’, fn) 里的 fn。</li>
+</ul>
+<p>一个 Node.js 程序结束时，Node.js 会检查 event loop 是否在等待异步 I/O 操作结束，是否在等待计时器触发，如果没有，就会关掉 event loop。</p>
+<h2 id="各阶段详解"><a href="#各阶段详解" class="headerlink" title="各阶段详解"></a>各阶段详解</h2><h3 id="timers-阶段"><a href="#timers-阶段" class="headerlink" title="timers 阶段"></a>timers 阶段</h3><p>计时器实际上是在指定多久以后可以执行某个回调函数，而不是指定某个函数的确切执行时间。当指定的时间达到后，计时器的回调函数会尽早被执行。如果操作系统很忙，或者 Node.js 正在执行一个耗时的函数，那么计时器的回调函数就会被推迟执行。</p>
+<p>注意，从原理上来说，poll 阶段能控制计时器的回调函数什么时候被执行。</p>
+<p>举例来说，你设置了一个计时器在 100 毫秒后执行，然后你的脚本用了 95 毫秒来异步读取了一个文件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">someAsyncOperation</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 假设读取这个文件一共花费 95 毫秒</span></span><br><span class="line">  fs.readFile(<span class="string">&#x27;/path/to/file&#x27;</span>, callback);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> timeoutScheduled = <span class="built_in">Date</span>.now();</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> delay = <span class="built_in">Date</span>.now() - timeoutScheduled;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;delay&#125;</span>毫秒后执行了 setTimeout 的回调`</span>);</span><br><span class="line">&#125;, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行一个耗时 95 毫秒的异步操作</span></span><br><span class="line">someAsyncOperation(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> startCallback = <span class="built_in">Date</span>.now();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 执行一个耗时 10 毫秒的同步操作</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="built_in">Date</span>.now() - startCallback &lt; <span class="number">10</span>) &#123;</span><br><span class="line">    <span class="comment">// 什么也不做</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>当 event loop 进入 poll 阶段，发现 poll 队列为空（因为文件还没读完），event loop 检查了一下最近的计时器，大概还有 100 毫秒时间，于是 event loop 决定这段时间就停在 poll 阶段。在 poll 阶段停了 95 毫秒之后，fs.readFile 操作完成，一个耗时 10 毫秒的回调函数被系统放入 poll 队列，于是 event loop 执行了这个回调函数。执行完毕后，poll 队列为空，于是 event loop 去看了一眼最近的计时器（译注：event loop 发现卧槽，已经超时 95 + 10 - 100 = 5 毫秒了），于是经由 check 阶段、close callbacks 阶段绕回到 timers 阶段，执行 timers 队列里的那个回调函数。这个例子中，100 毫秒的计时器实际上是在 105 毫秒后才执行的。</p>
+<p>注意：为了防止 poll 阶段占用了 event loop 的所有时间，libuv（Node.js 用来实现 event loop 和所有异步行为的 C 语言写成的库）对 poll 阶段的最长停留时间做出了限制，具体时间因操作系统而异。</p>
+<h3 id="I-O-callbacks-阶段"><a href="#I-O-callbacks-阶段" class="headerlink" title="I/O callbacks 阶段"></a>I/O callbacks 阶段</h3><p>这个阶段会执行一些系统操作的回调函数，比如 TCP 报错，如果一个 TCP socket 开始连接时出现了 ECONNREFUSED 错误，一些 *nix 系统就会（向 Node.js）通知这个错误。这个通知就会被放入 I/O callbacks 队列。</p>
+<h3 id="poll-阶段（轮询阶段）"><a href="#poll-阶段（轮询阶段）" class="headerlink" title="poll 阶段（轮询阶段）"></a>poll 阶段（轮询阶段）</h3><p>poll 阶段有两个功能：</p>
+<ol>
+<li>如果发现计时器的时间到了，就绕回到 timers 阶段执行计时器的回调。</li>
+<li>然后再，执行 poll 队列里的回调。</li>
+</ol>
+<p>当 event loop 进入 poll 阶段，如果发现没有计时器，就会：</p>
+<ol>
+<li>如果 poll 队列不是空的，event loop 就会依次执行队列里的回调函数，直到队列被清空或者到达 poll 阶段的时间上限。</li>
+<li>如果 poll 队列是空的，就会：<ol>
+<li>如果有 setImmediate() 任务，event loop 就结束 poll 阶段去往 check 阶段。</li>
+<li>如果没有 setImmediate() 任务，event loop 就会等待新的回调函数进入 poll 队列，并立即执行它。</li>
+</ol>
+</li>
+</ol>
+<p>一旦 poll 队列为空，event loop 就会检查计时器有没有到期，如果有计时器到期了，event loop 就会回到 timers 阶段执行计时器的回调。</p>
+<h3 id="check-阶段"><a href="#check-阶段" class="headerlink" title="check 阶段"></a>check 阶段</h3><p>这个阶段允许开发者在 poll 阶段结束后立即执行一些函数。如果 poll 阶段空闲了，同时存在 setImmediate() 任务，event loop 就会进入 check 阶段。</p>
+<p>setImmediate() 实际上是一种特殊的计时器，有自己特有的阶段。它是通过 libuv 里一个能将回调安排在 poll 阶段之后执行的 API 实现的。</p>
+<p>一般来说，当代码执行后，event loop 最终会达到 poll 阶段，等待新的连接、新的请求等。但是如果一个回调是由 setImmediate() 发出的，同时 poll 阶段空闲下来了，event loop 就会结束 poll 阶段进入 check 阶段，不再等待新的 poll 事件。</p>
+<p>（译注：感觉同样的话说了三遍）</p>
+<h3 id="close-callbacks-阶段"><a href="#close-callbacks-阶段" class="headerlink" title="close callbacks 阶段"></a>close callbacks 阶段</h3><p>如果一个 socket 或者 handle 被突然关闭（比如 socket.destroy()），那么就会有一个 close 事件进入这个阶段。否则（译注：我没看到这个否则在否定什么，是在否定「突然」吗？），这个 close 事件就会进入 process.nextTick()。</p>
+<h2 id="setImmediate-vs-setTimeout"><a href="#setImmediate-vs-setTimeout" class="headerlink" title="setImmediate() vs setTimeout()"></a>setImmediate() vs setTimeout()</h2><p>setImmediate 和 setTimeout 很相似，但是其回调函数的调用时机却不一样。</p>
+<p>setImmediate() 的作用是在当前 poll 阶段结束后调用一个函数。 setTimeout() 的作用是在一段时间后调用一个函数。 这两者的回调的执行顺序取决于 setTimeout 和 setImmediate 被调用时的环境。</p>
+<p>如果 setTimeout 和 setImmediate 都是在主模块（main module）中被调用的，那么回调的执行顺序取决于当前进程的性能，这个性能受其他应用程序进程的影响。</p>
+<p>举例来说，如果在主模块中运行下面的脚本，那么两个回调的执行顺序是无法判断的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// timeout_vs_immediate.js</span></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;timeout&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;immediate&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ node timeout_vs_immediate.js</span><br><span class="line">timeout</span><br><span class="line">immediate</span><br><span class="line"></span><br><span class="line">$ node timeout_vs_immediate.js</span><br><span class="line">immediate</span><br><span class="line">timeout</span><br></pre></td></tr></table></figure>
+
+<p>但是，如果把上面代码放到 I/O 操作的回调里，setImmediate 的回调就总是优先于 setTimeout 的回调：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// timeout_vs_immediate.js</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line">fs.readFile(__filename, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;timeout&#x27;</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;immediate&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ node timeout_vs_immediate.js</span><br><span class="line">immediate</span><br><span class="line">timeout</span><br><span class="line"></span><br><span class="line">$ node timeout_vs_immediate.js</span><br><span class="line">immediate</span><br><span class="line">timeout</span><br></pre></td></tr></table></figure>
+
+<p>setImmediate 的主要优势就是，如果在 I/O 操作的回调里，setImmediate 的回调总是比 setTimeout 的回调先执行。（译者注：怎么总是把一个道理翻来覆去地说）</p>
+<h2 id="process-nextTick"><a href="#process-nextTick" class="headerlink" title="process.nextTick()"></a>process.nextTick()</h2><p>你可能发现 process.nextTick() 这个重要的异步 API 没有出现在任何一个阶段里，那是因为从技术上来讲 process.nextTick() 并不是 event loop 的一部分。实际上，不管 event loop 当前处于哪个阶段，nextTick 队列都是在当前阶段后就被执行了。</p>
+<p>回过头来看我们的阶段图，你在任何一个阶段调用 process.nextTick(回调)，回调都会在当前阶段继续运行前被调用。这种行为有的时候会造成不好的结果，因为你可以递归地调用 process.nextTick()，这样 event loop 就会一直停在当前阶段不走……无法进入 poll 阶段。</p>
+<p>为什么 Node.js 要这样设计 process.nextTick 呢？</p>
+<p>因为有些异步 API 需要保证一致性，即使可以同步完成，也要保证异步操作的顺序，看下面代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">apiCall</span>(<span class="params">arg, callback</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> arg !== <span class="string">&#x27;string&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> process.nextTick(</span><br><span class="line">      callback,</span><br><span class="line">      <span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">&#x27;argument should be string&#x27;</span>)</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码检查了参数的类型，如果类型不是 string，就会将 error 传递给 callback。</p>
+<p>这段代码保证 apiCall 调用之后的同步代码能在 callback 之前运行。用于用到了 process.nextTick()，所以 callback 会在 event loop 进入下一个阶段前执行。为了做到这一点，JS 的调用栈可以先 unwind 再执行 nextTick 的回调，这样无论你递归调用多少次 process.nextTick() 都不会造成调用栈溢出（V8 里对应 RangeError: Maximum call stack size exceeded）。</p>
+<p>如果不这样设计，会造成一些潜在的问题，比如下面的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> bar;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这是一个异步 API，但是却同步地调用了 callback</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">someAsyncApiCall</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  callback();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//`someAsyncApiCall` 在执行过程中就调用了回调</span></span><br><span class="line">someAsyncApiCall(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 此时 bar 还没有被赋值为 1</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;bar&#x27;</span>, bar); <span class="comment">// undefined</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">bar = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>开发者虽然把 someAsyncApiCall 命名得像一个异步函数，但是实际上这个函数是同步执行的。当 someAsyncApiCall 被调用时，回调也在同一个 event loop 阶段被调用了。结果回调中就无法得到 bar 的值。因为赋值语句还没被执行。</p>
+<p>如果把回调放在 process.nextTick() 中执行，后面的赋值语句就可以先执行了。而且 process.nextTick() 的回调会在 eventLoop 进入下一个阶段前调用。（译注：又是把一个道理翻来覆去地讲）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> bar;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">someAsyncApiCall</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  process.nextTick(callback);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">someAsyncApiCall(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;bar&#x27;</span>, bar); <span class="comment">// 1</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">bar = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>一个更符合现实的例子是这样的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> server = net.createServer(<span class="function">() =&gt;</span> &#123;&#125;).listen(<span class="number">8080</span>);</span><br><span class="line"></span><br><span class="line">server.on(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>.listen(8080) 这句话是同步执行的。问题在于 listening 回调无法被触发，因为 listening 的监听代码在 .listen(8080) 的后面。</p>
+<p>为了解决这个问题，.listen() 函数可以使用 process.nextTick() 来执行 listening 事件的回调。</p>
+<h2 id="process-nextTick-vs-setImmediate"><a href="#process-nextTick-vs-setImmediate" class="headerlink" title="process.nextTick() vs setImmediate()"></a>process.nextTick() vs setImmediate()</h2><p>这两个函数功能很像，而且名字也很令人疑惑。</p>
+<p>process.nextTick() 的回调会在当前 event loop 阶段「立即」执行。 setImmediate() 的回调会在后续的 event loop 周期（tick）执行。</p>
+<p>（译注：看起来名字叫反了）</p>
+<p>二者的名字应该互换才对。process.nextTick() 比 setImmediate() 更 immediate（立即）一些。</p>
+<p>这是一个历史遗留问题，而且为了保证向后兼容性，也不太可能得到改善。所以就算这两个名字听起来让人很疑惑，也不会在未来有任何变化。</p>
+<p>我们推荐开发者在任何情况下都使用 setImmediate()，因为它的兼容性更好，而且它更容易理解。</p>
+<h2 id="什么时候用-process-nextTick-？"><a href="#什么时候用-process-nextTick-？" class="headerlink" title="什么时候用 process.nextTick()？"></a>什么时候用 process.nextTick()？</h2><p>There are two main reasons: 使用的理由有两个：</p>
+<ol>
+<li>让开发者处理错误、清除无用的资源，或者在 event loop 当前阶段结束前尝试重新请求资源</li>
+<li>有时候有必要让一个回调在调用栈 unwind 之后，event loop 进入下阶段之前执行</li>
+</ol>
+<p>为了让代码更合理，我们可能会写这样的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> server = net.createServer();</span><br><span class="line">server.on(<span class="string">&#x27;connection&#x27;</span>, <span class="function"><span class="params">conn</span> =&gt;</span> &#123;&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">8080</span>);</span><br><span class="line">server.on(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>假设 listen() 在 event loop 一启动的时候就执行了，而 listening 事件的回调被放在了 setImmediate() 里，listen 动作是立即发生的，如果想要 event loop 执行 listening 回调，就必须先经过 poll 阶段，当时 poll 阶段有可能会停留，以等待连接，这样一来就有可能出现 connect 事件的回调比 listening 事件的回调先执行。（译注：这显然不合理，所以我们需要用 process.nextTick）</p>
+<p>再举一个例子，一个类继承了 EventEmitter，而且想在实例化的时候触发一个事件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> EventEmitter = <span class="built_in">require</span>(<span class="string">&#x27;events&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> util = <span class="built_in">require</span>(<span class="string">&#x27;util&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">MyEmitter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  EventEmitter.call(<span class="built_in">this</span>);</span><br><span class="line">  <span class="built_in">this</span>.emit(<span class="string">&#x27;event&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line">util.inherits(MyEmitter, EventEmitter);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> myEmitter = <span class="keyword">new</span> MyEmitter();</span><br><span class="line">myEmitter.on(<span class="string">&#x27;event&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;an event occurred!&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>你不能直接在构造函数里执行 this.emit(‘event’)，因为这样的话后面的回调就永远无法执行。把 this.emit(‘event’) 放在 process.nextTick() 里，后面的回调就可以执行，这才是我们预期的行为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> EventEmitter = <span class="built_in">require</span>(<span class="string">&#x27;events&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> util = <span class="built_in">require</span>(<span class="string">&#x27;util&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">MyEmitter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  EventEmitter.call(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// use nextTick to emit the event once a handler is assigned</span></span><br><span class="line">  process.nextTick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.emit(<span class="string">&#x27;event&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line">util.inherits(MyEmitter, EventEmitter);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> myEmitter = <span class="keyword">new</span> MyEmitter();</span><br><span class="line">myEmitter.on(<span class="string">&#x27;event&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;an event occurred!&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/10505/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -529,7 +743,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-12-14 14:30:09" itemprop="dateModified" datetime="2020-12-14T14:30:09+08:00">2020-12-14</time>
+        <time title="修改时间：2020-12-14 14:30:31" itemprop="dateModified" datetime="2020-12-14T14:30:31+08:00">2020-12-14</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -579,7 +793,7 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">copy   ┌───────────────────────┐</span><br><span class="line">┌─&gt;│        timers   ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     I&#x2F;O callbacks     │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     idle, prepare     │</span><br><span class="line">│  └──────────┬────────────┘      ┌───────────────┐</span><br><span class="line">│  ┌──────────┴────────────┐      │   incoming:   │</span><br><span class="line">│  │         poll    ✅    │&lt;─────┤  connections, │</span><br><span class="line">│  └──────────┬────────────┘      │   data, etc.  │</span><br><span class="line">│  ┌──────────┴────────────┐      └───────────────┘</span><br><span class="line">│  │        check    ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">└──┤    close callbacks    │</span><br><span class="line">   └───────────────────────┘</span><br></pre></td></tr></table></figure>
 
-<h2 id="timers-和-poll"><a href="#timers-和-poll" class="headerlink" title="timers 和 poll"></a>timers 和 poll</h2><img src="/posts/undefined/event-loop.png" class="" title="event-loop">
+<h2 id="timers-和-poll"><a href="#timers-和-poll" class="headerlink" title="timers 和 poll"></a>timers 和 poll</h2><img src="/posts/10505/event-loop.png" class="" title="event-loop">
 
 <p>根据 <a target="_blank" rel="noopener" href="https://juejin.im/post/5ab7677f6fb9a028d56711d0">官方文档</a> 的描述，事件循环应该是从 timers 开始的，但不一定。</p>
 <p>NodeJS 的内部代码大概是这样写的：</p>
@@ -595,24 +809,24 @@
 <p>假设一段代码：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(fn, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
 
-<img src="/posts/undefined/poll.png" class="" title="poll">p
+<img src="/posts/10505/poll.png" class="" title="poll">p
 
 <p>当我们在执行这段代码时，会把 fn 放进 timers 中的一个队列中去（也可以认为是一个数组）。然后 JS 就做自己的事情去了。此时 timers 可能开启了，也可能没有开启。但最大的可能是，在执行 <code>setTimeout(fn, 1000);</code> 的时候，我们进入了 poll 阶段，poll 阶段就是等待（e.g. 等待 ajax 请求成功，或者读文件成功），大概几十毫秒。在等待期间，它会看时间，比如刚才 JS 让我 1000 毫秒后执行一个 fn，现在刚过去 500 毫秒，那我继续等，直到等到 1000 毫秒时，赶紧经过 check 阶段，进入 timers 阶段去执行 fn：</p>
-<img src="/posts/undefined/el2.png" class="">
+<img src="/posts/10505/el2.png" class="">
 
 <p>执行完毕后，又进入 poll 阶段，什么都不做，继续等。这个等有个时间限制的，假设是 3s，那么 3s 后如果什么都没等到，就进入 check 阶段，然后再回到 timers 阶段，如此循环。</p>
 <h2 id="check"><a href="#check" class="headerlink" title="check"></a>check</h2><p>check 阶段会执行一些立即执行的函数，主要就是 setImmediate(fn) 函数。该函数类似 setTimeout，但没有第二个参数。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">1000</span>);</span><br><span class="line">setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br></pre></td></tr></table></figure>
 
 <p>所以在执行例如 setImmediate(fn2) 时，fn2 不会进入 timers，而会进入 check 阶段的一个队列中：</p>
-<img src="/posts/undefined/poll2.png" class="" title="poll2">
+<img src="/posts/10505/poll2.png" class="" title="poll2">
 
 <p>由于我们不确定 timers 这个一阶段结束了还是未结束，所以我们以二阶段 poll 来研究。</p>
 <p>当执行 setTimeout 后，我们把 fn 扔进了 timers ，然后进入 poll 阶段开始等，现在又执行到了 setImmediate ，这是个立即执行函数，有事情开始做了，所以 poll 不等了，直接进入 check 阶段去执行 fn2。</p>
 <p>然后又回到 timers 阶段，不执行 fn（因为没到 1000 毫秒），又进入 poll 阶段，等到 1000 毫秒后，进入 check 阶段，然后返回 timers 阶段，开始执行 fn （fn 只能在进入 timers 阶段才能执行）。</p>
 <h2 id="经典考题"><a href="#经典考题" class="headerlink" title="经典考题"></a>经典考题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">0</span>);</span><br><span class="line">setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br></pre></td></tr></table></figure>
 
-<img src="/posts/undefined/poll3.png" class="" width="22">
+<img src="/posts/10505/poll3.png" class="" width="22">
 
 <p>按照理论（NodeJS 内部代码先调用的 event loop，再调用的执行 JS），应该 fn2 先执行，但实际结果是不一定的，有可能先打印 fn，再打印 fn2；也有可能先打印 fn2，再打印 fn。原因就在于 <strong>开启 event loop</strong> 和 <strong>执行 JS</strong> 的顺序是随机的。</p>
 <p>如果先开启了 event loop ，那么就先从 poll 阶段开始，因为 timers 阶段没发现有任何函数，所以进入 poll 开始等。接着等到了 <strong>执行 JS</strong> ，执行第一段代码，就把 0s 延迟的 fn 放进了 timers 的队列，接着执行第二段代码，把 fn2 放进了 check 队列，此刻 <strong>执行 JS</strong> 完毕，event loop 说：你执行完了是吧？我可以开始做事了，然后 poll 发现有任务要执行了，就进入 check 阶段执行 fn2，再返回到 timers 阶段，发现有个 fn 已经过时间了（因为延迟 0s），马上执行 fn。所以这种情况下，先打印 fn2，再打印 fn。</p>
@@ -633,7 +847,7 @@
 <p>fn3, fn2, fn, fn4</p>
 <h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;setImmediate1&#x27;</span>);</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeout1&#x27;</span>);</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeout2&#x27;</span>);</span><br><span class="line">    setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;setImmediate2&#x27;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
 
-<img src="/posts/undefined/el-test.png" class="" title="el-test">
+<img src="/posts/10505/el-test.png" class="" title="el-test">
 
 <p>执行第 2 行 setImmediate 后，把 setImmediate 中的函数 f1 放进 check 中（此刻不执行 f1），然后执行第 9 行的 setTimeout ，把 setTimeout 中的函数 f2 放进 timers 中（此刻也不执行 f2），然后进入 poll 阶段等待，发现有 f1 待执行，所以执行 f1，打印 setImmediate1 ，接着把 f3 放进 timers 的队列。此刻 check 阶段完成，重回 timers 阶段，发现队列中的 f2，执行 f2，打印 setTimeout2 ，接着把 f4 扔进 check 队列，然后执行 f3， 打印 setTimeout1 ，执行完后，进入 poll 阶段，发现有 f4 没执行，进入 check 阶段，执行 f4，所以最后打印 setImmediate2 。</p>
 <h2 id="宏任务-amp-微任务"><a href="#宏任务-amp-微任务" class="headerlink" title="宏任务&amp;微任务"></a>宏任务&amp;微任务</h2><h3 id="Event-Loop"><a href="#Event-Loop" class="headerlink" title="Event Loop"></a>Event Loop</h3><h4 id="NodeJS："><a href="#NodeJS：" class="headerlink" title="NodeJS："></a>NodeJS：</h4><ul>
@@ -663,7 +877,7 @@
 
 <p>（<strong>await 后面所有代码都属于 then 当中的，</strong>比如第 4 行后面加个 console.log(“233”)，那么此行代码也属于 then）而 async2 本身的代码会被立即执行，<strong>所以打印第 8 行中的 3</strong>。打印完后<strong>执行 then （</strong>执行 then 其实是需要 resolve 的，但 async 会去看你函数中有没有 resolve，如果没有会自动加上 resolve，相当于 async 帮你干了这样一件事：<strong>Promise.resolve(**async2()</strong>)<strong>.then(f1)**）</strong>，<strong>then 就是放队列</strong>，我们把 <code>console.log(2)</code> 记做任务 f1 放进「马上」中去，但此刻不执行。此刻 async1 彻底执行完了。</p>
 <p>接着执行 13 行的 new Promise，14 到 15 行代码会被立即执行（new Promise 中的函数会被立即执行，没有什么宏任务微任务，就相当于裸写 14 到 15 行代码），<strong>所以打印 4</strong>。在执行完 14 行 resolve 的时候，<strong>会指明执行 then 后面的第一个函数，而不是第二个函数（reject 时所执行的）</strong>，也就是 17 行代码的任务也放进「马上」中去，该任务记做 f2 ，至此当前代码全部执行完毕，然后看「马上」中的任务，执行 f1，<strong>打印 2</strong>。接着执行 f2， <strong>打印 5</strong>。</p>
-<img src="/posts/undefined/answer.png" class="" title="answer">
+<img src="/posts/10505/answer.png" class="" title="answer">
 
 <p><strong>注意点</strong>：上面的 resolve 只是决定执行 then 里面的成功回调函数，并不决定加入队列。<strong>决定加入队列的是 then。</strong></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>宏任务（一会儿）：setTimeout，setInterval，setImmediate（优先级比前两个高，因为是在 check 阶段）</p>
@@ -1407,117 +1621,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/16051/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/8214/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/8214/" class="post-title-link" itemprop="url">【翻译】Minification 压缩与 Gzip 压缩的区别</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-03-14 10:43:53" itemprop="dateCreated datePublished" datetime="2019-03-14T10:43:53+08:00">2019-03-14</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-11-22 10:46:42" itemprop="dateModified" datetime="2020-11-22T10:46:42+08:00">2020-11-22</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%90%8E%E7%AB%AF/%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">构建工具</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/8214/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/8214/" class="cy_cmt_count" data-xid="posts/8214/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>原链接：<a target="_blank" rel="noopener" href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
-</blockquote>
-<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
-<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/8214/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
