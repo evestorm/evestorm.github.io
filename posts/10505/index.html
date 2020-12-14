@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="我们只关心打钩的的阶段：  timers poll（此阶段会停留一段时间） check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）  123456789101112131415161718copy   ┌───────────────────────┐┌─&gt;│        timers   ✅    ││  └──────────┬────────────">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Event Loop 学习笔记">
+<meta property="og:url" content="https://evestorm.github.io/posts/10505/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="我们只关心打钩的的阶段：  timers poll（此阶段会停留一段时间） check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）  123456789101112131415161718copy   ┌───────────────────────┐┌─&gt;│        timers   ✅    ││  └──────────┬────────────">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/event-loop.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/poll.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/el2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/poll2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/poll3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/el-test.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/answer.png">
+<meta property="article:published_time" content="2019-04-28T06:19:51.000Z">
+<meta property="article:modified_time" content="2020-12-14T06:30:09.326Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Node">
+<meta property="article:tag" content="EventLoop">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/event-loop.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/10505/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Event Loop 学习笔记 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#timers-%E5%92%8C-poll"><span class="nav-number">1.</span> <span class="nav-text">timers 和 poll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check"><span class="nav-number">2.</span> <span class="nav-text">check</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E8%80%83%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">经典考题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#process-nextTick"><span class="nav-number">4.</span> <span class="nav-text">process.nextTick()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">面试题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8F%E4%BB%BB%E5%8A%A1-amp-%E5%BE%AE%E4%BB%BB%E5%8A%A1"><span class="nav-number">6.</span> <span class="nav-text">宏任务&amp;微任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Event-Loop"><span class="nav-number">6.1.</span> <span class="nav-text">Event Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NodeJS%EF%BC%9A"><span class="nav-number">6.1.1.</span> <span class="nav-text">NodeJS：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chrome%EF%BC%9A"><span class="nav-number">6.1.2.</span> <span class="nav-text">chrome：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98-1"><span class="nav-number">6.2.</span> <span class="nav-text">面试题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/10505/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Event Loop 学习笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-28 14:19:51" itemprop="dateCreated datePublished" datetime="2019-04-28T14:19:51+08:00">2019-04-28</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-14 14:30:09" itemprop="dateModified" datetime="2020-12-14T14:30:09+08:00">2020-12-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/Node/" itemprop="url" rel="index"><span itemprop="name">Node</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/10505/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/10505/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>我们只关心打钩的的阶段：</p>
+<ol>
+<li>timers</li>
+<li>poll（此阶段会停留一段时间）</li>
+<li>check（执行一些立即执行的函数【主要就是：setImmediate(fn) 函数】）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">copy   ┌───────────────────────┐</span><br><span class="line">┌─&gt;│        timers   ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     I&#x2F;O callbacks     │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">│  │     idle, prepare     │</span><br><span class="line">│  └──────────┬────────────┘      ┌───────────────┐</span><br><span class="line">│  ┌──────────┴────────────┐      │   incoming:   │</span><br><span class="line">│  │         poll    ✅    │&lt;─────┤  connections, │</span><br><span class="line">│  └──────────┬────────────┘      │   data, etc.  │</span><br><span class="line">│  ┌──────────┴────────────┐      └───────────────┘</span><br><span class="line">│  │        check    ✅    │</span><br><span class="line">│  └──────────┬────────────┘</span><br><span class="line">│  ┌──────────┴────────────┐</span><br><span class="line">└──┤    close callbacks    │</span><br><span class="line">   └───────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="timers-和-poll"><a href="#timers-和-poll" class="headerlink" title="timers 和 poll"></a>timers 和 poll</h2><img src="/posts/undefined/event-loop.png" class="" title="event-loop">
+
+<p>根据 <a target="_blank" rel="noopener" href="https://juejin.im/post/5ab7677f6fb9a028d56711d0">官方文档</a> 的描述，事件循环应该是从 timers 开始的，但不一定。</p>
+<p>NodeJS 的内部代码大概是这样写的：</p>
+<ul>
+<li>开启 eventLoop()</li>
+<li>执行 JS()</li>
+</ul>
+<p>但由于启动 event loop 是开个进程，需要时间的，而执行 JS 也得启动 V8 引擎，也是需要时间的，所以不确定这两个谁快谁慢。所以：</p>
+<ul>
+<li>有可能 setTimeout 先执行，后才进入 timers 阶段</li>
+<li>也有可能先进入 timers 阶段，后执行 setTimeout</li>
+</ul>
+<p>假设一段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(fn, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/poll.png" class="" title="poll">p
+
+<p>当我们在执行这段代码时，会把 fn 放进 timers 中的一个队列中去（也可以认为是一个数组）。然后 JS 就做自己的事情去了。此时 timers 可能开启了，也可能没有开启。但最大的可能是，在执行 <code>setTimeout(fn, 1000);</code> 的时候，我们进入了 poll 阶段，poll 阶段就是等待（e.g. 等待 ajax 请求成功，或者读文件成功），大概几十毫秒。在等待期间，它会看时间，比如刚才 JS 让我 1000 毫秒后执行一个 fn，现在刚过去 500 毫秒，那我继续等，直到等到 1000 毫秒时，赶紧经过 check 阶段，进入 timers 阶段去执行 fn：</p>
+<img src="/posts/undefined/el2.png" class="">
+
+<p>执行完毕后，又进入 poll 阶段，什么都不做，继续等。这个等有个时间限制的，假设是 3s，那么 3s 后如果什么都没等到，就进入 check 阶段，然后再回到 timers 阶段，如此循环。</p>
+<h2 id="check"><a href="#check" class="headerlink" title="check"></a>check</h2><p>check 阶段会执行一些立即执行的函数，主要就是 setImmediate(fn) 函数。该函数类似 setTimeout，但没有第二个参数。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">1000</span>);</span><br><span class="line">setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>所以在执行例如 setImmediate(fn2) 时，fn2 不会进入 timers，而会进入 check 阶段的一个队列中：</p>
+<img src="/posts/undefined/poll2.png" class="" title="poll2">
+
+<p>由于我们不确定 timers 这个一阶段结束了还是未结束，所以我们以二阶段 poll 来研究。</p>
+<p>当执行 setTimeout 后，我们把 fn 扔进了 timers ，然后进入 poll 阶段开始等，现在又执行到了 setImmediate ，这是个立即执行函数，有事情开始做了，所以 poll 不等了，直接进入 check 阶段去执行 fn2。</p>
+<p>然后又回到 timers 阶段，不执行 fn（因为没到 1000 毫秒），又进入 poll 阶段，等到 1000 毫秒后，进入 check 阶段，然后返回 timers 阶段，开始执行 fn （fn 只能在进入 timers 阶段才能执行）。</p>
+<h2 id="经典考题"><a href="#经典考题" class="headerlink" title="经典考题"></a>经典考题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">0</span>);</span><br><span class="line">setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/poll3.png" class="" width="22">
+
+<p>按照理论（NodeJS 内部代码先调用的 event loop，再调用的执行 JS），应该 fn2 先执行，但实际结果是不一定的，有可能先打印 fn，再打印 fn2；也有可能先打印 fn2，再打印 fn。原因就在于 <strong>开启 event loop</strong> 和 <strong>执行 JS</strong> 的顺序是随机的。</p>
+<p>如果先开启了 event loop ，那么就先从 poll 阶段开始，因为 timers 阶段没发现有任何函数，所以进入 poll 开始等。接着等到了 <strong>执行 JS</strong> ，执行第一段代码，就把 0s 延迟的 fn 放进了 timers 的队列，接着执行第二段代码，把 fn2 放进了 check 队列，此刻 <strong>执行 JS</strong> 完毕，event loop 说：你执行完了是吧？我可以开始做事了，然后 poll 发现有任务要执行了，就进入 check 阶段执行 fn2，再返回到 timers 阶段，发现有个 fn 已经过时间了（因为延迟 0s），马上执行 fn。所以这种情况下，先打印 fn2，再打印 fn。</p>
+<p>但如果 event loop 开启的比较慢，执行 JS 这一步先开始了。那么就会先把 fn 扔进队列，再才开始进入 timers 的第一阶段，此刻 timers 发现已经有了个 fn，还是 0s 延迟执行，所以就执行了 fn，再进入 poll ，poll 发现还有个 fn2 在等我立即执行，就接着进入 check 然后执行 fn2。所以这种情况下，先打印 fn，再打印 fn2。</p>
+<p>说到底，就是看 fn 是在第一次进入 timers 阶段前就存在，还是第一次进入 timers 阶段后才存在。</p>
+<p>那怎样才能保证 fn2 先执行呢？解决方案把这两段代码放进一个 setTimeout 中去，然后延迟 1s 执行，为的就是等 event loop 开启后，进入 poll 阶段，再开始执行这两段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="process-nextTick"><a href="#process-nextTick" class="headerlink" title="process.nextTick()"></a>process.nextTick()</h2><p>这个重要的异步 API 不属于 event loop 的任何一个阶段。nextTick 队列会在当前阶段后就被执行。</p>
+<p>以下面代码为例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn&#x27;</span>), <span class="number">0</span>);</span><br><span class="line">  setImmediate(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn2&#x27;</span>));</span><br><span class="line">  process.nextTick(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;fn3&#x27;</span>));</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>由于三段代码被放进了一个 setTimeout 中，且在 1s 后再被执行。所以 1s 后 event loop 肯定已经存在，此时就从 poll 阶段开始，然后执行三段代码，第一段把 fn 放进 timers 的队列，第二段把 fn2 放进 check 队列，然后 poll 阶段执行完了，根据 nextTick 队列会在<strong>当前阶段</strong>后就被执行，所以此刻在马上要进入 check 阶段之前，就把 nextTick 中的代码执行掉了，所以先打印 fn3，然后进入 check 阶段后打印 fn2，最后重新进入 timers 打印 fn。</p>
+<p>再来看下面这段代码：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(() =&gt; &#123;</span><br><span class="line">  setTimeout(() =&gt; &#123;</span><br><span class="line">    <span class="selector-tag">console</span><span class="selector-class">.log</span>(&quot;<span class="selector-tag">fn</span>&quot;);</span><br><span class="line">    process.nextTick(() =&gt; console.log(&quot;fn4&quot;));</span><br><span class="line">  &#125;, 0);</span><br><span class="line">  setImmediate(() =&gt; console.log(&quot;fn2&quot;));</span><br><span class="line">  process.nextTick(() =&gt; console.log(&quot;fn3&quot;));</span><br><span class="line">&#125;, 1000);</span><br></pre></td></tr></table></figure>
+
+<p>由于 fn4 紧跟着 fn，所以在 timers 阶段完成后，就执行了 fn4（注意 fn4 不会放进 timers 的队列，而是在队列里函数执行完后，紧跟着执行 fn4），所以最终顺序为：</p>
+<p>fn3, fn2, fn, fn4</p>
+<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;setImmediate1&#x27;</span>);</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeout1&#x27;</span>);</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeout2&#x27;</span>);</span><br><span class="line">    setImmediate(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;setImmediate2&#x27;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/el-test.png" class="" title="el-test">
+
+<p>执行第 2 行 setImmediate 后，把 setImmediate 中的函数 f1 放进 check 中（此刻不执行 f1），然后执行第 9 行的 setTimeout ，把 setTimeout 中的函数 f2 放进 timers 中（此刻也不执行 f2），然后进入 poll 阶段等待，发现有 f1 待执行，所以执行 f1，打印 setImmediate1 ，接着把 f3 放进 timers 的队列。此刻 check 阶段完成，重回 timers 阶段，发现队列中的 f2，执行 f2，打印 setTimeout2 ，接着把 f4 扔进 check 队列，然后执行 f3， 打印 setTimeout1 ，执行完后，进入 poll 阶段，发现有 f4 没执行，进入 check 阶段，执行 f4，所以最后打印 setImmediate2 。</p>
+<h2 id="宏任务-amp-微任务"><a href="#宏任务-amp-微任务" class="headerlink" title="宏任务&amp;微任务"></a>宏任务&amp;微任务</h2><h3 id="Event-Loop"><a href="#Event-Loop" class="headerlink" title="Event Loop"></a>Event Loop</h3><h4 id="NodeJS："><a href="#NodeJS：" class="headerlink" title="NodeJS："></a>NodeJS：</h4><ul>
+<li>timers（setTimeout）</li>
+<li>poll</li>
+<li>check（setImmediate）</li>
+</ul>
+<p><strong>注意：</strong>nextTick 不属于任何阶段，但会在当前阶段后执行</p>
+<p>如果强行问 NodeJS 中的宏任务微任务，那就是：</p>
+<p>setTimeout 和 setImmediate 是宏任务，nextTick 是微任务。因为 nextTick 不用等到下个阶段，会在当前阶段完成后立即执行。</p>
+<p>还有个 promise.then(fn)【注意是小写的 p，大写的 P 不能直接 then】，一般不考。Node 中的 promise.then 一般是用 nextTick 实现的，所以也按照当前阶段的后面来推。这里 then 里面的 fn 不是马上放队列（setTImeout，setImmediate 和 nextTick 都是里面的 fn 马上放队列），而是当你 resolve 以后，才放进当前阶段的后面执行。</p>
+<h4 id="chrome："><a href="#chrome：" class="headerlink" title="chrome："></a>chrome：</h4><ul>
+<li>宏任务（一会儿）setTimeout</li>
+<li>微任务（马上）.then(fn) <strong>fn 放马上</strong></li>
+<li>一会儿就是等会做，马上就是立即做；如果一会儿里面有个马上做的，还是马上做。</li>
+</ul>
+<p><strong>注意：</strong></p>
+<ol>
+<li>遇到 await 把它转为 promise 再看，因为 await 本来就是 promise 的语法糖。</li>
+<li>new Promise 是立即执行的，.then 才是微任务。</li>
+</ol>
+<h3 id="面试题-1"><a href="#面试题-1" class="headerlink" title="面试题"></a>面试题</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">await</span> async2();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">3</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">  resolve();</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">5</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>画图！！！不画图做不出来！！！</strong></p>
+<p>代码从上到下，先执行 11 行 async1，进入 async1，<strong>先打印 1</strong>。遇到 await 转为 promise =&gt;</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">async2(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="number">3</span>)).then(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<p>（<strong>await 后面所有代码都属于 then 当中的，</strong>比如第 4 行后面加个 console.log(“233”)，那么此行代码也属于 then）而 async2 本身的代码会被立即执行，<strong>所以打印第 8 行中的 3</strong>。打印完后<strong>执行 then （</strong>执行 then 其实是需要 resolve 的，但 async 会去看你函数中有没有 resolve，如果没有会自动加上 resolve，相当于 async 帮你干了这样一件事：<strong>Promise.resolve(**async2()</strong>)<strong>.then(f1)**）</strong>，<strong>then 就是放队列</strong>，我们把 <code>console.log(2)</code> 记做任务 f1 放进「马上」中去，但此刻不执行。此刻 async1 彻底执行完了。</p>
+<p>接着执行 13 行的 new Promise，14 到 15 行代码会被立即执行（new Promise 中的函数会被立即执行，没有什么宏任务微任务，就相当于裸写 14 到 15 行代码），<strong>所以打印 4</strong>。在执行完 14 行 resolve 的时候，<strong>会指明执行 then 后面的第一个函数，而不是第二个函数（reject 时所执行的）</strong>，也就是 17 行代码的任务也放进「马上」中去，该任务记做 f2 ，至此当前代码全部执行完毕，然后看「马上」中的任务，执行 f1，<strong>打印 2</strong>。接着执行 f2， <strong>打印 5</strong>。</p>
+<img src="/posts/undefined/answer.png" class="" title="answer">
+
+<p><strong>注意点</strong>：上面的 resolve 只是决定执行 then 里面的成功回调函数，并不决定加入队列。<strong>决定加入队列的是 then。</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>宏任务（一会儿）：setTimeout，setInterval，setImmediate（优先级比前两个高，因为是在 check 阶段）</p>
+<p>微任务（马上）：promise.then，process.nextTick</p>
+<p>宏任务微任务执行顺序：有微任务先执行微任务，微任务都执行完了，再执行宏任务</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.nlark.com/yuque/0/2019/png/260235/1557198825204-924929ec-1115-4e21-a771-cf18796f8f15.png?x-oss-process=image/resize,w_984">![image.png](Event Loop 学习笔记/resize,w_984.png)</a></p>
+<p><a href="https://evestorm.github.io/tags/Node/"> Node</a> <a href="https://evestorm.github.io/tags/EventLoop/"> EventLoop</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node/" rel="tag"># Node</a>
+              <a href="/tags/EventLoop/" rel="tag"># EventLoop</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/29963/" rel="prev" title="Axios异步请求跨域解决方案">
+                  <i class="fa fa-chevron-left"></i> Axios异步请求跨域解决方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/40707/" rel="next" title="CSS知识点（面试系列）">
+                  CSS知识点（面试系列） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
