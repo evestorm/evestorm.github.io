@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="盒模型标准盒模型（W3C 标准）： 一个块的总宽度 &#x3D; 内容宽度 + margin(左右) + padding(左右) + border(左右) 怪异盒模型（IE 标准）： 一个块的总宽度 &#x3D; width（包含 padding 和 border） + margin(左右) 怪异盒模型触发条件如果 html 文件最顶部 doctype 缺失，则在 ie6、7、8 将会触发怪异模式(quirks);">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS知识点（面试系列）">
+<meta property="og:url" content="https://evestorm.github.io/posts/40707/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="盒模型标准盒模型（W3C 标准）： 一个块的总宽度 &#x3D; 内容宽度 + margin(左右) + padding(左右) + border(左右) 怪异盒模型（IE 标准）： 一个块的总宽度 &#x3D; width（包含 padding 和 border） + margin(左右) 怪异盒模型触发条件如果 html 文件最顶部 doctype 缺失，则在 ie6、7、8 将会触发怪异模式(quirks);">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E4%B8%8A%E4%B8%8B%E5%88%86%E6%A0%8F.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E5%B7%A6%E5%8F%B3%E5%88%86%E6%A0%8F.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E5%86%85%E5%AE%B9%E7%BB%93%E6%9E%84%E6%9D%BF%E5%9D%97.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/float.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/margin.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E5%8F%B3%E6%B5%AE%E5%8A%A8.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E5%90%88%E5%B9%B6margin.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E5%90%88%E5%B9%B6margin2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/hebing.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/hebing2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/rwdawd.png">
+<meta property="article:published_time" content="2019-06-09T05:35:40.000Z">
+<meta property="article:modified_time" content="2020-12-14T05:46:47.415Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/%E4%B8%8A%E4%B8%8B%E5%88%86%E6%A0%8F.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/40707/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>CSS知识点（面试系列） | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%92%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">盒模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%AA%E5%BC%82%E7%9B%92%E6%A8%A1%E5%9E%8B%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">怪异盒模型触发条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-css-%E6%9D%A5%E8%AE%BE%E7%BD%AE%E7%9B%92%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">通过 css 来设置盒模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.</span> <span class="nav-text">应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSS-%E9%80%89%E6%8B%A9%E7%AC%A6%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F%E5%93%AA%E4%BA%9B%E5%B1%9E%E6%80%A7%E5%8F%AF%E4%BB%A5%E7%BB%A7%E6%89%BF%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">CSS 选择符有哪些？哪些属性可以继承？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E7%BB%A7%E6%89%BF%E5%B1%9E%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">可继承属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E7%BB%A7%E6%89%BF%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">不可继承属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSS-%E4%BC%98%E5%85%88%E7%BA%A7%E7%AE%97%E6%B3%95%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">CSS 优先级算法如何计算？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSS3-%E6%96%B0%E5%A2%9E%E4%BC%AA%E7%B1%BB%E6%9C%89%E9%82%A3%E4%BA%9B%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">CSS3 新增伪类有那些？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#display-none%E3%80%81visibility%EF%BC%9Ahidden-%E5%92%8C-opacity-0-%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">display:none、visibility：hidden 和 opacity: 0 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#position-%E8%B7%9F-display-%E3%80%81float-%E8%BF%99%E4%BA%9B%E7%89%B9%E6%80%A7%E7%9B%B8%E4%BA%92%E5%8F%A0%E5%8A%A0%E5%90%8E%E4%BC%9A%E6%80%8E%E4%B9%88%E6%A0%B7%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">position 跟 display 、float 这些特性相互叠加后会怎么样？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B2%E4%B8%80%E8%AE%B2-position-%E5%B1%9E%E6%80%A7%E4%B8%AD%E7%9A%84%E5%90%84%E7%A7%8D%E5%80%BC"><span class="nav-number">7.</span> <span class="nav-text">讲一讲 position 属性中的各种值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSS3-%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B0%E7%89%B9%E6%80%A7%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">CSS3 有哪些新特性？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%B8%A1"><span class="nav-number">8.1.</span> <span class="nav-text">过渡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E7%94%BB"><span class="nav-number">8.2.</span> <span class="nav-text">动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%A2%E7%8A%B6%E8%BD%AC%E6%8D%A2"><span class="nav-number">8.3.</span> <span class="nav-text">形状转换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">8.3.1.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-number">8.4.</span> <span class="nav-text">选择器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-number">8.4.1.</span> <span class="nav-text">属性选择器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E6%80%A7%E4%BC%AA%E7%B1%BB%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-number">8.4.2.</span> <span class="nav-text">结构性伪类选择器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B4%E5%BD%B1"><span class="nav-number">8.5.</span> <span class="nav-text">阴影</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%B9%E6%A1%86"><span class="nav-number">8.6.</span> <span class="nav-text">边框</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSS-%E5%BC%B9%E6%80%A7%E5%B8%83%E5%B1%80%EF%BC%88flex%EF%BC%89"><span class="nav-number">8.7.</span> <span class="nav-text">CSS 弹性布局（flex）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Flex-%E5%AE%B9%E5%99%A8%E5%B1%9E%E6%80%A7"><span class="nav-number">8.7.1.</span> <span class="nav-text">Flex 容器属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Flex-%E9%A1%B9%E7%9B%AE%E5%B1%9E%E6%80%A7"><span class="nav-number">8.7.2.</span> <span class="nav-text">Flex 项目属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">8.7.3.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#li-%E4%B8%8E-li-%E4%B9%8B%E9%97%B4%E6%9C%89%E7%9C%8B%E4%B8%8D%E8%A7%81%E7%9A%84%E7%A9%BA%E7%99%BD%E9%97%B4%E9%9A%94%E6%98%AF%E4%BB%80%E4%B9%88%E5%8E%9F%E5%9B%A0%E5%BC%95%E8%B5%B7%E7%9A%84%EF%BC%9F%E6%9C%89%E4%BB%80%E4%B9%88%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">li 与 li 之间有看不见的空白间隔是什么原因引起的？有什么解决办法？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-number">9.1.</span> <span class="nav-text">场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">9.2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">9.3.</span> <span class="nav-text">解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BFC-%E5%9D%97%E7%BA%A7%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%B8%8A%E4%B8%8B%E6%96%87%EF%BC%9Ablock-formatting-context"><span class="nav-number">10.</span> <span class="nav-text">BFC(块级格式化上下文：block formatting context)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%90%86%E8%A7%A3"><span class="nav-number">10.1.</span> <span class="nav-text">理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81-BFC-%E5%BA%94%E7%94%A8"><span class="nav-number">10.2.</span> <span class="nav-text">常见 BFC 应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E5%85%83%E7%B4%A0%E5%86%85%E9%83%A8%E6%B5%AE%E5%8A%A8"><span class="nav-number">10.2.1.</span> <span class="nav-text">清除元素内部浮动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%A4%96%E8%BE%B9%E8%B7%9D%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98"><span class="nav-number">10.2.2.</span> <span class="nav-text">解决外边距合并问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%A4%E6%A0%8F%E5%B8%83%E5%B1%80%EF%BC%8C%E5%AE%9E%E7%8E%B0%E5%B7%A6%E5%AE%9A%E5%AE%BD-%E5%8F%B3%E5%AE%BD%E8%87%AA%E9%80%82%E5%BA%94"><span class="nav-number">10.2.3.</span> <span class="nav-text">两栏布局，实现左定宽+右宽自适应</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%B7%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8%EF%BC%9F%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">11.</span> <span class="nav-text">请解释一下为什么需要清除浮动？清除浮动的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E8%B4%A8"><span class="nav-number">11.1.</span> <span class="nav-text">本质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%B8%85%E9%99%A4"><span class="nav-number">11.2.</span> <span class="nav-text">如何清除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%A4%96%E8%BE%B9%E8%B7%9D%E5%90%88%E5%B9%B6%EF%BC%9F"><span class="nav-number">12.</span> <span class="nav-text">什么是外边距合并？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%98%AF%E6%80%8E%E6%A0%B7%E8%A7%A3%E6%9E%90-CSS-%E9%80%89%E6%8B%A9%E5%99%A8%E7%9A%84%EF%BC%9F"><span class="nav-number">13.</span> <span class="nav-text">浏览器是怎样解析 CSS 选择器的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E7%A6%BB%E6%A0%B7%E5%BC%8F%E6%A8%A1%E5%9D%97%E6%80%8E%E4%B9%88%E5%86%99%EF%BC%8C%E8%AF%B4%E5%87%BA%E6%80%9D%E8%B7%AF%EF%BC%8C%E6%9C%89%E6%97%A0%E5%AE%9E%E8%B7%B5%E7%BB%8F%E9%AA%8C%EF%BC%9F"><span class="nav-number">14.</span> <span class="nav-text">抽离样式模块怎么写，说出思路，有无实践经验？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E7%AB%96%E5%90%91%E7%9A%84%E7%99%BE%E5%88%86%E6%AF%94%E8%AE%BE%E5%AE%9A%E6%98%AF%E7%9B%B8%E5%AF%B9%E4%BA%8E%E7%88%B6%E5%AE%B9%E5%99%A8%E7%9A%84%E9%AB%98%E5%BA%A6%E5%90%97%EF%BC%9F"><span class="nav-number">15.</span> <span class="nav-text">元素竖向的百分比设定是相对于父容器的高度吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%8D%E5%BA%94%E5%BC%8F%E8%AE%BE%E8%AE%A1%EF%BC%9F%E5%93%8D%E5%BA%94%E5%BC%8F%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%A6%82%E4%BD%95%E5%85%BC%E5%AE%B9%E4%BD%8E%E7%89%88%E6%9C%AC%E7%9A%84-IE%EF%BC%9F"><span class="nav-number">16.</span> <span class="nav-text">什么是响应式设计？响应式设计的基本原理是什么？如何兼容低版本的 IE？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E5%92%8C%E8%87%AA%E9%80%82%E5%BA%94%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">17.</span> <span class="nav-text">响应式和自适应设计的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%A0%E5%AF%B9-line-height-%E6%98%AF%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E7%9A%84%EF%BC%9F%E5%A6%82%E4%BD%95%E5%8D%95%E8%A1%8C%E6%96%87%E6%9C%AC%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD%EF%BC%9F%E5%A4%9A%E8%A1%8C%E6%96%87%E6%9C%AC%E5%91%A2%EF%BC%9F"><span class="nav-number">18.</span> <span class="nav-text">你对 line-height 是如何理解的？如何单行文本垂直居中？多行文本呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E8%A1%8C%E6%96%87%E6%9C%AC%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD%EF%BC%9A%EF%BC%88%E8%A1%8C%E9%AB%98-%E5%85%83%E7%B4%A0%E9%AB%98%E5%BA%A6%EF%BC%89"><span class="nav-number">18.1.</span> <span class="nav-text">单行文本垂直居中：（行高 &#x3D;&#x3D; 元素高度）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E8%A1%8C%E6%96%87%E6%9C%AC%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD%EF%BC%9A%EF%BC%88%E7%88%B6%E5%AE%B9%E5%99%A8-table%EF%BC%8C%E5%AD%90%E5%AE%B9%E5%99%A8-table-cell-vertical-align-middle%EF%BC%89"><span class="nav-number">18.2.</span> <span class="nav-text">多行文本垂直居中：（父容器 table，子容器 table-cell+vertical-align:middle）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%85%83%E7%B4%A0%E6%B5%AE%E5%8A%A8%E5%90%8E%EF%BC%8C%E8%AF%A5%E5%85%83%E7%B4%A0%E7%9A%84-display-%E5%80%BC%E6%98%AF%E5%A4%9A%E5%B0%91%EF%BC%9F"><span class="nav-number">19.</span> <span class="nav-text">设置元素浮动后，该元素的 display 值是多少？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E9%A1%B5%E9%9D%A2%E9%87%8C%E7%9A%84%E5%AD%97%E4%BD%93%E5%8F%98%E6%B8%85%E6%99%B0%EF%BC%8C%E5%8F%98%E7%BB%86%E7%94%A8-CSS-%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%9F"><span class="nav-number">20.</span> <span class="nav-text">让页面里的字体变清晰，变细用 CSS 怎么做？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#overflow-scroll-%E6%97%B6%E4%B8%8D%E8%83%BD%E5%B9%B3%E6%BB%91%E6%BB%9A%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%EF%BC%9F"><span class="nav-number">21.</span> <span class="nav-text">overflow: scroll 时不能平滑滚动的问题怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-CSS-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8-%E5%90%8E%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%9F"><span class="nav-number">22.</span> <span class="nav-text">什么是 CSS 预处理器 &#x2F; 后处理器？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CSS-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">22.1.</span> <span class="nav-text">CSS 预处理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSS-%E5%90%8E%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">22.2.</span> <span class="nav-text">CSS 后处理器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E5%B7%A6%E5%8F%B3%E4%B8%8A%E4%B8%8B%E9%97%B4%E9%9A%99-%E6%80%8E%E4%B9%88%E5%8E%BB%E9%99%A4%EF%BC%9A"><span class="nav-number">23.</span> <span class="nav-text">图片为什么有左右上下间隙,怎么去除：</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/40707/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSS知识点（面试系列）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-09 13:35:40" itemprop="dateCreated datePublished" datetime="2019-06-09T13:35:40+08:00">2019-06-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-14 13:46:47" itemprop="dateModified" datetime="2020-12-14T13:46:47+08:00">2020-12-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">面试</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/40707/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/40707/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="盒模型"><a href="#盒模型" class="headerlink" title="盒模型"></a>盒模型</h2><p>标准盒模型（W3C 标准）：</p>
+<p>一个块的总宽度 = <strong>内容宽度</strong> + margin(左右) + padding(左右) + border(左右)</p>
+<p>怪异盒模型（IE 标准）：</p>
+<p>一个块的总宽度 = <strong>width（包含 padding 和 border）</strong> + margin(左右)</p>
+<h3 id="怪异盒模型触发条件"><a href="#怪异盒模型触发条件" class="headerlink" title="怪异盒模型触发条件"></a>怪异盒模型触发条件</h3><p>如果 html 文件最顶部 doctype 缺失，则在 ie6、7、8 将会触发怪异模式(quirks);</p>
+<h3 id="通过-css-来设置盒模型"><a href="#通过-css-来设置盒模型" class="headerlink" title="通过 css 来设置盒模型"></a>通过 css 来设置盒模型</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">box-sizing</span>: <span class="selector-tag">content-box</span>; <span class="comment">/* 标准模型 */</span></span><br><span class="line">            <span class="selector-tag">border-box</span>;  <span class="comment">/* IE模型 */</span></span><br><span class="line">            <span class="selector-tag">inherit</span>;     <span class="comment">/* 从父元素继承 */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li>怪异盒模型（border-box）</li>
+</ul>
+<blockquote>
+<p>比如我们想做一个内边距 10px ，边框为 2px ，最终包括边框宽度为 100px 的 div ，之前的做法是先算出内容宽 <code>width</code> 。但有点繁琐，需要人算。此时我们可以把 div 的 box-sizing 设置为 border-box ，我们就可以直接把 width 设置为 100px ，其余的 padding 和 border 按照给定好的值一一填入，就可以完成这一切工作，省去了人为的计算内容宽 content 的过程，减少计算量的同时减少了错误率。</p>
+</blockquote>
+<h2 id="CSS-选择符有哪些？哪些属性可以继承？"><a href="#CSS-选择符有哪些？哪些属性可以继承？" class="headerlink" title="CSS 选择符有哪些？哪些属性可以继承？"></a>CSS 选择符有哪些？哪些属性可以继承？</h2><ol>
+<li>id 选择器（ #my-id ）</li>
+<li>类选择器（ .my-class-name ）</li>
+<li>标签选择器（ div, h1, p ）</li>
+<li>相邻选择器（ h1 + p 紧贴在 h1 后面的第一个 p 标签。同级标签，之间不能有其他标签 ）</li>
+<li>子代选择器（ ul &gt; li ul 标签下的下一个层级的 li ，并不是所有 ）</li>
+<li>后代选择器（ li a ）</li>
+<li>通配符选择器（ * ）</li>
+<li>属性选择器（ a[rel = “external”] ）</li>
+<li>伪类选择器（ a:hover, li:nth-child ）</li>
+</ol>
+<h3 id="可继承属性"><a href="#可继承属性" class="headerlink" title="可继承属性"></a>可继承属性</h3><p>font-size font-family color, UL LI DL DD DT;</p>
+<h3 id="不可继承属性"><a href="#不可继承属性" class="headerlink" title="不可继承属性"></a>不可继承属性</h3><p>border padding margin width height</p>
+<h2 id="CSS-优先级算法如何计算？"><a href="#CSS-优先级算法如何计算？" class="headerlink" title="CSS 优先级算法如何计算？"></a>CSS 优先级算法如何计算？</h2><ul>
+<li>写在后面的覆盖写在前面的</li>
+<li>描述越具体优先级越高 (div , div[class=’restart’])</li>
+<li>同权重 行内样式 &gt; 内嵌样式 &gt; 外部样式</li>
+<li>!important 优先级最高</li>
+</ul>
+<h2 id="CSS3-新增伪类有那些？"><a href="#CSS3-新增伪类有那些？" class="headerlink" title="CSS3 新增伪类有那些？"></a>CSS3 新增伪类有那些？</h2><ul>
+<li><code>p:first-of-type</code> 属于其父元素的特定类型首个子元素 等同于 <code>:nth-of-type(1)</code></li>
+<li><code>p:last-of-type</code> 属于其父元素的特定类型的最后一个子元素 等同于 <code>:nth-last-of-type(1)</code></li>
+<li><code>::after</code> 在元素之前添加内容,也可以用来做清除浮动。</li>
+<li><code>::before</code> 在元素之后添加内容</li>
+<li><code>:enabled/:disabled</code> 控制表单控件的禁用状态。</li>
+<li><code>:checked</code> 单选框或复选框被选中。</li>
+</ul>
+<h2 id="display-none、visibility：hidden-和-opacity-0-的区别？"><a href="#display-none、visibility：hidden-和-opacity-0-的区别？" class="headerlink" title="display:none、visibility：hidden 和 opacity: 0 的区别？"></a>display:none、visibility：hidden 和 opacity: 0 的区别？</h2><ul>
+<li>display：none （不占空间，不能点击）（回流+重绘）</li>
+<li>visibility：hidden （占据空间，不可点击）（重绘）</li>
+<li>opacity: 0（占据空间，可以点击）（重建图层，性能较高）</li>
+</ul>
+<p>更多：<a target="_blank" rel="noopener" href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/100">分析比较 opacity: 0、visibility: hidden、display: none 优劣和适用场景</a></p>
+<h2 id="position-跟-display-、float-这些特性相互叠加后会怎么样？"><a href="#position-跟-display-、float-这些特性相互叠加后会怎么样？" class="headerlink" title="position 跟 display 、float 这些特性相互叠加后会怎么样？"></a>position 跟 display 、float 这些特性相互叠加后会怎么样？</h2><ul>
+<li>position 属性规定元素的定位类型</li>
+<li>display 属性规定元素应该生成的框的类型</li>
+<li>float 属性是一种布局方式，定义元素在哪个方向浮动。</li>
+</ul>
+<p>优先级机制：position：absolute/fixed 优先级最高，有他们在时，float 不起作用，display 值需要调整。float 或者 absolute 定位的元素，只能是块元素或表格。</p>
+<h2 id="讲一讲-position-属性中的各种值"><a href="#讲一讲-position-属性中的各种值" class="headerlink" title="讲一讲 position 属性中的各种值"></a>讲一讲 position 属性中的各种值</h2><table>
+<thead>
+<tr>
+<th align="left"><strong>值</strong></th>
+<th align="left"><strong>是否脱标占有位置</strong></th>
+<th align="left"><strong>可使用边偏移</strong></th>
+<th align="left"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">static</td>
+<td align="left">不脱标，正常模式</td>
+<td align="left">不可以</td>
+<td align="left">自动（没有）定位（默认定位方式）</td>
+</tr>
+<tr>
+<td align="left">relative(自恋)</td>
+<td align="left">不脱标，占有位置</td>
+<td align="left">可以</td>
+<td align="left">相对定位，相对于其原文档流的位置进行定位</td>
+</tr>
+<tr>
+<td align="left">absolute(拼爹)</td>
+<td align="left">完全脱标，不占位置</td>
+<td align="left">可以</td>
+<td align="left">绝对定位，相对于其上一个已经定位（不为 static）的父元素进行定位</td>
+</tr>
+<tr>
+<td align="left">fixed(浏览器)</td>
+<td align="left">完全脱标，不占位置</td>
+<td align="left">可以</td>
+<td align="left">固定定位，相对于浏览器窗口进行定位（老 IE 不支持）</td>
+</tr>
+<tr>
+<td align="left">inherit</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">规定从父元素继承 position 属性的值</td>
+</tr>
+</tbody></table>
+<h2 id="CSS3-有哪些新特性？"><a href="#CSS3-有哪些新特性？" class="headerlink" title="CSS3 有哪些新特性？"></a>CSS3 有哪些新特性？</h2><h3 id="过渡"><a href="#过渡" class="headerlink" title="过渡"></a>过渡</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 语法 */</span></span><br><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">CSS</span>属性，过渡时间，效果曲线（默认<span class="selector-tag">ease</span>），延迟时间（默认0）</span><br><span class="line"></span><br><span class="line"><span class="comment">/* demo1 */</span></span><br><span class="line"><span class="comment">/*宽度从原始值到制定值的一个过渡，运动曲线ease,运动时间0.5秒，0.2秒后执行过渡*/</span></span><br><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">width</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease</span> .2<span class="selector-tag">s</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* demo2 */</span></span><br><span class="line"><span class="comment">/* 分开写 */</span></span><br><span class="line"><span class="selector-tag">transition-property</span>: <span class="selector-tag">width</span>;</span><br><span class="line"><span class="selector-tag">transition-duration</span>: 1<span class="selector-tag">s</span>;</span><br><span class="line"><span class="selector-tag">transition-timing-function</span>: <span class="selector-tag">linear</span>;</span><br><span class="line"><span class="selector-tag">transition-delay</span>: 2<span class="selector-tag">s</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动画"><a href="#动画" class="headerlink" title="动画"></a>动画</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 语法 */</span></span><br><span class="line"><span class="selector-tag">animation</span>：动画名称，动画时间，运动曲线（默认<span class="selector-tag">ease</span>），动画延迟（默认0），播放次数（默认1），</span><br><span class="line">是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br><span class="line"></span><br><span class="line"><span class="comment">/* demo1 */</span></span><br><span class="line"><span class="comment">/* 执行一次logo2-line动画，运动时间2秒，运动曲线为 linear */</span></span><br><span class="line"><span class="selector-tag">animation</span>: <span class="selector-tag">logo2-line</span> 2<span class="selector-tag">s</span> <span class="selector-tag">linear</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* demo2 */</span></span><br><span class="line"><span class="comment">/* 2秒后开始执行一次 logo2-line 动画，运动时间2秒，运动曲线为 linear */</span></span><br><span class="line"><span class="selector-tag">animation</span>: <span class="selector-tag">logo2-line</span> 2<span class="selector-tag">s</span> <span class="selector-tag">linear</span> 2<span class="selector-tag">s</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* demo3 */</span></span><br><span class="line"><span class="comment">/*无限执行 logo2-line 动画，每次运动时间2秒，运动曲线为 linear，并且执行反向动画*/</span></span><br><span class="line"><span class="selector-tag">animation</span>: <span class="selector-tag">logo2-line</span> 2<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line"></span><br><span class="line">还有一个重要属性：用来指定在动画执行之前和之后如何给动画的目标应用样式。</span><br><span class="line">animation-fill-mode: none | forwards | backwards | both;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">动画分为 初始状态 等待期 动画执行期 完成期 四个阶段。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">- none 表示 等待期和完成期，元素样式都为初始状态样式，不受动画定义（@keyframes）的影响</span></span><br><span class="line"><span class="comment">- forwards 表示等待期保持初始样式，完成期间保持最后一帧样式</span></span><br><span class="line"><span class="comment">- backwards 表示等待期为第一帧样式，完成期跳转为初始样式</span></span><br><span class="line"><span class="comment">- both 表示 等待期样式为第一帧样式，完成期保持最后一帧样式</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：<a target="_blank" rel="noopener" href="https://segmentfault.com/q/1010000003867335">如何理解 animation-fill-mode 及其使用？</a></p>
+<h3 id="形状转换"><a href="#形状转换" class="headerlink" title="形状转换"></a>形状转换</h3><p>transform: 适用于 2D 或 3D 转换的元素 <a target="_blank" rel="noopener" href="https://www.zhangxinxu.com/wordpress/2012/09/css3-3d-transform-perspective-animate-transition/">(3d 看这里)</a><br>transform-origin: 转换元素的位置（围绕那个点进行转换,默认中心）。默认 x, y, z ： 50%, 50%, 0 对应 left, top</p>
+<ul>
+<li>缩放 scale</li>
+<li>位移 translate</li>
+<li>旋转 rotate</li>
+<li>倾斜 skew</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">transform</span>: <span class="selector-tag">rotate</span>(30<span class="selector-tag">deg</span>);</span><br><span class="line"><span class="selector-tag">transform</span>: <span class="selector-tag">translate</span>(30<span class="selector-tag">px</span>, 30<span class="selector-tag">px</span>);</span><br><span class="line"><span class="selector-tag">transform</span>: <span class="selector-tag">scale</span>(0.8);</span><br><span class="line"><span class="selector-tag">transform</span>: <span class="selector-tag">skew</span>(10<span class="selector-tag">deg</span>, 10<span class="selector-tag">deg</span>);</span><br><span class="line"><span class="selector-tag">transform-origin</span>: <span class="selector-tag">left</span> <span class="selector-tag">top</span>; <span class="comment">/* 左上（默认中心）【改变元素变形的原点】 */</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h4><p>对 transition 、animation 和 transform 这块儿内容不熟的同学可以参考我的博客简单上手教程，基本上每个属性都有相应的 demo 展示：<a href="https://evestorm.github.io/categories/%E5%89%8D%E7%AB%AF/CSS/">Lance 的个人博客-css 分类</a></p>
+<p>另外，上面的知识点参考于下方资源，可自取：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000010780991">个人总结（css3 新特性）</a></li>
+<li><a target="_blank" rel="noopener" href="http://cubic-bezier.com/#.42,0,.58,1">cubic-bezier 贝塞尔在线预览</a></li>
+<li><a target="_blank" rel="noopener" href="https://cssreference.io/property/transition-timing-function/">transition-timing-function | cssreference</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.smashingmagazine.com/2014/04/understanding-css-timing-functions/">Understanding The CSS3 transition-timing-function Property</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000011019534">翻译 | 深入理解 CSS 时序函数</a></li>
+<li><a target="_blank" rel="noopener" href="http://koala.ink/posts/86be452a/">css3 动画详解【推荐】</a></li>
+</ul>
+<h3 id="选择器"><a href="#选择器" class="headerlink" title="选择器"></a>选择器</h3><h4 id="属性选择器"><a href="#属性选择器" class="headerlink" title="属性选择器"></a>属性选择器</h4><ul>
+<li>div[index] { background: red } 表示 div 下面带 index 属性的背景为红色</li>
+<li>div[index=a] { background: red } 表示 div 下面的自定义属性 index=a 的 div 的颜色变成红色。</li>
+<li>div[index~=a] { background: red } 只要 div 中 index 属性带 a 这个单词的就生效。[a 这个单词必须独立存在]<ul>
+<li>p[class~=’lance’] 只会匹配到 class=”xxx lance”，而不会匹配 class=”xxlancexx”</li>
+</ul>
+</li>
+<li>div[index*=a] { background: red } 只要 div 里面的 index 属性带 a 字母的就生效。</li>
+<li>div[index^=a] { background: red } 以 a 开头的</li>
+<li>div[index$=a] { background: red } 以 a 结尾</li>
+<li>div[index|=a] { background:red } 只要以 a- 开头的</li>
+</ul>
+<p>当需要多个的时候： div[key1=value1][key2=value2][key3=value3]…. { background:red }</p>
+<h4 id="结构性伪类选择器"><a href="#结构性伪类选择器" class="headerlink" title="结构性伪类选择器"></a>结构性伪类选择器</h4><p>前提：假如 div 是下面 p 标签的父元素</p>
+<ul>
+<li><pre><code>p:nth-child(n)
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  div 下类型为 p 的第 n 个子元素，下标从 1 开始！！</span><br><span class="line"></span><br><span class="line">  - &#96;:nth-child(odd)&#96; 奇数</span><br><span class="line">  - &#96;:nth-child(even)&#96; 偶数</span><br><span class="line"></span><br><span class="line">- &#96;p:nth-last-child(n)&#96; 从倒数，div 下类型为 p 的第 n 个子元素</span><br><span class="line"></span><br><span class="line">- &#96;p:last-child&#96; div 下最后一个子元素如果是 p ，则生效，否则不生效</span><br><span class="line"></span><br><span class="line">- &#96;p:first-child&#96; div 下第一个子元素如果是 p ，则生效，否则不生效【css2 的】</span><br><span class="line"></span><br><span class="line">- &#96;p:first-of-type&#96; div 下第一个类型为 p 的子元素【不需要 p 是这个 div 下的第一个子元素】</span><br><span class="line"></span><br><span class="line">- &#96;p:last-of-type&#96; div 下最后一个类型为 p 的子元素</span><br><span class="line"></span><br><span class="line">参考：[css 选择器中:first-child 与:first-of-type 的区别](https:&#x2F;&#x2F;www.cnblogs.com&#x2F;2050&#x2F;p&#x2F;3569509.html)</span><br><span class="line"></span><br><span class="line">#### 伪元素选择器</span><br><span class="line"></span><br><span class="line">1. &#96;::first-letter&#96; 文本的第一个单词或字（如中文、日文、韩文等）</span><br><span class="line">2. &#96;::first-line&#96; 文本第一行；</span><br><span class="line">3. &#96;::selection&#96; 可改变选中文本的样式；</span><br><span class="line">4. &#96;::before&#96; 和 &#96;::after&#96; 在元素内部的开始火结束为止创建一个元素，该元素为行内元素，必须结合 content 属性使用 div::before &#123; content: ‘开始’ &#125;</span><br><span class="line"></span><br><span class="line">#### 目标伪类选择器</span><br><span class="line"></span><br><span class="line">&#96;:target&#96; 目标伪类选择器， &#96;:&#96; 选择器可用于选取当前活动的目标元素</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;css</span><br><span class="line">:target &#123;</span><br><span class="line">  color: red;</span><br><span class="line">  font-size: 30px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+<h3 id="阴影"><a href="#阴影" class="headerlink" title="阴影"></a>阴影</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* x偏移量 | y偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */</span></span><br><span class="line"><span class="selector-tag">box-shadow</span>: 2<span class="selector-tag">px</span> 2<span class="selector-tag">px</span> 2<span class="selector-tag">px</span> 1<span class="selector-tag">px</span> <span class="selector-tag">rgba</span>(0, 0, 0, 0.2);</span><br></pre></td></tr></table></figure>
+
+<h3 id="边框"><a href="#边框" class="headerlink" title="边框"></a>边框</h3><ul>
+<li><p>边框图片 border-image</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">border-image</span>: <span class="selector-tag">image-source</span> <span class="selector-tag">image-height</span> <span class="selector-tag">image-width</span> <span class="selector-tag">image-repeat</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>圆角边框 border-radius</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">border-radius</span>: 左上角，右上角，右下角，左下角;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="CSS-弹性布局（flex）"><a href="#CSS-弹性布局（flex）" class="headerlink" title="CSS 弹性布局（flex）"></a>CSS 弹性布局（flex）</h3><h4 id="Flex-容器属性"><a href="#Flex-容器属性" class="headerlink" title="Flex 容器属性"></a>Flex 容器属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">copy主轴方向：水平排列（默认） | 水平反向排列 | 垂直排列 | 垂直反向排列</span><br><span class="line">flex-direction: row | row-reverse | column | column-reverse;</span><br><span class="line"></span><br><span class="line">换行：不换行（默认） | 换行 | 反向换行(第一行在最后面)</span><br><span class="line">flex-wrap: nowrap | wrap | wrap-reverse;</span><br><span class="line"></span><br><span class="line">flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap</span><br><span class="line">flex-flow: &lt;flex-direction&gt; || &lt;flex-wrap&gt;;</span><br><span class="line"></span><br><span class="line">主轴对齐方式：起点对齐（默认） | 终点对齐 | 居中对齐 | 两端对齐 | 分散对齐</span><br><span class="line">justify-content: flex-start | flex-end | center | space-between | space-around;</span><br><span class="line"></span><br><span class="line">交叉轴对齐方式：拉伸对齐（默认） | 起点对齐 | 终点对齐 | 居中对齐 | 第一行文字的基线对齐</span><br><span class="line">align-items: stretch | flex-start | flex-end | center | baseline;</span><br><span class="line"></span><br><span class="line">多根轴线对齐方式：拉伸对齐（默认） | 起点对齐 | 终点对齐 | 居中对齐 | 两端对齐 | 分散对齐</span><br><span class="line">align-content: stretch | flex-start | flex-end | center | space-between | space-around;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Flex-项目属性"><a href="#Flex-项目属性" class="headerlink" title="Flex 项目属性"></a>Flex 项目属性</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">顺序：数值越小越靠前，默认为0</span><br><span class="line"><span class="selector-tag">order</span>: &lt;<span class="selector-tag">number</span>&gt;;</span><br><span class="line"></span><br><span class="line">放大比例：默认为0，如果有剩余空间也不放大，值为1则放大，2是1的双倍大小，以此类推</span><br><span class="line"><span class="selector-tag">flex-grow</span>: &lt;<span class="selector-tag">number</span>&gt;;</span><br><span class="line"></span><br><span class="line">缩小比例：默认为1，如果空间不足则会缩小，值为0不缩小</span><br><span class="line"><span class="selector-tag">flex-shrink</span>: &lt;<span class="selector-tag">number</span>&gt;;</span><br><span class="line"></span><br><span class="line">项目自身大小：默认<span class="selector-tag">auto</span>，为原来的大小，可设置固定值 50<span class="selector-tag">px</span>/50%</span><br><span class="line">flex-basis: &lt;length&gt; | auto;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">flex-grow</span>, <span class="selector-tag">flex-shrink</span> 和 <span class="selector-tag">flex-basis</span> 的简写，默认值为0 1 <span class="selector-tag">auto</span></span><br><span class="line">两个快捷值：<span class="selector-tag">auto</span> (1 1 <span class="selector-tag">auto</span>) 和 <span class="selector-tag">none</span> (0 0 <span class="selector-tag">auto</span>)</span><br><span class="line">flex:none | [ &lt;&#x27;flex-grow&#x27;&gt; &lt;&#x27;flex-shrink&#x27;&gt;? || &lt;&#x27;flex-basis&#x27;&gt; ]</span><br><span class="line"></span><br><span class="line">项目自身对齐：继承父元素（默认） | 起点对齐 | 终点对齐 | 居中对齐 | 基线对齐 | 拉伸对齐</span><br><span class="line">align-self: auto | flex-start | flex-end | center | baseline | stretch;</span><br></pre></td></tr></table></figure>
+
+<h4 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h4><p>左右分栏、上下分栏。（检验下自己如何完成下列布局）</p>
+<img src="/posts/undefined/%E4%B8%8A%E4%B8%8B%E5%88%86%E6%A0%8F.png" class="" title="上下分栏">
+
+<img src="/posts/undefined/%E5%B7%A6%E5%8F%B3%E5%88%86%E6%A0%8F.png" class="" title="左右分栏">
+
+<img src="/posts/undefined/%E5%86%85%E5%AE%B9%E7%BB%93%E6%9E%84%E6%9D%BF%E5%9D%97.png" class="" title="内容结构板块">
+
+<p>对 flex 不熟悉的同学可以参考下面网站进行学习：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/25303493">30 分钟学会 Flex 布局</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.deathghost.cn/article/css/38">flex 网页布局首选方案 灵活应用 flex 弹性布局快速构建 web 结构</a></li>
+</ul>
+<p>不愿意看长篇大论的可以通过这个塔防游戏来学习：<a target="_blank" rel="noopener" href="http://www.flexboxdefense.com/">Flexbox Defense</a></p>
+<h2 id="li-与-li-之间有看不见的空白间隔是什么原因引起的？有什么解决办法？"><a href="#li-与-li-之间有看不见的空白间隔是什么原因引起的？有什么解决办法？" class="headerlink" title="li 与 li 之间有看不见的空白间隔是什么原因引起的？有什么解决办法？"></a>li 与 li 之间有看不见的空白间隔是什么原因引起的？有什么解决办法？</h2><h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><blockquote>
+<p>有时，在写页面的时候，会需要将</p>
+<p>这个块状元素横排显示，此时就需要将 display 属性设置为 inline-block ，此时问题出现了，在两个</p>
+<p>元素之间会出现大约 8px 左右的空白间隙</p>
+</blockquote>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>浏览器的默认行为是把 inline 元素间的空白字符（空格换行 tab ）渲染成一个空格，也就是我们上面的代码</p>
+<p>换行后会产生换行字符，而它会变成一个空格，当然空格就占用一个字符的宽度。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>给 ul 标签设置 <code>font-size: 0;</code> 并为 li 元素重新设置 <code>font-size: xxpx;</code></p>
+<h2 id="BFC-块级格式化上下文：block-formatting-context"><a href="#BFC-块级格式化上下文：block-formatting-context" class="headerlink" title="BFC(块级格式化上下文：block formatting context)"></a>BFC(块级格式化上下文：block formatting context)</h2><h3 id="理解"><a href="#理解" class="headerlink" title="理解"></a>理解</h3><p>BFC 就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。我们可以利用这些特性解决特定环境下的布局问题。</p>
+<h3 id="常见-BFC-应用"><a href="#常见-BFC-应用" class="headerlink" title="常见 BFC 应用"></a>常见 BFC 应用</h3><h4 id="清除元素内部浮动"><a href="#清除元素内部浮动" class="headerlink" title="清除元素内部浮动"></a>清除元素内部浮动</h4><blockquote>
+<p>计算 BFC 的高度时，自然也会检测浮动或者定位的盒子高度。</p>
+</blockquote>
+<p>只要把父元素设为 BFC 就可以清理子元素的浮动了，最常见的用法就是在父元素上设置 <code>overflow: hidden</code> 样式，对于 IE6 加上 <code>zoom: 1</code> 就可以了。</p>
+<img src="/posts/undefined/float.png" class="" title="float">
+
+<h4 id="解决外边距合并问题"><a href="#解决外边距合并问题" class="headerlink" title="解决外边距合并问题"></a>解决外边距合并问题</h4><blockquote>
+<p>盒子垂直方向的距离由 margin 决定。属于同一个 BFC 的两个相邻盒子的 margin 会发生重叠</p>
+</blockquote>
+<p>属于同一个 BFC 的两个相邻盒子的 margin 会发生重叠，那么我们创建不属于同一个 BFC ，就不会发生 margin 重叠了。</p>
+<img src="/posts/undefined/margin.png" class="" title="margin">
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container4 green&quot;</span> <span class="attr">style</span>=<span class="string">&quot;height: 500px;&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 给其中一个 div 外面包一个 div ，然后通过触发外面这个 div 的 BFC ，就可以阻止这两个 div 的 margin 重叠 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;overflow: hidden;&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;blue w100 h100&quot;</span> <span class="attr">style</span>=<span class="string">&quot;margin-bottom: 20px;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;red w200 h200&quot;</span> <span class="attr">style</span>=<span class="string">&quot;margin-top: 20px;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="两栏布局，实现左定宽-右宽自适应"><a href="#两栏布局，实现左定宽-右宽自适应" class="headerlink" title="两栏布局，实现左定宽+右宽自适应"></a>两栏布局，实现左定宽+右宽自适应</h4><blockquote>
+<p>普通流体元素 BFC 后，为了和浮动元素不产生任何交集，顺着浮动边缘形成自己的封闭上下文</p>
+</blockquote>
+<img src="/posts/undefined/%E5%8F%B3%E6%B5%AE%E5%8A%A8.png" class="" title="右浮动">
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span> <span class="attr">style</span>=<span class="string">&quot;height: 300px; background-color: red;&quot;</span>&gt;</span></span><br><span class="line">  &lt;div</span><br><span class="line">    style=&quot;width: 100px; height: 100px; float: left; background-color: blue;&quot;</span><br><span class="line">  &gt;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;overflow: hidden; background-color: green;&quot;</span>&gt;</span></span><br><span class="line">    我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容我是右边内容</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 给右侧div添加 overflow: hidden即可 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：设置浮动后，<strong>div 会被 float 覆盖，而文本却不会被 float 覆盖</strong>，是因为 <strong>float 当初设计的时候</strong>就是为了<strong>使文本围绕在浮动对象的周围</strong>。</p>
+</blockquote>
+<p>参考: [<a target="_blank" rel="noopener" href="https://juejin.im/post/5909db2fda2f60005d2093db">布局概念] 关于 CSS-BFC 深入理解</a></p>
+<h2 id="请解释一下为什么需要清除浮动？清除浮动的方式"><a href="#请解释一下为什么需要清除浮动？清除浮动的方式" class="headerlink" title="请解释一下为什么需要清除浮动？清除浮动的方式"></a>请解释一下为什么需要清除浮动？清除浮动的方式</h2><p>浮动本质是用来做一些文字混排效果的，但是被我们拿来做布局用，则会有很多的问题出现。</p>
+<p>由于浮动元素不再占用原文档流的位置，所以它会对后面的元素排版产生影响，为了解决这些问题，此时就需要在该元素中清除浮动。准确地说，并不是清除浮动，而是<strong>清除浮动后造成的影响</strong></p>
+<h3 id="本质"><a href="#本质" class="headerlink" title="本质"></a>本质</h3><p>清除浮动主要为了解决父级元素因为子级浮动引起内部高度为 0 的问题。</p>
+<h3 id="如何清除"><a href="#如何清除" class="headerlink" title="如何清除"></a>如何清除</h3><p>设置一个 clearfix 类，在出现浮动问题的父元素上添加此类即可：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="attribute">display</span>: block;</span><br><span class="line">  <span class="attribute">clear</span>: both;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">visibility</span>: hidden;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">  <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="什么是外边距合并？"><a href="#什么是外边距合并？" class="headerlink" title="什么是外边距合并？"></a>什么是外边距合并？</h2><p>外边距合并指的是，当两个垂直外边距相遇时，它们将形成一个外边距。 合并后的外边距的高度等于两个发生合并的外边距的高度中的较大者。</p>
+<blockquote>
+<p>当一个元素出现在另一个元素上面时，第一个元素的下外边距与第二个元素的上外边距会发生合并：</p>
+</blockquote>
+<img src="/posts/undefined/%E5%90%88%E5%B9%B6margin.png" class="" title="合并margin">
+
+<blockquote>
+<p>当一个元素包含在另一个元素中时（假设没有内边距或边框把外边距分隔开），它们的上和/或下外边距也会发生合并：</p>
+</blockquote>
+<img src="/posts/undefined/%E5%90%88%E5%B9%B6margin2.png" class="" title="合并margin2">
+
+<blockquote>
+<p>尽管看上去有些奇怪，但是外边距甚至可以与自身发生合并。</p>
+<p>假设有一个空元素，它有外边距，但是</p>
+<p>没有边框或填充</p>
+<p>。在这种情况下，上外边距与下外边距就碰到了一起，它们会发生合并：</p>
+</blockquote>
+<img src="/posts/undefined/hebing.png" class="" title="hebing">
+
+<blockquote>
+<p>如果这个外边距遇到另一个元素的外边距，它还会发生合并：</p>
+</blockquote>
+<img src="/posts/undefined/hebing2.png" class="" title="hebing2">
+
+<p><strong>注释：</strong>只有普通文档流中块框的垂直外边距才会发生外边距合并。<strong>行内框、浮动框或绝对定位</strong>之间的外边距不会合并。</p>
+<h2 id="浏览器是怎样解析-CSS-选择器的？"><a href="#浏览器是怎样解析-CSS-选择器的？" class="headerlink" title="浏览器是怎样解析 CSS 选择器的？"></a>浏览器是怎样解析 CSS 选择器的？</h2><p>从右向左的，这样会提高查找选择器所对应的元素的效率</p>
+<ol>
+<li>样式系统从关键选择器开始匹配，然后左移查找规则选择器的祖先元素。</li>
+<li>只要选择器的子树一直在工作，样式系统就会持续左移，直到和规则匹配，或者是因为不匹配而放弃该规则。</li>
+</ol>
+<h2 id="抽离样式模块怎么写，说出思路，有无实践经验？"><a href="#抽离样式模块怎么写，说出思路，有无实践经验？" class="headerlink" title="抽离样式模块怎么写，说出思路，有无实践经验？"></a>抽离样式模块怎么写，说出思路，有无实践经验？</h2><p>我们按照 CSS 的性质和用途，将 CSS 文件分成 「公共型样式」、「特殊型样式」、「皮肤型样式」，并以此顺序引用（按需求决定是否添加版本号）。</p>
+<ol>
+<li>公共型样式：包括了以下几个部分：“标签的重置和设置默认值”、“统一调用背景图和清除浮动或其他需统一处理的长样式”、“网站通用布局”、“通用模块和其扩展”、“元件和其扩展”、“功能类样式”、“皮肤类样式”。</li>
+<li>特殊型样式：当某个栏目或页面的样式与网站整体差异较大或者维护率较高时，可以独立引用一个样式：“特殊的布局、模块和元件及扩展”、“特殊的功能、颜色和背景”，也可以是某个大型控件或模块的独立样式。</li>
+<li>皮肤型样式：如果产品需要换肤功能，那么我们需要将颜色、背景等抽离出来放在这里。</li>
+</ol>
+<p>参考：<a target="_blank" rel="noopener" href="http://nec.netease.com/standard/css-sort.html">CSS 规范 - 分类方法</a></p>
+<h2 id="元素竖向的百分比设定是相对于父容器的高度吗？"><a href="#元素竖向的百分比设定是相对于父容器的高度吗？" class="headerlink" title="元素竖向的百分比设定是相对于父容器的高度吗？"></a>元素竖向的百分比设定是相对于父容器的高度吗？</h2><ul>
+<li>对于 height 属性来说是的。</li>
+<li>对于 margin-top/bottom(padding-top/bottom) 来讲不是，而是相对于容器的宽度计算的</li>
+</ul>
+<h2 id="什么是响应式设计？响应式设计的基本原理是什么？如何兼容低版本的-IE？"><a href="#什么是响应式设计？响应式设计的基本原理是什么？如何兼容低版本的-IE？" class="headerlink" title="什么是响应式设计？响应式设计的基本原理是什么？如何兼容低版本的 IE？"></a>什么是响应式设计？响应式设计的基本原理是什么？如何兼容低版本的 IE？</h2><p>响应式网站设计（Responsive Web design）是一个网站能够兼容多个终端，而不是为每一个终端做一个特定的版本。<br>基本原理是通过媒体查询检测不同的设备屏幕尺寸做处理。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@media</span> screen <span class="keyword">and</span> (<span class="attribute">max-width:</span> <span class="number">990px</span>) &#123;</span><br><span class="line">  <span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">background</span>: orange;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* &lt;head&gt;里边 &lt;link rel=”stylesheet” href=”xxx.css” media=”only screen and (max-width:480px)”&gt; */</span></span><br></pre></td></tr></table></figure>
+
+<p>页面头部必须有 meta 声明的 viewport ：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta</span><br><span class="line">  name=&quot;viewport&quot;</span><br><span class="line">  content=&quot;width=device-width, initial-scale=1.0, user-scalable=no&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>兼容 ie6-8 方案：使用 respond.js 插件：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--[if lte IE 8]&gt;</span></span><br><span class="line"><span class="comment">  &lt;script src=&quot;https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js&quot;&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="comment">&lt;![endif]--&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="响应式和自适应设计的区别"><a href="#响应式和自适应设计的区别" class="headerlink" title="响应式和自适应设计的区别"></a>响应式和自适应设计的区别</h2><p>其实 RWD 和 AWD 都是响应式设计，从外观上很难分辨，但他们自己运行机理不同，</p>
+<p>RWD 是主动式的响应设计，AWD 是被动式的响应式设计。</p>
+<ul>
+<li>RWD 不管用户使用的是什么设备都是在服务器把数据推送到浏览器后，脚本或 CSS 自行侦测屏幕大小后执行对应的样式表内容，并且一直通过本地脚本在监听屏幕大小的变化，随时做出样式响应的变化，所以是主动的。</li>
+<li>AWD 是用户通过浏览器发送请求后，服务器根据请求中用户设备信息（request headers 的 user-agent）做出判断，调用已经在服务器里准备好的，适应对应设备样式文件+HTML 内容+JS，返回给浏览器以这种方式响应不同设备。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> deviceAgent = request.headers[<span class="string">&#x27;user-agent&#x27;</span>].toLowerCase();</span><br><span class="line"><span class="keyword">var</span> agentID = deviceAgent.match(<span class="regexp">/(iphone|ipod|ipad|android)/</span>);</span><br><span class="line"><span class="keyword">if</span> (agentID) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;手机访问&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;电脑访问&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/rwdawd.png" class="" title="rwdawd">
+
+<h2 id="你对-line-height-是如何理解的？如何单行文本垂直居中？多行文本呢？"><a href="#你对-line-height-是如何理解的？如何单行文本垂直居中？多行文本呢？" class="headerlink" title="你对 line-height 是如何理解的？如何单行文本垂直居中？多行文本呢？"></a>你对 line-height 是如何理解的？如何单行文本垂直居中？多行文本呢？</h2><p>行高是指一行文字的高度，具体说是两行文字间基线的距离。CSS 中起高度作用的是 height 和 line-height ，没有定义 height 属性，最终其表现作用一定是 line-height 。</p>
+<h3 id="单行文本垂直居中：（行高-元素高度）"><a href="#单行文本垂直居中：（行高-元素高度）" class="headerlink" title="单行文本垂直居中：（行高 == 元素高度）"></a>单行文本垂直居中：（行高 == 元素高度）</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">height</span>: 40<span class="selector-tag">px</span>;</span><br><span class="line"><span class="selector-tag">line-height</span>: 40<span class="selector-tag">px</span>; <span class="comment">/* 行高==高 */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="多行文本垂直居中：（父容器-table，子容器-table-cell-vertical-align-middle）"><a href="#多行文本垂直居中：（父容器-table，子容器-table-cell-vertical-align-middle）" class="headerlink" title="多行文本垂直居中：（父容器 table，子容器 table-cell+vertical-align:middle）"></a>多行文本垂直居中：（父容器 table，子容器 table-cell+vertical-align:middle）</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">span</span>&gt;</span>啊实打实大苏打啊实打实大师大师的啊实打实大苏打<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">div &#123; width: 300px; height: 200px; display: table; background-color: pink; &#125;</span><br><span class="line">span &#123; display: table-cell; vertical-align: middle; &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="设置元素浮动后，该元素的-display-值是多少？"><a href="#设置元素浮动后，该元素的-display-值是多少？" class="headerlink" title="设置元素浮动后，该元素的 display 值是多少？"></a>设置元素浮动后，该元素的 display 值是多少？</h2><p>自动变成了 display: block</p>
+<h2 id="让页面里的字体变清晰，变细用-CSS-怎么做？"><a href="#让页面里的字体变清晰，变细用-CSS-怎么做？" class="headerlink" title="让页面里的字体变清晰，变细用 CSS 怎么做？"></a>让页面里的字体变清晰，变细用 CSS 怎么做？</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-webkit-font-smoothing</span>: <span class="selector-tag">antialiased</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="overflow-scroll-时不能平滑滚动的问题怎么处理？"><a href="#overflow-scroll-时不能平滑滚动的问题怎么处理？" class="headerlink" title="overflow: scroll 时不能平滑滚动的问题怎么处理？"></a>overflow: scroll 时不能平滑滚动的问题怎么处理？</h2><p>一个 div 使用了 <code>overflow:scroll;</code> ，在移动端可以滚动，但是无法平滑滚动（就像浏览网页那样）</p>
+<p>开启滚动硬件加速：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-webkit-overflow-scrolling</span>: <span class="selector-tag">touch</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="什么是-CSS-预处理器-后处理器？"><a href="#什么是-CSS-预处理器-后处理器？" class="headerlink" title="什么是 CSS 预处理器 / 后处理器？"></a>什么是 CSS 预处理器 / 后处理器？</h2><h3 id="CSS-预处理器"><a href="#CSS-预处理器" class="headerlink" title="CSS 预处理器"></a>CSS 预处理器</h3><p>CSS 预处理器定义了一种新的语言，其基本思想是，用一种专门的编程语言，为 CSS 增加了一些编程的特性，将 CSS 作为目标生成文件，然后开发者就只要使用这种语言进行编码工作。通俗的说，CSS 预处理器用一种专门的编程语言，进行 Web 页面样式设计，然后再编译成正常的 CSS 文件</p>
+<blockquote>
+<p>Sass（SCSS）、LESS</p>
+</blockquote>
+<h3 id="CSS-后处理器"><a href="#CSS-后处理器" class="headerlink" title="CSS 后处理器"></a>CSS 后处理器</h3><p>CSS 后处理器 是对 CSS 进行处理，并最终生成 CSS 的 预处理器，它属于广义上的 CSS 预处理器。</p>
+<p>我们很久以前就在用 CSS 后处理器 了，最典型的例子是 CSS 压缩工具（如 clean-css），只不过以前没单独拿出来说过。还有最近比较火的 Autoprefixer，以 Can I Use 上的 浏览器支持数据 为基础，自动处理兼容性问题。</p>
+<blockquote>
+<p>Rework、PostCSS</p>
+</blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/yushuangyushuang/article/details/79209752">CSS 预处理器和后处理器</a></p>
+<h2 id="图片为什么有左右上下间隙-怎么去除："><a href="#图片为什么有左右上下间隙-怎么去除：" class="headerlink" title="图片为什么有左右上下间隙,怎么去除："></a>图片为什么有左右上下间隙,怎么去除：</h2><p>原因：</p>
+<ul>
+<li>左右：因为 img 是 inline-block 行内元素，行内元素之间有『换行（回车），空格，tab』时会产生左右间隙</li>
+<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙</li>
+</ul>
+<p>解决办法：</p>
+<ul>
+<li>移除上下间隙：<ul>
+<li>img 本身设置 display: block;</li>
+<li>父元素设置 font-size: 0; （基线与字体大小有关，字体为零，基线间就没距离了）</li>
+<li>img 本身设置 vertical-align: bottom;（让 inline-block 的 img 与每行的底部对齐）</li>
+</ul>
+</li>
+<li>移除左右间距：<ul>
+<li>行内元素间不要有换行，连成一行写消除间隙</li>
+<li>第一行结尾写上 <code>&lt;!-- ，第二行开头跟上 --&gt;</code> 。即利用注释消除间距</li>
+<li>父元素 font-size 设置 0</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/29963/" rel="prev" title="Axios异步请求跨域解决方案">
+                  <i class="fa fa-chevron-left"></i> Axios异步请求跨域解决方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/51111/" rel="next" title="CSS布局面试题（面试系列）">
+                  CSS布局面试题（面试系列） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
