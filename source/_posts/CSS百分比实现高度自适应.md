@@ -16,6 +16,8 @@ date: 2020-03-09 13:32:41
 
 {% asset_img margin-top.png margin-top %}
 
+<!-- more -->
+
 ## 1. 给容器设置 padding-top/bottom
 
 `padding-top/bottom` 的百分比值，是依赖父容器宽度的，所以给子元素设置一个与父元素高度相同百分值的 `padding-top` 即可实现。

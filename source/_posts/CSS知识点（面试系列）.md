@@ -19,6 +19,8 @@ date: 2019-06-09 13:35:40
 
 一个块的总宽度 = **width（包含 padding 和 border）** + margin(左右)
 
+<!-- more -->
+
 ### 怪异盒模型触发条件
 
 如果 html 文件最顶部 doctype 缺失，则在 ie6、7、8 将会触发怪异模式(quirks);

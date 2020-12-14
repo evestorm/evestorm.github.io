@@ -18,6 +18,8 @@ tags:
 - 方法一、启动 Mac 自带的 Apache 服务器
 - 方法二：使用 Python 的 SimpleHTTPServer 模块启动服务器
 
+<!-- more -->
+
 ### 我们为什么需要服务器？
 
 #### 1. 本地文件 VS. 远程文件

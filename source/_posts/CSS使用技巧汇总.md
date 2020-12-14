@@ -17,6 +17,8 @@ date: 2020-09-20 13:21:07
 
 DEMO 地址：https://codepen.io/protic_milos/pen/GRpYJKd
 
+<!-- more -->
+
 ### attr()
 
 `attr` 函数用于获取所选元素的属性值。 它接受三个参数，`属性名称` ，`属性值的单位` 和 `默认值` 。
