@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="介绍什么是 Grid LayoutGrid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，包含了行（row）与列（column）以及间距（gap）。下图能够很好的说明这一点（图片来自mdn）：   Grid vs Flex工作中写移动端页面的朋友对 Flex 布局肯定不陌生，有些人可能更极端一点，直接 Flex 一把梭。那 Grid 和 Flex 有什么区别呢？我们仍然可以用一张图">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Grid布局入门">
+<meta property="og:url" content="https://evestorm.github.io/posts/42136/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="介绍什么是 Grid LayoutGrid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，包含了行（row）与列（column）以及间距（gap）。下图能够很好的说明这一点（图片来自mdn）：   Grid vs Flex工作中写移动端页面的朋友对 Flex 布局肯定不陌生，有些人可能更极端一点，直接 Flex 一把梭。那 Grid 和 Flex 有什么区别呢？我们仍然可以用一张图">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/grid.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/gridvflex.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/shangexian.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/shangexianduomingming.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/shangexianrepeat.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/grid-template-areas.png">
+<meta property="article:published_time" content="2020-01-04T14:52:47.000Z">
+<meta property="article:modified_time" content="2020-12-14T14:57:08.914Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="CSS3">
+<meta property="article:tag" content="Grid">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/grid.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/42136/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Grid布局入门 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Grid-Layout"><span class="nav-number">1.1.</span> <span class="nav-text">什么是 Grid Layout</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Grid-vs-Flex"><span class="nav-number">1.2.</span> <span class="nav-text">Grid vs Flex</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%8C%E4%B8%8E%E5%88%97"><span class="nav-number">2.1.</span> <span class="nav-text">行与列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9A%E5%AE%BD%E5%BA%A6-amp-%E7%99%BE%E5%88%86%E6%AF%94%E5%AE%BD%E5%BA%A6"><span class="nav-number">2.1.1.</span> <span class="nav-text">固定宽度 &amp; 百分比宽度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E8%AE%BE%E7%BD%AE"><span class="nav-number">2.1.2.</span> <span class="nav-text">重复设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AF%94%E4%BE%8B%E5%88%92%E5%88%86"><span class="nav-number">2.1.3.</span> <span class="nav-text">比例划分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.4.</span> <span class="nav-text">组合定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#minmax"><span class="nav-number">2.1.5.</span> <span class="nav-text">minmax</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%B4%E8%B7%9D"><span class="nav-number">2.2.</span> <span class="nav-text">间距</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%8C%E9%97%B4%E8%B7%9D"><span class="nav-number">2.2.1.</span> <span class="nav-text">行间距</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%97%E9%97%B4%E8%B7%9D"><span class="nav-number">2.2.2.</span> <span class="nav-text">列间距</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%B4%E8%B7%9D%E7%AE%80%E5%86%99"><span class="nav-number">2.2.3.</span> <span class="nav-text">间距简写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E7%BA%BF%E5%91%BD%E5%90%8D"><span class="nav-number">2.3.</span> <span class="nav-text">网格线命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E5%8C%BA%E5%9F%9F%E5%91%BD%E5%90%8D"><span class="nav-number">2.4.</span> <span class="nav-text">网格区域命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.5.</span> <span class="nav-text">元素定位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E6%A0%85%E6%A0%BC%E7%BA%BF"><span class="nav-number">2.5.1.</span> <span class="nav-text">根据栅格线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E6%A0%85%E6%A0%BC%E5%91%BD%E5%90%8D"><span class="nav-number">2.5.2.</span> <span class="nav-text">根据栅格命名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E5%81%8F%E7%A7%BB%E9%87%8F"><span class="nav-number">2.5.3.</span> <span class="nav-text">根据偏移量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90-%E7%AE%80%E5%86%99%E6%A8%A1%E5%BC%8F-grid-row-grid-column"><span class="nav-number">2.5.4.</span> <span class="nav-text">[推荐]简写模式 grid-row&#x2F;grid-column</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E5%86%99%E5%BD%A2%E5%BC%8F-grid-area"><span class="nav-number">2.5.5.</span> <span class="nav-text">简写形式 grid-area</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%85%E6%A0%BC%E6%B5%81%E5%8A%A8"><span class="nav-number">2.6.</span> <span class="nav-text">栅格流动</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%85%E6%A0%BC%E6%B5%81%E5%8A%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">2.6.1.</span> <span class="nav-text">栅格流动的基本使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%BA%E5%88%B6%E5%A1%AB%E5%85%85"><span class="nav-number">2.6.2.</span> <span class="nav-text">强制填充</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%85%E6%A0%BC%E5%AF%B9%E9%BD%90"><span class="nav-number">2.7.</span> <span class="nav-text">栅格对齐</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E7%AE%80%E5%86%99-place-content"><span class="nav-number">2.7.1.</span> <span class="nav-text">组合简写 place-content</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E7%AE%80%E5%86%99-place-items"><span class="nav-number">2.7.2.</span> <span class="nav-text">组合简写 place-items</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E7%AE%80%E5%86%99-place-self"><span class="nav-number">2.7.3.</span> <span class="nav-text">组合简写 place-self</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.8.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">87</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/42136/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Grid布局入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-04 22:52:47" itemprop="dateCreated datePublished" datetime="2020-01-04T22:52:47+08:00">2020-01-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-14 22:57:08" itemprop="dateModified" datetime="2020-12-14T22:57:08+08:00">2020-12-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/42136/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/42136/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="什么是-Grid-Layout"><a href="#什么是-Grid-Layout" class="headerlink" title="什么是 Grid Layout"></a>什么是 Grid Layout</h3><p>Grid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，包含了行（row）与列（column）以及间距（gap）。下图能够很好的说明这一点（图片来自<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Learn/CSS/CSS_layout/Grids">mdn</a>）：</p>
+<img src="/posts/undefined/grid.png" class="" title="grid_layout">
+
+<h3 id="Grid-vs-Flex"><a href="#Grid-vs-Flex" class="headerlink" title="Grid vs Flex"></a>Grid vs Flex</h3><p>工作中写移动端页面的朋友对 Flex 布局肯定不陌生，有些人可能更极端一点，直接 Flex 一把梭。那 Grid 和 Flex 有什么区别呢？我们仍然可以用一张图片进行举例说明：</p>
+<img src="/posts/undefined/gridvflex.png" class="" title="grid-vs-flex">
+
+<p>在上图中，我们可以使用 Grid 来搭建页面的整体结构；而使用 Flex 控制 Grid 中的单个区域，例如顶部导航栏中的具体内容。</p>
+<p><strong>Grid vs Flex 总结</strong></p>
+<ul>
+<li>Grid 是一种二维布局方式，而 Flex 是一维的。</li>
+<li>Grid 重点关注布局, 而 Flex 重点关注内容的流向。</li>
+<li>Flex 适用于应用的组件，而 Grid 适用于应用本身的布局。</li>
+</ul>
+<p>总的来说，Grid 擅长搭建布局结构，而 Flex 则擅长处理元素的流向。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="行与列"><a href="#行与列" class="headerlink" title="行与列"></a>行与列</h3><p>首先我们需要将容器的 display 属性设置为 grid，然后使用下列 CSS 属性来控制其中的行与列：</p>
+<ul>
+<li>grid-template-columns 用来划分列数</li>
+<li>grid-template-rows 用来划分行数</li>
+</ul>
+<h4 id="固定宽度-amp-百分比宽度"><a href="#固定宽度-amp-百分比宽度" class="headerlink" title="固定宽度 &amp; 百分比宽度"></a>固定宽度 &amp; 百分比宽度</h4><iframe height="826" scrolling="no" title="01-grid-行与列基本使用" src="https://codepen.io/JingW/embed/RwNjowB?height=826&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="重复设置"><a href="#重复设置" class="headerlink" title="重复设置"></a>重复设置</h4><p>通过上面 demo 你会发现一个问题，如果一行有 3 列，我们就需要定义 3 列各自的宽，那如果有 10 列，20 列呢？难道都需要一个个设置，岂不是太麻烦了？所以重复设置的需求应运而生。我们可以使用 <code>repeat</code> 统一设置值，第一个参数为重复数量，第二个参数是重复值。下面是两个示例：</p>
+<iframe height="1030" scrolling="no" title="02-grid-repeat重复" src="https://codepen.io/JingW/embed/abzVQmR?height=1020&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="比例划分"><a href="#比例划分" class="headerlink" title="比例划分"></a>比例划分</h4><p>我们还可以像 Flex 布局的 <code>flex: 1</code> 那样，给布局中的元素设置比例。在 Grid 中，我们使用 <code>fr</code> 这个单位来设置元素在空间中所占的比例。</p>
+<iframe height="700" scrolling="no" title="03-grid-比例划分" src="https://codepen.io/JingW/embed/oNgoQEK?height=700&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="组合定义"><a href="#组合定义" class="headerlink" title="组合定义"></a>组合定义</h4><p><code>grid-tempalte</code> 是 <code>grid-template-rows</code>、<code>grid-template-columns</code>、<code>grid-template-areas</code> 的三个属性的简写。</p>
+<p>下面是使用 <code>grid-template</code> 同时声明 <code>grid-template-rows、grid-template-columns</code>。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-template</span>: 100<span class="selector-tag">px</span> 1<span class="selector-tag">fr</span> / 50<span class="selector-tag">px</span> 1<span class="selector-tag">fr</span>;</span><br></pre></td></tr></table></figure>
+
+<p>下面是使用 <code>grid-template</code> 定义 <code>grid-template-areas</code> ，有关 <code>grid-template-areas</code> 的使用方法会在下面介绍：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-template</span>:</span><br><span class="line">  &#x27;header . .&#x27;</span><br><span class="line">  &#x27;. main .&#x27;</span><br><span class="line">  &#x27;footer footer .&#x27;;</span><br></pre></td></tr></table></figure>
+
+<iframe height="1133" scrolling="no" title="yLyPQjj" src="https://codepen.io/JingW/embed/yLyPQjj?height=1133&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="minmax"><a href="#minmax" class="headerlink" title="minmax"></a>minmax</h4><p>使用 minmax 方法可以设置取值范围。下面行高在 <code>最小100px ~ 最大1fr</code> 间取值：</p>
+<iframe height="531" scrolling="no" title="05-grid-minmax设置最大最小值" src="https://codepen.io/JingW/embed/dyPZQro?height=531&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="间距"><a href="#间距" class="headerlink" title="间距"></a>间距</h3><h4 id="行间距"><a href="#行间距" class="headerlink" title="行间距"></a>行间距</h4><iframe height="439" scrolling="no" title="06-grid-行间距row-gap" src="https://codepen.io/JingW/embed/ExabOqB?height=439&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="列间距"><a href="#列间距" class="headerlink" title="列间距"></a>列间距</h4><iframe height="443" scrolling="no" title="07-grid-列间距column-gap" src="https://codepen.io/JingW/embed/QWwOzLr?height=443&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="间距简写"><a href="#间距简写" class="headerlink" title="间距简写"></a>间距简写</h4><p>使用 gap 规则可以一次定义行、列间距，如果间距一样可以只设置一个值：</p>
+<iframe height="437" scrolling="no" title="07-grid-间距简写gap" src="https://codepen.io/JingW/embed/zYxPyOQ?height=437&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="网格线命名"><a href="#网格线命名" class="headerlink" title="网格线命名"></a>网格线命名</h3><p>通过 grid-template-rows 和 grid-template-columns 定义网格时，网格线可以被命名。网格线名称也可以设置网格项目位置</p>
+<p>分配网格线名称必须用方括号[网格线名称]，然后后面紧跟网格轨道的尺寸值。定义网格线名称时需要避免使用规范中出现的关键词，以免导致混乱。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-template-rows</span>: <span class="selector-attr">[row-1-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[row-2-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[row-2-end]</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">grid-template-columns</span>: <span class="selector-attr">[col-1-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[col-2-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[col-3-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[col-3-end]</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/shangexian.png" class="" title="栅格线">
+
+<p>可以在方括号中添加多个名称来命名网格线名称，使用多外名称命名网格线名称时，名称间要用空格隔开。每一个网格线的名称可以用来定位网格项目的位置</p>
+<img src="/posts/undefined/shangexianduomingming.png" class="" title="栅格线多命名">
+
+<p>使用网格线名称设置网格项目位置和使用网格线号码设置网格项目位置类似，引用网格线名称的时候不应该带方括号</p>
+<p>使用 repeat()函数可以给网格线分配相同的名称。这可以节省一定的时间。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-template-rows</span>: <span class="selector-tag">repeat</span>(3, <span class="selector-attr">[row-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[row-end]</span>);</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">grid-template-columns</span>: <span class="selector-tag">repeat</span>(3, <span class="selector-attr">[col-start]</span> 1<span class="selector-tag">fr</span> <span class="selector-attr">[col-end]</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用 repeat()函数可以给网格线命名，这也导致多个网格线具有相同的网格线名称。相同网格线名称指定网格线的位置和名称，也且会自动在网格线名称后面添加对应的数字，使其网格线名称也是唯一的标识符</p>
+<img src="/posts/undefined/shangexianrepeat.png" class="" title="repeat命名栅格线">
+
+<p>使用相同的网格线名称可以设置网格项目的位置。网格线的名称和数字之间需要用空格分开</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-row</span>: <span class="selector-tag">row-start</span> 2 / <span class="selector-tag">row-end</span> 3;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">grid-column</span>: <span class="selector-tag">col-start</span> / <span class="selector-tag">col-start</span> 3;</span><br></pre></td></tr></table></figure>
+
+<h3 id="网格区域命名"><a href="#网格区域命名" class="headerlink" title="网格区域命名"></a>网格区域命名</h3><p>像网格线名称一样，网格区域的名称可以使用 grid-template-areas 属性来命名。引用网格区域名称也可以设置网格项目位置。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">grid-template-areas: &#x27;header header&#x27; &#x27;content sidebar&#x27; &#x27;footer footer&#x27;;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">grid-template-rows</span>: 150<span class="selector-tag">px</span> 1<span class="selector-tag">fr</span> 100<span class="selector-tag">px</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">grid-template-columns</span>: 1<span class="selector-tag">fr</span> 200<span class="selector-tag">px</span>;</span><br></pre></td></tr></table></figure>
+
+<p>设置网格区域的名称应该放置在单引号或双引号内，每个名称由一个空格符分开。网格区域的名称，每组（单引号或双引号内的网格区域名称）定义了网格的一行，每个网格区域名称定义网格的一列</p>
+<p><strong>[注意]grid-template-areas: “header header” “content sidebar” “footer footer”;不可以简写为 grid-template-areas: “header” “content sidebar” “footer”;</strong></p>
+<img src="/posts/undefined/grid-template-areas.png" class="" title="grid-template-areas">
+
+<p>grid-row-start、grid-row-end、grid-column-start 和 grid-column-end 以及简写的 grid-row、grid-column、grid-area 都可以引用网格区域名称，用来设置网格项目位置</p>
+<h3 id="元素定位"><a href="#元素定位" class="headerlink" title="元素定位"></a>元素定位</h3><table>
+<thead>
+<tr>
+<th align="left">选项</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">grid-row-start</td>
+<td align="left">行开始栅格线</td>
+</tr>
+<tr>
+<td align="left">grid-row-end</td>
+<td align="left">行结束栅格线</td>
+</tr>
+<tr>
+<td align="left">grid-column-start</td>
+<td align="left">列开始栅格线</td>
+</tr>
+<tr>
+<td align="left">grid-column-end</td>
+<td align="left">列结束栅格线</td>
+</tr>
+</tbody></table>
+<h4 id="根据栅格线"><a href="#根据栅格线" class="headerlink" title="根据栅格线"></a>根据栅格线</h4><p>通过设置具体的第几条栅格线来设置区域位置，设置的数值可以是正数和负数：</p>
+<iframe height="435" scrolling="no" title="09-grid-栅格线" src="https://codepen.io/JingW/embed/oNgomod?height=435&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="根据栅格命名"><a href="#根据栅格命名" class="headerlink" title="根据栅格命名"></a>根据栅格命名</h4><iframe height="436" scrolling="no" title="10-grid-栅格线命名" src="https://codepen.io/JingW/embed/mdyqvgZ?height=436&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="根据偏移量"><a href="#根据偏移量" class="headerlink" title="根据偏移量"></a>根据偏移量</h4><p>使用 <code>span</code> 可以设置移动单元格数量，数值只能为正数。</p>
+<ul>
+<li>设置在 <code>grid-*-end</code> 表示 <code>grid-*-end</code> 栅格线是从 <code>grid-*-start</code> 移动几个单元格</li>
+<li>设置在 <code>grid-*-start</code> 表示 <code>grid-*-start</code> 栅格线是从 <code>grid-*-end</code> 移动几个单元格</li>
+</ul>
+<iframe height="445" scrolling="no" title="11-grid-偏移量" src="https://codepen.io/JingW/embed/dyPZrOE?height=445&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="推荐-简写模式-grid-row-grid-column"><a href="#推荐-简写模式-grid-row-grid-column" class="headerlink" title="[推荐]简写模式 grid-row/grid-column"></a>[推荐]简写模式 grid-row/grid-column</h4><p>可以使用 <code>grid-row</code> 设置行开始栅格线，使用 <code>grid-column</code> 设置结束栅格线。</p>
+<p>上例中的居中对齐元素，可以使用以下简写的方式声明（推荐）。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-row</span>: 2/3;</span><br><span class="line"><span class="selector-tag">grid-column</span>: 2/3;</span><br></pre></td></tr></table></figure>
+
+<iframe height="438" scrolling="no" title="12-grid-grid-row/grid-column简写形式" src="https://codepen.io/JingW/embed/bGNabrX?height=438&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="简写形式-grid-area"><a href="#简写形式-grid-area" class="headerlink" title="简写形式 grid-area"></a>简写形式 grid-area</h4><p><code>grid-area</code> 更加简洁是同时对 <code>grid-row</code> 与 <code>grid-column</code> 属性的组合声明。</p>
+<p>语法结构如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">grid-row-start</span>/<span class="selector-tag">grid-column-start</span>/<span class="selector-tag">grid-row-end</span>/<span class="selector-tag">grid-column-end</span></span><br></pre></td></tr></table></figure>
+
+<p>下面是将元素定位在中间的示例：</p>
+<iframe height="412" scrolling="no" title="13-grid-grid-area简写形式" src="https://codepen.io/JingW/embed/mdypbBQ?height=412&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="栅格流动"><a href="#栅格流动" class="headerlink" title="栅格流动"></a>栅格流动</h3><p>在容器中设置<code>grid-auto-flow</code> 属性可以改变单元流动方式。</p>
+<table>
+<thead>
+<tr>
+<th align="left">选项</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">column</td>
+<td align="left">按列排序</td>
+</tr>
+<tr>
+<td align="left">row</td>
+<td align="left">按行排列</td>
+</tr>
+</tbody></table>
+<h4 id="栅格流动的基本使用"><a href="#栅格流动的基本使用" class="headerlink" title="栅格流动的基本使用"></a>栅格流动的基本使用</h4><iframe height="557" scrolling="no" title="14-grid-grid-auto-flow栅格流动" src="https://codepen.io/JingW/embed/gObobYm?height=557&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="强制填充"><a href="#强制填充" class="headerlink" title="强制填充"></a>强制填充</h4><p>当元素在栅格中放不下时，将会发生换行产生留白，使用 grid-auto-flow: row dense; 可以执行填充空白区域操作。</p>
+<iframe height="495" scrolling="no" title="15-grid-强制填充" src="https://codepen.io/JingW/embed/eYmymZX?height=495&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="栅格对齐"><a href="#栅格对齐" class="headerlink" title="栅格对齐"></a>栅格对齐</h3><p>可以通过属性方便的定义栅格的对齐方式，可用值包括 <code>start | end | center | stretch | space-between | space-evenly | space-around</code>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">选项</th>
+<th align="left">说明</th>
+<th align="left">对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">align-items</td>
+<td align="left">栅格内所有元素的垂直排列方式</td>
+<td align="left">栅格容器</td>
+</tr>
+<tr>
+<td align="left">justify-items</td>
+<td align="left">栅格内所有元素的横向排列方式</td>
+<td align="left">栅格容器</td>
+</tr>
+<tr>
+<td align="left">justify-content</td>
+<td align="left">所有栅格在容器中的水平对齐方式，容器有额外空间时</td>
+<td align="left">栅格容器</td>
+</tr>
+<tr>
+<td align="left">align-content</td>
+<td align="left">所有栅格在容器中的垂直对齐方式，容器有额外空间时</td>
+<td align="left">栅格容器</td>
+</tr>
+<tr>
+<td align="left">align-self</td>
+<td align="left">元素在栅格中垂直对齐方式</td>
+<td align="left">栅格元素</td>
+</tr>
+<tr>
+<td align="left">justify-self</td>
+<td align="left">元素在栅格中水平对齐方式</td>
+<td align="left">栅格元素</td>
+</tr>
+</tbody></table>
+<iframe height="559" scrolling="no" title="16-grid-元素对齐" src="https://codepen.io/JingW/embed/LYEeERG?height=559&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h4 id="组合简写-place-content"><a href="#组合简写-place-content" class="headerlink" title="组合简写 place-content"></a>组合简写 place-content</h4><p>用于控制栅格的对齐方式，语法如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">place-content</span>: &lt;<span class="selector-tag">align-content</span>&gt; &lt;<span class="selector-tag">justify-content</span>&gt;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="组合简写-place-items"><a href="#组合简写-place-items" class="headerlink" title="组合简写 place-items"></a>组合简写 place-items</h4><p>控制所有元素的对齐方式，语法结构如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">place-items</span>: &lt;<span class="selector-tag">align-items</span>&gt; &lt;<span class="selector-tag">justify-items</span>&gt;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="组合简写-place-self"><a href="#组合简写-place-self" class="headerlink" title="组合简写 place-self"></a>组合简写 place-self</h4><p>控制单个元素的对齐方式</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">place-self</span>: &lt;<span class="selector-tag">align-self</span>&gt; &lt;<span class="selector-tag">justify-self</span>&gt;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wangxiang9528/p/9867822.html">Grid 布局方式的实例详解</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS3/" rel="tag"># CSS3</a>
+              <a href="/tags/Grid/" rel="tag"># Grid</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/12897/" rel="prev" title="奇妙的-webkit-background-clip">
+                  <i class="fa fa-chevron-left"></i> 奇妙的-webkit-background-clip
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/61419/" rel="next" title="git提交代码到错误的远端分支如何撤回并提交到正确分支">
+                  git提交代码到错误的远端分支如何撤回并提交到正确分支 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
