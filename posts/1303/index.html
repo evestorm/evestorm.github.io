@@ -23,21 +23,24 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="问题描述后端希望前端能动态配置 API 地址，但前端往往在 npm run build 生成 dist 后，配置就无法更改了。 解决方案利用 generate-asset-webpack-plugin 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。">
+<meta name="description" content="问题描述项目中遇到使用滑动条的地方，但设计稿上的按钮面积非常小，用户在手机上由于不容易精确触摸到按钮导致拖动滚动条困难：   所以就想着扩大按钮的点击区域。通常情况下想要扩大点击区域有两种方案：  增加 border 添加 padding  然而由于此滑动条使用的是三方库，圆形按钮的位置使用的是绝对定位，不太好改它本身的大小，因为这样要调整的 css 样式太多。所以上面两种方案都被毙掉了，最后 G">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vue项目如何动态配置后端api地址">
-<meta property="og:url" content="https://evestorm.github.io/posts/47242/index.html">
+<meta property="og:title" content="css扩大元素点击区域">
+<meta property="og:url" content="https://evestorm.github.io/posts/1303/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="问题描述后端希望前端能动态配置 API 地址，但前端往往在 npm run build 生成 dist 后，配置就无法更改了。 解决方案利用 generate-asset-webpack-plugin 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。">
+<meta property="og:description" content="问题描述项目中遇到使用滑动条的地方，但设计稿上的按钮面积非常小，用户在手机上由于不容易精确触摸到按钮导致拖动滚动条困难：   所以就想着扩大按钮的点击区域。通常情况下想要扩大点击区域有两种方案：  增加 border 添加 padding  然而由于此滑动条使用的是三方库，圆形按钮的位置使用的是绝对定位，不太好改它本身的大小，因为这样要调整的 css 样式太多。所以上面两种方案都被毙掉了，最后 G">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-12-07T05:35:30.000Z">
-<meta property="article:modified_time" content="2020-12-07T05:46:31.905Z">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/%E6%BB%91%E5%8A%A8%E6%9D%A1.png">
+<meta property="article:published_time" content="2019-11-11T05:29:56.000Z">
+<meta property="article:modified_time" content="2020-12-14T05:32:14.201Z">
 <meta property="article:author" content="Lance">
-<meta property="article:tag" content="vue-cli">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/%E6%BB%91%E5%8A%A8%E6%9D%A1.png">
 
 
-<link rel="canonical" href="https://evestorm.github.io/posts/47242/">
+<link rel="canonical" href="https://evestorm.github.io/posts/1303/">
 
 
 <script class="page-configurations">
@@ -49,7 +52,7 @@
     lang   : 'zh-CN'
   };
 </script>
-<title>vue项目如何动态配置后端api地址 | EVE | 暴风雨前夕</title>
+<title>css扩大元素点击区域 | EVE | 暴风雨前夕</title>
   
 
 
@@ -207,7 +210,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.</span> <span class="nav-text">使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B9%B6%E5%BC%95%E5%85%A5-generate-asset-webpack-plugin"><span class="nav-number">3.1.</span> <span class="nav-text">安装并引入 generate-asset-webpack-plugin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E9%9C%80%E8%A6%81%E7%94%9F%E6%88%90%E7%9A%84%E9%85%8D%E7%BD%AE%E5%86%85%E5%AE%B9"><span class="nav-number">3.2.</span> <span class="nav-text">定义需要生成的配置内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">配置</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -283,7 +286,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/47242/">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/1303/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
@@ -296,7 +299,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          vue项目如何动态配置后端api地址
+          css扩大元素点击区域
         </h1>
 
         <div class="post-meta-container">
@@ -306,10 +309,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2020-12-07 13:35:30 / 修改时间：13:46:31" itemprop="dateCreated datePublished" datetime="2020-12-07T13:35:30+08:00">2020-12-07</time>
+      <time title="创建时间：2019-11-11 13:29:56" itemprop="dateCreated datePublished" datetime="2019-11-11T13:29:56+08:00">2019-11-11</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-14 13:32:14" itemprop="dateModified" datetime="2020-12-14T13:32:14+08:00">2020-12-14</time>
+      </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
@@ -320,11 +329,7 @@
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
         </span>
     </span>
 
@@ -345,8 +350,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/posts/47242/#SOHUCS" itemprop="discussionUrl">
-        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/47242/" itemprop="commentCount"></span>
+      <a title="changyan" href="/posts/1303/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/1303/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -361,25 +366,19 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
-<a id="more"></a>
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>项目中遇到使用滑动条的地方，但设计稿上的按钮面积非常小，用户在手机上由于不容易精确触摸到按钮导致拖动滚动条困难：</p>
+<img src="/posts/undefined/%E6%BB%91%E5%8A%A8%E6%9D%A1.png" class="" title="滑动条设计稿截图">
 
-<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>vue.config.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
-<p>vue.config.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
+<p>所以就想着扩大按钮的点击区域。通常情况下想要扩大点击区域有两种方案：</p>
+<ul>
+<li>增加 border</li>
+<li>添加 padding</li>
+</ul>
+<p>然而由于此滑动条使用的是三方库，圆形按钮的位置使用的是绝对定位，不太好改它本身的大小，因为这样要调整的 css 样式太多。所以上面两种方案都被毙掉了，最后 Google 到下面方案。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p><strong>使用伪元素扩大可点击区域</strong></p>
+<p>伪元素能为其父元素捕获鼠标交互动作，因此，只需通过伪元素扩大父元素的空间大小，就能扩大可点击区域。</p>
+<p>代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;extend-via-pseudo-elem&quot;</span>&gt;</span>点击<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">.extend-via-pseudo-elem &#123; position: relative; &#125; .extend-via-pseudo-elem::before</span><br><span class="line">&#123; content: &#x27;&#x27;; position: absolute; top: -20px; right: -20px; bottom: -20px;</span><br><span class="line">left: -20px; &#125;</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -389,20 +388,21 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/vue-cli/" rel="tag"># vue-cli</a>
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/9274/" rel="prev" title="字体侵权避坑指南">
-                  <i class="fa fa-chevron-left"></i> 字体侵权避坑指南
+                <a href="/posts/40394/" rel="prev" title="阿里云云服务器ECS购买与使用（笔记）">
+                  <i class="fa fa-chevron-left"></i> 阿里云云服务器ECS购买与使用（笔记）
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/5691/" rel="next" title="Vue深度作用选择器">
-                  Vue深度作用选择器 <i class="fa fa-chevron-right"></i>
+                <a href="/posts/709/" rel="next" title="【转载】20个ChromeDevTools调试技巧">
+                  【转载】20个ChromeDevTools调试技巧 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
