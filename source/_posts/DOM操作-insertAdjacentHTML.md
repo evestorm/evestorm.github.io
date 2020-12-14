@@ -1,11 +1,12 @@
 ---
 title: DOM操作-insertAdjacentHTML
-date: 2020-07-24 14:16:03
 tags:
   - DOM
 categories:
   - 前端
   - HTML
+abbrlink: 39637
+date: 2020-07-24 14:16:03
 ---
 
 ## 添加

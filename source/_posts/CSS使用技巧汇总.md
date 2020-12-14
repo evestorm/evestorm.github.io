@@ -9,7 +9,16 @@ abbrlink: 61575
 date: 2020-09-20 13:21:07
 ---
 
-持续更新…
+## CSS 样式
+
+### css 设置文字无法选中
+
+```css
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+```
 
 ## CSS 函数
 

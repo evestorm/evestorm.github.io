@@ -1,6 +1,5 @@
 ---
 title: CSS粘住固定底部的5种方法(转载)
-date: 2020-05-18 14:06:28
 tags:
   - 技巧
   - 布局
@@ -8,6 +7,8 @@ tags:
 categories:
   - 前端
   - CSS
+abbrlink: 52603
+date: 2020-05-18 14:06:28
 ---
 
 译文地址：http://caibaojian.com/css-5-ways-sticky-footer.html

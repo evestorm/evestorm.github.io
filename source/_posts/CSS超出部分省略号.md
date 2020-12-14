@@ -1,11 +1,12 @@
 ---
 title: CSS超出部分省略号
-date: 2019-07-09 14:08:33
 tags:
   - 技巧
 categories:
   - 前端
   - CSS
+abbrlink: 26295
+date: 2019-07-09 14:08:33
 ---
 
 ## CSS 实现单行省略号
