@@ -346,6 +346,74 @@
       </tags>
   </entry>
   <entry>
+    <title>CSS粘住固定底部的5种方法(转载)</title>
+    <url>/posts/52603/</url>
+    <content><![CDATA[<p>译文地址：<a href="http://caibaojian.com/css-5-ways-sticky-footer.html">http://caibaojian.com/css-5-ways-sticky-footer.html</a><br>原文地址：<a href="https://css-tricks.com/couple-takes-sticky-footer/">https://css-tricks.com/couple-takes-sticky-footer/</a><br>译者：前端开发博客-Jack</p>
+<h3 id="方法一：全局增加一个负值下边距等于底部高度"><a href="#方法一：全局增加一个负值下边距等于底部高度" class="headerlink" title="方法一：全局增加一个负值下边距等于底部高度"></a>方法一：全局增加一个负值下边距等于底部高度</h3><p>有一个全局的元素包含除了底部之外的所有内容。它有一个负值下边距等于底部的高度，就像<a href="http://ryanfait.com/html5-sticky-footer/">这个演示链接</a>。</p>
+<a id="more"></a>
+
+<p><a href="http://caibaojian.com/t/html">HTML</a>代码</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrapper&quot;</span>&gt;</span></span><br><span class="line">    content</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;push&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="http://caibaojian.com/css3/">CSS</a>代码：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span>,</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Equal to height of footer */</span></span><br><span class="line">  <span class="comment">/* But also accounting for potential margin-bottom of last child */</span></span><br><span class="line">  <span class="attribute">margin-bottom</span>: -<span class="number">50px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span>,</span><br><span class="line"><span class="selector-class">.push</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<iframe name="cp_embed_1" src="https://codepen.io/chriscoyier/embed/VjZmGj?height=392&amp;theme-id=1&amp;slug-hash=VjZmGj&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_1" scrolling="no" frameborder="0" height="392" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_VjZmGj" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
+
+<p>这个代码需要一个额外的元素.push 等于底部的高度，来防止内容覆盖到底部的元素。这个 push 元素是智能的，它并没有占用到底部的利用，而是通过全局加了一个负边距来填充。</p>
+<h3 id="方法二：底部元素增加负值上边距"><a href="#方法二：底部元素增加负值上边距" class="headerlink" title="方法二：底部元素增加负值上边距"></a>方法二：底部元素增加负值上边距</h3><p>虽然这个代码减少了一个.push 的元素，但还是需要增加多一层的元素包裹内容，并给他一个内边距使其等于底部的高度，防止内容覆盖到底部的内容。</p>
+<p>HTML 代码：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content-inside&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="http://caibaojian.com/t/css">CSS</a>：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span>,</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content-inside</span> &#123;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">20px</span>;</span><br><span class="line">  <span class="attribute">padding-bottom</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">  <span class="attribute">margin-top</span>: -<span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<iframe name="cp_embed_2" src="https://codepen.io/chriscoyier/embed/aZoBMb?height=300&amp;theme-id=1&amp;slug-hash=aZoBMb&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_2" scrolling="no" frameborder="0" height="300" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_aZoBMb" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
+
+<h2 id="方法三：使用-calc-计算内容的高度"><a href="#方法三：使用-calc-计算内容的高度" class="headerlink" title="方法三：使用 calc()计算内容的高度"></a>方法三：使用 calc()计算内容的高度</h2><p>HTML</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="http://caibaojian.com/t/css">CSS</a>:</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="built_in">calc</span>(<span class="number">100vh</span> - <span class="number">70px</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<iframe name="cp_embed_3" src="https://codepen.io/chriscoyier/embed/jqRXBz?height=414&amp;theme-id=1&amp;slug-hash=jqRXBz&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_3" scrolling="no" frameborder="0" height="414" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_jqRXBz" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
+
+<p>给 70px 而不是 50px 是为了为了跟底部隔开 20px，防止紧靠在一起。</p>
+<h3 id="方法四：使用flexbox"><a href="#方法四：使用flexbox" class="headerlink" title="方法四：使用flexbox"></a>方法四：使用<a href="http://caibaojian.com/t/flexbox">flexbox</a></h3><p>关于 flexbox 的教程，还请查看之前的一篇<a href="http://caibaojian.com/flexbox-guide.html">详细的教程</a></p>
+<p>HTML:</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>CSS:</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-direction</span>: column;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<iframe name="cp_embed_4" src="https://codepen.io/chriscoyier/embed/RRbKrL?height=488&amp;theme-id=1&amp;slug-hash=RRbKrL&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_4" scrolling="no" frameborder="0" height="488" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_RRbKrL" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
+
+<h3 id="方法五：使用-grid-布局"><a href="#方法五：使用-grid-布局" class="headerlink" title="方法五：使用 grid 布局"></a>方法五：使用 grid 布局</h3><p>HTML：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>CSS：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">display</span>: grid;</span><br><span class="line">  <span class="attribute">grid-template-rows</span>: <span class="number">1</span>fr auto;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">grid-row-start</span>: <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">grid-row-end</span>: <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<iframe name="cp_embed_5" src="https://codepen.io/chriscoyier/embed/YWKNrE?height=477&amp;theme-id=1&amp;slug-hash=YWKNrE&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_5" scrolling="no" frameborder="0" height="477" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_YWKNrE" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
+
+<p>grid 早于 flexbox 出现，但并没有 flexbox 被广泛支持，你可能在 chrome Canary 或者 Firefox 开发版上才可以看见效果</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CSS超出部分省略号</title>
     <url>/posts/26295/</url>
     <content><![CDATA[<h2 id="CSS-实现单行省略号"><a href="#CSS-实现单行省略号" class="headerlink" title="CSS 实现单行省略号"></a>CSS 实现单行省略号</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">overflow</span>: hidden;</span><br><span class="line">  <span class="attribute">text-overflow</span>: ellipsis;</span><br><span class="line">  <span class="attribute">white-space</span>: nowrap;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -583,6 +651,34 @@
       </categories>
   </entry>
   <entry>
+    <title>Github添加个人Profile</title>
+    <url>/posts/22751/</url>
+    <content><![CDATA[<p>用户现在可直接在 GitHub 个人页中添加 README 介绍，用于展示更加详细的个人信息。</p>
+<p>效果：<a href="https://github.com/evestorm">https://github.com/evestorm</a></p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>摘自：<a href="https://zhuanlan.zhihu.com/p/161029860">https://zhuanlan.zhihu.com/p/161029860</a></p>
+<p>第一步，创建与 GitHub 用户名同名的代码仓库。</p>
+<img src="/posts/undefined/step1.jpg" class="" title="step1">
+
+<p>第二步，返回个人页，即可看到成功生成 README 展示区块。</p>
+<p>接着点击编辑按钮，用 Markdown 语法编写 README 文件，即可快速更新：</p>
+<img src="/posts/undefined/step2.jpg" class="" title="step2">
+
+<h2 id="Github-Profile-模板"><a href="#Github-Profile-模板" class="headerlink" title="Github Profile 模板"></a>Github Profile 模板</h2><p>在 github 上找到了个 repo ，摘录了大量 Profile 模板，可以去上面找找自己心仪的应用到自己的 github 上：</p>
+<p><a href="https://github.com/kautukkundan/Awesome-Profile-README-templates">https://github.com/kautukkundan/Awesome-Profile-README-templates</a></p>
+<h2 id="Github-readme-统计数据"><a href="#Github-readme-统计数据" class="headerlink" title="Github readme 统计数据"></a>Github readme 统计数据</h2><p><a href="https://github.com/anuraghazra/github-readme-stats">https://github.com/anuraghazra/github-readme-stats</a></p>
+<p>这个 repo 可以让我们统计 Github 上的一些数据信息。例如最近一年的提交次数，star 个数等。可以放进 Github Profile 中展示。</p>
+<h2 id="徽章生成"><a href="#徽章生成" class="headerlink" title="徽章生成"></a>徽章生成</h2><p>经常看到不少 github 项目中有类似下图所示的徽章：</p>
+<img src="/posts/undefined/badge.jpg" class="" title="badge">
+
+<p>这样的徽章可以在 <a href="https://shields.io/">https://shields.io/</a> 上生成。网上有不少教程，我就不自己写了，贴个链接：</p>
+<p><a href="https://blog.csdn.net/woshiwangdaye/article/details/105182357">https://blog.csdn.net/woshiwangdaye/article/details/105182357</a></p>
+]]></content>
+      <tags>
+        <tag>其他</tag>
+        <tag>GitHub</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JS中如何实现继承</title>
     <url>/posts/2751/</url>
     <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
@@ -744,6 +840,52 @@
       </categories>
   </entry>
   <entry>
+    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
+    <url>/posts/8214/</url>
+    <content><![CDATA[<blockquote>
+<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
+</blockquote>
+<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
+<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
+<a id="more"></a>
+
+<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
+<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
+<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
+<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
+<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
+<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
+<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
+<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
+
+<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
+<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
+<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
+
+<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
+<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
+<blockquote>
+<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
+</blockquote>
+<p>微软也开始为此优化它们的语法分析器：</p>
+<blockquote>
+<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
+</blockquote>
+<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>构建工具</category>
+      </categories>
+      <tags>
+        <tag>翻译</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Promise用法</title>
     <url>/posts/7878/</url>
     <content><![CDATA[<h2 id="Promise是什么"><a href="#Promise是什么" class="headerlink" title="Promise是什么"></a>Promise是什么</h2><p>Promise 是一种异步编程的解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。</p>
@@ -808,158 +950,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
-    <url>/posts/8214/</url>
-    <content><![CDATA[<blockquote>
-<p>原链接：<a href="https://css-tricks.com/the-difference-between-minification-and-gzipping/">https://css-tricks.com/the-difference-between-minification-and-gzipping/</a><br>作者：Chris Coyier</p>
-</blockquote>
-<p>这两种方法都针对你网站上的资源（比如 .css 文件和 .js 文件）所使用。它们都用来压缩文件大小，使服务器和浏览器之间的网络更加通畅，提高网页性能。网络是网页的速度瓶颈所在，而压缩文件大小能够改善这一点。</p>
-<p>但这两者也截然不同。如果之前你并不知道这一点，那么你应当花时间来了解它。</p>
-<a id="more"></a>
-
-<h1 id="Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…"><a href="#Minification-能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少-hex-代码的长度…" class="headerlink" title="Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…"></a>Minification 能够删除空格符（whitespace）、注释符（comments）、无用的分号（semicolons）或是减少 hex 代码的长度…</h1><p>……诸如此类。剩下的文件依然是有效代码。你不必尝试读取它或是使用它，它并没有违反任何规则。就像对原始文件那样，浏览器可以读取它和使用它。</p>
-<p>Minification 能够创建你最终使用的新文件。比如当你创建了一个名为 <code>style.css</code> 的文件之后，你可以把它压缩为 <code>style.min.css</code>。</p>
-<h1 id="Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"><a href="#Gizpping-能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。" class="headerlink" title="Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。"></a>Gizpping 能识别所有重复的字符串，并使用指代该字符串第一个实例的指针来代替。</h1><p>Julia Evans 曾想出一个绝佳的方法来解释这一点（点击<a href="https://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">这里</a>查阅她发布的内容和视频）。下面是一首诗的第一段：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Once upon a midnight dreary, <span class="keyword">while</span> I &#123;pon&#125;dered weak an&#123;d wea&#125;&#123;ry,&#125;</span><br><span class="line">Over many&#123; a &#125;quaint&#123; and &#125;curious volume <span class="keyword">of</span> forgotten lore,</span><br><span class="line">W&#123;hile I &#125;nodded, n&#123;ear&#125;ly napping, su&#123;dde&#125;n&#123;ly &#125;th&#123;ere&#125; ca&#123;me &#125;a t&#123;apping,&#125;</span><br><span class="line">As&#123; <span class="keyword">of</span> &#125;so&#123;me o&#125;ne gent&#123;ly &#125;r&#123;apping, &#125;&#123;rapping&#125; at my chamb&#123;er &#125;door.</span><br><span class="line"><span class="string">`&#x27;Tis&#123; some &#125;visitor,&#x27;&#123; I &#125;mu&#123;tte&#125;r&#123;ed, &#125;`</span>t&#123;apping at my chamber door&#125; -</span><br><span class="line">O&#123;nly th&#125;is,&#123; and &#125;no&#123;thi&#125;&#123;ng &#125;m&#123;ore&#125;.</span><br></pre></td></tr></table></figure>
-
-<p>Gzip 识别出括弧里的文字都是重复的，因此将会使用指针来代替它们，这样这些文字占用的空间将会比原来更小。</p>
-<p>对于减少文件大小、尤其是代码而言，这种方法十分高效，因为代码中有大量重复的内容。设想一下一个 HTML 文件里有多少个 <code>&lt;div</code>，一个 CSS 文件里又有多少 <code>&#123;</code>。</p>
-<p>你也可以创建某个文件的 Gzip 压缩版本，比如 style.css.zip。但你一般不会这样做，浏览器也不知道应该如何使用这个文件。</p>
-<p>在网页中，Gzip 压缩直接通过服务器完成。因此你要做的是配置服务器。一旦完成配置，Gzip 压缩将会自动进行，你无需再做任何工作。服务器会压缩文件，并通过网络传送文件。浏览器则接受文件，并在使用之前进行解压。我从未听谁提到过压缩和解压的成本，因此在这里我假设这些成本可以忽略不计，并且我们获得的受益远大于成本。</p>
-<p>点击<a href="https://css-tricks.com/snippets/htaccess/active-gzip-compression/">这里</a>查看如何在 Apache 服务器中进行配置，这里使用了 <code>mod_deflate</code> 模块。H5BP 也为所有常见的服务器<a href="https://github.com/h5bp/server-configs">提供了服务器配置</a>，包括 Gzipping。</p>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>我们将用到 <a href="https://getbootstrap.com/">Bootstrap</a> 中常见的 CSS 文件。</p>
-<img src="/posts/8214/3e99e9b284d401c365c5044bc715ba44c9246f83.jpg" class="" title="3e99e9b284d401c365c5044bc715ba44c9246f83">
-
-<p>通过 Minification 来压缩这个 CSS 文件，你将节省 17% 的空间，而使用 Gzipping 能够节省 85%，将两种方法结合使用节省的空间是 86%。</p>
-<p>下面是使用 DevTools 检查工作状况时的理想情况：</p>
-<img src="/posts/8214/997aee7f7378ac61ca5b36877a65f44c3ed70bc5.jpg" class="" title="997aee7f7378ac61ca5b36877a65f44c3ed70bc5">
-
-<h1 id="Gzip压缩-要高效得多，而将两种方法结合起来更为理想。"><a href="#Gzip压缩-要高效得多，而将两种方法结合起来更为理想。" class="headerlink" title="Gzip压缩 要高效得多，而将两种方法结合起来更为理想。"></a>Gzip压缩 要高效得多，而将两种方法结合起来更为理想。</h1><p>Gzip 压缩节省的空间大概是 Minification 压缩的五倍。然而，通过 Minification 压缩，你也可以获得一些帮助，不过在构建步骤时你需要耗费一些额外的力气。</p>
-<p>同样<a href="http://carlos.bueno.org/2010/02/measuring-javascript-parse-and-load.html#minifi">有证据</a>证明浏览器在读取和解析 Minification 压缩的文件时速度更快：</p>
-<blockquote>
-<p>正如预期的那样，除了缩短网络传输时间以外，Minification 压缩还有助于解析和加载。这也许是因为缺少注释符和额外的空白符。</p>
-</blockquote>
-<p>微软也开始为此优化它们的语法分析器：</p>
-<blockquote>
-<p>因此，在 Window 10 和 Microsoft Edge 中，我们新添加了快速路径，改善了在 Chakra 的 JIT 编译器中嵌入和优化部分探视程序的体验，以保证压缩代码的运行速度不低于原始版本。通过这些改变，通过 UglifyJS 压缩过的个体代码模式的性能提高了 20% 到 50%。</p>
-</blockquote>
-<p>缓存资源同样与这段对话相关，没有什么比一个不需要请求任何资源的浏览器速度更快了！关于这一点，网上或者<a href="https://www.amazon.com/Designing-Performance-Weighing-Aesthetics-Speed/dp/1491902515/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=css-tricks-20&linkId=d4d794b5604a084164c8ba33d2540283">书</a>中还有许多相关知识，不过很快我们也许会发布一些有关使用技巧的内容。</p>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>构建工具</category>
-      </categories>
-      <tags>
-        <tag>翻译</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CSS粘住固定底部的5种方法(转载)</title>
-    <url>/posts/52603/</url>
-    <content><![CDATA[<p>译文地址：<a href="http://caibaojian.com/css-5-ways-sticky-footer.html">http://caibaojian.com/css-5-ways-sticky-footer.html</a><br>原文地址：<a href="https://css-tricks.com/couple-takes-sticky-footer/">https://css-tricks.com/couple-takes-sticky-footer/</a><br>译者：前端开发博客-Jack</p>
-<h3 id="方法一：全局增加一个负值下边距等于底部高度"><a href="#方法一：全局增加一个负值下边距等于底部高度" class="headerlink" title="方法一：全局增加一个负值下边距等于底部高度"></a>方法一：全局增加一个负值下边距等于底部高度</h3><p>有一个全局的元素包含除了底部之外的所有内容。它有一个负值下边距等于底部的高度，就像<a href="http://ryanfait.com/html5-sticky-footer/">这个演示链接</a>。</p>
-<a id="more"></a>
-
-<p><a href="http://caibaojian.com/t/html">HTML</a>代码</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrapper&quot;</span>&gt;</span></span><br><span class="line">    content</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;push&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><a href="http://caibaojian.com/css3/">CSS</a>代码：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span>,</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Equal to height of footer */</span></span><br><span class="line">  <span class="comment">/* But also accounting for potential margin-bottom of last child */</span></span><br><span class="line">  <span class="attribute">margin-bottom</span>: -<span class="number">50px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span>,</span><br><span class="line"><span class="selector-class">.push</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>演示：</p>
-<iframe name="cp_embed_1" src="https://codepen.io/chriscoyier/embed/VjZmGj?height=392&amp;theme-id=1&amp;slug-hash=VjZmGj&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_1" scrolling="no" frameborder="0" height="392" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_VjZmGj" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
-
-<p>这个代码需要一个额外的元素.push 等于底部的高度，来防止内容覆盖到底部的元素。这个 push 元素是智能的，它并没有占用到底部的利用，而是通过全局加了一个负边距来填充。</p>
-<h3 id="方法二：底部元素增加负值上边距"><a href="#方法二：底部元素增加负值上边距" class="headerlink" title="方法二：底部元素增加负值上边距"></a>方法二：底部元素增加负值上边距</h3><p>虽然这个代码减少了一个.push 的元素，但还是需要增加多一层的元素包裹内容，并给他一个内边距使其等于底部的高度，防止内容覆盖到底部的内容。</p>
-<p>HTML 代码：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content-inside&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><a href="http://caibaojian.com/t/css">CSS</a>：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span>,</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content-inside</span> &#123;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">20px</span>;</span><br><span class="line">  <span class="attribute">padding-bottom</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">  <span class="attribute">margin-top</span>: -<span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>演示：</p>
-<iframe name="cp_embed_2" src="https://codepen.io/chriscoyier/embed/aZoBMb?height=300&amp;theme-id=1&amp;slug-hash=aZoBMb&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_2" scrolling="no" frameborder="0" height="300" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_aZoBMb" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
-
-<h2 id="方法三：使用-calc-计算内容的高度"><a href="#方法三：使用-calc-计算内容的高度" class="headerlink" title="方法三：使用 calc()计算内容的高度"></a>方法三：使用 calc()计算内容的高度</h2><p>HTML</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><a href="http://caibaojian.com/t/css">CSS</a>:</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="built_in">calc</span>(<span class="number">100vh</span> - <span class="number">70px</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>演示：</p>
-<iframe name="cp_embed_3" src="https://codepen.io/chriscoyier/embed/jqRXBz?height=414&amp;theme-id=1&amp;slug-hash=jqRXBz&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_3" scrolling="no" frameborder="0" height="414" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_jqRXBz" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
-
-<p>给 70px 而不是 50px 是为了为了跟底部隔开 20px，防止紧靠在一起。</p>
-<h3 id="方法四：使用flexbox"><a href="#方法四：使用flexbox" class="headerlink" title="方法四：使用flexbox"></a>方法四：使用<a href="http://caibaojian.com/t/flexbox">flexbox</a></h3><p>关于 flexbox 的教程，还请查看之前的一篇<a href="http://caibaojian.com/flexbox-guide.html">详细的教程</a></p>
-<p>HTML:</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>CSS:</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-direction</span>: column;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.content</span> &#123;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>演示：</p>
-<iframe name="cp_embed_4" src="https://codepen.io/chriscoyier/embed/RRbKrL?height=488&amp;theme-id=1&amp;slug-hash=RRbKrL&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_4" scrolling="no" frameborder="0" height="488" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_RRbKrL" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
-
-<h3 id="方法五：使用-grid-布局"><a href="#方法五：使用-grid-布局" class="headerlink" title="方法五：使用 grid 布局"></a>方法五：使用 grid 布局</h3><p>HTML：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span>content<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span> <span class="attr">class</span>=<span class="string">&quot;footer&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>CSS：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">html</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">display</span>: grid;</span><br><span class="line">  <span class="attribute">grid-template-rows</span>: <span class="number">1</span>fr auto;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">grid-row-start</span>: <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">grid-row-end</span>: <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>演示：</p>
-<iframe name="cp_embed_5" src="https://codepen.io/chriscoyier/embed/YWKNrE?height=477&amp;theme-id=1&amp;slug-hash=YWKNrE&amp;default-tab=result&amp;user=chriscoyier&amp;embed-version=2&amp;name=cp_embed_5" scrolling="no" frameborder="0" height="477" allowtransparency="true" allowfullscreen="true" allowpaymentrequest="true" title="CodePen Embed" class="cp_embed_iframe " loading="lazy" id="cp_embed_YWKNrE" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; width: 688px; overflow: hidden; display: block;"></iframe>
-
-<p>grid 早于 flexbox 出现，但并没有 flexbox 被广泛支持，你可能在 chrome Canary 或者 Firefox 开发版上才可以看见效果</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-        <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
-    <url>/posts/22469/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
-<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></li>
-</ul>
-<a id="more"></a>
-
-<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
-<li>文件——&gt;首选项——&gt;设置</li>
-<li>Ctrl+P 搜索 settings.json</li>
-</ol>
-<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
-<p>有注释的才需要添加，其他没注释的可以不用管</p>
-</blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>,</span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;path-intellisense.mappings&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;@&quot;</span>: <span class="string">&quot;$&#123;workspaceRoot&#125;/src&quot;</span></span><br><span class="line">  &#125; <span class="comment">// Vue路径提示配置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="number">0</span>, <span class="comment">// 忽略强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-tabs&#x27;</span>: <span class="number">0</span>, <span class="comment">// 忽略tab检查</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="number">0</span> <span class="comment">// 忽略检查当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Sequelize框架进阶</title>
     <url>/posts/3278/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -1013,6 +1003,44 @@
       </categories>
       <tags>
         <tag>Sequelize</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
+    <url>/posts/22469/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
+<h2 id="插件安装"><a href="#插件安装" class="headerlink" title="插件安装"></a>插件安装</h2><ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="配置-VSCode-用户-Settings-json"><a href="#配置-VSCode-用户-Settings-json" class="headerlink" title="配置 VSCode 用户 Settings.json"></a>配置 VSCode 用户 Settings.json</h2><h3 id="打开方式"><a href="#打开方式" class="headerlink" title="打开方式"></a>打开方式</h3><ol>
+<li>文件——&gt;首选项——&gt;设置</li>
+<li>Ctrl+P 搜索 settings.json</li>
+</ol>
+<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><blockquote>
+<p>有注释的才需要添加，其他没注释的可以不用管</p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">14</span>,</span><br><span class="line">  <span class="attr">&quot;bracket-pair-colorizer-2.showBracketsInGutter&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;e9262ee54aa0988ee98c24e6be1dada1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Atom One Dark&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 新增配置</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">&quot;editor.formatOnSave&quot;</span>: <span class="literal">true</span>, <span class="comment">// #每次保存的时候自动格式化</span></span><br><span class="line">  <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;source.fixAll.eslint&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;, <span class="comment">// 每次保存的时候将代码按eslint格式进行修复</span></span><br><span class="line">  <span class="attr">&quot;editor.tabSize&quot;</span>: <span class="number">2</span>, <span class="comment">// 重新设定tabSize</span></span><br><span class="line">  <span class="attr">&quot;prettier.semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 添加代码结尾的分号</span></span><br><span class="line">  <span class="attr">&quot;prettier.singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 使用单引号替代双引号</span></span><br><span class="line">  <span class="attr">&quot;prettier.arrowParens&quot;</span>: <span class="string">&quot;avoid&quot;</span>, <span class="comment">// 箭头函数参数只有一个时是否要有小括号。</span></span><br><span class="line">  <span class="comment">// avoid - 省略括号</span></span><br><span class="line">  <span class="comment">// always - 总是不省略</span></span><br><span class="line">  <span class="attr">&quot;prettier.htmlWhitespaceSensitivity&quot;</span>: <span class="string">&quot;ignore&quot;</span>, <span class="comment">// 指定 HTML 文件的全局空白区域敏感度</span></span><br><span class="line">  <span class="comment">// &quot;css&quot;- 遵守 CSS display属性的默认值。</span></span><br><span class="line">  <span class="comment">// &quot;strict&quot; - 空格被认为是敏感的。</span></span><br><span class="line">  <span class="comment">// &quot;ignore&quot; - 空格被认为是不敏感的。</span></span><br><span class="line">  <span class="comment">// html 中空格也会占位，影响布局，prettier 格式化的时候可能会将文本换行，造成布局错乱</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;Prettier is an opinionated code formatter.&lt;/a&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- 变成 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;!-- &quot;Prettier is an opinionated code formatter. &quot; 另起一行，在页面的布局上就会多一个节点文本出来 --&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;a href=&quot;https://prettier.io/&quot;&gt;</span></span><br><span class="line">  <span class="comment">//    Prettier is an opinionated code formatter.</span></span><br><span class="line">  <span class="comment">//  &lt;/a&gt;</span></span><br><span class="line">  <span class="comment">// --------------- html -----------------</span></span><br><span class="line">  <span class="attr">&quot;prettier.jsxBracketSameLine&quot;</span>: <span class="literal">true</span>, <span class="comment">// 将 &gt; 多行 JSX 元素放在最后一行的末尾，而不是单独放在下一行（不适用于自闭元素）。</span></span><br><span class="line">  <span class="comment">// true - 放最后一行末尾</span></span><br><span class="line">  <span class="comment">// false - 单独放在末尾的下一行</span></span><br><span class="line">  <span class="attr">&quot;prettier.bracketSpacing&quot;</span>: <span class="literal">true</span>, <span class="comment">// 在对象，数组括号与文字之间加空格 &quot;&#123; foo: bar &#125;&quot;</span></span><br><span class="line">  <span class="attr">&quot;prettier.trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span>, <span class="comment">// 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）</span></span><br><span class="line">  <span class="attr">&quot;javascript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// JS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;typescript.preferences.quoteStyle&quot;</span>: <span class="string">&quot;single&quot;</span>, <span class="comment">// TS格式化设置单引号</span></span><br><span class="line">  <span class="attr">&quot;javascript.format.insertSpaceBeforeFunctionParenthesis&quot;</span>: <span class="literal">false</span>, <span class="comment">// 让函数(名)和后面的括号之间加个空格</span></span><br><span class="line">  <span class="comment">// 配置 ESLint 检查的文件类型</span></span><br><span class="line">  <span class="attr">&quot;eslint.validate&quot;</span>: [<span class="string">&quot;javascript&quot;</span>, <span class="string">&quot;vue&quot;</span>, <span class="string">&quot;html&quot;</span>],</span><br><span class="line">  <span class="attr">&quot;eslint.options&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">// 指定vscode的eslint所处理的文件的后缀</span></span><br><span class="line">    <span class="attr">&quot;extensions&quot;</span>: [<span class="string">&quot;.js&quot;</span>, <span class="string">&quot;.vue&quot;</span>, <span class="string">&quot;.ts&quot;</span>, <span class="string">&quot;.tsx&quot;</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//一定要在vutur.defaultFormatterOptions参数中设置，单独修改prettier扩展的设置是无法解决这个问题的，因为perttier默认忽略了vue文件（事实上从忽略列表移除vue也不能解决这个问题）</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatterOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化末尾加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span>, <span class="comment">// 格式化以单引号为主</span></span><br><span class="line">      <span class="attr">&quot;trailingComma&quot;</span>: <span class="string">&quot;none&quot;</span> <span class="comment">// 是否末尾自动添加逗号（数组，json，对象）</span></span><br><span class="line">      <span class="comment">// &quot;es5&quot; - 在ES5中的对象、数组等最后一个元素后面加逗号</span></span><br><span class="line">      <span class="comment">// &quot;none&quot; - 不加逗号</span></span><br><span class="line">      <span class="comment">// &quot;all&quot; - 尽可能都加逗号 (包括函数function的参数).</span></span><br><span class="line">    &#125;, <span class="comment">// 配置文档：https://prettier.io/docs/en/options.html</span></span><br><span class="line">    <span class="attr">&quot;js-beautify-html&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">// force-aligned | force-expand-multiline vue html代码格式化</span></span><br><span class="line">      <span class="attr">&quot;wrap_attributes&quot;</span>: <span class="string">&quot;force-aligned&quot;</span>, <span class="comment">// 对除第一个属性外的其他每个属性进行换行，并保持对齐</span></span><br><span class="line">      <span class="comment">// - auto: 仅在超出行长度时才对属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force: 对除第一个属性外的其他每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - force-aligned: 对除第一个属性外的其他每个属性进行换行，并保持对齐。</span></span><br><span class="line">      <span class="comment">// - force-expand-multiline: 对每个属性进行换行。</span></span><br><span class="line">      <span class="comment">// - aligned-multiple: 当超出折行长度时，将属性进行垂直对齐。</span></span><br><span class="line">      <span class="attr">&quot;wrap_line_length&quot;</span>: <span class="number">200</span>, <span class="comment">// 换行长度</span></span><br><span class="line">      <span class="attr">&quot;wrap_width_line&quot;</span>: <span class="literal">false</span>, <span class="comment">// 根据行宽换行</span></span><br><span class="line">      <span class="attr">&quot;semi&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化不加分号</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">true</span> <span class="comment">// 格式化使用单引号</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;prettyhtml&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;printWidth&quot;</span>: <span class="number">200</span>, <span class="comment">// 每行最多多少字符换行</span></span><br><span class="line">      <span class="attr">&quot;singleQuote&quot;</span>: <span class="literal">false</span>, <span class="comment">// 格式化使用单引号</span></span><br><span class="line">      <span class="attr">&quot;wrapAttributes&quot;</span>: <span class="literal">false</span>, <span class="comment">// 强制属性换行</span></span><br><span class="line">      <span class="attr">&quot;sortAttributes&quot;</span>: <span class="literal">true</span> <span class="comment">// 按字母顺序排序属性</span></span><br><span class="line">    &#125; <span class="comment">// 配置文档：https://github.com/Prettyhtml/prettyhtml</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.html&quot;</span>: <span class="string">&quot;js-beautify-html&quot;</span>, <span class="comment">// 使用 js-beautify-html 格式化 html</span></span><br><span class="line">  <span class="attr">&quot;vetur.format.defaultFormatter.js&quot;</span>: <span class="string">&quot;prettier&quot;</span>, <span class="comment">// 使用 prettier 格式化 js</span></span><br><span class="line">  <span class="attr">&quot;[vue]&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;octref.vetur&quot;</span> <span class="comment">// 使用 vetur 格式化 vue</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Fira Code&#x27;, Menlo, Monaco, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;path-intellisense.mappings&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;@&quot;</span>: <span class="string">&quot;$&#123;workspaceRoot&#125;/src&quot;</span></span><br><span class="line">  &#125; <span class="comment">// Vue路径提示配置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置-eslintrc-js"><a href="#配置-eslintrc-js" class="headerlink" title="配置 .eslintrc.js"></a>配置 .eslintrc.js</h2><p>Vue 项目的根目录下创建 .eslintrc.js ：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  root: <span class="literal">true</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    parser: <span class="string">&#x27;babel-eslint&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">&#x27;plugin:vue/essential&#x27;</span>, <span class="string">&#x27;eslint:recommended&#x27;</span>, <span class="string">&#x27;airbnb-base/legacy&#x27;</span>],</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="comment">// 文档：https://cn.eslint.org/docs/rules/</span></span><br><span class="line">    <span class="string">&#x27;generator-star-spacing&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 强制 generator 函数中 * 号周围使用一致的空格</span></span><br><span class="line">    <span class="comment">// 开发模式允许使用console</span></span><br><span class="line">    <span class="string">&#x27;no-console&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 开发环境允许使用调试 (生产模式禁用)</span></span><br><span class="line">    <span class="string">&#x27;no-debugger&#x27;</span>: process.env.NODE_ENV === <span class="string">&#x27;production&#x27;</span> ? <span class="string">&#x27;error&#x27;</span> : <span class="string">&#x27;off&#x27;</span>,</span><br><span class="line">    <span class="comment">// 禁止使用 var</span></span><br><span class="line">    <span class="string">&#x27;no-var&#x27;</span>: <span class="string">&#x27;error&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;padded-blocks&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 代码块中避免多余留白</span></span><br><span class="line">    <span class="string">&#x27;comma-dangle&#x27;</span>: [<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;never&#x27;</span>], <span class="comment">// 是否允许对象中出现结尾逗号</span></span><br><span class="line">    <span class="string">&#x27;no-undef&#x27;</span>: <span class="number">0</span>, <span class="comment">// 禁用未声明的变量，除非它们在 /*global */ 注释中被提到</span></span><br><span class="line">    quotes: <span class="number">0</span>, <span class="comment">// 强制使用一致的反勾号、双引号或单引号 (0: double, 1: single, 2: backtick)</span></span><br><span class="line">    eqeqeq: <span class="string">&#x27;off&#x27;</span>, <span class="comment">//  关闭 (要求使用 === 和 !==) 的校验</span></span><br><span class="line">    <span class="string">&#x27;eol-last&#x27;</span>: <span class="string">&#x27;off&#x27;</span>, <span class="comment">// 要求或禁止文件末尾存在空行</span></span><br><span class="line">    indent: <span class="number">0</span>, <span class="comment">// 忽略强制使用一致的缩进</span></span><br><span class="line">    <span class="string">&#x27;no-tabs&#x27;</span>: <span class="number">0</span>, <span class="comment">// 忽略tab检查</span></span><br><span class="line">    <span class="string">&#x27;no-mixed-spaces-and-tabs&#x27;</span>: <span class="number">0</span> <span class="comment">// 忽略检查当空格用于对齐时，允许混合制表符和空格。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>npm 安装 <code>eslint-config-airbnb-base</code> ：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm info &quot;eslint-config-airbnb-base@latest&quot; peerDependencies</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>.eslintrc.js</code> 中添加（上面配置已添加）：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;extends&quot;</span>: <span class="string">&quot;airbnb-base/legacy&quot;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -1156,6 +1184,39 @@
       </tags>
   </entry>
   <entry>
+    <title>Vue的生命周期函数</title>
+    <url>/posts/33186/</url>
+    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
+<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
+<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
+<a id="more"></a>
+
+<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>结束掉 loading 动画</li>
+<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
+</ul>
+<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
+<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
+<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
+<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
+<li>此函数中也能发起异步请求</li>
+</ul>
+<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
+<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
+<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
+<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
+<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Webpack4 如何优雅打包缓存文件（转载）</title>
     <url>/posts/64694/</url>
     <content><![CDATA[<p>一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。</p>
@@ -1235,39 +1296,6 @@
       </categories>
       <tags>
         <tag>Webpack</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue的生命周期函数</title>
-    <url>/posts/33186/</url>
-    <content><![CDATA[<h2 id="创建期间的生命周期函数"><a href="#创建期间的生命周期函数" class="headerlink" title="创建期间的生命周期函数"></a>创建期间的生命周期函数</h2><h3 id="beforeCreate"><a href="#beforeCreate" class="headerlink" title="beforeCreate"></a>beforeCreate</h3><p>实例刚在内存中被创建出来，此时还没有初始化好 data 和 methods 属性。</p>
-<h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p>执行 loading 动画。</p>
-<h3 id="created"><a href="#created" class="headerlink" title="created"></a>created</h3><p>实例已经在内存中创建完毕，data 和 methods 等属性也已经创建完成。但此刻<strong>还没有开始编译模板</strong>。</p>
-<a id="more"></a>
-
-<h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>结束掉 loading 动画</li>
-<li>做一些初始化工作，比如函数自执行，发起异步请求获取数据</li>
-</ul>
-<h3 id="beforeMount"><a href="#beforeMount" class="headerlink" title="beforeMount"></a>beforeMount</h3><p>此刻<strong>已经完成了模板的编译</strong>，但<strong>还没有挂载到页面上</strong>。换句话说，此时页面中类似 的语法还没有被替换成真正的数据。</p>
-<h3 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h3><p>此刻已经将编译好的模板挂载到了页面中指定的容器中显示。用户已经可以看到渲染好的页面了。</p>
-<h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul>
-<li>由于此刻已经把模板挂载到了页面，所以能够在此钩子函数中获取 DOM 节点。</li>
-<li>此函数中也能发起异步请求</li>
-</ul>
-<h2 id="运行期间的生命周期函数"><a href="#运行期间的生命周期函数" class="headerlink" title="运行期间的生命周期函数"></a>运行期间的生命周期函数</h2><h3 id="beforeUpdate"><a href="#beforeUpdate" class="headerlink" title="beforeUpdate"></a>beforeUpdate</h3><p>状态更新之前执行此函数，此刻 data 中的状态值是最新的，但是<strong>界面上显示的数据还是旧的</strong>。因此此时还没有开始重新渲染 DOM 节点。</p>
-<h3 id="updated"><a href="#updated" class="headerlink" title="updated"></a>updated</h3><p>实例更新完毕后调用此函数，此刻 data 中的状态值和界面上显示的数据，都已经完成了更新，界面已经被重新渲染好了。</p>
-<h2 id="销毁期间的生命周期函数"><a href="#销毁期间的生命周期函数" class="headerlink" title="销毁期间的生命周期函数"></a>销毁期间的生命周期函数</h2><h3 id="beforeDestroy"><a href="#beforeDestroy" class="headerlink" title="beforeDestroy"></a>beforeDestroy</h3><p>实例销毁之前调用。此刻实例仍然完全可用。</p>
-<h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p>一切你想要在组件销毁之前做事，例如弹出确认窗：“你确认删除XXX吗？”</p>
-<h3 id="destroyed"><a href="#destroyed" class="headerlink" title="destroyed"></a>destroyed</h3><p>实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -1459,22 +1487,6 @@
       </tags>
   </entry>
   <entry>
-    <title>cnchar.js获取汉字的拼音</title>
-    <url>/posts/38408/</url>
-    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
-<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
-<p>几种常用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>解决方案</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>cookie与session区别</title>
     <url>/posts/63891/</url>
     <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
@@ -1514,6 +1526,22 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>cnchar.js获取汉字的拼音</title>
+    <url>/posts/38408/</url>
+    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
+<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
+<p>几种常用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
   </entry>
   <entry>
     <title>css扩大元素点击区域</title>
@@ -1575,6 +1603,24 @@
       <tags>
         <tag>技巧</tag>
         <tag>flex</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git提交代码到错误的远端分支如何撤回并提交到正确分支</title>
+    <url>/posts/61419/</url>
+    <content><![CDATA[<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>假如你要提交代码到 bug 分支，然而却忘了切分支，仍然在 dev 开发分支上改了 bug，而且已经推送到远端了。此时你该如何撤回远端在 dev 分支的修改，并把代码推送到正确的远端 bug 分支上呢？</p>
+<p>你可以执行下面操作：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 切换到你提交了错误代码的分支</span></span><br><span class="line">git checkout dev</span><br><span class="line"><span class="meta">#</span><span class="bash"> 撤销最近的一次提交</span></span><br><span class="line">git revert HEAD --no-edit</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将revert commit push到远端</span></span><br><span class="line">git push origin dev</span><br><span class="line"><span class="meta">#</span><span class="bash"> 切换到正确的分支</span></span><br><span class="line">git checkout bug</span><br><span class="line">将目标 commit 嫁接到当前分支</span><br><span class="line">git cherry-pick db6bb3f &lt;=你之前提交到错误分支的那个commit的SHA</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/42929114">Git 误操作救命篇一： 如何将改动撤销？</a></p>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>版本控制</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -2058,7 +2104,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#103;&#105;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#x62;&#x2e;&#99;&#x6f;&#x6d;">&#103;&#105;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#x62;&#x2e;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#x67;&#105;&#116;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#x62;&#46;&#99;&#111;&#x6d;">&#x67;&#105;&#116;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#x62;&#46;&#99;&#111;&#x6d;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -2084,7 +2130,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#x69;&#x74;&#64;&#x67;&#x69;&#116;&#x68;&#x75;&#98;&#x2e;&#99;&#x6f;&#x6d;">&#103;&#x69;&#x74;&#64;&#x67;&#x69;&#116;&#x68;&#x75;&#98;&#x2e;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#x74;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#98;&#x2e;&#99;&#111;&#109;">&#x67;&#x69;&#x74;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#98;&#x2e;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -2162,20 +2208,6 @@
       </categories>
       <tags>
         <tag>技巧</tag>
-        <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【转载】滚动视差-CSS不在话下</title>
-    <url>/posts/56953/</url>
-    <content><![CDATA[<p>掘金链接：<a href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
-<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
         <tag>转载</tag>
       </tags>
   </entry>
@@ -2287,6 +2319,20 @@
       </categories>
       <tags>
         <tag>缓存</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【转载】滚动视差-CSS不在话下</title>
+    <url>/posts/56953/</url>
+    <content><![CDATA[<p>掘金链接：<a href="https://juejin.im/post/5b6d0756e51d4562b31ad23c">https://juejin.im/post/5b6d0756e51d4562b31ad23c</a></p>
+<p>github 链接：<a href="https://github.com/chokcoco/iCSS/issues/37">https://github.com/chokcoco/iCSS/issues/37</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -2560,36 +2606,6 @@
       </tags>
   </entry>
   <entry>
-    <title>两栏布局方案汇总</title>
-    <url>/posts/44541/</url>
-    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
-<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<a id="more"></a>
-
-<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用Jekyll搭建GitHubPages博客</title>
     <url>/posts/63074/</url>
     <content><![CDATA[<h2 id="安装-Jekyll"><a href="#安装-Jekyll" class="headerlink" title="安装 Jekyll"></a>安装 Jekyll</h2><p>来源：<a href="https://jekyllrb.com/docs/installation/">https://jekyllrb.com/docs/installation/</a></p>
@@ -2638,6 +2654,36 @@
       </categories>
       <tags>
         <tag>Jekyll</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>两栏布局方案汇总</title>
+    <url>/posts/44541/</url>
+    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
+<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2794,6 +2840,41 @@
       </tags>
   </entry>
   <entry>
+    <title>函数中的rest参数</title>
+    <url>/posts/29820/</url>
+    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
+<blockquote>
+<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
+<ul>
+<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
+</li>
+<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
+</li>
+<li><pre><code>arguments
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+callee</code></pre>
+<p>属性）。</p>
+<ul>
+<li>arguments.callee 属性包含当前正在执行的函数。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端vscode插件配置</title>
     <url>/posts/11039/</url>
     <content><![CDATA[<h3 id="外观配置"><a href="#外观配置" class="headerlink" title="外观配置"></a>外观配置</h3><ul>
@@ -2850,41 +2931,6 @@
       </categories>
       <tags>
         <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>函数中的rest参数</title>
-    <url>/posts/29820/</url>
-    <content><![CDATA[<h2 id="什么是-REST-参数"><a href="#什么是-REST-参数" class="headerlink" title="什么是 REST 参数"></a>什么是 REST 参数</h2><p>REST参数翻译过来就是剩余参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">MDN</a>上的定义是：</p>
-<blockquote>
-<p>剩余参数语法允许我们将一个不定数量的参数表示为一个数组。</p>
-</blockquote>
-<a id="more"></a>
-
-<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.reduce(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> previous + current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// expected output: 6</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line"><span class="comment">// expected output: 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下例中，剩余参数包含了从第二个到最后的所有实参，然后用第一个实参依次乘以它们</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">multiply</span>(<span class="params">multiplier, ...theArgs</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> theArgs.map(<span class="function"><span class="keyword">function</span> (<span class="params">element</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> multiplier * element;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = multiply(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); </span><br><span class="line"><span class="built_in">console</span>.log(arr);  <span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="rest-参数和-arguments-对象的区别"><a href="#rest-参数和-arguments-对象的区别" class="headerlink" title="rest 参数和 arguments 对象的区别"></a>rest 参数和 arguments 对象的区别</h2><p>剩余参数和 <code>arguments</code>对象之间的区别主要有三个：</p>
-<ul>
-<li><p>剩余参数只包含那些没有对应形参的实参，而 <code>arguments</code> 对象包含了传给函数的所有实参。</p>
-</li>
-<li><p><code>arguments</code>对象不是一个真正的数组，而剩余参数是真正的 <code>Array</code>实例，也就是说你能够在它上面直接使用所有的数组方法，比如 <code>sort</code>，<code>map</code>，<code>forEach</code>或<code>pop</code>。</p>
-</li>
-<li><pre><code>arguments
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">对象还有一些附加的属性 （如</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-callee</code></pre>
-<p>属性）。</p>
-<ul>
-<li>arguments.callee 属性包含当前正在执行的函数。</li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>ES6</tag>
       </tags>
   </entry>
   <entry>
@@ -4086,62 +4132,6 @@ h1.name {
   </entry>
   <entry>
     <title></title>
-    <url>/posts/3/</url>
-    <content><![CDATA[.card {
-    background-color: #e9e9e9;
-    transition: 0.3s;
-    border-radius: 15px; /* 5px rounded corners */
-    margin: 5px;
-    padding-bottom: 0.5em;
-}
-
-    .card > img {
-        border-radius: 15px 15px 0 0;
-        width: 100%
-    }
-
-.card-content > button {
-    margin: 0 auto;
-    display: block;
-}
-
-.card-content > p {
-    font-weight: bold;
-    justify-content: center;
-}
-
-.card-content > h3 {
-    font-size: 1.75em;
-    margin-top: 0em;
-    margin-bottom: 0em;
-}
-
-.card-content > h5 {
-    font-size: 1.25em;
-    font-weight: 500;
-    margin-top: 0em;
-    margin-bottom: 0em;
-}
-
-.card-content > h6 {
-    font-size: 1em;
-    font-weight: 500;
-    margin-top: 0em;
-    margin-bottom: 0.5em;
-}
-
-.card:hover {
-    transform: scale(1.025);
-    box-shadow: 0 5px 5px 0 rgba(0,0,0,0.25);
-}
-
-.card-content {
-    margin: 0.5em;
-}
-]]></content>
-  </entry>
-  <entry>
-    <title></title>
     <url>/posts/4/</url>
     <content><![CDATA[
 
@@ -4289,6 +4279,62 @@ footer {
     flex: 1;
     background-color: #e9e9e9;
     border-radius: 15px;
+}
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/posts/3/</url>
+    <content><![CDATA[.card {
+    background-color: #e9e9e9;
+    transition: 0.3s;
+    border-radius: 15px; /* 5px rounded corners */
+    margin: 5px;
+    padding-bottom: 0.5em;
+}
+
+    .card > img {
+        border-radius: 15px 15px 0 0;
+        width: 100%
+    }
+
+.card-content > button {
+    margin: 0 auto;
+    display: block;
+}
+
+.card-content > p {
+    font-weight: bold;
+    justify-content: center;
+}
+
+.card-content > h3 {
+    font-size: 1.75em;
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+.card-content > h5 {
+    font-size: 1.25em;
+    font-weight: 500;
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+.card-content > h6 {
+    font-size: 1em;
+    font-weight: 500;
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+}
+
+.card:hover {
+    transform: scale(1.025);
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,0.25);
+}
+
+.card-content {
+    margin: 0.5em;
 }
 ]]></content>
   </entry>
