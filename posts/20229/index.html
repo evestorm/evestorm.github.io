@@ -30,20 +30,20 @@
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
 <meta property="og:description" content="一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。 什么是垃圾要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的垃圾。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/garbage-collection-5.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/20229/garbage-collection-5.png">
 <meta property="article:published_time" content="2019-04-27T15:08:53.000Z">
-<meta property="article:modified_time" content="2020-12-15T15:14:17.585Z">
+<meta property="article:modified_time" content="2020-12-15T15:14:51.728Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="hexo, 博客, 技术, 前端">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
 
 
 <link rel="canonical" href="https://evestorm.github.io/posts/20229/">
@@ -232,7 +232,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">97</span>
+          <span class="site-state-item-count">98</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -323,7 +323,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-12-15 23:14:17" itemprop="dateModified" datetime="2020-12-15T23:14:17+08:00">2020-12-15</time>
+        <time title="修改时间：2020-12-15 23:14:51" itemprop="dateModified" datetime="2020-12-15T23:14:51+08:00">2020-12-15</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -388,15 +388,15 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
 
 <p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
-<img src="/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
+<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
 
-<img src="/posts/undefined/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
+<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
 
 <h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
 
 <p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
-<img src="/posts/undefined/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
+<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
 
 <h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
 <blockquote>
@@ -406,25 +406,25 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
 <p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
-<img src="/posts/undefined/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
+<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
 
 <p>接着我们执行下面操作：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
 
 <p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
-<img src="/posts/undefined/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
+<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
 
-<img src="/posts/undefined/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
+<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
 
 <p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
 
 <p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
-<img src="/posts/undefined/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
+<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
 
 <h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
 <h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
-<img src="/posts/undefined/garbage-collection-5.png" class="" title="标记清除">
+<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
 
 <p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
 <p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
