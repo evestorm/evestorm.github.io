@@ -18,6 +18,8 @@ categories:
 
 第一步，创建与 GitHub 用户名同名的代码仓库。
 
+<!-- more -->
+
 {% asset_img step1.jpg step1 %}
 
 第二步，返回个人页，即可看到成功生成 README 展示区块。

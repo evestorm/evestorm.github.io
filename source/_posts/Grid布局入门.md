@@ -18,6 +18,8 @@ Grid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，
 
 {% asset_img grid.png grid_layout %}
 
+<!-- more -->
+
 ### Grid vs Flex
 
 工作中写移动端页面的朋友对 Flex 布局肯定不陌生，有些人可能更极端一点，直接 Flex 一把梭。那 Grid 和 Flex 有什么区别呢？我们仍然可以用一张图片进行举例说明：

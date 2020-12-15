@@ -23,6 +23,8 @@ git config --global user.name 'your name'
 git config --global user.email 'your_email@domain.com'
 ```
 
+<!-- more -->
+
 ### 相关配置说明
 
 ```shell
