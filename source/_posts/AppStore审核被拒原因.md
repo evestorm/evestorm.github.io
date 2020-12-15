@@ -3,8 +3,8 @@ title: AppStore审核被拒原因
 tags:
   - iOS
 categories:
+  - 移动端
   - iOS
-  - 上架
 abbrlink: 36545
 date: 2020-07-20 16:02:40
 ---
