@@ -1500,6 +1500,90 @@
       </categories>
   </entry>
   <entry>
+    <title>JS垃圾回收机制</title>
+    <url>/posts/20229/</url>
+    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
+<a id="more"></a>
+
+<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
+
+<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
+
+<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
+<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
+<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
+
+<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
+
+<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
+<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
+
+<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
+<blockquote>
+<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
+</blockquote>
+<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
+<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
+
+<p>接着我们执行下面操作：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
+
+<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
+<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
+
+<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
+
+<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
+<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
+
+<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
+<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
+<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
+
+<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
+<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
+<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
+<ul>
+<li>新一代（e.g. 一个函数中的临时变量）</li>
+<li>老一代（e.g. window 对象）</li>
+</ul>
+<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
+<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
+<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
+<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
+<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
+
+<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
+<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
+<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
     <title>JS数组有哪些常用方法</title>
     <url>/posts/21501/</url>
     <content><![CDATA[<h2 id="改变原数组的方法"><a href="#改变原数组的方法" class="headerlink" title="改变原数组的方法"></a>改变原数组的方法</h2><h3 id="splice-添加-删除数组元素"><a href="#splice-添加-删除数组元素" class="headerlink" title="splice() 添加/删除数组元素"></a>splice() 添加/删除数组元素</h3><blockquote>
@@ -1638,90 +1722,6 @@
       </categories>
   </entry>
   <entry>
-    <title>JS垃圾回收机制</title>
-    <url>/posts/20229/</url>
-    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
-<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
-<a id="more"></a>
-
-<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
-
-<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
-<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
-
-<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
-<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
-<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
-
-<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
-
-<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
-<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
-
-<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
-<blockquote>
-<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
-</blockquote>
-<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
-<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
-
-<p>接着我们执行下面操作：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
-
-<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
-<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
-
-<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
-
-<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
-<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
-
-<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
-<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
-<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
-
-<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
-<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
-<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
-<ul>
-<li>新一代（e.g. 一个函数中的临时变量）</li>
-<li>老一代（e.g. window 对象）</li>
-</ul>
-<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
-<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
-<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
-<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
-<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
-<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
-
-<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
-<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
-<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
-<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
-<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>JavaScript使用技巧</title>
     <url>/posts/64741/</url>
     <content><![CDATA[<h3 id="转-Boolean-类型"><a href="#转-Boolean-类型" class="headerlink" title="转 Boolean 类型"></a>转 Boolean 类型</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">!!<span class="number">0</span>; <span class="comment">// false</span></span><br><span class="line">!!<span class="number">1</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
@@ -1848,6 +1848,30 @@
       </categories>
       <tags>
         <tag>翻译</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Photoshop如何生成多页PDF</title>
+    <url>/posts/13252/</url>
+    <content><![CDATA[<p>来源：<a href="http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html">http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html</a></p>
+<ol>
+<li>要把分页的内容分别在 ps 中建立不同的文档</li>
+</ol>
+<img src="/posts/undefined/pdf1.png" class="" title="pdf1">
+
+<img src="/posts/undefined/pdf2.png" class="" title="pdf2">
+
+<ol>
+<li>然后点击文件——自动——pdf 演示文稿，选择添加打开的文件，选择多页面文档，点击存储即可</li>
+</ol>
+<img src="/posts/undefined/pdf3.png" class="" title="pdf3">
+]]></content>
+      <categories>
+        <category>教程</category>
+        <category>PS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2182,81 +2206,6 @@
       </tags>
   </entry>
   <entry>
-    <title>animation动画（一）</title>
-    <url>/posts/57136/</url>
-    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
-<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
-<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
-</ul>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
-<p>CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。</p>
-</blockquote>
-<p>———— 出自 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations | MDN</a></p>
-<a id="more"></a>
-
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 简写 */</span></span><br><span class="line"><span class="selector-tag">animation</span>: 动画名称，一个周期所花费的时间，运动曲线（默认<span class="selector-tag">ease</span>），</span><br><span class="line">           动画延迟（默认0），播放次数（默认1），</span><br><span class="line">           是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br></pre></td></tr></table></figure>
-
-<p>就像在介绍中写到的那样，整个 animations 是个模块，包含很多属性来定义动画，比方说 <code>animation-name</code> 、<code>animation-duration</code> 和 <code>animation-delay</code> 等等。但本着快速上手的目的，第一篇文章主要围绕 <code>animation</code> 这个简写属性来讲，因为用它最直观，而且就经验来讲，日常使用最多的也是这个属性。</p>
-<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>一个CSS3动画由两个基本项组成：</p>
-<ol>
-<li>关键帧（Keyforames） - 用来定义动画的阶段和样式。</li>
-<li>动画属性 - 分配关键帧（@keyframes）到一个特定的css元素，来定义它的动画方式。</li>
-</ol>
-<p>我们围绕这两项讨论，并在这个过程中实现一个按钮不断放大缩小的动画效果：</p>
-<img src="/posts/57136/shrink.gif" class="" title="shrink">
-
-<h3 id="keyframes"><a href="#keyframes" class="headerlink" title="keyframes"></a>keyframes</h3><p>关键帧 keyframes 定义了动画在每个阶段的动画效果。它包括：</p>
-<ul>
-<li>动画名称：定义动画的名称</li>
-<li>动画阶段：整个动画阶段用百分比来表示。0% 表示动画的开始状态。100% 表示动画的结束状态。可以在其间添加多个中间状态，比如 20%，60%…</li>
-<li>动画属性：给动画每个阶段定义的CSS属性</li>
-</ul>
-<p>现在我们来编写一段 @keyframes 。动画名称命名为 <code>shrink</code> 。它只有简单的两个阶段：</p>
-<ul>
-<li>第一阶段（0%）：元素的缩放比例为 1:1</li>
-<li>第二阶段（100%）：元素的缩放比例为 1:0.8</li>
-</ul>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> shrink &#123;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="动画属性"><a href="#动画属性" class="headerlink" title="动画属性"></a>动画属性</h3><p>接着，我们给要设置动画的元素添加上动画属性。要使动画生效，我们至少要添加以下两个动画属性：</p>
-<ul>
-<li>animation-name: 动画的名称，在 @keyframes 中定义。</li>
-<li>animation-duration: 动画的持续时间，以秒为单位（例如 5s）或毫秒（例如 200ms）。</li>
-</ul>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="comment">/*  其他样式  */</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画名称: shrink  */</span></span><br><span class="line">  <span class="selector-tag">animation-name</span>: <span class="selector-tag">shrink</span>;</span><br><span class="line">  <span class="comment">/*  动画持续时间: 0.5秒 */</span></span><br><span class="line">  <span class="selector-tag">animation-duration</span>: .5<span class="selector-tag">s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这样我们就实现页面加载后，一个按钮从开始的原始大小，经过0.5s后变成了原始大小的0.8的动画效果。然而我们希望最终的效果是一个按钮的不断放大和缩小，交替进行。这就得添加 <code>animation-iteration-count</code> 和 <code>animation-direction</code> 两个动画属性了，它们一个用来定义元素动画的循环次数，一个用来定义动画在循环过程中是否反向运动：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画的循环次数: 无限次  */</span></span><br><span class="line">  <span class="selector-tag">animation-iteration-count</span>: <span class="selector-tag">infinite</span>;</span><br><span class="line">  <span class="comment">/*  循环是否反向：先正向后反向  */</span></span><br><span class="line">  <span class="selector-tag">animation-direction</span>: <span class="selector-tag">alternate</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>最终的简写形式如下：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="selector-tag">animation</span>: <span class="selector-tag">shrink</span> .5<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整效果：</p>
-<iframe height="265" scrolling="no" title="animation-shrink" src="https://codepen.io/JingW/embed/MRaJrz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="资源-📚"><a href="#资源-📚" class="headerlink" title="资源 📚"></a>资源 📚</h2><ul>
-<li><p>animation | 一个CSS3动画库</p>
-<p>【推荐】</p>
-<ul>
-<li><a href="https://daneden.github.io/animate.css/">点我查看效果</a></li>
-</ul>
-</li>
-<li><p>magic | 另一个CSS3动画库</p>
-<ul>
-<li><a href="https://www.minimamente.com/example/magic_animations/">点我查看效果</a></li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Webpack4 如何优雅打包缓存文件（转载）</title>
     <url>/posts/64694/</url>
     <content><![CDATA[<p>一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。</p>
@@ -2336,6 +2285,81 @@
       </categories>
       <tags>
         <tag>Webpack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>animation动画（一）</title>
+    <url>/posts/57136/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
+<p>CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。</p>
+</blockquote>
+<p>———— 出自 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations | MDN</a></p>
+<a id="more"></a>
+
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 简写 */</span></span><br><span class="line"><span class="selector-tag">animation</span>: 动画名称，一个周期所花费的时间，运动曲线（默认<span class="selector-tag">ease</span>），</span><br><span class="line">           动画延迟（默认0），播放次数（默认1），</span><br><span class="line">           是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br></pre></td></tr></table></figure>
+
+<p>就像在介绍中写到的那样，整个 animations 是个模块，包含很多属性来定义动画，比方说 <code>animation-name</code> 、<code>animation-duration</code> 和 <code>animation-delay</code> 等等。但本着快速上手的目的，第一篇文章主要围绕 <code>animation</code> 这个简写属性来讲，因为用它最直观，而且就经验来讲，日常使用最多的也是这个属性。</p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>一个CSS3动画由两个基本项组成：</p>
+<ol>
+<li>关键帧（Keyforames） - 用来定义动画的阶段和样式。</li>
+<li>动画属性 - 分配关键帧（@keyframes）到一个特定的css元素，来定义它的动画方式。</li>
+</ol>
+<p>我们围绕这两项讨论，并在这个过程中实现一个按钮不断放大缩小的动画效果：</p>
+<img src="/posts/57136/shrink.gif" class="" title="shrink">
+
+<h3 id="keyframes"><a href="#keyframes" class="headerlink" title="keyframes"></a>keyframes</h3><p>关键帧 keyframes 定义了动画在每个阶段的动画效果。它包括：</p>
+<ul>
+<li>动画名称：定义动画的名称</li>
+<li>动画阶段：整个动画阶段用百分比来表示。0% 表示动画的开始状态。100% 表示动画的结束状态。可以在其间添加多个中间状态，比如 20%，60%…</li>
+<li>动画属性：给动画每个阶段定义的CSS属性</li>
+</ul>
+<p>现在我们来编写一段 @keyframes 。动画名称命名为 <code>shrink</code> 。它只有简单的两个阶段：</p>
+<ul>
+<li>第一阶段（0%）：元素的缩放比例为 1:1</li>
+<li>第二阶段（100%）：元素的缩放比例为 1:0.8</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> shrink &#123;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动画属性"><a href="#动画属性" class="headerlink" title="动画属性"></a>动画属性</h3><p>接着，我们给要设置动画的元素添加上动画属性。要使动画生效，我们至少要添加以下两个动画属性：</p>
+<ul>
+<li>animation-name: 动画的名称，在 @keyframes 中定义。</li>
+<li>animation-duration: 动画的持续时间，以秒为单位（例如 5s）或毫秒（例如 200ms）。</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="comment">/*  其他样式  */</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画名称: shrink  */</span></span><br><span class="line">  <span class="selector-tag">animation-name</span>: <span class="selector-tag">shrink</span>;</span><br><span class="line">  <span class="comment">/*  动画持续时间: 0.5秒 */</span></span><br><span class="line">  <span class="selector-tag">animation-duration</span>: .5<span class="selector-tag">s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就实现页面加载后，一个按钮从开始的原始大小，经过0.5s后变成了原始大小的0.8的动画效果。然而我们希望最终的效果是一个按钮的不断放大和缩小，交替进行。这就得添加 <code>animation-iteration-count</code> 和 <code>animation-direction</code> 两个动画属性了，它们一个用来定义元素动画的循环次数，一个用来定义动画在循环过程中是否反向运动：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画的循环次数: 无限次  */</span></span><br><span class="line">  <span class="selector-tag">animation-iteration-count</span>: <span class="selector-tag">infinite</span>;</span><br><span class="line">  <span class="comment">/*  循环是否反向：先正向后反向  */</span></span><br><span class="line">  <span class="selector-tag">animation-direction</span>: <span class="selector-tag">alternate</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终的简写形式如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="selector-tag">animation</span>: <span class="selector-tag">shrink</span> .5<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整效果：</p>
+<iframe height="265" scrolling="no" title="animation-shrink" src="https://codepen.io/JingW/embed/MRaJrz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="资源-📚"><a href="#资源-📚" class="headerlink" title="资源 📚"></a>资源 📚</h2><ul>
+<li><p>animation | 一个CSS3动画库</p>
+<p>【推荐】</p>
+<ul>
+<li><a href="https://daneden.github.io/animate.css/">点我查看效果</a></li>
+</ul>
+</li>
+<li><p>magic | 另一个CSS3动画库</p>
+<ul>
+<li><a href="https://www.minimamente.com/example/magic_animations/">点我查看效果</a></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
       </tags>
   </entry>
   <entry>
@@ -2655,6 +2679,30 @@
       </tags>
   </entry>
   <entry>
+    <title>iOS版本更新后打开时提醒用户去AppStore更新</title>
+    <url>/posts/12210/</url>
+    <content><![CDATA[<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><ul>
+<li>Xcode11</li>
+<li>Swift5</li>
+<li>Alamofire 5.2.1</li>
+<li>SwiftyJSON 5.0.0</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><blockquote>
+<p>AppDelegate.swift</p>
+</blockquote>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SwiftyJSON</span><br><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"><span class="keyword">import</span> Alamofire</span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span>, <span class="title">WXApiDelegate</span>, <span class="title">WXApiLogDelegate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions <span class="keyword">_</span>: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        <span class="comment">// 检测App是否需要更新</span></span><br><span class="line">        checkVersion()</span><br><span class="line"></span><br><span class="line">        window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">        window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">        window?.makeKeyAndVisible()</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// MARK: App更新</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取版本号</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">checkVersion</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="type">AF</span>.request(<span class="string">&quot;https://itunes.apple.com/lookup?bundleId=App的bundleId&quot;</span>, method: .<span class="keyword">get</span>, parameters: [:])</span><br><span class="line">            .responseJSON &#123; response <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(response)</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">let</span> value = response.value &#123;</span><br><span class="line">                    <span class="keyword">let</span> json = <span class="type">JSON</span>(value)</span><br><span class="line">                    <span class="keyword">self</span>.compareVersion(appStoreVersion: json[<span class="string">&quot;results&quot;</span>][<span class="number">0</span>][<span class="string">&quot;version&quot;</span>].stringValue)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 比较版本</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">compareVersion</span><span class="params">(appStoreVersion: String)</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(appStoreVersion)</span><br><span class="line">        <span class="keyword">let</span> version: <span class="type">String</span> = (<span class="type">Bundle</span>.main.infoDictionary?[<span class="string">&quot;CFBundleShortVersionString&quot;</span>] <span class="keyword">as</span>? <span class="type">String</span>)!</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> appStoreVersion == version &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;当前已是最新版&quot;</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> alertC = <span class="type">UIAlertController</span>(title: <span class="string">&quot;有新版本&quot;</span>, message: <span class="string">&quot;前去更新版本？&quot;</span>, preferredStyle: .alert)</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;去更新&quot;</span>, style: .<span class="keyword">default</span>, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">self</span>.updateApp(appId: <span class="type">AppID</span>)</span><br><span class="line">            &#125;))</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;下次再说&quot;</span>, style: .cancel, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">            &#125;))</span><br><span class="line">            <span class="type">UIApplication</span>.shared.keyWindow?.rootViewController?.present(alertC, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新App</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">updateApp</span><span class="params">(appId <span class="keyword">_</span>: String)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">        <span class="keyword">let</span> urlString = <span class="string">&quot;itms-apps://itunes.apple.com/app/id\(AppID)&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">URL</span>(string: urlString) &#123;</span><br><span class="line">            <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">#available</span>(iOS <span class="number">10</span>, *) &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url, options: [:],</span><br><span class="line">                                          completionHandler: &#123;</span><br><span class="line">                                              <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.openURL(url)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>iOS极光推送-初版</title>
     <url>/posts/15162/</url>
     <content><![CDATA[<h2 id="苹果证书设置"><a href="#苹果证书设置" class="headerlink" title="苹果证书设置"></a>苹果证书设置</h2><h3 id="开启-Push-Notification-功能"><a href="#开启-Push-Notification-功能" class="headerlink" title="开启 Push Notification 功能"></a>开启 Push Notification 功能</h3><p>找到你 App 的 id:</p>
@@ -2767,30 +2815,6 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS版本更新后打开时提醒用户去AppStore更新</title>
-    <url>/posts/12210/</url>
-    <content><![CDATA[<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><ul>
-<li>Xcode11</li>
-<li>Swift5</li>
-<li>Alamofire 5.2.1</li>
-<li>SwiftyJSON 5.0.0</li>
-</ul>
-<a id="more"></a>
-
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><blockquote>
-<p>AppDelegate.swift</p>
-</blockquote>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SwiftyJSON</span><br><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"><span class="keyword">import</span> Alamofire</span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span>, <span class="title">WXApiDelegate</span>, <span class="title">WXApiLogDelegate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions <span class="keyword">_</span>: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        <span class="comment">// 检测App是否需要更新</span></span><br><span class="line">        checkVersion()</span><br><span class="line"></span><br><span class="line">        window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">        window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">        window?.makeKeyAndVisible()</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// MARK: App更新</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取版本号</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">checkVersion</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="type">AF</span>.request(<span class="string">&quot;https://itunes.apple.com/lookup?bundleId=App的bundleId&quot;</span>, method: .<span class="keyword">get</span>, parameters: [:])</span><br><span class="line">            .responseJSON &#123; response <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(response)</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">let</span> value = response.value &#123;</span><br><span class="line">                    <span class="keyword">let</span> json = <span class="type">JSON</span>(value)</span><br><span class="line">                    <span class="keyword">self</span>.compareVersion(appStoreVersion: json[<span class="string">&quot;results&quot;</span>][<span class="number">0</span>][<span class="string">&quot;version&quot;</span>].stringValue)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 比较版本</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">compareVersion</span><span class="params">(appStoreVersion: String)</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(appStoreVersion)</span><br><span class="line">        <span class="keyword">let</span> version: <span class="type">String</span> = (<span class="type">Bundle</span>.main.infoDictionary?[<span class="string">&quot;CFBundleShortVersionString&quot;</span>] <span class="keyword">as</span>? <span class="type">String</span>)!</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> appStoreVersion == version &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;当前已是最新版&quot;</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> alertC = <span class="type">UIAlertController</span>(title: <span class="string">&quot;有新版本&quot;</span>, message: <span class="string">&quot;前去更新版本？&quot;</span>, preferredStyle: .alert)</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;去更新&quot;</span>, style: .<span class="keyword">default</span>, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">self</span>.updateApp(appId: <span class="type">AppID</span>)</span><br><span class="line">            &#125;))</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;下次再说&quot;</span>, style: .cancel, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">            &#125;))</span><br><span class="line">            <span class="type">UIApplication</span>.shared.keyWindow?.rootViewController?.present(alertC, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新App</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">updateApp</span><span class="params">(appId <span class="keyword">_</span>: String)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">        <span class="keyword">let</span> urlString = <span class="string">&quot;itms-apps://itunes.apple.com/app/id\(AppID)&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">URL</span>(string: urlString) &#123;</span><br><span class="line">            <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">#available</span>(iOS <span class="number">10</span>, *) &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url, options: [:],</span><br><span class="line">                                          completionHandler: &#123;</span><br><span class="line">                                              <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.openURL(url)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>iOS的App语言设置为中文</title>
     <url>/posts/64032/</url>
     <content><![CDATA[<p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
@@ -2836,6 +2860,29 @@
       </tags>
   </entry>
   <entry>
+    <title>let和const和var的区别</title>
+    <url>/posts/37021/</url>
+    <content><![CDATA[<h2 id="const-和-let-异同"><a href="#const-和-let-异同" class="headerlink" title="const 和 let 异同"></a>const 和 let 异同</h2><h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><ul>
+<li>let 定义变量可以只声明不赋值</li>
+<li>const 定义常量声明时必须赋值，一旦定义不可轻易改变</li>
+</ul>
+<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>解决 var 没有块作用域,、变量提升、可以重复声明的问题。 let 和 const 有自己的块作用域, 不存在变量提升问题, 同一块作用域中不可重复声明（会报错）。</p>
+<h2 id="let-const-和-var-区别"><a href="#let-const-和-var-区别" class="headerlink" title="let/const 和 var 区别"></a>let/const 和 var 区别</h2><ul>
+<li>var 有变量提升，let/const 没有</li>
+<li>let/const 的作用域是块，而 var 的作用域是函数</li>
+<li>let/const 有暂时性死区，只要 let/const 声明的变量，在未声明之前使用或者赋值都会报错（ReferenceError）</li>
+<li>let/const 不能被重复定义</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>ES6</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>jsonp解决跨域问题的原理</title>
     <url>/posts/40160/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
@@ -2868,29 +2915,6 @@
       </categories>
       <tags>
         <tag>跨域</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>let和const和var的区别</title>
-    <url>/posts/37021/</url>
-    <content><![CDATA[<h2 id="const-和-let-异同"><a href="#const-和-let-异同" class="headerlink" title="const 和 let 异同"></a>const 和 let 异同</h2><h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><ul>
-<li>let 定义变量可以只声明不赋值</li>
-<li>const 定义常量声明时必须赋值，一旦定义不可轻易改变</li>
-</ul>
-<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>解决 var 没有块作用域,、变量提升、可以重复声明的问题。 let 和 const 有自己的块作用域, 不存在变量提升问题, 同一块作用域中不可重复声明（会报错）。</p>
-<h2 id="let-const-和-var-区别"><a href="#let-const-和-var-区别" class="headerlink" title="let/const 和 var 区别"></a>let/const 和 var 区别</h2><ul>
-<li>var 有变量提升，let/const 没有</li>
-<li>let/const 的作用域是块，而 var 的作用域是函数</li>
-<li>let/const 有暂时性死区，只要 let/const 声明的变量，在未声明之前使用或者赋值都会报错（ReferenceError）</li>
-<li>let/const 不能被重复定义</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>ES6</tag>
       </tags>
   </entry>
   <entry>
@@ -2960,6 +2984,62 @@
       </categories>
       <tags>
         <tag>macOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mac安装homebrew出错-Failed to connect to raw.githubusercontent.com port 443/Connection refused error</title>
+    <url>/posts/24685/</url>
+    <content><![CDATA[<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><p>安装 homebrew 时总是报错：（Failed to connect to raw.githubusercontent.com port 443:Connection refused error）</p>
+<p>原因是 github 的 raw.githubusercontent.com 域名解析被污染了。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改 hosts 文件</p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><p>查询真实 ip</p>
+<p>到 <a href="https://www.ipaddress.com/">https://www.ipaddress.com</a> 查询 raw.githubusercontent.com 的真实 ip。</p>
+<p>修改 hosts ：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<p>添加如下内容：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">199.232.68.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+        <category>macOS</category>
+      </categories>
+      <tags>
+        <tag>macOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mac网线转接头连接网线无法上网</title>
+    <url>/posts/45588/</url>
+    <content><![CDATA[<p>mac 笔记本电脑没有直接插网线的接口，所以需要一个转接头。我在某东下单了一个绿联转接头并连上了网线，说明书上说即插即用不用配置，然而我发现并不能直接上网。所以搜索了绿联的外置网卡驱动，下载了一个我这个型号转接头能用的驱动。安装完毕重启 mac 就能直接上网了。</p>
+<h3 id="绿联驱动下载地址"><a href="#绿联驱动下载地址" class="headerlink" title="绿联驱动下载地址"></a>绿联驱动下载地址</h3><p><a href="https://www.lulian.cn/download/list-34-cn.html">绿联-驱动下载中心</a></p>
+<img src="/posts/undefined/image-20201119105228757.png" class="" title="image-20201119105228757">
+
+<p>Ctrl/CMD + F 搜索你的设备型号，然后下载对应平台下的驱动安装就好。</p>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+        <category>macOS</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>node14+版本下hexo部署失败</title>
+    <url>/posts/430/</url>
+    <content><![CDATA[<p>最近升级了 node14，发现在用 hexo 写博客部署时失败了，报错大致如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">FATAL Something&#x27;s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span><br><span class="line">TypeError [ERR_INVALID_ARG_TYPE]: The &quot;mode&quot; argument must be integer. Received an instance of Object</span><br><span class="line">    at copyFile (fs.js:1890:10)</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at ret (eval at makeNodePromisifiedEval (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span><br><span class="line">    at C:\Users\Administrator\blog\node_modules\hexo-deployer-git\node_modules\hexo-fs\lib\fs.js:144:39</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:517:31)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br><span class="line">    at Promise._resolveCallback (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:437:57)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:529:17)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br></pre></td></tr></table></figure>
+
+<p>google 了下发现是 hexo 不支持最新 node14+，issue<a href="https://github.com/hexojs/hexo/issues/4263">见此</a>，解决方案两种：降低 node 版本或者升级最新<a href="mailto:hexo@4.2.1">hexo@4.2.1</a>+。</p>
+<p>我尝试了升级 hexo 到 4.2.1 发现并没有什么卵用，照样报相同的错，所以选择了降低 node 版本到稳定版：</p>
+<p>直接到官网下载最新稳定版：<a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a></p>
+<p>然后重新执行 <code>hexo clean &amp;&amp; hexo deploy</code> 打包命令就好了。</p>
+<p>P.S. 如果打包成功后，最好验证下 hexo 下的分类和标签是否正常工作，我就遇到了点击自己博客首页的「分类」和「标签」后，跳转的页面报 404，原因是打开的路由最后多了个空格：<code>./categories/%20</code> 。不知道啥原因，所以我把 hexo 版本退回到了 3.8.0。这样路由就正确了。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Node</tag>
       </tags>
   </entry>
   <entry>
@@ -3420,7 +3500,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#x67;&#x69;&#116;&#64;&#103;&#x69;&#x74;&#x68;&#x75;&#98;&#46;&#x63;&#111;&#109;">&#x67;&#x69;&#116;&#64;&#103;&#x69;&#x74;&#x68;&#x75;&#98;&#46;&#x63;&#111;&#109;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#103;&#x69;&#116;&#x40;&#103;&#x69;&#116;&#x68;&#117;&#98;&#46;&#99;&#x6f;&#109;">&#103;&#x69;&#116;&#x40;&#103;&#x69;&#116;&#x68;&#117;&#98;&#46;&#99;&#x6f;&#109;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -3446,7 +3526,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#x74;&#64;&#103;&#x69;&#x74;&#104;&#117;&#x62;&#x2e;&#x63;&#111;&#109;">&#x67;&#105;&#x74;&#64;&#103;&#x69;&#x74;&#104;&#117;&#x62;&#x2e;&#x63;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#x74;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#x62;&#46;&#99;&#111;&#109;">&#x67;&#105;&#x74;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#x62;&#46;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -4250,42 +4330,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>去除图片上下左右间隙</title>
-    <url>/posts/31251/</url>
-    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
-<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<a id="more"></a>
-
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
-<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
-<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
-</ul>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
-<li>移除上下间隙：<ul>
-<li>img本身设置 <code>display: block;</code></li>
-<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
-<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
-</ul>
-</li>
-<li>移除左右间距：<ul>
-<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
-<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
-<li>父元素 <code>font-size: 0</code></li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>垂直居中方案汇总</title>
     <url>/posts/12733/</url>
     <content><![CDATA[<p>这里汇总了常见的元素居中方案。</p>
@@ -4320,6 +4364,42 @@ callee</code></pre>
 
 <h3 id="Flex布局"><a href="#Flex布局" class="headerlink" title="Flex布局"></a>Flex布局</h3><p>父元素 <code>display: flex</code>，<code>justify-content</code> 和 <code>align-items</code> 都设为 center 实现垂直居中</p>
 <iframe height="460" scrolling="no" title="div水平垂直居中 - flex" src="https://codepen.io/JingW/embed/rRdNyo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>去除图片上下左右间隙</title>
+    <url>/posts/31251/</url>
+    <content><![CDATA[<h2 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h2><p>当在定宽父容器下有多张图片顺序排列时，图片的上下左右之间都有间隙：</p>
+<iframe height="265" scrolling="no" title="KEBmRP" src="https://codepen.io/JingW/embed/KEBmRP/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
+<li>左右：因为 img 是 inline-block 元素，元素代码之间有『换行（回车），空格，tab』时会产生左右间隙。</li>
+<li>上下：行内元素默认与父容器基线对齐，而基线与父容器底部有一定间隙，所以上下图片间有间隙。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
+<li>移除上下间隙：<ul>
+<li>img本身设置 <code>display: block;</code></li>
+<li>父元素设置 <code>font-size: 0;</code> （基线与字体大小有关，字体为零，基线间就没距离了）</li>
+<li>img本身设置 <code>vertical-align: bottom;</code>（让inline-block 的 img 与每行的底部对齐）</li>
+</ul>
+</li>
+<li>移除左右间距：<ul>
+<li>行内元素间不要有换行，连成一行写消除间隙（阅读性差，不推荐）</li>
+<li>第一行img结尾写上 <code>&lt;!--</code> ，第二行img开头跟上 <code>--&gt;</code> 。即利用注释消除间距</li>
+<li>父元素 <code>font-size: 0</code></li>
+</ul>
+</li>
+</ul>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -4516,74 +4596,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>【转载】如何在Mac上配置一个本地Web服务器</title>
-    <url>/posts/28116/</url>
-    <content><![CDATA[<p>来源：<a href="https://shannonchenchn.github.io/2018/10/22/How-do-you-set-up-a-local-web-server-on-Mac/">https://shannonchenchn.github.io/2018/10/22/How-do-you-set-up-a-local-web-server-on-Mac/</a></p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
-<li>我们为什么需要服务器？<ul>
-<li><ol>
-<li>本地文件 VS. 远程文件</li>
-</ol>
-</li>
-<li><ol>
-<li>直接访问本地文件时存在的问题</li>
-</ol>
-</li>
-</ul>
-</li>
-<li>方法一、启动 Mac 自带的 Apache 服务器</li>
-<li>方法二：使用 Python 的 SimpleHTTPServer 模块启动服务器</li>
-</ul>
-<a id="more"></a>
-
-<h3 id="我们为什么需要服务器？"><a href="#我们为什么需要服务器？" class="headerlink" title="我们为什么需要服务器？"></a>我们为什么需要服务器？</h3><h4 id="1-本地文件-VS-远程文件"><a href="#1-本地文件-VS-远程文件" class="headerlink" title="1. 本地文件 VS. 远程文件"></a>1. 本地文件 VS. 远程文件</h4><p>通常情况下，你可以通过在浏览器中直接打开或者通过一个 URL 来访问一个文件。</p>
-<p>使用浏览器访问本地文件时，一般地址是 <code>file://</code> 开头的本地文件地址。<br>而访问远程文件时，一般地址是 <code>http://</code> 或者 <code>https://</code> 开头的地址，表示这个文件通过 http 协议访问的。</p>
-<h4 id="2-直接访问本地文件时存在的问题"><a href="#2-直接访问本地文件时存在的问题" class="headerlink" title="2. 直接访问本地文件时存在的问题"></a>2. 直接访问本地文件时存在的问题</h4><p>在有些情况下，你打开一个本地的 html 文件时，会出现运行错误。</p>
-<p>导致这些错误的原因主要有以下两个：<br>（1） 其中包含了异步请求。 如果你直接打开本地文件运行，一些浏览器（包括 Chrome）将不会运行其中的异步请求（请参阅 从服务器获取数据）。 这是因为安全限制而导致的（更多关于 Web 安全的信息，请参阅<a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Website_security">Website security</a>）。</p>
-<p>比如，你直接在浏览器中打开含有如下内容的文件：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> request = <span class="keyword">new</span> XMLHttpRequest();</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">      request.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(request);</span></span><br><span class="line">      &#125;;</span><br><span class="line"></span><br><span class="line"><span class="javascript">      <span class="comment">// 发送请求:</span></span></span><br><span class="line"><span class="javascript">      request.open(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;./data.json&#x27;</span>);</span></span><br><span class="line">      request.send();</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>HTML 测试页面<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>测试页面<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后，你会在 console 中看到这样的错误：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">index.html:12 Failed to load file:///Users/ShannonChen/Desktop/Playground/nodejs_example/data.json: Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension, https.</span><br></pre></td></tr></table></figure>
-
-<p>（2） 执行文件中的代码时需要通过执行一些附加逻辑（如 PHP 或 Python）才能获得结果，而不仅仅是直接访问一个文件。</p>
-<p>比如，我登录了京东网站后，查看购物车页面时，需要服务器返回的是包含我的购物车数据的页面，这个时候，就需要服务端在接收到请求后，跟我的用户信息（一般是 cookie）来返回匹配的数据。</p>
-<h3 id="方法一、启动-Mac-自带的-Apache-服务器"><a href="#方法一、启动-Mac-自带的-Apache-服务器" class="headerlink" title="方法一、启动 Mac 自带的 Apache 服务器"></a>方法一、启动 Mac 自带的 Apache 服务器</h3><ol>
-<li>运行 Apache <code>$ sudo apachectl start</code></li>
-<li>退出 Apache <code>$ sudo apachectl stop</code></li>
-<li>把工程文件夹放到以下位置中 <code>/Library/WebServer/Documents</code></li>
-<li>在浏览器中访问：在地址栏中输入地址 <code>http://localhost/工程文件夹名称/</code>，回车。</li>
-</ol>
-<p><strong>注意：</strong> 不再需要使用后一定要记得退出，否则会消耗电脑性能。</p>
-<p>Q：如何修改 Apache 的默认端口？<br>A：首先，找到 Apache 的配置文件，位于 <code>/etc/apache2</code> 下的 <code>httpd.conf</code>。<br>然后，找到 <code>Listen 80</code> 那一行，修改成你想要的端口即可。</p>
-<h3 id="方法二：借助-Mac-系统自带的-Python，使用其中的-SimpleHTTPServer-模块启动服务器"><a href="#方法二：借助-Mac-系统自带的-Python，使用其中的-SimpleHTTPServer-模块启动服务器" class="headerlink" title="方法二：借助 Mac 系统自带的 Python，使用其中的 SimpleHTTPServer 模块启动服务器"></a>方法二：借助 Mac 系统自带的 Python，使用其中的 SimpleHTTPServer 模块启动服务器</h3><ol>
-<li><p>安装 Python，其实 Mac 系统就自带了 Python2.7。</p>
-</li>
-<li><p>通过 <code>cd &lt;your-working-dir&gt;</code> 进入到你的工作目录下，也就是你要让别人访问的文件所在的目录。</p>
-</li>
-<li><p>在工作目录下执行下面的命令后，就可以启动服务了：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 3.X</span></span><br><span class="line">python3 -m http.server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 2.X</span></span><br><span class="line">python -m SimpleHTTPServer</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>默认情况下，上面的操作将会在本地 Web 服务器上的端口 8000 上运行工作目录中的内容。您可以通过在浏览器中输入 URL <code>http://localhost:8000</code> 并回车，来访问此服务器。你会看到列出的目录的内容，点击就可以查看你想运行的 HTML 文件。</p>
-</li>
-</ol>
-<p>Q：如何修改服务器的默认端口？<br>A：可以通过运行下面的命令来指定一个端口号：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 3.X</span></span><br><span class="line">python -m http.server &lt;your-port&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 2.X</span></span><br><span class="line">python -m SimpleHTTPServer &lt;your-port&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>方法二相比方法一来说，更简单、方便，也更灵活，而且还可以随时在终端上看到服务器的状态。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server">How do you set up a local testing server? - Learn web development | MDN</a>（推荐阅读）</li>
-<li><a href="https://www.jianshu.com/p/d006a34a343f">Mac OS X 启用 Web 服务器</a></li>
-<li><a href="http://www.jianshu.com/p/90d5fa728861">Mac 自带的本地服务器的使用</a></li>
-<li><a href="https://blog.csdn.net/seafishyls/article/details/44546809">Mac OS 原来自带了 apache，基本用法总结</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>服务器</category>
-      </categories>
-  </entry>
-  <entry>
     <title>如何清除浮动</title>
     <url>/posts/12906/</url>
     <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
@@ -4666,64 +4678,71 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>字体侵权避坑指南</title>
-    <url>/posts/9274/</url>
-    <content><![CDATA[<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p>本文摘录自：<a href="https://www.uisdc.com/avoiding-pits-in-font-copyright">https://www.uisdc.com/avoiding-pits-in-font-copyright</a></p>
-<p><strong>初始设定：</strong>字体，微软雅黑。</p>
-<p><strong>场景设定：</strong>因产品需要，客户希望在 windows 的客户端查看网站都能够和设计稿保持一致用微软雅黑。项目组给了两种前端解决方案：</p>
-<ul>
-<li>在 css 样式文件中：引用字体样式为微软雅黑。</li>
-<li>在网站样式文件中，打包微软雅黑字体，客户打开网站会预加载微软雅黑字体。</li>
+    <title>【转载】如何在Mac上配置一个本地Web服务器</title>
+    <url>/posts/28116/</url>
+    <content><![CDATA[<p>来源：<a href="https://shannonchenchn.github.io/2018/10/22/How-do-you-set-up-a-local-web-server-on-Mac/">https://shannonchenchn.github.io/2018/10/22/How-do-you-set-up-a-local-web-server-on-Mac/</a></p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li>我们为什么需要服务器？<ul>
+<li><ol>
+<li>本地文件 VS. 远程文件</li>
+</ol>
+</li>
+<li><ol>
+<li>直接访问本地文件时存在的问题</li>
+</ol>
+</li>
 </ul>
-<p>请问两种解决方案应该用哪一个？</p>
+</li>
+<li>方法一、启动 Mac 自带的 Apache 服务器</li>
+<li>方法二：使用 Python 的 SimpleHTTPServer 模块启动服务器</li>
+</ul>
 <a id="more"></a>
 
-<p><strong>案例分析：</strong></p>
-<p>应使用第一种方案，因为第一种方案，我们只是设定了如果载体有安装微软雅黑的字体的客户端，那网站显示字体，这个字体授权的控制单位在客户端那里。如果用第二种方案，我们预置了，不管任何客户端都加载微软雅黑字体，除非客户已经购买了微软雅黑所属的方正公司授权商用，否则即判定为字体侵权。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">font-family: &#x27;微软雅黑&#x27;;</span><br><span class="line"><span class="keyword">@font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">&#x27;MyFont&#x27;</span>; <span class="comment">/* 字体名称 */</span></span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">&#x27;微软雅黑.ttf&#x27;</span>); <span class="comment">/*字体源文件*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="我们为什么需要服务器？"><a href="#我们为什么需要服务器？" class="headerlink" title="我们为什么需要服务器？"></a>我们为什么需要服务器？</h3><h4 id="1-本地文件-VS-远程文件"><a href="#1-本地文件-VS-远程文件" class="headerlink" title="1. 本地文件 VS. 远程文件"></a>1. 本地文件 VS. 远程文件</h4><p>通常情况下，你可以通过在浏览器中直接打开或者通过一个 URL 来访问一个文件。</p>
+<p>使用浏览器访问本地文件时，一般地址是 <code>file://</code> 开头的本地文件地址。<br>而访问远程文件时，一般地址是 <code>http://</code> 或者 <code>https://</code> 开头的地址，表示这个文件通过 http 协议访问的。</p>
+<h4 id="2-直接访问本地文件时存在的问题"><a href="#2-直接访问本地文件时存在的问题" class="headerlink" title="2. 直接访问本地文件时存在的问题"></a>2. 直接访问本地文件时存在的问题</h4><p>在有些情况下，你打开一个本地的 html 文件时，会出现运行错误。</p>
+<p>导致这些错误的原因主要有以下两个：<br>（1） 其中包含了异步请求。 如果你直接打开本地文件运行，一些浏览器（包括 Chrome）将不会运行其中的异步请求（请参阅 从服务器获取数据）。 这是因为安全限制而导致的（更多关于 Web 安全的信息，请参阅<a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Website_security">Website security</a>）。</p>
+<p>比如，你直接在浏览器中打开含有如下内容的文件：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> request = <span class="keyword">new</span> XMLHttpRequest();</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">      request.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(request);</span></span><br><span class="line">      &#125;;</span><br><span class="line"></span><br><span class="line"><span class="javascript">      <span class="comment">// 发送请求:</span></span></span><br><span class="line"><span class="javascript">      request.open(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;./data.json&#x27;</span>);</span></span><br><span class="line">      request.send();</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>HTML 测试页面<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>测试页面<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="字体侵权情况"><a href="#字体侵权情况" class="headerlink" title="字体侵权情况"></a>字体侵权情况</h2><p>1 图片或视频中使用了版权字体。</p>
-<ol start="2">
-<li>网站本身引入了字体库文件（直接将整个字体库加载了，也就是说如果浏览者没有这个字体，则会下载这种）</li>
+<p>然后，你会在 console 中看到这样的错误：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">index.html:12 Failed to load file:///Users/ShannonChen/Desktop/Playground/nodejs_example/data.json: Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension, https.</span><br></pre></td></tr></table></figure>
+
+<p>（2） 执行文件中的代码时需要通过执行一些附加逻辑（如 PHP 或 Python）才能获得结果，而不仅仅是直接访问一个文件。</p>
+<p>比如，我登录了京东网站后，查看购物车页面时，需要服务器返回的是包含我的购物车数据的页面，这个时候，就需要服务端在接收到请求后，跟我的用户信息（一般是 cookie）来返回匹配的数据。</p>
+<h3 id="方法一、启动-Mac-自带的-Apache-服务器"><a href="#方法一、启动-Mac-自带的-Apache-服务器" class="headerlink" title="方法一、启动 Mac 自带的 Apache 服务器"></a>方法一、启动 Mac 自带的 Apache 服务器</h3><ol>
+<li>运行 Apache <code>$ sudo apachectl start</code></li>
+<li>退出 Apache <code>$ sudo apachectl stop</code></li>
+<li>把工程文件夹放到以下位置中 <code>/Library/WebServer/Documents</code></li>
+<li>在浏览器中访问：在地址栏中输入地址 <code>http://localhost/工程文件夹名称/</code>，回车。</li>
 </ol>
-]]></content>
-      <categories>
-        <category>设计</category>
-        <category>平面</category>
-      </categories>
-      <tags>
-        <tag>字体侵权</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>对HTML语义化的理解</title>
-    <url>/posts/2906/</url>
-    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
-<ol>
-<li>利与开发：方便代码的阅读和维护</li>
-<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
+<p><strong>注意：</strong> 不再需要使用后一定要记得退出，否则会消耗电脑性能。</p>
+<p>Q：如何修改 Apache 的默认端口？<br>A：首先，找到 Apache 的配置文件，位于 <code>/etc/apache2</code> 下的 <code>httpd.conf</code>。<br>然后，找到 <code>Listen 80</code> 那一行，修改成你想要的端口即可。</p>
+<h3 id="方法二：借助-Mac-系统自带的-Python，使用其中的-SimpleHTTPServer-模块启动服务器"><a href="#方法二：借助-Mac-系统自带的-Python，使用其中的-SimpleHTTPServer-模块启动服务器" class="headerlink" title="方法二：借助 Mac 系统自带的 Python，使用其中的 SimpleHTTPServer 模块启动服务器"></a>方法二：借助 Mac 系统自带的 Python，使用其中的 SimpleHTTPServer 模块启动服务器</h3><ol>
+<li><p>安装 Python，其实 Mac 系统就自带了 Python2.7。</p>
+</li>
+<li><p>通过 <code>cd &lt;your-working-dir&gt;</code> 进入到你的工作目录下，也就是你要让别人访问的文件所在的目录。</p>
+</li>
+<li><p>在工作目录下执行下面的命令后，就可以启动服务了：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 3.X</span></span><br><span class="line">python3 -m http.server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 2.X</span></span><br><span class="line">python -m SimpleHTTPServer</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>默认情况下，上面的操作将会在本地 Web 服务器上的端口 8000 上运行工作目录中的内容。您可以通过在浏览器中输入 URL <code>http://localhost:8000</code> 并回车，来访问此服务器。你会看到列出的目录的内容，点击就可以查看你想运行的 HTML 文件。</p>
+</li>
 </ol>
-<a id="more"></a>
+<p>Q：如何修改服务器的默认端口？<br>A：可以通过运行下面的命令来指定一个端口号：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 3.X</span></span><br><span class="line">python -m http.server &lt;your-port&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你的 Python 版本是 2.X</span></span><br><span class="line">python -m SimpleHTTPServer &lt;your-port&gt;</span><br></pre></td></tr></table></figure>
 
-<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
-<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
-
-
-<p>元素细节：</p>
-<ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>方法二相比方法一来说，更简单、方便，也更灵活，而且还可以随时在终端上看到服务器的状态。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server">How do you set up a local testing server? - Learn web development | MDN</a>（推荐阅读）</li>
+<li><a href="https://www.jianshu.com/p/d006a34a343f">Mac OS X 启用 Web 服务器</a></li>
+<li><a href="http://www.jianshu.com/p/90d5fa728861">Mac 自带的本地服务器的使用</a></li>
+<li><a href="https://blog.csdn.net/seafishyls/article/details/44546809">Mac OS 原来自带了 apache，基本用法总结</a></li>
 </ul>
-<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>HTML</category>
+        <category>后端</category>
+        <category>服务器</category>
       </categories>
   </entry>
   <entry>
@@ -4757,6 +4776,36 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>this</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>字体侵权避坑指南</title>
+    <url>/posts/9274/</url>
+    <content><![CDATA[<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p>本文摘录自：<a href="https://www.uisdc.com/avoiding-pits-in-font-copyright">https://www.uisdc.com/avoiding-pits-in-font-copyright</a></p>
+<p><strong>初始设定：</strong>字体，微软雅黑。</p>
+<p><strong>场景设定：</strong>因产品需要，客户希望在 windows 的客户端查看网站都能够和设计稿保持一致用微软雅黑。项目组给了两种前端解决方案：</p>
+<ul>
+<li>在 css 样式文件中：引用字体样式为微软雅黑。</li>
+<li>在网站样式文件中，打包微软雅黑字体，客户打开网站会预加载微软雅黑字体。</li>
+</ul>
+<p>请问两种解决方案应该用哪一个？</p>
+<a id="more"></a>
+
+<p><strong>案例分析：</strong></p>
+<p>应使用第一种方案，因为第一种方案，我们只是设定了如果载体有安装微软雅黑的字体的客户端，那网站显示字体，这个字体授权的控制单位在客户端那里。如果用第二种方案，我们预置了，不管任何客户端都加载微软雅黑字体，除非客户已经购买了微软雅黑所属的方正公司授权商用，否则即判定为字体侵权。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">font-family: &#x27;微软雅黑&#x27;;</span><br><span class="line"><span class="keyword">@font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">&#x27;MyFont&#x27;</span>; <span class="comment">/* 字体名称 */</span></span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">&#x27;微软雅黑.ttf&#x27;</span>); <span class="comment">/*字体源文件*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="字体侵权情况"><a href="#字体侵权情况" class="headerlink" title="字体侵权情况"></a>字体侵权情况</h2><p>1 图片或视频中使用了版权字体。</p>
+<ol start="2">
+<li>网站本身引入了字体库文件（直接将整个字体库加载了，也就是说如果浏览者没有这个字体，则会下载这种）</li>
+</ol>
+]]></content>
+      <categories>
+        <category>设计</category>
+        <category>平面</category>
+      </categories>
+      <tags>
+        <tag>字体侵权</tag>
       </tags>
   </entry>
   <entry>
@@ -4812,6 +4861,37 @@ callee</code></pre>
       <tags>
         <tag>闭包</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>对HTML语义化的理解</title>
+    <url>/posts/2906/</url>
+    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
+<ol>
+<li>利与开发：方便代码的阅读和维护</li>
+<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
+<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
+
+
+<p>元素细节：</p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
+</ul>
+<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
   </entry>
   <entry>
     <title>常见排序算法</title>
@@ -5091,6 +5171,30 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
+    <title>用JS实现翻转二叉树</title>
+    <url>/posts/50491/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
+<p>输入</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>输出</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>算法</category>
+      </categories>
+  </entry>
+  <entry>
     <title>有序表查找之二分查找</title>
     <url>/posts/39853/</url>
     <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>二分查找又名折半查找。它的前提是所操作的数据集是一个有序的数据集。它的基本思想是：开始时，先找出有序集合中间的那个元素。如果此元素比要查找的元素大，就接着在较小的一个半区进行查找；反之，如果此元素比要找的元素小，就在较大的一个半区进行查找。在每个更小的数据集中重复这个查找过程，直到找到要查找的元素或者数据集不能再分割。</p>
@@ -5109,30 +5213,6 @@ callee</code></pre>
 <p>递归实现</p>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">4</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">15</span>, <span class="number">33</span>, <span class="number">46</span>, <span class="number">49</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">101</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binary_search</span>(<span class="params">arr, min, max, target</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (min &gt; max) &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> mid = <span class="built_in">parseInt</span>((min + max) / <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (target === arr[mid]) &#123;</span><br><span class="line">        <span class="keyword">return</span> mid;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (target &gt; arr[mid]) &#123;</span><br><span class="line">        min = mid + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        max = mid - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(binary_search(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>, <span class="number">33</span>));</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>算法</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>用JS实现翻转二叉树</title>
-    <url>/posts/50491/</url>
-    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
-<p>输入</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>输出</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>后端</category>
