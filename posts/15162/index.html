@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="苹果证书设置开启 Push Notification 功能找到你 App 的 id:   开启消息推送：   配置消息推送    点击 Development SSL Certificate 创建证书：   上传 csr 文件点击继续：   开发推送证书配置完毕：   起个名字下载到本地:   相同的步骤配置正式环境的推送证书：     两个证书配置完毕后的效果：   分别双击两个证书，在“Key">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS极光推送-初版">
+<meta property="og:url" content="https://evestorm.github.io/posts/15162/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="苹果证书设置开启 Push Notification 功能找到你 App 的 id:   开启消息推送：   配置消息推送    点击 Development SSL Certificate 创建证书：   上传 csr 文件点击继续：   开发推送证书配置完毕：   起个名字下载到本地:   相同的步骤配置正式环境的推送证书：     两个证书配置完毕后的效果：   分别双击两个证书，在“Key">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132620154.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132503908.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132714159.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132725279.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132820152.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825132921777.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133009708.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133126663.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133233873.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133314393.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133436324.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825134055576.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825134141788.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825133633752.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825135528626.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825135536095.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825135631804.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825135710436.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825135731263.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825141021644.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825141047595.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825144319615.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825215627247.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825155413289.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825155513706.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/image-20200825155522931.png">
+<meta property="article:published_time" content="2020-08-26T14:27:22.000Z">
+<meta property="article:modified_time" content="2020-12-15T14:40:14.056Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/image-20200825132620154.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/15162/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>iOS极光推送-初版 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8B%B9%E6%9E%9C%E8%AF%81%E4%B9%A6%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">苹果证书设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%90%AF-Push-Notification-%E5%8A%9F%E8%83%BD"><span class="nav-number">1.1.</span> <span class="nav-text">开启 Push Notification 功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81"><span class="nav-number">1.2.</span> <span class="nav-text">配置消息推送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E7%94%9F%E6%88%90%E4%B8%80%E9%81%8D-Profile-%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">重新生成一遍 Profile 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%81%E5%85%89%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">极光配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">创建应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS-%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">iOS 证书配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E6%9E%81%E5%85%89-SDK"><span class="nav-number">3.</span> <span class="nav-text">导入极光 SDK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E6%9E%B6%E5%89%8D%E6%8F%90%E9%86%92"><span class="nav-number">3.1.</span> <span class="nav-text">上架前提醒</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A1%A5%E6%8E%A5%E6%96%87%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text">创建桥接文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AppDelegate-swift-%E4%B8%AD%E7%BC%96%E5%86%99%E6%9E%81%E5%85%89%E7%9B%B8%E5%85%B3%E4%BB%A3%E7%A0%81"><span class="nav-number">3.3.</span> <span class="nav-text">AppDelegate.swift 中编写极光相关代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E9%80%9A%E7%9F%A5"><span class="nav-number">3.4.</span> <span class="nav-text">测试通知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/15162/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS极光推送-初版
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-26 22:27:22" itemprop="dateCreated datePublished" datetime="2020-08-26T22:27:22+08:00">2020-08-26</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-15 22:40:14" itemprop="dateModified" datetime="2020-12-15T22:40:14+08:00">2020-12-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">移动端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/15162/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/15162/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="苹果证书设置"><a href="#苹果证书设置" class="headerlink" title="苹果证书设置"></a>苹果证书设置</h2><h3 id="开启-Push-Notification-功能"><a href="#开启-Push-Notification-功能" class="headerlink" title="开启 Push Notification 功能"></a>开启 Push Notification 功能</h3><p>找到你 App 的 id:</p>
+<img src="/posts/undefined/image-20200825132620154.png" class="" title="image-20200825132620154">
+
+<p>开启消息推送：</p>
+<img src="/posts/undefined/image-20200825132503908.png" class="" title="image-20200825132503908">
+
+<h3 id="配置消息推送"><a href="#配置消息推送" class="headerlink" title="配置消息推送"></a>配置消息推送</h3><img src="/posts/undefined/image-20200825132714159.png" class="" title="image-20200825132714159">
+
+<img src="/posts/undefined/image-20200825132725279.png" class="" title="image-20200825132725279">
+
+<p>点击 <code>Development SSL Certificate</code> 创建证书：</p>
+<img src="/posts/undefined/image-20200825132820152.png" class="" title="image-20200825132820152">
+
+<p>上传 csr 文件点击继续：</p>
+<img src="/posts/undefined/image-20200825132921777.png" class="" title="image-20200825132921777">
+
+<p>开发推送证书配置完毕：</p>
+<img src="/posts/undefined/image-20200825133009708.png" class="" title="image-20200825133009708">
+
+<p>起个名字下载到本地:</p>
+<img src="/posts/undefined/image-20200825133126663.png" class="" title="image-20200825133126663">
+
+<p>相同的步骤配置正式环境的推送证书：</p>
+<img src="/posts/undefined/image-20200825133233873.png" class="" title="image-20200825133233873">
+
+<img src="/posts/undefined/image-20200825133314393.png" class="" title="image-20200825133314393">
+
+<p>两个证书配置完毕后的效果：</p>
+<img src="/posts/undefined/image-20200825133436324.png" class="" title="image-20200825133436324">
+
+<p>分别双击两个证书，在“KeychainAccess”中打开，选择左侧“钥匙串”列表中“登录”，以及“种类”列表中“我的证书”，找到刚才下载的证书，并导出为 .p12 文件。</p>
+<p>找到它并设置为总是信任：</p>
+<img src="/posts/undefined/image-20200825134055576.png" class="" title="image-20200825134055576">
+
+<p>将其导出为 p12 文件：</p>
+<img src="/posts/undefined/image-20200825134141788.png" class="" title="image-20200825134141788">
+
+<p>同样的方式为生产证书设置总是信任以及导出为 p12 证书。</p>
+<h3 id="重新生成一遍-Profile-文件"><a href="#重新生成一遍-Profile-文件" class="headerlink" title="重新生成一遍 Profile 文件"></a>重新生成一遍 Profile 文件</h3><img src="/posts/undefined/image-20200825133633752.png" class="" title="image-20200825133633752">
+
+<h2 id="极光配置"><a href="#极光配置" class="headerlink" title="极光配置"></a>极光配置</h2><p>登录极光官网：</p>
+<p><a target="_blank" rel="noopener" href="https://www.jiguang.cn/">https://www.jiguang.cn/</a></p>
+<p>认证开发者账号，此处省略。</p>
+<p>进入开发者平台：</p>
+<p><a target="_blank" rel="noopener" href="https://www.jiguang.cn/dev2/#/newOverview?appKey=">https://www.jiguang.cn/dev2/#/newOverview?appKey=</a></p>
+<h3 id="创建应用"><a href="#创建应用" class="headerlink" title="创建应用"></a>创建应用</h3><img src="/posts/undefined/image-20200825135528626.png" class="" title="image-20200825135528626">
+
+<p>填写应用名称以及上传图标：</p>
+<img src="/posts/undefined/image-20200825135536095.png" class="" title="image-20200825135536095">
+
+<p>创建完毕后会自动跳转：</p>
+<img src="/posts/undefined/image-20200825135631804.png" class="" title="image-20200825135631804">
+
+<p>进入推送设置：</p>
+<img src="/posts/undefined/image-20200825135710436.png" class="" title="image-20200825135710436">
+
+<h3 id="iOS-证书配置"><a href="#iOS-证书配置" class="headerlink" title="iOS 证书配置"></a>iOS 证书配置</h3><img src="/posts/undefined/image-20200825135731263.png" class="" title="image-20200825135731263">
+
+<p>配置完毕后点击保存：</p>
+<img src="/posts/undefined/image-20200825141021644.png" class="" title="image-20200825141021644">
+
+<img src="/posts/undefined/image-20200825141047595.png" class="" title="image-20200825141047595">
+
+<h2 id="导入极光-SDK"><a href="#导入极光-SDK" class="headerlink" title="导入极光 SDK"></a>导入极光 SDK</h2><p>在 Xcode 中通过 Cocoapods 的方式导入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod &#x27;JPush&#x27;, &#x27;3.3.4&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>通过 <code>pod update --no-repo-update</code> 进行 pods 更新。</p>
+<h3 id="上架前提醒"><a href="#上架前提醒" class="headerlink" title="上架前提醒"></a>上架前提醒</h3><p>提交新版本或者初次上架之前，最后会遇到一个关于 IDFA 的选项。</p>
+<blockquote>
+<p>您的 App 正在使用广告标识符 (IDFA)。您必须先提供关于 IDFA 的使用信息或将其从 App 中移除，然后再上传您的二进制文件。</p>
+</blockquote>
+<p><strong>记得要勾上是</strong>。否则会遇到麻烦。</p>
+<p>P.S. 如果你的项目不需要投送广告，可以选择无 IDFA 版本的极光 SDK，集成方式如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pod &#x27;JCore&#x27;, &#x27;2.3.4-noidfa&#x27;</span><br><span class="line">pod &#x27;JPush&#x27;, &#x27;3.3.4&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>配置推送：</p>
+<p>我的 Xcode 版本为 11，所以要开启 Application Target 的 Capabilities-&gt; <code>Access WIFI Infomation</code> 选项。</p>
+<img src="/posts/undefined/image-20200825144319615.png" class="" title="image-20200825144319615">
+
+<p>还有 <code>PushNotifications</code> ，以及打开 <code>Remote notifications</code> ：</p>
+<img src="/posts/undefined/image-20200825215627247.png" class="" title="image-20200825215627247">
+
+<h3 id="创建桥接文件"><a href="#创建桥接文件" class="headerlink" title="创建桥接文件"></a>创建桥接文件</h3><blockquote>
+<p>XXX_Bridging-Header.h （XXX 随便设置，一般用项目名大写字母）</p>
+</blockquote>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*极光推送*/</span></span><br><span class="line">#<span class="keyword">import</span> &quot;JPUSHService.h&quot;</span><br><span class="line"><span class="comment">// iOS10注册APNs所需头文件</span></span><br><span class="line"><span class="comment">//#ifdef NSFoundationVersionNumber_iOS_9_x_Max</span></span><br><span class="line">#<span class="keyword">import</span> &lt;UserNotifications/UserNotifications.h&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="AppDelegate-swift-中编写极光相关代码"><a href="#AppDelegate-swift-中编写极光相关代码" class="headerlink" title="AppDelegate.swift 中编写极光相关代码"></a>AppDelegate.swift 中编写极光相关代码</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//  AppDelegate.swift</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> UserNotifications <span class="comment">// 本地通知相关</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span>, <span class="title">JPUSHRegisterDelegate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注册极光推送</span></span><br><span class="line">        registerJPush(launchOptions: launchOptions)</span><br><span class="line"></span><br><span class="line">        window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">        window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">        window?.makeKeyAndVisible()</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">applicationDidFinishLaunching</span><span class="params">(<span class="keyword">_</span>: UIApplication)</span></span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// MARK: 极光推送相关</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">registerJPush</span><span class="params">(launchOptions: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 注册极光推送</span></span><br><span class="line">        <span class="keyword">let</span> entiity = <span class="type">JPUSHRegisterEntity</span>()</span><br><span class="line"></span><br><span class="line">        entiity.types = <span class="type">Int</span>(<span class="type">UNAuthorizationOptions</span>.alert.rawValue |</span><br><span class="line">            <span class="type">UNAuthorizationOptions</span>.badge.rawValue |</span><br><span class="line">            <span class="type">UNAuthorizationOptions</span>.sound.rawValue)</span><br><span class="line"></span><br><span class="line">        <span class="type">JPUSHService</span>.register(forRemoteNotificationConfig: entiity, delegate: <span class="keyword">self</span>)</span><br><span class="line"></span><br><span class="line">        <span class="type">JPUSHService</span>.setup(withOption: launchOptions,</span><br><span class="line">                           appKey: <span class="type">JPushAppKey</span>,</span><br><span class="line">                           channel: <span class="string">&quot;app store&quot;</span>,</span><br><span class="line">                           apsForProduction: <span class="literal">false</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">jpushNotificationCenter</span><span class="params">(<span class="keyword">_</span>: UNUserNotificationCenter!, willPresent notification: UNNotification!, withCompletionHandler completionHandler: <span class="params">(<span class="params">(Int)</span></span></span></span> -&gt; <span class="type">Void</span>)!) &#123;</span><br><span class="line">        <span class="keyword">let</span> userInfo = notification.request.content.userInfo</span><br><span class="line">        <span class="keyword">if</span> notification.request.trigger <span class="keyword">is</span> <span class="type">UNPushNotificationTrigger</span> &#123;</span><br><span class="line">            <span class="type">JPUSHService</span>.handleRemoteNotification(userInfo)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 需要执行这个方法，选择是否提醒用户，有Badge、Sound、Alert三种类型可以选择设置</span></span><br><span class="line">        completionHandler(<span class="type">Int</span>(<span class="type">UNNotificationPresentationOptions</span>.alert.rawValue))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">jpushNotificationCenter</span><span class="params">(<span class="keyword">_</span>: UNUserNotificationCenter!, didReceive response: UNNotificationResponse!, withCompletionHandler completionHandler: <span class="params">(<span class="params">()</span></span></span></span> -&gt; <span class="type">Void</span>)!) &#123;</span><br><span class="line">        <span class="keyword">let</span> userInfo = response.notification.request.content.userInfo</span><br><span class="line">        <span class="keyword">if</span> response.notification.request.trigger <span class="keyword">is</span> <span class="type">UNPushNotificationTrigger</span> &#123;</span><br><span class="line">            <span class="type">JPUSHService</span>.handleRemoteNotification(userInfo)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 系统要求执行这个方法</span></span><br><span class="line">        completionHandler()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 点推送进来执行这个方法</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: <span class="keyword">Any</span>], fetchCompletionHandler completionHandler: @escaping <span class="params">(UIBackgroundFetchResult)</span></span></span> -&gt; <span class="type">Void</span>) &#123;</span><br><span class="line">        <span class="type">JPUSHService</span>.handleRemoteNotification(userInfo)</span><br><span class="line">        completionHandler(<span class="type">UIBackgroundFetchResult</span>.newData)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 系统获取Token</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)</span></span> &#123;</span><br><span class="line">        <span class="type">JPUSHService</span>.registerDeviceToken(deviceToken)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取token 失败</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error)</span></span> &#123; <span class="comment">// 可选</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;did Fail To Register For Remote Notifications With Error: \(error)&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 后台进前台</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">applicationDidEnterBackground</span><span class="params">(<span class="keyword">_</span>: UIApplication)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 销毁通知红点</span></span><br><span class="line">				<span class="type">UIApplication</span>.shared.applicationIconBadgeNumber = <span class="number">0</span></span><br><span class="line">				<span class="type">JPUSHService</span>.setBadge(<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">let</span> center = <span class="type">UNUserNotificationCenter</span>.current()</span><br><span class="line">        center.removeAllDeliveredNotifications() <span class="comment">// To remove all delivered notifications</span></span><br><span class="line">        center.removeAllPendingNotificationRequests() <span class="comment">// To remove all pending notifications which are not delivered yet but scheduled.</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// source: https://stackoverflow.com/questions/40397552/cancelalllocalnotifications-not-working-in-ios10</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">jpushNotificationCenter</span><span class="params">(<span class="keyword">_</span>: UNUserNotificationCenter!, openSettingsFor <span class="keyword">_</span>: UNNotification!)</span></span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">jpushNotificationAuthorization</span><span class="params">(<span class="keyword">_</span>: JPAuthorizationStatus, withInfo <span class="keyword">_</span>: [AnyHashable: <span class="keyword">Any</span>]!)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试通知"><a href="#测试通知" class="headerlink" title="测试通知"></a>测试通知</h3><p>现在我们来测试下发个通知给所有用户：</p>
+<img src="/posts/undefined/image-20200825155413289.png" class="" title="image-20200825155413289">
+
+<img src="/posts/undefined/image-20200825155513706.png" class="" title="image-20200825155513706">
+
+<img src="/posts/undefined/image-20200825155522931.png" class="" title="image-20200825155522931">
+
+<p>点击确认就能够发送通知给用户啦。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://docs.jiguang.cn/jpush/client/iOS/ios_guide_new/">iOS SDK 集成指南</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/38408/" rel="prev" title="cnchar.js获取汉字的拼音">
+                  <i class="fa fa-chevron-left"></i> cnchar.js获取汉字的拼音
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/22751/" rel="next" title="Github添加个人Profile">
+                  Github添加个人Profile <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
