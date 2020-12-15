@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="转 Boolean 类型12!!0; &#x2F;&#x2F; false!!1; &#x2F;&#x2F; true  通过两个取反，可以强制转换为 Boolean 类型。 转 Number 类型12+&amp;#x27;233&amp;#x27; + &#x2F;&#x2F; 233  new Date(); &#x2F;&#x2F; 13位时间戳">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript使用技巧">
+<meta property="og:url" content="https://evestorm.github.io/posts/64741/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转 Boolean 类型12!!0; &#x2F;&#x2F; false!!1; &#x2F;&#x2F; true  通过两个取反，可以强制转换为 Boolean 类型。 转 Number 类型12+&amp;#x27;233&amp;#x27; + &#x2F;&#x2F; 233  new Date(); &#x2F;&#x2F; 13位时间戳">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-06-08T14:56:38.000Z">
+<meta property="article:modified_time" content="2020-12-15T14:59:16.325Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="技巧">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/64741/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>JavaScript使用技巧 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC-Boolean-%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">转 Boolean 类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC-Number-%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">转 Number 类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%AD%E8%B7%AF%E6%B1%82%E5%80%BC"><span class="nav-number">3.</span> <span class="nav-text">短路求值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E7%AE%80%E5%86%99"><span class="nav-number">4.</span> <span class="nav-text">变量声明简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5%E7%AE%80%E5%86%99"><span class="nav-number">5.</span> <span class="nav-text">条件语句简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%81%E8%BF%9B%E5%88%B6%E4%B9%98%E6%96%B9%E7%AE%80%E5%86%99"><span class="nav-number">6.</span> <span class="nav-text">十进制乘方简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E7%AE%80%E5%86%99"><span class="nav-number">7.</span> <span class="nav-text">对象属性简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0%E7%AE%80%E5%86%99"><span class="nav-number">8.</span> <span class="nav-text">箭头函数简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E8%BF%94%E5%9B%9E%E5%80%BC%E7%AE%80%E5%86%99"><span class="nav-number">9.</span> <span class="nav-text">隐式返回值简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0%E5%80%BC%E7%AE%80%E5%86%99"><span class="nav-number">10.</span> <span class="nav-text">默认参数值简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%9E%84%E8%B5%8B%E5%80%BC%E7%AE%80%E5%86%99"><span class="nav-number">11.</span> <span class="nav-text">解构赋值简写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%BB%E7%BB%93-const-%E5%A3%B0%E6%98%8E%E7%9A%84%E5%AF%B9%E8%B1%A1%EF%BC%8C%E9%81%BF%E5%85%8D%E6%9B%B4%E6%94%B9%E5%85%B6%E4%B8%AD%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">12.</span> <span class="nav-text">冻结 const 声明的对象，避免更改其中的属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BE%8E%E5%8C%96-JSON-stringify-%E7%9A%84%E8%BE%93%E5%87%BA"><span class="nav-number">13.</span> <span class="nav-text">美化 JSON.stringify 的输出</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%8F%82%E6%95%B0%EF%BC%9A%E5%87%BD%E6%95%B0%E6%88%96%E6%95%B0%E7%BB%84"><span class="nav-number">13.1.</span> <span class="nav-text">第二个参数：函数或数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E4%B8%AA%E5%8F%82%E6%95%B0%EF%BC%9A%E6%8C%87%E5%AE%9A%E7%BC%A9%E8%BF%9B%E7%94%A8%E7%9A%84%E7%A9%BA%E7%99%BD%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">13.2.</span> <span class="nav-text">第三个参数：指定缩进用的空白字符串</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/64741/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript使用技巧
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-06-08 22:56:38" itemprop="dateCreated datePublished" datetime="2020-06-08T22:56:38+08:00">2020-06-08</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-15 22:59:16" itemprop="dateModified" datetime="2020-12-15T22:59:16+08:00">2020-12-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/64741/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/64741/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="转-Boolean-类型"><a href="#转-Boolean-类型" class="headerlink" title="转 Boolean 类型"></a>转 Boolean 类型</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">!!<span class="number">0</span>; <span class="comment">// false</span></span><br><span class="line">!!<span class="number">1</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<p>通过两个取反，可以强制转换为 Boolean 类型。</p>
+<h3 id="转-Number-类型"><a href="#转-Number-类型" class="headerlink" title="转 Number 类型"></a>转 Number 类型</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">+<span class="string">&#x27;233&#x27;</span> + <span class="comment">// 233</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Date</span>(); <span class="comment">// 13位时间戳</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>会自动转化为 Number 类型的。日期取时间戳不用 new Date().getTime()。</p>
+<h3 id="短路求值"><a href="#短路求值" class="headerlink" title="短路求值"></a>短路求值</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = b || <span class="number">1</span>; <span class="comment">// b为真，a=b; b为假，a=1;</span></span><br><span class="line"><span class="keyword">let</span> c = b &amp;&amp; <span class="number">1</span>; <span class="comment">// b为真，c=1; b为假，c=b;</span></span><br></pre></td></tr></table></figure>
+
+<p>用来简化 <code>if-else</code></p>
+<h3 id="变量声明简写"><a href="#变量声明简写" class="headerlink" title="变量声明简写"></a>变量声明简写</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">let</span> y;</span><br><span class="line"><span class="keyword">let</span> z = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> x = <span class="number">1</span>,</span><br><span class="line">  y,</span><br><span class="line">  z = <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="条件语句简写"><a href="#条件语句简写" class="headerlink" title="条件语句简写"></a>条件语句简写</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (result === <span class="literal">true</span>)</span><br><span class="line"><span class="keyword">if</span> (result !== <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (result)</span><br><span class="line"><span class="keyword">if</span> (!result)</span><br></pre></td></tr></table></figure>
+
+<h3 id="十进制乘方简写"><a href="#十进制乘方简写" class="headerlink" title="十进制乘方简写"></a>十进制乘方简写</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">1e7</span>; i++) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// e.g.</span></span><br><span class="line"><span class="comment">// 1e0 === 1;</span></span><br><span class="line"><span class="comment">// 1e1 === 10;</span></span><br><span class="line"><span class="comment">// 1e2 === 100;</span></span><br><span class="line"><span class="comment">// 1e3 === 1000;</span></span><br><span class="line"><span class="comment">// 1e4 === 10000;</span></span><br><span class="line"><span class="comment">// 1e5 === 100000;</span></span><br></pre></td></tr></table></figure>
+
+<p>这是一个省略大数字后面零的写法，例如 1e7 本质上就是 1 后面接着 7 个零，也就是十进制的 10000000。</p>
+<h3 id="对象属性简写"><a href="#对象属性简写" class="headerlink" title="对象属性简写"></a>对象属性简写</h3><p>ES6 提供了一种及其简单的方式去分配一个属性给对象，如果属性名与键名（key）相同，则可以采用 ES6 的方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = &#123; <span class="attr">x</span>: x, <span class="attr">y</span>: y &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> obj = &#123; x, y &#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="箭头函数简写"><a href="#箭头函数简写" class="headerlink" title="箭头函数简写"></a>箭头函数简写</h3><p>这个没什么好说的，写出来是为了给后面的隐式返回值做铺垫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sayHello</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;Hello&#x27;</span>, name);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;Loaded&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">2000</span>);</span><br><span class="line"></span><br><span class="line">list.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">item</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(item);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line">sayHello = <span class="function"><span class="params">name</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;Hello&#x27;</span>, name);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;Loaded&#x27;</span>), <span class="number">2000</span>);</span><br><span class="line"></span><br><span class="line">list.forEach(<span class="function"><span class="params">item</span> =&gt;</span> <span class="built_in">console</span>.log(item));</span><br></pre></td></tr></table></figure>
+
+<h3 id="隐式返回值简写"><a href="#隐式返回值简写" class="headerlink" title="隐式返回值简写"></a>隐式返回值简写</h3><p>箭头函数能隐式返回其值这大家都知道，下面要说的是再返回多行语句下，如何省略 return 关键字：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">calcCircumference</span>(<span class="params">diameter</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.PI * diameter;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> func = <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123; <span class="attr">foo</span>: <span class="number">1</span> &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line">calcCircumference = <span class="function"><span class="params">diameter</span> =&gt;</span> <span class="built_in">Math</span>.PI * diameter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> func = <span class="function">() =&gt;</span> (&#123; <span class="attr">foo</span>: <span class="number">1</span> &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>为返回多行语句（例如对象字面量），则需要使用()包围函数体，这也保证了这段代码是单独的声明。</p>
+<h3 id="默认参数值简写"><a href="#默认参数值简写" class="headerlink" title="默认参数值简写"></a>默认参数值简写</h3><p>以前为了判断传递给方法参数的默认值，需要用到 if 语句，而在 ES6 中可以直接在参数声明直接定义函数默认值：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">volume</span>(<span class="params">l, w, h</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (w === <span class="literal">undefined</span>) w = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">if</span> (h === <span class="literal">undefined</span>) h = <span class="number">4</span>;</span><br><span class="line">  <span class="keyword">return</span> l * w * h;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line">volume = <span class="function">(<span class="params">l, w = <span class="number">3</span>, h = <span class="number">4</span></span>) =&gt;</span> l * w * h;</span><br><span class="line"></span><br><span class="line">volume(<span class="number">2</span>); <span class="comment">//output: 24</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="解构赋值简写"><a href="#解构赋值简写" class="headerlink" title="解构赋值简写"></a>解构赋值简写</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> observable = <span class="built_in">require</span>(<span class="string">&#x27;mobx/observable&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> action = <span class="built_in">require</span>(<span class="string">&#x27;mobx/action&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> runInAction = <span class="built_in">require</span>(<span class="string">&#x27;mobx/runInAction&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> store = <span class="built_in">this</span>.props.store;</span><br><span class="line"><span class="keyword">const</span> form = <span class="built_in">this</span>.props.form;</span><br><span class="line"><span class="keyword">const</span> loading = <span class="built_in">this</span>.props.loading;</span><br><span class="line"><span class="keyword">const</span> errors = <span class="built_in">this</span>.props.errors;</span><br><span class="line"><span class="keyword">const</span> entity = <span class="built_in">this</span>.props.entity;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 简写:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; observable, action, runInAction &#125; <span class="keyword">from</span> <span class="string">&#x27;mobx&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> &#123; store, form, loading, errors, entity &#125; = <span class="built_in">this</span>.props;</span><br></pre></td></tr></table></figure>
+
+<p>也可以分配变量名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; store, form, loading, errors, <span class="attr">entity</span>: contact &#125; = <span class="built_in">this</span>.props;</span><br></pre></td></tr></table></figure>
+
+<h3 id="冻结-const-声明的对象，避免更改其中的属性"><a href="#冻结-const-声明的对象，避免更改其中的属性" class="headerlink" title="冻结 const 声明的对象，避免更改其中的属性"></a>冻结 const 声明的对象，避免更改其中的属性</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> HOST = &#123;</span><br><span class="line">  url: <span class="string">&#x27;https://www.bilibili.com/api&#x27;</span>,</span><br><span class="line">  port: <span class="number">443</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">Object</span>.freeze(HOST); <span class="comment">// 冻结/锁住对象</span></span><br><span class="line">HOST.port = <span class="number">80</span>; <span class="comment">// 控制台会报错，且无法更改port</span></span><br><span class="line"><span class="built_in">console</span>.log(HOST);</span><br></pre></td></tr></table></figure>
+
+<h3 id="美化-JSON-stringify-的输出"><a href="#美化-JSON-stringify-的输出" class="headerlink" title="美化 JSON.stringify 的输出"></a>美化 JSON.stringify 的输出</h3><h4 id="第二个参数：函数或数组"><a href="#第二个参数：函数或数组" class="headerlink" title="第二个参数：函数或数组"></a>第二个参数：函数或数组</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Udacity = &#123;</span><br><span class="line">  title: <span class="string">&#x27;优达学城&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;https://www.udacity.com&#x27;</span>,</span><br><span class="line">  lessons: [&#123; <span class="attr">name</span>: <span class="string">&#x27;Front-End&#x27;</span> &#125;, &#123; <span class="attr">name</span>: <span class="string">&#x27;Back-End&#x27;</span> &#125;]</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 只取 Udacity 中的 title 和 url 字段</span></span><br><span class="line"><span class="keyword">let</span> json = <span class="built_in">JSON</span>.stringify(</span><br><span class="line">  Udacity,</span><br><span class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">key, value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (key === <span class="string">&#x27;title&#x27;</span>) &#123;</span><br><span class="line">      value = <span class="string">&#x27;I love &#x27;</span> + value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span></span><br><span class="line">); <span class="comment">// 对象</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> json = <span class="built_in">JSON</span>.stringify(Udacity, [<span class="string">&#x27;title&#x27;</span>, <span class="string">&#x27;url&#x27;</span>], <span class="number">2</span>); <span class="comment">// 数组</span></span><br><span class="line"><span class="built_in">console</span>.log(json);</span><br></pre></td></tr></table></figure>
+
+<h4 id="第三个参数：指定缩进用的空白字符串"><a href="#第三个参数：指定缩进用的空白字符串" class="headerlink" title="第三个参数：指定缩进用的空白字符串"></a>第三个参数：指定缩进用的空白字符串</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> obj = &#123;</span><br><span class="line">  name: <span class="string">&#x27;Lance&#x27;</span>,</span><br><span class="line">  age: <span class="number">26</span>,</span><br><span class="line">  weight: <span class="number">120</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(obj, <span class="literal">null</span>, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第三个参数代表：指定缩进用的空白字符串</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// &#123;</span></span><br><span class="line"><span class="comment">//   &quot;name&quot;: &quot;Lance&quot;,</span></span><br><span class="line"><span class="comment">//   &quot;age&quot;: 26,</span></span><br><span class="line"><span class="comment">//   &quot;weight&quot;: 120</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/19083/" rel="prev" title="Git回滚到历史节点=>SourceTree篇(转载)">
+                  <i class="fa fa-chevron-left"></i> Git回滚到历史节点=>SourceTree篇(转载)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/3583/" rel="next" title="CSS3伪元素实现自定义复选框">
+                  CSS3伪元素实现自定义复选框 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
