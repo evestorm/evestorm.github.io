@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。 什么是垃圾要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的垃圾。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS垃圾回收机制">
+<meta property="og:url" content="https://evestorm.github.io/posts/20229/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。 什么是垃圾要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的垃圾。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/garbage-collection-5.png">
+<meta property="article:published_time" content="2019-04-27T15:08:53.000Z">
+<meta property="article:modified_time" content="2020-12-15T15:14:17.585Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="hexo, 博客, 技术, 前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/20229/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>JS垃圾回收机制 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%9E%83%E5%9C%BE"><span class="nav-number">1.</span> <span class="nav-text">什么是垃圾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">1.2.</span> <span class="nav-text">局部变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E5%BC%95%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">单引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%BC%95%E7%94%A8"><span class="nav-number">1.4.</span> <span class="nav-text">多引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">1.5.</span> <span class="nav-text">环引用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6"><span class="nav-number">2.</span> <span class="nav-text">如何实现垃圾回收</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4"><span class="nav-number">2.1.</span> <span class="nav-text">标记清除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%EF%BC%88Generational-collection%EF%BC%89"><span class="nav-number">2.1.1.</span> <span class="nav-text">分代收集（Generational collection）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E9%87%8F%E6%94%B6%E9%9B%86%EF%BC%88Incremental-collection%EF%BC%89"><span class="nav-number">2.1.2.</span> <span class="nav-text">增量收集（Incremental collection）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BA%E9%97%B2%E6%94%B6%E9%9B%86%EF%BC%88Idle-time-collection%EF%BC%89"><span class="nav-number">2.1.3.</span> <span class="nav-text">空闲收集（Idle-time collection）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">引用计数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">3.</span> <span class="nav-text">资源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">97</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/20229/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JS垃圾回收机制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-27 23:08:53" itemprop="dateCreated datePublished" datetime="2019-04-27T23:08:53+08:00">2019-04-27</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-15 23:14:17" itemprop="dateModified" datetime="2020-12-15T23:14:17+08:00">2020-12-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/20229/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/20229/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
+<a id="more"></a>
+
+<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
+
+<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
+
+<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
+<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
+<img src="/posts/undefined/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
+
+<img src="/posts/undefined/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
+
+<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
+<img src="/posts/undefined/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
+
+<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
+<blockquote>
+<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
+</blockquote>
+<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
+<img src="/posts/undefined/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
+
+<p>接着我们执行下面操作：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
+
+<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
+<img src="/posts/undefined/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
+
+<img src="/posts/undefined/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
+
+<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
+<img src="/posts/undefined/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
+
+<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
+<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
+<img src="/posts/undefined/garbage-collection-5.png" class="" title="标记清除">
+
+<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
+<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
+<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
+<ul>
+<li>新一代（e.g. 一个函数中的临时变量）</li>
+<li>老一代（e.g. window 对象）</li>
+</ul>
+<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
+<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
+<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
+<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
+<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
+
+<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://javascript.info/garbage-collection">Garbage collection</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
+<li><a target="_blank" rel="noopener" href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/15966/" rel="prev" title="JS严格模式vs非严格模式">
+                  <i class="fa fa-chevron-left"></i> JS严格模式vs非严格模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/10505/" rel="next" title="Event Loop 学习笔记">
+                  Event Loop 学习笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
