@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="今天来实现一个简单的 Vue 数据响应式，最终达到两个基本效果：  当用户在 input 中输入内容时，文本节点会跟着改变 当直接更新 message 属性后，页面中 input 标签和文本节点的值会跟着改变  最终效果：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue数据响应式的简单实现">
+<meta property="og:url" content="https://evestorm.github.io/posts/12491/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="今天来实现一个简单的 Vue 数据响应式，最终达到两个基本效果：  当用户在 input 中输入内容时，文本节点会跟着改变 当直接更新 message 属性后，页面中 input 标签和文本节点的值会跟着改变  最终效果：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/sw.gif">
+<meta property="article:published_time" content="2019-04-27T13:44:34.000Z">
+<meta property="article:modified_time" content="2020-12-16T13:46:18.557Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/sw.gif">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/12491/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Vue数据响应式的简单实现 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">具体代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#index-html"><span class="nav-number">3.1.</span> <span class="nav-text">index.html</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dep-js-%E6%B6%88%E6%81%AF%E8%AE%A2%E9%98%85%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">Dep.js 消息订阅器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#main-js-%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6"><span class="nav-number">3.3.</span> <span class="nav-text">main.js 入口文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Observer-js-%E8%A7%82%E5%AF%9F%E8%80%85"><span class="nav-number">3.4.</span> <span class="nav-text">Observer.js 观察者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Watcher-js-%E8%AE%A2%E9%98%85%E8%80%85"><span class="nav-number">3.5.</span> <span class="nav-text">Watcher.js 订阅者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Compiler-js-%E6%8C%87%E4%BB%A4%E8%A7%A3%E6%9E%90%E5%99%A8"><span class="nav-number">3.6.</span> <span class="nav-text">Compiler.js 指令解析器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-js"><span class="nav-number">3.7.</span> <span class="nav-text">Vue.js</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">58</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/12491/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue数据响应式的简单实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-27 21:44:34" itemprop="dateCreated datePublished" datetime="2019-04-27T21:44:34+08:00">2019-04-27</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-16 21:46:18" itemprop="dateModified" datetime="2020-12-16T21:46:18+08:00">2020-12-16</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/12491/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/12491/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>今天来实现一个简单的 Vue 数据响应式，最终达到两个基本效果：</p>
+<ul>
+<li>当用户在 input 中输入内容时，文本节点会跟着改变</li>
+<li>当直接更新 message 属性后，页面中 input 标签和文本节点的值会跟着改变</li>
+</ul>
+<p>最终效果：</p>
+<img src="/posts/undefined/sw.gif" class="" title="实现效果">
+
+<a id="more"></a>
+
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Vue 实现数据响应式的核心原理是：<strong>借助发布/订阅模式</strong> + <strong>数据劫持</strong> 。</p>
+<ul>
+<li>创建 vue 实例时深度遍历 data 下所有属性，利用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty">Object.defineProperty</a> 把属性转为 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/get">getter/setter</a>。</li>
+<li>Vue 实现了 <a target="_blank" rel="noopener" href="https://juejin.im/post/5a9108b6f265da4e7527b1a4">发布订阅者模式</a>，在模板编译过程中解析 Vue 指令，给组件中的属性添加上相应订阅者（Watcher），这样在数据变更后会触发相应属性的 setter ，通过消息订阅器（Dep）发消息给所有订阅者（Watcher），从而触发相应组件的更新。</li>
+</ul>
+<h2 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── Compiler.js       # 指令解析器</span><br><span class="line">├── Dep.js            # 消息订阅器</span><br><span class="line">├── Observer.js       # 观察者</span><br><span class="line">├── Vue.js            # Vue的简单实现</span><br><span class="line">├── Watcher.js        # 订阅者</span><br><span class="line">├── index.html</span><br><span class="line">└── main.js           # 入口文件</span><br></pre></td></tr></table></figure>
+
+<h2 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h2><h3 id="index-html"><a href="#index-html" class="headerlink" title="index.html"></a>index.html</h3><p>包含一个 input 标签和文本节点。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Document<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">v-model</span>=<span class="string">&quot;message&quot;</span> /&gt;</span></span><br><span class="line">      &#123;&#123;message&#125;&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;dist/main.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Dep-js-消息订阅器"><a href="#Dep-js-消息订阅器" class="headerlink" title="Dep.js 消息订阅器"></a>Dep.js 消息订阅器</h3><p>发布订阅者模式的简单实现。包含核心方法 <code>listen</code> 以及 <code>notify</code> ，<code>listen</code> 负责给属性添加订阅者，<code>notify</code> 负责在属性发生变化时通知所有该属性的订阅者。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dep</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;【Dep】实例化了一个消息订阅器&#x27;</span>);</span><br><span class="line">    <span class="comment">// 订阅者数组</span></span><br><span class="line">    <span class="built_in">this</span>.list = [];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">listen</span>(<span class="params">sub</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 谁要订阅我，就调用listen，把自己添加进订阅者数组中去</span></span><br><span class="line">    <span class="built_in">this</span>.list.push(sub);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">notify</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 当属性发生变化后，会在 setter 中调用此方法，</span></span><br><span class="line">    <span class="comment">// 消息订阅者通知订阅者数组中的所有人执行update操作</span></span><br><span class="line">    <span class="built_in">this</span>.list.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">item, index</span>) </span>&#123;</span><br><span class="line">      item.update();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Dep.prototype.target = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Dep;</span><br></pre></td></tr></table></figure>
+
+<h3 id="main-js-入口文件"><a href="#main-js-入口文件" class="headerlink" title="main.js 入口文件"></a>main.js 入口文件</h3><p>该文件中 new 一个 Vue 实例，并把该实例挂载到 window 对象上。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;./Vue&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    message: <span class="string">&#x27;lance&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.vm = vm;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Observer-js-观察者"><a href="#Observer-js-观察者" class="headerlink" title="Observer.js 观察者"></a>Observer.js 观察者</h3><p>深度遍历 data 下的所有属性，利用 <code>Object.defineProperty</code> 把属性转为 <code>getter/setter</code> ，并在此过程中给每个属性都绑定上发布/订阅模块。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Dep <span class="keyword">from</span> <span class="string">&#x27;./Dep&#x27;</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Observer</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">data</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.data = data;</span><br><span class="line">    <span class="built_in">Object</span>.keys(<span class="built_in">this</span>.data).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>._bind(data, key, data[key]);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">_bind</span>(<span class="params">data, key, val</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> myDep = <span class="keyword">new</span> Dep();</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(data, key, &#123;</span><br><span class="line">      <span class="comment">// 新建vm实例时，给data添加属性就是第一次赋值，就调用了get</span></span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="comment">// 第一次访问这个属性时</span></span><br><span class="line">        <span class="comment">// 把订阅者(Watcher对象)注入发布/订阅模块</span></span><br><span class="line">        <span class="comment">// 后续访问就不用再添加这个属性的订阅者了</span></span><br><span class="line">        <span class="keyword">if</span> (Dep.target) myDep.listen(Dep.target);</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (newValue === val) <span class="keyword">return</span>;</span><br><span class="line">        val = newValue;</span><br><span class="line">        myDep.notify();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Observer;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Watcher-js-订阅者"><a href="#Watcher-js-订阅者" class="headerlink" title="Watcher.js 订阅者"></a>Watcher.js 订阅者</h3><p>实现 update 方法，在属性发生变化时收到通知并执行它，从而更新组件数据。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Dep <span class="keyword">from</span> <span class="string">&#x27;./Dep&#x27;</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Watcher</span> </span>&#123;</span><br><span class="line">  <span class="comment">// watcher需要当前组件中的：</span></span><br><span class="line">  <span class="comment">// 【节点】，【节点上相关的data属性】，【vm实例】</span></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">node, name, vm</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.node = node;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.vm = vm;</span><br><span class="line">    <span class="comment">// 将消息订阅器实例的当前订阅者设置为自己</span></span><br><span class="line">    Dep.target = <span class="built_in">this</span>;</span><br><span class="line">    <span class="built_in">this</span>.update();</span><br><span class="line">    Dep.target = <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">update</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 得到数据变更通知后更新组件</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.node.nodeType === <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="built_in">this</span>.node.value = <span class="built_in">this</span>.vm[<span class="built_in">this</span>.name];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">this</span>.node.nodeValue = <span class="built_in">this</span>.vm[<span class="built_in">this</span>.name];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Watcher;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Compiler-js-指令解析器"><a href="#Compiler-js-指令解析器" class="headerlink" title="Compiler.js 指令解析器"></a>Compiler.js 指令解析器</h3><p>负责解析挂载到 Vue 上的 html 模板，找出 Vue 相关的指令。例如遇到 input 标签上有 <code>v-model</code> ，则给绑定的属性添加订阅者（Watcher），并为 input 标签添加 <em>input</em> 事件，在用户输入 value 后更改 data 中相应属性的值。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Watcher <span class="keyword">from</span> <span class="string">&#x27;./Watcher&#x27;</span>;</span><br><span class="line"><span class="comment">// 辨认 &#123;&#123;&#125;&#125; 的正则</span></span><br><span class="line"><span class="keyword">const</span> REG = <span class="regexp">/\&#123;\&#123;(.*)\&#125;\&#125;/</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">el, vm</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.el = <span class="built_in">document</span>.querySelector(el);</span><br><span class="line">    <span class="built_in">this</span>.vm = vm;</span><br><span class="line">    <span class="built_in">this</span>.frag = <span class="built_in">this</span>._createFragment();</span><br><span class="line">    <span class="built_in">this</span>.el.appendChild(<span class="built_in">this</span>.frag);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">_createFragment</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> frag = <span class="built_in">document</span>.createDocumentFragment();</span><br><span class="line">    <span class="keyword">var</span> child;</span><br><span class="line">    <span class="comment">// 遍历挂载对象下的所有节点</span></span><br><span class="line">    <span class="keyword">while</span> ((child = <span class="built_in">this</span>.el.firstChild)) &#123;</span><br><span class="line">      <span class="built_in">this</span>._compile(child);</span><br><span class="line">      frag.appendChild(child);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> frag;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">_compile</span>(<span class="params">node</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> self = <span class="built_in">this</span>;</span><br><span class="line">    <span class="comment">// 类型为元素</span></span><br><span class="line">    <span class="keyword">if</span> (node.nodeType === <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">var</span> attr = node.attributes;</span><br><span class="line">      <span class="keyword">if</span> (attr.hasOwnProperty(<span class="string">&#x27;v-model&#x27;</span>)) &#123;</span><br><span class="line">        <span class="keyword">var</span> name = attr[<span class="string">&#x27;v-model&#x27;</span>].nodeValue;</span><br><span class="line">        <span class="comment">// 添加 input 监听事件</span></span><br><span class="line">        node.addEventListener(<span class="string">&#x27;input&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</span><br><span class="line">          self.vm[name] = e.target.value;</span><br><span class="line">        &#125;);</span><br><span class="line">        node.value = <span class="built_in">this</span>.vm[name];</span><br><span class="line">        <span class="comment">// 给该属性添加订阅者</span></span><br><span class="line">        <span class="keyword">new</span> Watcher(node, name, <span class="built_in">this</span>.vm);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 元素为文本</span></span><br><span class="line">    <span class="keyword">if</span> (node.nodeType === <span class="number">3</span>) &#123;</span><br><span class="line">      <span class="comment">// 目标：转化html中的 &#123;&#123;message&#125;&#125; 和 绑上watcher</span></span><br><span class="line">      <span class="keyword">if</span> (REG.test(node.nodeValue)) &#123;</span><br><span class="line">        <span class="comment">// 获取匹配到的字符串</span></span><br><span class="line">        <span class="keyword">var</span> name = <span class="built_in">RegExp</span>.$1;</span><br><span class="line">        name = name.trim();</span><br><span class="line">        <span class="comment">// 给元素添加订阅者，当vm实例的数据发生改变时,</span></span><br><span class="line">        <span class="comment">// 能收到通知并触发watcher中的update来更新元素上的值</span></span><br><span class="line">        <span class="comment">// 传递：</span></span><br><span class="line">        <span class="comment">// node节点（因为要改变元素中的值）</span></span><br><span class="line">        <span class="comment">// name属性名</span></span><br><span class="line">        <span class="comment">// 实例vm（为了调用vm下的属性）</span></span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;【Compiler】解析到文本元素，给它创建一个watcher实例&#x27;</span>);</span><br><span class="line">        <span class="keyword">new</span> Watcher(node, name, <span class="built_in">this</span>.vm);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Compiler;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Vue-js"><a href="#Vue-js" class="headerlink" title="Vue.js"></a>Vue.js</h3><p>调用 <code>Compiler</code> 和 <code>Observer</code> ，实现数据响应式。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Observer <span class="keyword">from</span> <span class="string">&#x27;./Observer&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Compiler <span class="keyword">from</span> <span class="string">&#x27;./Compiler&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vue</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">options</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.$options = options;</span><br><span class="line">    <span class="built_in">this</span>.$el = <span class="built_in">this</span>.$options.el;</span><br><span class="line">    <span class="built_in">this</span>._data = <span class="built_in">this</span>.$options.data;</span><br><span class="line">    <span class="built_in">Object</span>.keys(<span class="built_in">this</span>._data).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>._proxy(key);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">new</span> Observer(<span class="built_in">this</span>._data);</span><br><span class="line">    <span class="keyword">new</span> Compiler(<span class="built_in">this</span>.$el, <span class="built_in">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 每次获取或赋值data中的属性时这样写代码：</span></span><br><span class="line">  <span class="comment">// Vue.$options.data.message 很长</span></span><br><span class="line">  <span class="comment">// 我们的期望：Vue.message</span></span><br><span class="line">  <span class="function"><span class="title">_proxy</span>(<span class="params">key</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> self = <span class="built_in">this</span>;</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(<span class="built_in">this</span>, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> self._data[key];</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">value</span>)</span> &#123;</span><br><span class="line">        self._data[key] = value;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br></pre></td></tr></table></figure>
+
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>根目录下运行 <code>webpack main.js</code> 进行打包，浏览器运行 <code>index.html</code> 文件后便能看到文章开头的实现效果，完。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/15966/" rel="prev" title="JS严格模式vs非严格模式">
+                  <i class="fa fa-chevron-left"></i> JS严格模式vs非严格模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/20229/" rel="next" title="JS垃圾回收机制">
+                  JS垃圾回收机制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
