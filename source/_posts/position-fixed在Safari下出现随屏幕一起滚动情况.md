@@ -1,12 +1,14 @@
 ---
 title: position/fixed在Safari下出现随屏幕一起滚动情况
-date: 2020-08-07 00:08:50
 tags:
   - iOS
+  - css
   - 移动端
 categories:
   - 前端
   - 移动端
+abbrlink: 6653
+date: 2020-08-07 00:08:50
 ---
 
 在 `position:fixed/absolute` 内加入：
