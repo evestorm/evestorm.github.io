@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="概括涉及到的分类 网络层面 构建层面 浏览器渲染层面 服务端层面  涉及到的功能点 资源的合并与压缩 图片编解码原理和类型选择 浏览器渲染机制 懒加载预加载 浏览器存储 缓存机制 PWA Vue-SSR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="web性能优化-实践(转载)">
+<meta property="og:url" content="https://evestorm.github.io/posts/47143/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="概括涉及到的分类 网络层面 构建层面 浏览器渲染层面 服务端层面  涉及到的功能点 资源的合并与压缩 图片编解码原理和类型选择 浏览器渲染机制 懒加载预加载 浏览器存储 缓存机制 PWA Vue-SSR">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/jingtaitupian.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/html-yasuo.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/html-yasuoduibi.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/wenjianhebing.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/img-jiexiguocheng.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/rendering.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/gpu-speed.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/cookie.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/fenjihuancun.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/fenjihuancun-liuchengtu.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/liuchengtu2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/service-side-rendering.png">
+<meta property="article:published_time" content="2019-08-02T14:13:49.000Z">
+<meta property="article:modified_time" content="2020-12-16T14:20:18.710Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="性能优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/jingtaitupian.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/47143/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>web性能优化-实践(转载) | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E6%8B%AC"><span class="nav-number">1.</span> <span class="nav-text">概括</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%89%E5%8F%8A%E5%88%B0%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">1.0.1.</span> <span class="nav-text">涉及到的分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%89%E5%8F%8A%E5%88%B0%E7%9A%84%E5%8A%9F%E8%83%BD%E7%82%B9"><span class="nav-number">1.0.2.</span> <span class="nav-text">涉及到的功能点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E5%90%88%E5%B9%B6%E4%B8%8E%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.</span> <span class="nav-text">资源合并与压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http%E8%AF%B7%E6%B1%82%E7%9A%84%E8%BF%87%E7%A8%8B%E5%8F%8A%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%82%B9"><span class="nav-number">2.1.</span> <span class="nav-text">http请求的过程及潜在的性能优化点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E4%B8%80%E4%B8%AA%E8%AF%B7%E6%B1%82%E4%BB%8E%E5%8F%91%E9%80%81%E5%88%B0%E8%BF%94%E5%9B%9E%E9%83%BD%E7%BB%8F%E5%8E%86%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">2.1.1.</span> <span class="nav-text">浏览器的一个请求从发送到返回都经历了什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E7%9A%84%E5%90%88%E5%B9%B6%E4%B8%8E%E5%8E%8B%E7%BC%A9%E8%AE%BE%E8%AE%A1%E5%88%B0%E7%9A%84%E6%80%A7%E8%83%BD%E7%82%B9"><span class="nav-number">2.1.2.</span> <span class="nav-text">资源的合并与压缩设计到的性能点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#html%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.2.</span> <span class="nav-text">html压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8Chtml%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.2.1.</span> <span class="nav-text">如何进行html的压缩</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#css%E5%8F%8Ajs%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.3.</span> <span class="nav-text">css及js压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#css%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.3.1.</span> <span class="nav-text">css的压缩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#css%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">css压缩的方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js%E7%9A%84%E5%8E%8B%E7%BC%A9%E4%B8%8E%E6%B7%B7%E4%B9%B1"><span class="nav-number">2.3.3.</span> <span class="nav-text">js的压缩与混乱</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.4.</span> <span class="nav-text">js压缩的方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%88%E5%B9%B6%E6%96%87%E4%BB%B6%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.4.</span> <span class="nav-text">不合并文件可能存在的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%88%E5%B9%B6%E7%BC%BA%E7%82%B9"><span class="nav-number">2.4.1.</span> <span class="nav-text">文件合并缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%88%E5%B9%B6%E5%AF%B9%E5%BA%94%E7%BC%BA%E7%82%B9%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">2.4.2.</span> <span class="nav-text">文件合并对应缺点的处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%88%E5%B9%B6%E5%AF%B9%E5%BA%94%E6%96%B9%E6%B3%95"><span class="nav-number">2.4.3.</span> <span class="nav-text">文件合并对应方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E7%9B%B8%E5%85%B3%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">图片相关优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E5%BC%A0JPG%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">一张JPG的解析过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#png8-png24-png32%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.2.</span> <span class="nav-text">png8&#x2F;png24&#x2F;png32之间的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%9B%BE%E7%89%87%E5%B8%B8%E7%94%A8%E7%9A%84%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.</span> <span class="nav-text">不同的格式图片常用的业务场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%A0%BC%E5%BC%8F%E5%9B%BE%E7%89%87%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">3.3.1.</span> <span class="nav-text">不同格式图片的特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%A0%BC%E5%BC%8F%E5%9B%BE%E7%89%87%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.2.</span> <span class="nav-text">不同格式图片的使用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E5%8E%8B%E7%BC%A9%E7%9A%84%E5%87%A0%E7%A7%8D%E6%83%85%E5%86%B5"><span class="nav-number">3.4.</span> <span class="nav-text">图片压缩的几种情况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#css%E5%92%8Cjs%E7%9A%84%E8%A3%85%E8%BD%BD%E4%B8%8E%E6%89%A7%E8%A1%8C"><span class="nav-number">4.</span> <span class="nav-text">css和js的装载与执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML-%E9%A1%B5%E9%9D%A2%E5%8A%A0%E8%BD%BD%E6%B8%B2%E6%9F%93%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">4.1.</span> <span class="nav-text">HTML 页面加载渲染的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%BD%91%E7%AB%99%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E7%AB%AF%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%B8%B2%E6%9F%93%E7%9A%84"><span class="nav-number">4.1.1.</span> <span class="nav-text">一个网站在浏览器端是如何进行渲染的</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML-%E6%B8%B2%E6%9F%93%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%89%B9%E7%82%B9"><span class="nav-number">4.2.</span> <span class="nav-text">HTML 渲染过程中的一些特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%94%9Fjs%E5%92%8CpreloadJS%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.3.</span> <span class="nav-text">预加载原生js和preloadJS实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E5%8A%A0%E8%BD%BD%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">4.3.1.</span> <span class="nav-text">预加载实现的几种方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%BB%98%E4%B8%8E%E5%9B%9E%E6%B5%81"><span class="nav-number">5.</span> <span class="nav-text">重绘与回流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#css%E6%80%A7%E8%83%BD%E8%AE%A9javascript%E5%8F%98%E6%85%A2"><span class="nav-number">5.1.</span> <span class="nav-text">css性能让javascript变慢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%87%8D%E7%BB%98%E5%92%8C%E5%9B%9E%E6%B5%81"><span class="nav-number">5.2.</span> <span class="nav-text">什么是重绘和回流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E6%B5%81"><span class="nav-number">5.2.1.</span> <span class="nav-text">回流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E7%BB%98"><span class="nav-number">5.2.2.</span> <span class="nav-text">重绘</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB"><span class="nav-number">5.2.3.</span> <span class="nav-text">关系</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E9%87%8D%E7%BB%98%E3%80%81%E5%9B%9E%E6%B5%81%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="nav-number">5.3.</span> <span class="nav-text">避免重绘、回流的两种方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E9%A1%B5%E9%9D%A2%E9%87%8D%E5%B8%83%E5%B1%80%E7%9A%84%E4%B8%80%E4%BA%9B-css-%E5%B1%9E%E6%80%A7"><span class="nav-number">5.3.1.</span> <span class="nav-text">触发页面重布局的一些 css 属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AA%E8%A7%A6%E5%8F%91%E9%87%8D%E7%BB%98%E4%B8%8D%E8%A7%A6%E5%8F%91%E5%9B%9E%E6%B5%81"><span class="nav-number">5.3.2.</span> <span class="nav-text">只触发重绘不触发回流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA-DOM-%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">5.3.3.</span> <span class="nav-text">新建 DOM 的过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BB%98%E5%88%B6DOM%E7%9A%84%E8%BF%87%E7%A8%8B%E6%98%AF%E8%BF%99%E6%A0%B7%E5%AD%90%E7%9A%84%EF%BC%9A"><span class="nav-number">5.4.</span> <span class="nav-text">浏览器绘制DOM的过程是这样子的：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#chrome%E5%88%9B%E5%BB%BA%E5%9B%BE%E5%B1%82%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="nav-number">5.4.1.</span> <span class="nav-text">chrome创建图层的条件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.4.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E6%88%98%E4%BC%98%E5%8C%96%E7%82%B9%E6%80%BB%E7%BB%93"><span class="nav-number">5.5.</span> <span class="nav-text">实战优化点总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AD%98%E5%82%A8"><span class="nav-number">6.</span> <span class="nav-text">浏览器存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cookies"><span class="nav-number">6.1.</span> <span class="nav-text">cookies</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E7%A7%8D%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F%E5%B9%B6%E5%AD%98%EF%BC%8C%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%EF%BC%9F"><span class="nav-number">6.1.1.</span> <span class="nav-text">多种浏览器存储方式并存，如何选择？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie%E3%80%81session%E3%80%81localStorage%E3%80%81sessionStorage%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">6.2.</span> <span class="nav-text">cookie、session、localStorage、sessionStorage基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#indexedDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">6.3.</span> <span class="nav-text">indexedDB基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#indexDB%E4%BA%8B%E5%8A%A1"><span class="nav-number">6.4.</span> <span class="nav-text">indexDB事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-Worker%E7%A6%BB%E7%BA%BF%E5%BA%94%E7%94%A8"><span class="nav-number">6.5.</span> <span class="nav-text">Service Worker离线应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0ServiceWorker%E4%B8%8E%E4%B8%BB%E9%A1%B5%E9%9D%A2%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-number">6.6.</span> <span class="nav-text">如何实现ServiceWorker与主页面之间的通信</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98"><span class="nav-number">7.</span> <span class="nav-text">缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#httpheader"><span class="nav-number">7.1.</span> <span class="nav-text">httpheader</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E7%BC%93%E5%AD%98%E6%80%A7"><span class="nav-number">7.1.1.</span> <span class="nav-text">可缓存性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%B0%E6%9C%9F"><span class="nav-number">7.1.2.</span> <span class="nav-text">到期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E9%AA%8C%E8%AF%81-%E5%92%8C-%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD"><span class="nav-number">7.1.3.</span> <span class="nav-text">重新验证 和 重新加载</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Expires"><span class="nav-number">7.2.</span> <span class="nav-text">Expires</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Last-modified-%E5%92%8C-If-Modified-since"><span class="nav-number">7.3.</span> <span class="nav-text">Last-modified 和 If-Modified-since</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Etag-%E5%92%8C-If-none-match"><span class="nav-number">7.4.</span> <span class="nav-text">Etag 和 If-none-match</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">7.5.</span> <span class="nav-text">流程图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">8.</span> <span class="nav-text">服务端性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vue-%E6%B8%B2%E6%9F%93%E9%9D%A2%E4%B8%B4%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">8.1.</span> <span class="nav-text">vue 渲染面临的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%B1%82%E6%AC%A1%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="nav-number">8.2.</span> <span class="nav-text">多层次的优化方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E7%AB%A0%E6%9D%A5%E6%BA%90"><span class="nav-number">9.</span> <span class="nav-text">文章来源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/47143/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          web性能优化-实践(转载)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-02 22:13:49" itemprop="dateCreated datePublished" datetime="2019-08-02T22:13:49+08:00">2019-08-02</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-16 22:20:18" itemprop="dateModified" datetime="2020-12-16T22:20:18+08:00">2020-12-16</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">性能优化</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/47143/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/47143/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h2><h4 id="涉及到的分类"><a href="#涉及到的分类" class="headerlink" title="涉及到的分类"></a>涉及到的分类</h4><ul>
+<li>网络层面</li>
+<li>构建层面</li>
+<li>浏览器渲染层面</li>
+<li>服务端层面</li>
+</ul>
+<h4 id="涉及到的功能点"><a href="#涉及到的功能点" class="headerlink" title="涉及到的功能点"></a>涉及到的功能点</h4><ul>
+<li>资源的合并与压缩</li>
+<li>图片编解码原理和类型选择</li>
+<li>浏览器渲染机制</li>
+<li>懒加载预加载</li>
+<li>浏览器存储</li>
+<li>缓存机制</li>
+<li><code>PWA</code></li>
+<li><code>Vue-SSR</code></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="资源合并与压缩"><a href="#资源合并与压缩" class="headerlink" title="资源合并与压缩"></a>资源合并与压缩</h2><h3 id="http请求的过程及潜在的性能优化点"><a href="#http请求的过程及潜在的性能优化点" class="headerlink" title="http请求的过程及潜在的性能优化点"></a><code>http</code>请求的过程及潜在的性能优化点</h3><ul>
+<li>理解<code>减少http请求数量</code>和<code>减少请求资源大小</code>两个优化要点</li>
+<li>掌握<code>压缩</code>与<code>合并</code>的原理</li>
+<li>掌握通过<code>在线网站</code>和<code>fis3</code>两种实现压缩与合并的方法</li>
+</ul>
+<h4 id="浏览器的一个请求从发送到返回都经历了什么"><a href="#浏览器的一个请求从发送到返回都经历了什么" class="headerlink" title="浏览器的一个请求从发送到返回都经历了什么"></a>浏览器的一个请求从发送到返回都经历了什么</h4><p>动态的加载静态的资源</p>
+<img src="/posts/undefined/jingtaitupian.png" class="" title="浏览器请求过程">
+
+<ul>
+<li><code>dns</code>是否可以通过缓存减少<code>dns</code>查询时间</li>
+<li>网络请求的过程走最近的网络环境</li>
+<li>相同的静态资源是否可以缓存</li>
+<li>能否减少<code>http</code>请求大小</li>
+<li>能否减少<code>http</code>请求数量</li>
+<li>服务端渲染</li>
+</ul>
+<h4 id="资源的合并与压缩设计到的性能点"><a href="#资源的合并与压缩设计到的性能点" class="headerlink" title="资源的合并与压缩设计到的性能点"></a>资源的合并与压缩设计到的性能点</h4><ul>
+<li>减少<code>http</code>请求的数量</li>
+<li>减少请求的大小</li>
+</ul>
+<h3 id="html压缩"><a href="#html压缩" class="headerlink" title="html压缩"></a><code>html</code>压缩</h3><blockquote>
+<p><code>HTML</code>代码压缩就是压缩这些在文本文件中有意义，但是在<code>HTML</code>中不显示的字符，包括<code>空格</code>,<code>制表符</code>,<code>换行符</code>等，还有一些其他意义的字符，如<code>HTML</code>注释也可以被压缩</p>
+</blockquote>
+<img src="/posts/undefined/html-yasuo.png" class="" title="html-压缩">
+
+<blockquote>
+<p>意义</p>
+</blockquote>
+<img src="/posts/undefined/html-yasuoduibi.png" class="" title="html-压缩对比">
+
+<ul>
+<li>大型网站意义比较大</li>
+</ul>
+<h4 id="如何进行html的压缩"><a href="#如何进行html的压缩" class="headerlink" title="如何进行html的压缩"></a>如何进行<code>html</code>的压缩</h4><ul>
+<li>使用在线网站进行压缩(走构建工具多，公司级在线网站手动压缩小)</li>
+<li><code>node.js</code>提供了<code>html-minifier</code>工具</li>
+<li>后端<code>模板引擎渲染压缩</code></li>
+</ul>
+<h3 id="css及js压缩"><a href="#css及js压缩" class="headerlink" title="css及js压缩"></a><code>css</code>及<code>js</code>压缩</h3><h4 id="css的压缩"><a href="#css的压缩" class="headerlink" title="css的压缩"></a><code>css</code>的压缩</h4><ul>
+<li>无效代码删除<ul>
+<li>注释、无效字符</li>
+</ul>
+</li>
+<li><code>css</code>语义合并</li>
+</ul>
+<h4 id="css压缩的方式"><a href="#css压缩的方式" class="headerlink" title="css压缩的方式"></a><code>css</code>压缩的方式</h4><ul>
+<li>使用在线网站进行压缩</li>
+<li>使用<code>html-minifier</code>对<code>html</code>中的<code>css</code>进行压缩</li>
+<li>使用<code>clean-css</code>对<code>css</code>进行压缩</li>
+</ul>
+<h4 id="js的压缩与混乱"><a href="#js的压缩与混乱" class="headerlink" title="js的压缩与混乱"></a><code>js</code>的压缩与混乱</h4><ul>
+<li>无效字符的删除<ul>
+<li>空格、注释、回车等</li>
+</ul>
+</li>
+<li>剔除注释</li>
+<li>代码语意的缩减和优化<ul>
+<li>变量名缩短(<code>a</code>,<code>b</code>)等</li>
+</ul>
+</li>
+<li>代码保护<ul>
+<li>前端代码是透明的，客户端代码用户是可以直接看到的，可以轻易被窥探到逻辑和漏洞</li>
+</ul>
+</li>
+</ul>
+<h4 id="js压缩的方式"><a href="#js压缩的方式" class="headerlink" title="js压缩的方式"></a><code>js</code>压缩的方式</h4><ul>
+<li>使用在线网站进行压缩</li>
+<li>使用<code>html-minifier</code>对<code>html</code>中的<code>js</code>进行压缩</li>
+<li>使用<code>uglifyjs2</code>对<code>js</code>进行压缩</li>
+</ul>
+<h3 id="不合并文件可能存在的问题"><a href="#不合并文件可能存在的问题" class="headerlink" title="不合并文件可能存在的问题"></a>不合并文件可能存在的问题</h3><ul>
+<li>文件与文件有插入之间的上行请求，又增加了<code>N-1</code>个网络延迟</li>
+<li>受丢包问题影响更严重</li>
+<li>经过代理服务器时可能会被断开</li>
+</ul>
+<img src="/posts/undefined/wenjianhebing.png" class="" title="文件合并">
+
+<h4 id="文件合并缺点"><a href="#文件合并缺点" class="headerlink" title="文件合并缺点"></a>文件合并缺点</h4><ul>
+<li>首屏渲染问题<ul>
+<li>文件合并之后的<code>js</code>变大，如果首页的渲染依赖这个<code>js</code>的话，整个页面的渲染要等<code>js</code>请求完才能执行</li>
+<li>如果首屏只依赖<code>a.js</code>，只要等<code>a.js</code>完成后就可执行</li>
+<li>没有通过服务器端渲染，现在框架都需要等合并完的文件请求完才能执行，基本都需要等文件合并后的<code>js</code></li>
+</ul>
+</li>
+<li>缓存失效问题<ul>
+<li>标记 <code>js</code> <code>md5</code>戳</li>
+<li>合并之后的<code>js</code>,任何一个改动都会导致大面积的缓存失效</li>
+</ul>
+</li>
+</ul>
+<h4 id="文件合并对应缺点的处理"><a href="#文件合并对应缺点的处理" class="headerlink" title="文件合并对应缺点的处理"></a>文件合并对应缺点的处理</h4><ul>
+<li>公共库合并</li>
+<li>不同页面<code>js</code>单独打包</li>
+<li>见机行事，随机应变</li>
+</ul>
+<h4 id="文件合并对应方法"><a href="#文件合并对应方法" class="headerlink" title="文件合并对应方法"></a>文件合并对应方法</h4><ul>
+<li>使用在线网站进行合并</li>
+<li>构建阶段，使用<code>nodejs</code>进行文件合并</li>
+</ul>
+<h2 id="图片相关优化"><a href="#图片相关优化" class="headerlink" title="图片相关优化"></a>图片相关优化</h2><h3 id="一张JPG的解析过程"><a href="#一张JPG的解析过程" class="headerlink" title="一张JPG的解析过程"></a>一张<code>JPG</code>的解析过程</h3><img src="/posts/undefined/img-jiexiguocheng.jpg" class="" title="img-解析过程">
+
+<p><code>jpg</code>有损压缩：虽然损失一些信息，但是肉眼可见影响并不大</p>
+<h3 id="png8-png24-png32之间的区别"><a href="#png8-png24-png32之间的区别" class="headerlink" title="png8/png24/png32之间的区别"></a><code>png8</code>/<code>png24</code>/<code>png32</code>之间的区别</h3><ul>
+<li><code>png8</code> —-<code>256色</code> + 支持透明</li>
+<li><code>png24</code> —-<code>2^24</code> + 不支持透明</li>
+<li><code>png32</code> —<code>2^24</code> +支持透明</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文件大小&#96; + &#96;色彩丰富程度</span><br></pre></td></tr></table></figure>
+
+<p><code>png32</code>是在<code>png24</code>上支持了透明，针对不同的业务场景选择不同的图片格式很重要</p>
+<h3 id="不同的格式图片常用的业务场景"><a href="#不同的格式图片常用的业务场景" class="headerlink" title="不同的格式图片常用的业务场景"></a>不同的格式图片常用的业务场景</h3><h4 id="不同格式图片的特点"><a href="#不同格式图片的特点" class="headerlink" title="不同格式图片的特点"></a>不同格式图片的特点</h4><ul>
+<li><code>jpg</code>有损压缩，压缩率高，不支持透明</li>
+<li><code>png</code>支持透明，浏览器兼容性好</li>
+<li><code>webp</code>压缩程度更好，在<code>ios webview</code>中有兼容性问题</li>
+<li><code>svg</code>矢量图，代码内嵌，相对较小，图片样式相对简单的场景(尽量使用，绘制能力有限，图片简单用的比较多)</li>
+</ul>
+<h4 id="不同格式图片的使用场景"><a href="#不同格式图片的使用场景" class="headerlink" title="不同格式图片的使用场景"></a>不同格式图片的使用场景</h4><ul>
+<li><code>jpg</code>：大部分不需要透明图片的业务场景</li>
+<li><code>png</code>：大部分需要透明图片的业务场景</li>
+<li><code>webp</code>：<code>android</code>全部(解码速度和压缩率高于<code>jpg</code>和<code>png</code>，但是<code>ios</code> <code>safari</code>还没支持)</li>
+<li><code>svg</code>：图片样式相对简单的业务场景</li>
+</ul>
+<h3 id="图片压缩的几种情况"><a href="#图片压缩的几种情况" class="headerlink" title="图片压缩的几种情况"></a>图片压缩的几种情况</h3><ul>
+<li><p>针对真实图片情况，舍弃一些相对无关紧要的色彩信息</p>
+</li>
+<li><pre><code>CSS雪碧图
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  ：把你的网站用到的一些图片整合到一张单独的图片中</span><br><span class="line"></span><br><span class="line">  - 优点：减少&#96;HTTP&#96;请求的数量(通过&#96;backgroundPosition&#96;定位所需图片)</span><br><span class="line">  - 缺点：整合图片比较大时，加载比较慢(如果这张图片没有加载成功，整个页面会失去图片信息)&#96;facebook&#96;官网任然在用，主要&#96;pc&#96;用的比较多，相对性能比较强</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  Image-inline</span><br></pre></td></tr></table></figure>
+
+：将图片的内容嵌到
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">html</span><br></pre></td></tr></table></figure>
+
+中(减少网站的
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HTTP</span><br></pre></td></tr></table></figure>
+
+请求)
+
+- `base64信息`，减少网站的 HTTP 请求,如果图片比较小比较多，时间损耗主要在请求的骨干网络</code></pre>
+</li>
+<li><pre><code>使用矢量图
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  - 使用&#96;SVG&#96;进行矢量图的绘制</span><br><span class="line">  - 使用&#96;icon-font&#96;解决&#96;icon&#96;问题</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  在android下使用webp</span><br></pre></td></tr></table></figure>
+
+- `webp`的优势主要体现在它具有更优的图像数据压缩算法，能带来更小的图片体积，而且拥有肉眼识别无差异的图像质量；
+- 同时具备了无损和有损的压缩模式、`Alpha`透明以及动画的特性，在`JPEG`和`PNG`上的转化效果都非常优秀、稳定和统一
+</code></pre>
+</li>
+</ul>
+<h2 id="css和js的装载与执行"><a href="#css和js的装载与执行" class="headerlink" title="css和js的装载与执行"></a><code>css</code>和<code>js</code>的装载与执行</h2><h3 id="HTML-页面加载渲染的过程"><a href="#HTML-页面加载渲染的过程" class="headerlink" title="HTML 页面加载渲染的过程"></a>HTML 页面加载渲染的过程</h3><h4 id="一个网站在浏览器端是如何进行渲染的"><a href="#一个网站在浏览器端是如何进行渲染的" class="headerlink" title="一个网站在浏览器端是如何进行渲染的"></a>一个网站在浏览器端是如何进行渲染的</h4><img src="/posts/undefined/rendering.jpg" class="" title="页面渲染过程">
+
+<h3 id="HTML-渲染过程中的一些特点"><a href="#HTML-渲染过程中的一些特点" class="headerlink" title="HTML 渲染过程中的一些特点"></a>HTML 渲染过程中的一些特点</h3><ul>
+<li><p>顺序执行，并发加载</p>
+<ul>
+<li>词法分析：从上到下依次解析<ul>
+<li>通过<code>HTML</code>生成<code>Token对象</code>（当前节点的所有子节点生成后，才会通过<code>next token</code>获取到当前节点的兄弟节点），最终生成<code>Dom Tree</code></li>
+</ul>
+</li>
+<li>并发加载：资源请求是并发请求的</li>
+<li>并发上限<ul>
+<li>浏览器中可以支持并发请求，不同浏览器所支持的并发数量不同（以域名划分），以<code>Chrome</code>为例，并发上限为 6 个</li>
+<li>优化点： 把 CDN 资源分布在多个域名下</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>是否阻塞</p>
+<ul>
+<li><pre><code>css
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">阻塞</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  css</span><br></pre></td></tr></table></figure>
+
+  在
+
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">head</span><br></pre></td></tr></table></figure>
+
+  中通过
+
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">link</span><br></pre></td></tr></table></figure>
+
+  引入会阻塞页面的渲染
+
+  - 如果我们把`css`代码放在`head`中去引入的话，那么我们整个页面的渲染实际上就会等待`head`中`css`加载并生成`css树`，最终和`DOM`整合生成`RanderTree`之后才会进行渲染
+  - 为了浏览器的渲染，能让页面显示的时候视觉上更好。 避免某些情况，如：假设你放在页面最底部，用户打开页面时，有可能出现，页面先是显示一大堆文字或图片，自上而下，丝毫没有排版和样式可言。最后，页面又恢复所要的效果
+
+- `css`不阻塞`js`的加载，但阻塞`js`的执行
+
+- `css`不阻塞外部脚步的加载(`webkit preloader 预资源加载器`)</code></pre>
+</li>
+<li><pre><code>js
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">阻塞</span><br><span class="line"></span><br><span class="line">- 直接通过</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  &lt;script src&gt;
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">引入会阻塞后面节点的渲染</span><br><span class="line"></span><br><span class="line">- &#96;html parse&#96;认为&#96;js&#96;会动态修改文档结构(&#96;document.write&#96;等方式)，没有进行后面文档的变化</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  async</span><br></pre></td></tr></table></figure>
+
+    、
+
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">defer</span><br></pre></td></tr></table></figure>
+
+    (
+
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">async</span><br></pre></td></tr></table></figure>
+
+    放弃了依赖关系)
+
+    - `defer`属性（`&lt;script defer&gt;&lt;/script&gt;`） (这是延迟执行引入的`js`脚本（即脚本加载是不会导致解析停止，等到`document`全部解析完毕后，`defer-script`也加载完毕后，在执行所有的`defer-script`加载的`js`代码，再触发`Domcontentloaded`）
+
+    - ```
+      async
+      <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">属性（</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      &lt;script async&gt;&lt;/script&gt;
+      <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">          ）</span><br><span class="line"></span><br><span class="line">          - 这是异步执行引入的&#96;js&#96;脚本文件</span><br><span class="line">          - 与&#96;defer&#96;的区别是&#96;async&#96;会在加载完成后就执行，但是不会影响阻塞到解析和渲染。但是还是会阻塞&#96;load&#96;事件，所以&#96;async-script&#96;会可能在&#96;DOMcontentloaded&#96;触发前或后执行，但是一定会在&#96;load&#96;事件前触发。</span><br><span class="line"></span><br><span class="line">## 懒加载与预加载</span><br><span class="line"></span><br><span class="line">### 懒加载</span><br><span class="line"></span><br><span class="line">- 图片进入可视区域之后请求图片资源</span><br><span class="line">- 对于电商等图片很多，页面很长的业务场景适用</span><br><span class="line">- 减少无效资源的加载</span><br><span class="line">- 并发加载的资源过多会会阻塞 js 的加载，影响网站的正常使用</span><br><span class="line"></span><br><span class="line">&#96;img src&#96;被设置之后，&#96;webkit&#96;解析到之后才去请求这个资源。所以我们希望图片到达可视区域之后，&#96;img src&#96;才会被设置进来，没有到达可视区域前并不现实真正的&#96;src&#96;，而是类似一个&#96;1px&#96;的占位符。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+场景：电商图片
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 预加载</span><br><span class="line"></span><br><span class="line">- 图片等静态资源在使用之前的提前请求</span><br><span class="line">- 资源使用到时能从缓存中加载，提升用户体验</span><br><span class="line">- 页面展示的依赖关系维护</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+场景：抽奖
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 懒加载原生&#96;js&#96;和&#96;zepto.lazyload&#96;</span><br><span class="line"></span><br><span class="line">&gt; 原理</span><br><span class="line"></span><br><span class="line">先将&#96;img&#96;标签中的&#96;src&#96;链接设为同一张图片（空白图片），将其真正的图片地址存储再&#96;img&#96;标签的自定义属性中（比如&#96;data-src&#96;）。当&#96;js&#96;监听到该图片元素进入可视窗口时，即将自定义属性中的地址存储到&#96;src&#96;属性中，达到懒加载的效果。</span><br><span class="line"></span><br><span class="line">&gt; 注意问题：</span><br><span class="line"></span><br><span class="line">- 关注首屏处理,因为还没滑动，需要手动调用一次方法</span><br><span class="line">- 占位，图片大小首先需要预设高度，如果没有设置的话，会全部显示出来</span><br><span class="line"></span><br><span class="line">&#123;% asset_img lanjiazai.jpg 懒加载页面结构 %&#125;</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;js</span><br><span class="line">var viewheight &#x3D; document.documentElement.clientHeight; &#x2F;&#x2F;可视区域高度</span><br><span class="line"></span><br><span class="line">function lazyload() &#123;</span><br><span class="line">  var eles &#x3D; document.querySelectorAll(&#39;img[data-original][lazyload]&#39;);</span><br><span class="line"></span><br><span class="line">  Array.prototype.forEach.call(eles, function (item, index) &#123;</span><br><span class="line">    var rect;</span><br><span class="line">    if (item.dataset.original &#x3D;&#x3D;&#x3D; &#39;&#39;) return;</span><br><span class="line">    rect &#x3D; item.getBoundingClientRect(); &#x2F;&#x2F;返回元素的大小及其相对于视口的</span><br><span class="line"></span><br><span class="line">    if (rect.bottom &gt;&#x3D; 0 &amp;&amp; rect.top &lt; viewheight) &#123;</span><br><span class="line">      !(function () &#123;</span><br><span class="line">        var img &#x3D; new Image();</span><br><span class="line">        img.src &#x3D; item.dataset.url;</span><br><span class="line">        img.onload &#x3D; function () &#123;</span><br><span class="line">          item.src &#x3D; img.src;</span><br><span class="line">        &#125;;</span><br><span class="line">        item.removeAttribute(&#39;data-original&#39;);</span><br><span class="line">        item.removeAttribute(&#39;lazyload&#39;);</span><br><span class="line">      &#125;)();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">lazyload();</span><br><span class="line">document.addEventListener(&#39;scroll&#39;, lazyload);</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="预加载原生js和preloadJS实现"><a href="#预加载原生js和preloadJS实现" class="headerlink" title="预加载原生js和preloadJS实现"></a>预加载原生<code>js</code>和<code>preloadJS</code>实现</h3><h4 id="预加载实现的几种方式"><a href="#预加载实现的几种方式" class="headerlink" title="预加载实现的几种方式"></a>预加载实现的几种方式</h4><ul>
+<li>第一种方式：直接请求下来</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;img</span><br><span class="line">  src=&quot;https://user-gold-cdn.xitu.io/2019/2/21/1690d1b216cbfa18&quot;</span><br><span class="line">  style=&quot;display: none&quot;</span><br><span class="line">/&gt;</span><br><span class="line">&lt;img</span><br><span class="line">  src=&quot;https://user-gold-cdn.xitu.io/2019/2/21/1690d1b21b70c8d2&quot;</span><br><span class="line">  style=&quot;display: none&quot;</span><br><span class="line">/&gt;</span><br><span class="line">&lt;img</span><br><span class="line">  src=&quot;https://user-gold-cdn.xitu.io/2019/2/21/1690d1b216e17e26&quot;</span><br><span class="line">  style=&quot;display: none&quot;</span><br><span class="line">/&gt;</span><br><span class="line">&lt;img</span><br><span class="line">  src=&quot;https://user-gold-cdn.xitu.io/2019/2/21/1690d1b217b3ae59&quot;</span><br><span class="line">  style=&quot;display: none&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第二种方式：<code>image</code>对象</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> image = <span class="keyword">new</span> Image();</span><br><span class="line">image.src = <span class="string">&quot;www.pic26.com/dafdafd/safdas.jpg&quot;</span>；</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>第三种方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XMLHttpRequest</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>缺点：存在跨域问题</li>
+<li>优点：好控制</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> xmlhttprequest = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line"></span><br><span class="line">xmlhttprequest.onreadystatechange = callback;</span><br><span class="line"></span><br><span class="line">xmlhttprequest.onprogress = progressCallback;</span><br><span class="line"></span><br><span class="line">xmlhttprequest.open(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;http:www.xxx.com&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">xmlhttprequest.send();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">callback</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xmlhttprequest.readyState == <span class="number">4</span> &amp;&amp; xmlhttprequest.status == <span class="number">200</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> responseText = xmlhttprequest.responseText;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Request was unsuccessful:&#x27;</span> + xmlhttprequest.status);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">progressCallback</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  e = e || event;</span><br><span class="line">  <span class="keyword">if</span> (e.lengthComputable) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Received&#x27;</span> + e.loaded + <span class="string">&#x27;of&#x27;</span> + e.total + <span class="string">&#x27;bytes&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">PreloadJS模块;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>本质</strong>：<strong>权衡浏览器加载能力，让它尽可能饱和利用起来</strong></li>
+</ul>
+<h2 id="重绘与回流"><a href="#重绘与回流" class="headerlink" title="重绘与回流"></a>重绘与回流</h2><h3 id="css性能让javascript变慢"><a href="#css性能让javascript变慢" class="headerlink" title="css性能让javascript变慢"></a><code>css</code>性能让<code>javascript</code>变慢</h3><p>要把<code>css</code>相关的外部文件引入放进<code>head</code>中，加载<code>css</code>时，整个页面的渲染是阻塞的，同样的执行<code>javascript</code>代码的时候也是阻塞的，例如<code>javascript</code>死循环。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">一个线程   &#x3D;&gt;  javascript解析</span><br><span class="line">一个线程   &#x3D;&gt;  UI渲染</span><br></pre></td></tr></table></figure>
+
+<p>这两个线程是互斥的，当<code>UI</code>渲染的时候，<code>javascript</code>的代码被终止。当<code>javascript</code>代码执行，<code>UI</code>线程被冻结。所以<code>css</code>的性能让<code>javascript</code>变慢。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">频繁触发重绘与回流，会导致UI频繁渲染，最终导致js变慢</span><br></pre></td></tr></table></figure>
+
+<h3 id="什么是重绘和回流"><a href="#什么是重绘和回流" class="headerlink" title="什么是重绘和回流"></a>什么是重绘和回流</h3><h4 id="回流"><a href="#回流" class="headerlink" title="回流"></a>回流</h4><ul>
+<li>当<code>render tree</code>中的一部分(或全部)因为元素的<code>规模尺寸</code>，<code>布局</code>，<code>隐藏</code>等改变而需要<code>重新构建</code>。这就成为回流(<code>reflow</code>)</li>
+<li>当<code>页面布局</code>和<code>几何属性</code>改变时，就需要<code>回流</code></li>
+</ul>
+<h4 id="重绘"><a href="#重绘" class="headerlink" title="重绘"></a>重绘</h4><ul>
+<li>当<code>render tree</code>中的一些元素需要更新属性，而这些属性只是影响元素的<code>外观</code>，<code>风格</code>，而不影响布局，比如<code>background-color</code>。就称重绘</li>
+</ul>
+<h4 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h4><p>用到<code>chrome</code> 分析 <code>performance</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">回流必将引起重绘，但是重绘不一定会引起回流</span><br></pre></td></tr></table></figure>
+
+<h3 id="避免重绘、回流的两种方法"><a href="#避免重绘、回流的两种方法" class="headerlink" title="避免重绘、回流的两种方法"></a>避免重绘、回流的两种方法</h3><h4 id="触发页面重布局的一些-css-属性"><a href="#触发页面重布局的一些-css-属性" class="headerlink" title="触发页面重布局的一些 css 属性"></a>触发页面重布局的一些 css 属性</h4><ul>
+<li>盒子模型相关属性会触发重布局<ul>
+<li><code>width</code> / <code>height</code> / <code>min-height</code></li>
+<li><code>padding</code> / <code>margin</code></li>
+<li><code>display</code></li>
+<li><code>border-width</code> / <code>border</code></li>
+</ul>
+</li>
+<li>定位属性及浮动也会触发重布局<ul>
+<li><code>top</code> / <code>bottom</code> / <code>left</code> / <code>right</code></li>
+<li><code>position</code></li>
+<li><code>float</code></li>
+<li><code>clear</code></li>
+</ul>
+</li>
+<li>改变节点内部文字结构也会触发重布局<ul>
+<li><code>text-align</code> / <code>vertical-align</code></li>
+<li><code>overflow</code> / <code>overflow-y</code></li>
+<li><code>font-size</code> / <code>font-family</code> / <code>font-weight</code></li>
+<li><code>line-height</code></li>
+<li><code>white-space</code></li>
+</ul>
+</li>
+</ul>
+<p>优化点：使用不触发回流的方案替代触发回流的方案</p>
+<h4 id="只触发重绘不触发回流"><a href="#只触发重绘不触发回流" class="headerlink" title="只触发重绘不触发回流"></a>只触发重绘不触发回流</h4><ul>
+<li><code>color</code></li>
+<li><code>border-style</code>、<code>border-radius</code></li>
+<li><code>visibility</code></li>
+<li><code>text-decoration</code></li>
+<li><code>background</code>、<code>background-image</code>、<code>background-position</code>、<code>background-repeat</code>、<code>background-size</code></li>
+<li><code>outline</code>、<code>outline-color</code>、<code>outline-style</code>、<code>outline-width</code></li>
+<li><code>box-shadow</code></li>
+</ul>
+<h4 id="新建-DOM-的过程"><a href="#新建-DOM-的过程" class="headerlink" title="新建 DOM 的过程"></a>新建 DOM 的过程</h4><ul>
+<li>获取<code>DOM</code>后分割为多个图层</li>
+<li>对每个图层的节点计算样式结果(<code>Recalculate style</code> 样式重计算)</li>
+<li>为每个节点生成图形和位置(<code>Layout</code> 回流和重布局)</li>
+<li>将每个节点绘制填充到图层位图中(<code>Paint Setup</code>和<code>Paint</code> <code>重绘</code>)</li>
+<li>图层作为纹理上传至<code>gpu</code></li>
+<li>符合多个图层到页面上生成最终屏幕图像(<code>Composite Layers</code> 图层重组)</li>
+</ul>
+<h3 id="浏览器绘制DOM的过程是这样子的："><a href="#浏览器绘制DOM的过程是这样子的：" class="headerlink" title="浏览器绘制DOM的过程是这样子的："></a>浏览器绘制<code>DOM</code>的过程是这样子的：</h3><ul>
+<li>获取 DOM 并将其分割为多个层（<code>layer</code>），将每个层独立地绘制进位图（<code>bitmap</code>）中</li>
+<li>将层作为纹理（<code>texture</code>）上传至 <code>GPU</code>，复合（<code>composite</code>）多个层来生成最终的屏幕图像</li>
+<li><code>left/top/margin</code>之类的属性会影响到元素在文档中的布局，当对布局（<code>layout</code>）进行动画时，该元素的布局改变可能会影响到其他元素在文档中的位置，就导致了所有被影响到的元素都要进行重新布局，浏览器需要为整个层进行重绘并重新上传到 <code>GPU</code>，造成了极大的性能开销。</li>
+<li><code>transform</code> 属于合成属性（<code>composite property</code>），对合成属性进行 <code>transition/animation</code> 动画将会创建一个合成层（<code>composite layer</code>），这使得被动画元素在一个独立的层中进行动画。</li>
+<li>通常情况下，浏览器会将一个层的内容先绘制进一个位图中，然后再作为纹理（<code>texture</code>）上传到 <code>GPU</code>，只要该层的内容不发生改变，就没必要进行重绘（<code>repaint</code>），浏览器会通过重新复合（<code>recomposite</code>）来形成一个新的帧。</li>
+</ul>
+<h4 id="chrome创建图层的条件"><a href="#chrome创建图层的条件" class="headerlink" title="chrome创建图层的条件"></a><code>chrome</code>创建图层的条件</h4><blockquote>
+<p>将频繁重绘回流的 DOM 元素单独作为一个独立图层，那么这个 DOM 元素的重绘和回流的影响只会在这个图层中</p>
+</blockquote>
+<ul>
+<li><code>3D</code>或透视变换</li>
+<li><code>CSS</code>属性使用加速视频解码的 <code>&lt;video&gt;</code> 元素</li>
+<li>拥有 <code>3D</code> (<code>WebGL</code>) 上下文或加速的 <code>2D</code> 上下文的 <code>&lt;canvas&gt;</code> 元素</li>
+<li>复合插件(如 <code>Flash</code>)</li>
+<li>进行 <code>opacity/transform</code> 动画的元素拥有加速</li>
+<li><code>CSS filters</code> 的元素有一个包含复合层的后代节点(换句话说，就是一个元素拥有一个子元素，该子元素在自己的层里)</li>
+<li>元素有一个 <code>z-index</code> 较低且包含一个复合层的兄弟元素(换句话说就是该元素在复合层上面渲染)</li>
+</ul>
+<blockquote>
+<p>总结：对布局属性进行动画，浏览器需要为每一帧进行重绘并上传到 <code>GPU</code> 中对合成属性进行动画，浏览器会为元素创建一个独立的复合层，当元素内容没有发生改变，该层就不会被重绘，浏览器会通过重新复合来创建动画帧</p>
+</blockquote>
+<p>gif 图</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>尽量避免使用触发<code>回流</code>、<code>重绘</code>的<code>CSS</code>属性</li>
+<li>将<code>重绘</code>、<code>回流</code>的影响范围限制在单独的图层(<code>layers</code>)之内</li>
+<li>图层合成过程中消耗很大页面性能，这时候需要平衡考虑重绘回流的性能消耗</li>
+</ul>
+<h3 id="实战优化点总结"><a href="#实战优化点总结" class="headerlink" title="实战优化点总结"></a>实战优化点总结</h3><ul>
+<li><p>用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">translate</span><br></pre></td></tr></table></figure>
+
+<p>替代</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top</span><br></pre></td></tr></table></figure>
+
+<p>属性</p>
+<ul>
+<li><code>top</code>会触发<code>layout</code>，但<code>translate</code>不会</li>
+</ul>
+</li>
+<li><p>用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">opacity</span><br></pre></td></tr></table></figure>
+
+<p>代替</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">visibility</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>opacity</code>不会触发重绘也不会触发回流，只是改变图层<code>alpha</code>值，但是必须要将这个图片独立出一个图层</li>
+<li><code>visibility</code>会触发重绘</li>
+</ul>
+</li>
+<li><p>不要一条一条的修改<code>DOM</code>的样式，预先定义好<code>class</code>，然后修改<code>DOM</code>的<code>className</code></p>
+</li>
+<li><p><code>把DOM</code>离线后修改，比如：先把<code>DOM</code>给<code>display:none</code>（有一次<code>reflow</code>），然后你修改 100 次，然后再把它显示出来</p>
+</li>
+<li><p>不要把</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DOM</span><br></pre></td></tr></table></figure>
+
+<p>节点的属性值放在一个循环里当成循环的变量</p>
+<ul>
+<li><code>offsetHeight</code>、<code>offsetWidth</code>每次都要刷新缓冲区，缓冲机制被破坏</li>
+<li>先用变量存储下来</li>
+</ul>
+</li>
+<li><p>不要使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">table</span><br></pre></td></tr></table></figure>
+
+<p>布局，可能很小的一个小改动会造成整个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">table</span><br></pre></td></tr></table></figure>
+
+<p>的重新布局</p>
+<ul>
+<li><code>div</code>只会影响后续样式的布局</li>
+</ul>
+</li>
+<li><p>动画实现的速度的选择</p>
+<ul>
+<li>选择合适的动画速度</li>
+<li>根据<code>performance</code>量化性能优化</li>
+</ul>
+</li>
+<li><p>对于动画新建图层</p>
+<ul>
+<li><p>启用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpu</span><br></pre></td></tr></table></figure>
+
+<p>硬件加速(并行运算)，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpu加速</span><br></pre></td></tr></table></figure>
+
+<p>意味着数据需要从</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cpu</span><br></pre></td></tr></table></figure>
+
+<p>走总线到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpu</span><br></pre></td></tr></table></figure>
+
+<p>传输，需要考虑传输损耗.</p>
+<ul>
+<li><code>transform:translateZ(0)</code></li>
+<li><code>transform:translate3D(0)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<img src="/posts/undefined/gpu-speed.png" class="" title="gpu加速">
+
+<h2 id="浏览器存储"><a href="#浏览器存储" class="headerlink" title="浏览器存储"></a>浏览器存储</h2><h3 id="cookies"><a href="#cookies" class="headerlink" title="cookies"></a><code>cookies</code></h3><h4 id="多种浏览器存储方式并存，如何选择？"><a href="#多种浏览器存储方式并存，如何选择？" class="headerlink" title="多种浏览器存储方式并存，如何选择？"></a>多种浏览器存储方式并存，如何选择？</h4><img src="/posts/undefined/cookie.jpg" class="" title="cookie">
+
+<ul>
+<li><p>因为<code>http</code>请求无状态，所以需要<code>cookie</code>去维持客户端状态</p>
+</li>
+<li><pre><code>cookie
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">的生成方式：</span><br><span class="line"></span><br><span class="line">- &#96;http&#96;–&gt;&#96;response header&#96;–&gt;&#96;set-cookie&#96;</span><br><span class="line"></span><br><span class="line">- &#96;js&#96;中可以通过&#96;document.cookie&#96;可以读写&#96;cookie&#96;</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  cookie</span><br></pre></td></tr></table></figure>
+
+  的使用用处：
+
+  - 用于浏览器端和服务器端的交互(用户状态)
+  - 客户端自身数据的存储</code></pre>
+</li>
+<li><p><code>expire</code>：过期时间</p>
+</li>
+<li><pre><code>cookie
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  的限制：</span><br><span class="line"></span><br><span class="line">  - 作为浏览器存储，大小&#96;4kb&#96;左右</span><br><span class="line">  - 需要设置过期时间 &#96;expire&#96;</span><br><span class="line"></span><br><span class="line">- 重要属性：&#96;httponly&#96; 不支持&#96;js&#96;读写(防止收到模拟请求攻击)</span><br><span class="line"></span><br><span class="line">- 不太作为存储方案而是用于维护客户关系</span><br><span class="line"></span><br><span class="line">- 优化点：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+cookie
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  中在相关域名下面</span><br><span class="line"></span><br><span class="line">  - &#96;cdn&#96;的流量损耗</span><br><span class="line">  - 解决方案：&#96;cdn&#96;的域名和主站域名要分开</span><br><span class="line"></span><br><span class="line">### WebStorage</span><br><span class="line"></span><br><span class="line">#### localstorage</span><br><span class="line"></span><br><span class="line">- &#96;HTML5&#96;设计出来专门用于浏览器存储的</span><br><span class="line">- 大小为&#96;5M&#96;左右</span><br><span class="line">- 仅在客户端使用，不和服务端进行通信</span><br><span class="line">- 接口封装较好</span><br><span class="line">- 浏览器本地缓存方案</span><br><span class="line"></span><br><span class="line">#### sessionstorage</span><br><span class="line"></span><br><span class="line">- 会话级别的浏览器存储</span><br><span class="line">- 大小为&#96;5M&#96;左右</span><br><span class="line">- 仅在客户端使用，不和服务器端进行通信</span><br><span class="line">- 接口封装较好</span><br><span class="line">- 对于表单信息的维护</span><br><span class="line"></span><br><span class="line">### indexedDB</span><br><span class="line"></span><br><span class="line">- &#96;IndexedDB&#96;是一种低级&#96;API&#96;，用于客户端存储大量结构化数据。该&#96;API&#96;使用索引来实现对该数据的高性能搜索。虽然&#96;Web&#96;</span><br><span class="line">- &#96;Storage&#96;对于存储叫少量的数据很管用，但对于存储更大量的结构化数据来说，这种方法不太有用。&#96;IndexedDB&#96;提供了一个解决方案。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+为应用创建离线版本
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- &#96;cdn&#96;域名不要带&#96;cookie&#96;</span><br><span class="line">- &#96;localstorage&#96;存库、图片</span><br><span class="line"></span><br><span class="line">&#96;cookie&#96;种在主站下，二级域名也会携带这个域名，造成流量的浪费</span><br><span class="line"></span><br><span class="line">### Service Worker 产生的意义</span><br><span class="line"></span><br><span class="line">### PWA 与 Service Worker</span><br><span class="line"></span><br><span class="line">- &#96;PWA&#96;(&#96;Progressive Web Apps&#96;)是一种&#96;Web App&#96;新模型，并不是具体指某一种前言的技术或者某一个单一的知识点，我们从英文缩写来看就能看出来，这是一个渐进式的&#96;Web App&#96;，是通过一系列新的&#96;Web特性&#96;，配合优秀的&#96;UI&#96;交互设计，逐步增强&#96;Web App&#96;的用户体验</span><br><span class="line"></span><br><span class="line">#### chrome 插件 lighthouse</span><br><span class="line"></span><br><span class="line">&gt; 检测是不是一个渐进式&#96;web app&#96;</span><br><span class="line"></span><br><span class="line">- 当前手机在弱网环境下能不能加载出来</span><br><span class="line">- 离线环境下能不能加载出来</span><br><span class="line"></span><br><span class="line">&gt; 特点</span><br><span class="line"></span><br><span class="line">- 可靠：没有网络的环境中也能提供基本的页面访问，而不会出现“未连接到互联网”的页面</span><br><span class="line">- 快速：针对网页渲染及网络数据访问有较好的优化</span><br><span class="line">- 融入(&#96;Engaging&#96;)：应用可以被增加到手机桌面，并且和普通应用一样有全屏、推送等特性</span><br><span class="line"></span><br><span class="line">#### service worker</span><br><span class="line"></span><br><span class="line">&gt; &#96;service worker&#96;是一个脚本，浏览器独立于当前页面，将其在后台运行，为实现一些不依赖页面的或者用户交互的特性打开了一扇大门。在未来这些特性将包括消息推送，背景后台同步，&#96;geofencing&#96;(地理围栏定位)，但他将推出的第一个首要的特性，就是拦截和处理网络请求的能力，包括以编程方式来管理被缓存的响应。</span><br><span class="line"></span><br><span class="line">&#123;% asset_img service-worker.png service-worker %&#125;</span><br><span class="line"></span><br><span class="line">#### 案例分析</span><br><span class="line"></span><br><span class="line">[Service Worker 学习与实践](https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5ba0fe356fb9a05d2c43a25c)</span><br><span class="line"></span><br><span class="line">[了解 servie worker](https:&#x2F;&#x2F;link.juejin.im&#x2F;?target&#x3D;http%3A%2F%2Fkailian.github.io%2F2017%2F03%2F01%2Fservice-worker%23🐉)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+copychrome://serviceworker-internals/
+chrome://inspect/#service-worker/
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&#96;service worker&#96;网络拦截能力，存储&#96;Cache Storage&#96;，实现离线应用</span><br><span class="line"></span><br><span class="line">#### indexedDB</span><br><span class="line"></span><br><span class="line">&#123;% asset_img indexdb.png indexdb %&#125;</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;js</span><br><span class="line">callback &amp;&amp; callback()写法</span><br><span class="line">相当于</span><br><span class="line">if(callback)&#123;</span><br><span class="line">   callback();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+<h3 id="cookie、session、localStorage、sessionStorage基本操作"><a href="#cookie、session、localStorage、sessionStorage基本操作" class="headerlink" title="cookie、session、localStorage、sessionStorage基本操作"></a><code>cookie</code>、<code>session</code>、<code>localStorage</code>、<code>sessionStorage</code>基本操作</h3><h3 id="indexedDB基本操作"><a href="#indexedDB基本操作" class="headerlink" title="indexedDB基本操作"></a><code>indexedDB</code>基本操作</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">object store:对象存储本身就是结构化存储</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">openDB</span>(<span class="params">name, callback</span>) </span>&#123;</span><br><span class="line">           <span class="comment">//建立打开indexdb  indexedDB.open</span></span><br><span class="line">           <span class="keyword">var</span> request = <span class="built_in">window</span>.indexedDB.open(name)</span><br><span class="line">           request.onerror = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">               <span class="built_in">console</span>.log(<span class="string">&#x27;on indexedDB error&#x27;</span>)</span><br><span class="line">           &#125;</span><br><span class="line">           request.onsuccess = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">                   myDB.db = e.target.result</span><br><span class="line">                   callback &amp;&amp; callback()</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="comment">//from no database to first version,first version to second version...</span></span><br><span class="line">           request.onupgradeneeded = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="built_in">console</span>.log(<span class="string">&#x27;created&#x27;</span>)</span><br><span class="line">               <span class="keyword">var</span> store = request.result.createObjectStore(<span class="string">&#x27;books&#x27;</span>, &#123;</span><br><span class="line">                   keyPath: <span class="string">&#x27;isbn&#x27;</span></span><br><span class="line">               &#125;)</span><br><span class="line">               <span class="built_in">console</span>.log(store)</span><br><span class="line">               <span class="keyword">var</span> titleIndex = store.createIndex(<span class="string">&#x27;by_title&#x27;</span>, <span class="string">&#x27;title&#x27;</span>, &#123;</span><br><span class="line">                   unique: <span class="literal">true</span></span><br><span class="line">               &#125;)</span><br><span class="line">               <span class="keyword">var</span> authorIndex = store.createIndex(<span class="string">&#x27;by_author&#x27;</span>, <span class="string">&#x27;author&#x27;</span>)</span><br><span class="line"></span><br><span class="line">               store.put(&#123;</span><br><span class="line">                   title: <span class="string">&#x27;quarry memories&#x27;</span>,</span><br><span class="line">                   author: <span class="string">&#x27;fred&#x27;</span>,</span><br><span class="line">                   isbn: <span class="number">123456</span></span><br><span class="line">               &#125;)</span><br><span class="line">               store.put(&#123;</span><br><span class="line">                   title: <span class="string">&#x27;dafd memories&#x27;</span>,</span><br><span class="line">                   author: <span class="string">&#x27;frdfaded&#x27;</span>,</span><br><span class="line">                   isbn: <span class="number">12345</span></span><br><span class="line">               &#125;)</span><br><span class="line">               store.put(&#123;</span><br><span class="line">                   title: <span class="string">&#x27;dafd medafdadmories&#x27;</span>,</span><br><span class="line">                   author: <span class="string">&#x27;frdfdsafdafded&#x27;</span>,</span><br><span class="line">                   isbn: <span class="number">12345434</span></span><br><span class="line">               &#125;)</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> myDB = &#123;</span><br><span class="line">           name: <span class="string">&#x27;tesDB&#x27;</span>,</span><br><span class="line">           version: <span class="string">&#x27;2.0.1&#x27;</span>,</span><br><span class="line">           db: <span class="literal">null</span></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="keyword">function</span> <span class="title">addData</span>(<span class="params">db, storeName</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       openDB(myDB.name, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="comment">// myDB.db = e.target.result</span></span><br><span class="line">           <span class="comment">// window.indexedDB.deleteDatabase(myDB.name)</span></span><br><span class="line">       &#125;);</span><br><span class="line"></span><br><span class="line">       <span class="comment">//删除indexedDB</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="indexDB事务"><a href="#indexDB事务" class="headerlink" title="indexDB事务"></a><code>indexDB</code>事务</h3><p><code>transcation</code> 与 <code>object store</code>建立关联关系来操作<code>object store</code> 建立之初可以配置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> transcation = db.transcation(<span class="string">&#x27;books&#x27;</span>, <span class="string">&#x27;readwrite&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> store = transcation.objectStore(<span class="string">&#x27;books&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> data = store.get(<span class="number">34314</span>);</span><br><span class="line">store.delete(<span class="number">2334</span>);</span><br><span class="line">store.add(&#123;</span><br><span class="line">  title: <span class="string">&#x27;dafd medafdadmories&#x27;</span>,</span><br><span class="line">  author: <span class="string">&#x27;frdfdsafdafded&#x27;</span>,</span><br><span class="line">  isbn: <span class="number">12345434</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Service-Worker离线应用"><a href="#Service-Worker离线应用" class="headerlink" title="Service Worker离线应用"></a><code>Service Worker</code>离线应用</h3><p><code>serviceworker</code>需要<code>https</code>协议</p>
+<h3 id="如何实现ServiceWorker与主页面之间的通信"><a href="#如何实现ServiceWorker与主页面之间的通信" class="headerlink" title="如何实现ServiceWorker与主页面之间的通信"></a>如何实现<code>ServiceWorker</code>与主页面之间的通信</h3><p><a href="https://link.juejin.im/?target=https://lavas.baidu.com/guide/v1/foundation/lavas-start">lavas</a></p>
+<h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><blockquote>
+<p>期望大规模数据能自动化缓存，而不是手动进行缓存，需要浏览器端和服务器端协商一种缓存机制</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Cache-Control 所控制的缓存策略</li>
+<li>last-modified 和 etag 以及整个服务端浏览器端的缓存流程</li>
+<li>基于 node 实践以上缓存方式</li>
+</ul>
+</blockquote>
+<h3 id="httpheader"><a href="#httpheader" class="headerlink" title="httpheader"></a><code>httpheader</code></h3><h4 id="可缓存性"><a href="#可缓存性" class="headerlink" title="可缓存性"></a>可缓存性</h4><ul>
+<li><code>public</code>:表明响应可以被任何对象（包括：发送请求的客户端，代理服务器，等等）缓存。</li>
+<li><code>private</code>:表明响应只能被单个用户缓存，不能作为共享缓存（即代理服务器不能缓存它）。</li>
+<li><code>no-cache</code>:强制所有缓存了该响应的缓存用户，在使用已存储的缓存数据前，发送带验证器的请求到原始服务器</li>
+<li><code>only-if-cached</code>:表明如果缓存存在，只使用缓存，无论原始服务器数据是否有更新</li>
+</ul>
+<h4 id="到期"><a href="#到期" class="headerlink" title="到期"></a>到期</h4><ul>
+<li><code>max-age=&lt;seconds&gt;</code>:设置缓存存储的最大周期，超过这个时间缓存被认为过期(单位秒)。与<code>Expires</code>相反，时间是相对于请求的时间。</li>
+<li><code>s-maxage=&lt;seconds&gt;</code>:覆盖<code>max-age</code> 或者 <code>Expires</code> 头，但是仅适用于共享缓存(比如各个代理)，并且私有缓存中它被忽略。<code>cdn</code>缓存</li>
+<li><code>max-stale[=&lt;seconds&gt;]</code> 表明客户端愿意接收一个已经过期的资源。 可选的设置一个时间(单位秒)，表示响应不能超过的过时时间。</li>
+<li><code>min-fresh=&lt;seconds&gt;</code> 表示客户端希望在指定的时间内获取最新的响应。</li>
+</ul>
+<h4 id="重新验证-和-重新加载"><a href="#重新验证-和-重新加载" class="headerlink" title="重新验证 和 重新加载"></a>重新验证 和 重新加载</h4><blockquote>
+<p>重新验证</p>
+</blockquote>
+<ul>
+<li><code>must-revalidate</code>：缓存必须在使用之前验证旧资源的状态，并且不可使用过期资源。</li>
+<li><code>proxy-revalidate</code>：与<code>must-revalidate</code>作用相同，但它仅适用于共享缓存（例如代理），并被私有缓存忽略。</li>
+<li><code>immutable</code> ：表示响应正文不会随时间而改变。资源（如果未过期）在服务器上不发生改变，因此客户端不应发送重新验证请求头（例如<code>If-None-Match</code>或<code>If-Modified-Since</code>）来检查更新，即使用户显式地刷新页面。在<code>Firefox</code>中，<code>immutable</code>只能被用在 <code>https:// transactions</code>.</li>
+</ul>
+<blockquote>
+<p>重新加载</p>
+</blockquote>
+<ul>
+<li><code>no-store</code>:缓存不应存储有关客户端请求或服务器响应的任何内容。</li>
+<li><code>no-transform</code>:不得对资源进行转换或转变。<code>Content-Encoding</code>,<code>Content-Range</code>, <code>Content-Type</code>等<code>HTTP</code>头不能由代理修改。例如，非透明代理可以对图像格式进行转换，以便节省缓存空间或者减少缓慢链路上的流量。 <code>no-transform</code>指令不允许这样做。</li>
+</ul>
+<h3 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h3><ul>
+<li>缓存过期时间，用来指定资源到期的时间，是服务器端的时间点</li>
+<li>告诉浏览器在过期时间前浏览器可以直接从浏览器缓存中存取数据，而无需再次请求</li>
+<li><code>expires</code>是<code>http1.0</code>的时候的</li>
+<li><code>http1.1</code>时候，我们希<code>望cache</code>的管理统一进行，<code>max-age</code>优先级高于<code>expires</code>，当有<code>max-age</code>在的时候<code>expires</code>可能就会被忽略。</li>
+<li>如果没有设置<code>cache-control</code>时候会使用<code>expires</code></li>
+</ul>
+<h3 id="Last-modified-和-If-Modified-since"><a href="#Last-modified-和-If-Modified-since" class="headerlink" title="Last-modified 和 If-Modified-since"></a>Last-modified 和 If-Modified-since</h3><ul>
+<li>基于客户端和服务器端协商的缓存机制</li>
+<li><code>last-modified</code> –&gt; <code>response header</code><br><code>if-modified-since</code> –&gt; <code>request header</code></li>
+<li>需要与<code>cache-control</code>共同使用</li>
+</ul>
+<blockquote>
+<p><code>last-modified</code>有什么缺点？</p>
+</blockquote>
+<ul>
+<li>某些服务端不能获取精确的修改时间</li>
+<li>文件修改时间改了，但文件的内容却没有变</li>
+</ul>
+<h3 id="Etag-和-If-none-match"><a href="#Etag-和-If-none-match" class="headerlink" title="Etag 和 If-none-match"></a>Etag 和 If-none-match</h3><ul>
+<li>文件内容的 hash 值</li>
+<li><code>etag</code> –&gt;<code>reponse header</code><br><code>if-none-match</code> –&gt;<code>request header</code></li>
+<li>需要与<code>cache-control</code>共同使用</li>
+</ul>
+<p>好处：</p>
+<ul>
+<li>比<code>if-modified-since</code>更加准确</li>
+<li>优先级比<code>etage</code>更高</li>
+</ul>
+<img src="/posts/undefined/fenjihuancun.jpg" class="" title="分级缓存策略">
+
+<h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><img src="/posts/undefined/fenjihuancun-liuchengtu.png" class="" title="流程图">
+
+<img src="/posts/undefined/liuchengtu2.png" class="" title="流程图2">
+
+<h2 id="服务端性能优化"><a href="#服务端性能优化" class="headerlink" title="服务端性能优化"></a>服务端性能优化</h2><p>服务端用的 node.js 因为和前端用的同一种语言，可以利用服务端运算能力来进行相关的运算而减少前端的运算</p>
+<ul>
+<li><code>vue</code>渲染遇到的问题</li>
+<li><code>vue-ssr</code>和原理和引用</li>
+</ul>
+<h3 id="vue-渲染面临的问题"><a href="#vue-渲染面临的问题" class="headerlink" title="vue 渲染面临的问题"></a>vue 渲染面临的问题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">先加载vue.js</span><br><span class="line">&#x3D;&gt;  执行vue.js代码</span><br><span class="line">&#x3D;&gt;  生成html</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>以前没有前端框架时，</p>
+</blockquote>
+<ul>
+<li><p>用<code>jsp/php</code>在服务端进行数据的填充，发送给客户端就是已经<code>填充好数据</code>的 html</p>
+</li>
+<li><p>使用<code>jQuery</code>异步加载数据</p>
+</li>
+<li><p>使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">React</span><br></pre></td></tr></table></figure>
+
+<p>和</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vue</span><br></pre></td></tr></table></figure>
+
+<p>前端框架</p>
+<ul>
+<li>代价：需要框架全部加载完，才能把页面渲染出来，页面的首屏性能不好</li>
+</ul>
+</li>
+</ul>
+<h3 id="多层次的优化方案"><a href="#多层次的优化方案" class="headerlink" title="多层次的优化方案"></a>多层次的优化方案</h3><ul>
+<li>构建层的模板编译。<code>runtime</code>,<code>compile</code>拆开,构建层做模板编译工作。<code>webpack</code>构建时候，统一，直接编译成<code>runtime</code>可以执行的代码</li>
+<li>数据无关的<code>prerender</code>的方式</li>
+<li>服务端渲染</li>
+</ul>
+<img src="/posts/undefined/service-side-rendering.png" class="" title="服务端渲染">
+
+<h2 id="文章来源"><a href="#文章来源" class="headerlink" title="文章来源"></a>文章来源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5c011e0c5188252ea66afdfa">前端面试之路四(web 性能优化篇)</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="tag"># 性能优化</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/23904/" rel="prev" title="Vue组件开发——无限菜单">
+                  <i class="fa fa-chevron-left"></i> Vue组件开发——无限菜单
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/7260/" rel="next" title="vue骨架屏">
+                  vue骨架屏 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
