@@ -1,6 +1,5 @@
 ---
 title: 理解Vue中的computed用法以及和methods、watch的区别(摘录)
-date: 2019-10-23 13:49:12
 tags:
   - 笔记
   - Vue
@@ -8,6 +7,8 @@ categories:
   - 前端
   - 框架
   - Vue
+abbrlink: 42683
+date: 2019-10-23 13:49:12
 ---
 
 摘录来源：https://www.cnblogs.com/tugenhua0707/p/11760466.html
