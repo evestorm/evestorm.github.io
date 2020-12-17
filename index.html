@@ -220,20 +220,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">192</span>
+          <span class="site-state-item-count">194</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-count">49</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-count">70</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -270,6 +270,104 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/39457/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/39457/" class="post-title-link" itemprop="url">在vue-cli3项目中解决动态引入图片img404的问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-12-17 23:05:27 / 修改时间：23:13:36" itemprop="dateCreated datePublished" datetime="2020-12-17T23:05:27+08:00">2020-12-17</time>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/39457/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/39457/" class="cy_cmt_count" data-xid="posts/39457/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>最新需要在项目中动态显示侧边栏菜单的图标。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>按照一般的开发模式，静态图片路径是相对路径还是绝对路径都可以，因为图片路径是静态的是死的，所以 webpack 去找这个图片路径的时候是能找到的。</p>
+<p>但是我的这个路径是动态的，我在 <code>computed</code> 给出一个拼接了变量的路径，项目启动在浏览器下死活出不了这个图片，死活都是 404。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`../assets/icc-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述这样的路径是不行的，一直是 404，原因也讲了点，vue-cli3 中内置的 webpack 会把图片当做一个模块引用，然后打包等等，路径就不对了，我们的静态资源是不需要打包等等的，。</p>
+<p>静态资源是直接被 webpack copy 到对应的静态资源文件夹下，所以根本原因就在于，用了动态路径的图片，webpack 将它认作为一个模块打包了，路径错乱，所以 404。</p>
+<p>找到了原因就很简单了，解决这个动态路径图片 404 的方案其实 vue-cli3 官网就有写过：<a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/guide/html-and-static-assets.html#%E5%A4%84%E7%90%86%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90">vue-cli3 的官方解决方案</a></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
+<p>Sidebar.vue</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      customIcon: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      baseUrl: process.env.BASE_URL <span class="comment">// 项目根目录路径前缀</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>把你所用的动态图片 img 放到 public 目录下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── favicon.ico</span><br><span class="line">├── index.html</span><br><span class="line">└── sidebar-icon</span><br><span class="line">    ├── hc-control.png</span><br><span class="line">    ├── hc-list.png</span><br><span class="line">    ├── home.png</span><br><span class="line">    ├── material.png</span><br><span class="line">    ├── package.png</span><br><span class="line">    ├── repo.png</span><br><span class="line">    ├── secure.png</span><br><span class="line">    ├── sys-arg.png</span><br><span class="line">    └── sys-manage.png</span><br></pre></td></tr></table></figure>
+
+<p>修改你的动态路径图片地址:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;<span class="built_in">this</span>.baseUrl&#125;</span>sidebar-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;img :src=<span class="string">&quot;fullURL&quot;</span> /&gt;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1204,118 +1302,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/61674/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/63074/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/63074/" class="post-title-link" itemprop="url">使用Jekyll搭建GitHubPages博客</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-11-16 23:06:43" itemprop="dateCreated datePublished" datetime="2020-11-16T23:06:43+08:00">2020-11-16</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-11-21 23:11:14" itemprop="dateModified" datetime="2020-11-21T23:11:14+08:00">2020-11-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%99%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">教程</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%99%E7%A8%8B/%E5%8D%9A%E5%AE%A2/" itemprop="url" rel="index"><span itemprop="name">博客</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/63074/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/63074/" class="cy_cmt_count" data-xid="posts/63074/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="安装-Jekyll"><a href="#安装-Jekyll" class="headerlink" title="安装 Jekyll"></a>安装 Jekyll</h2><p>来源：<a target="_blank" rel="noopener" href="https://jekyllrb.com/docs/installation/">https://jekyllrb.com/docs/installation/</a></p>
-<h3 id="macOS"><a href="#macOS" class="headerlink" title="macOS"></a>macOS</h3><p>终端运行：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
-
-<p>安装 Ruby：</p>
-<p>Jekyll 依赖 Ruby v2.5.0+，如果你的 macOS 版本为 Catalina 10.15 或以上，则不需要再手动安装，因为系统自带 Ruby 2.6.3 。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/63074/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
