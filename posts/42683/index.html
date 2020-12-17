@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="摘录来源：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;tugenhua0707&#x2F;p&#x2F;11760466.html 一. 理解 Vue 中的 computed 用法computed 是计算属性的; 它会根据所依赖的数据动态显示新的计算结果, 该计算结果会被缓存起来。computed 的值在 getter 执行后是会被缓存的。如果所依赖的数据发生改变时候, 就会重新调用 getter 来计算最新的结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解Vue中的computed用法以及和methods、watch的区别(摘录)">
+<meta property="og:url" content="https://evestorm.github.io/posts/42683/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="摘录来源：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;tugenhua0707&#x2F;p&#x2F;11760466.html 一. 理解 Vue 中的 computed 用法computed 是计算属性的; 它会根据所依赖的数据动态显示新的计算结果, 该计算结果会被缓存起来。computed 的值在 getter 执行后是会被缓存的。如果所依赖的数据发生改变时候, 就会重新调用 getter 来计算最新的结">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/computed-reversedMsg.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/42683/%E7%90%86%E8%A7%A3Vue%E4%B8%AD%E7%9A%84computed%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%92%8Cmethods%E3%80%81watch%E7%9A%84%E5%8C%BA%E5%88%AB(%E6%91%98%E5%BD%95)/vm.msg.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/vm-msg.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/42683/%E7%90%86%E8%A7%A3Vue%E4%B8%AD%E7%9A%84computed%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%92%8Cmethods%E3%80%81watch%E7%9A%84%E5%8C%BA%E5%88%AB(%E6%91%98%E5%BD%95)/mul-computed.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/single.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/single-2.png">
+<meta property="article:published_time" content="2019-10-23T05:49:12.000Z">
+<meta property="article:modified_time" content="2020-12-17T05:52:58.395Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/computed-reversedMsg.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/42683/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>理解Vue中的computed用法以及和methods、watch的区别(摘录) | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E7%90%86%E8%A7%A3-Vue-%E4%B8%AD%E7%9A%84-computed-%E7%94%A8%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">一. 理解 Vue 中的 computed 用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#computed-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">computed 应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%EF%BC%9Acomputed-%E5%92%8C-methods-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">二：computed 和 methods 的区别?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#computed-%E5%92%8C-methods-%E5%8C%BA%E5%88%AB%E6%98%AF"><span class="nav-number">2.1.</span> <span class="nav-text">computed 和 methods 区别是</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%EF%BC%9AVue-%E4%B8%AD%E7%9A%84-watch-%E7%9A%84%E7%94%A8%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">三：Vue 中的 watch 的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#watch-%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E6%98%AF"><span class="nav-number">3.1.</span> <span class="nav-text">watch 的使用场景是</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#watch-%E6%99%AE%E9%80%9A%E7%9B%91%E5%90%AC%E5%92%8C%E6%B7%B1%E5%BA%A6%E7%9B%91%E5%90%AC"><span class="nav-number">3.1.1.</span> <span class="nav-text">watch 普通监听和深度监听</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3-handler-%E6%96%B9%E6%B3%95%E5%8F%8A-immediate-%E5%B1%9E%E6%80%A7"><span class="nav-number">3.1.2.</span> <span class="nav-text">理解 handler 方法及 immediate 属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3-deep-%E5%B1%9E%E6%80%A7"><span class="nav-number">3.1.3.</span> <span class="nav-text">理解 deep 属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#watch-%E5%92%8C-computed-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.1.4.</span> <span class="nav-text">watch 和 computed 的区别</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/42683/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          理解Vue中的computed用法以及和methods、watch的区别(摘录)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-23 13:49:12" itemprop="dateCreated datePublished" datetime="2019-10-23T13:49:12+08:00">2019-10-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-17 13:52:58" itemprop="dateModified" datetime="2020-12-17T13:52:58+08:00">2020-12-17</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/42683/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/42683/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>摘录来源：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tugenhua0707/p/11760466.html">https://www.cnblogs.com/tugenhua0707/p/11760466.html</a></p>
+<h2 id="一-理解-Vue-中的-computed-用法"><a href="#一-理解-Vue-中的-computed-用法" class="headerlink" title="一. 理解 Vue 中的 computed 用法"></a>一. 理解 Vue 中的 computed 用法</h2><p>computed 是计算属性的; 它会根据所依赖的数据动态显示新的计算结果, 该计算结果会被缓存起来。computed 的值在 getter 执行后是会被缓存的。如果所依赖的数据发生改变时候, 就会重新调用 getter 来计算最新的结果。</p>
+<p>下面我们根据官网中的 demo 来理解下 computed 的使用及何时使用 computed。</p>
+<p>computed 设计的初衷是为了使模板中的逻辑运算更简单, 比如在 Vue 模板中有很多复杂的数据计算的话, 我们可以把该计算逻辑放入到 computed 中去计算。</p>
+<a id="more"></a>
+
+<p>下面我们看下官网中的一个 demo 如下:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span>&#123;&#123; msg.split(&#x27;&#x27;).reverse().join(&#x27;&#x27;) &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          msg: <span class="string">&#x27;hello&#x27;</span></span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 我们的 data 属性中的 msg 默认值为 ‘hello’; 然后我们在 vue 模板中会对该数据值进行反转操作后输出数据, 因此在页面上就会显示 ‘olleh’; 这样的数据。这是一个简单的运算, 但是如果页面中的运算比这个还更复杂的话, 这个时候我们可以使用 computed 来进行计算属性值, computed 的目的就是能使模板中的运算逻辑更简单。因此我们现在需要把上面的代码改写成下面如下代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>原来的数据: &#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>反转后的数据为: &#123;&#123; reversedMsg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          msg: <span class="string">&#x27;hello&#x27;</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        computed: &#123;</span><br><span class="line"><span class="javascript">          <span class="function"><span class="title">reversedMsg</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// this 指向 vm 实例</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="built_in">this</span>.msg.split(<span class="string">&#x27;&#x27;</span>).reverse().join(<span class="string">&#x27;&#x27;</span>);</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 我们在 computed 中声明了一个计算属性 reversedMsg。我们提供的 reversedMsg 函数, 将用作属性 vm.reversedMsg 的 getter 函数; 我们可以在上面实例化后代码中, 打印如下信息:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(vm);</span><br></pre></td></tr></table></figure>
+
+<p>打印信息如下所示, 我们可以看到 vm.reversedMsg = ‘olleh’;</p>
+<img src="/posts/undefined/computed-reversedMsg.png" class="" title="computed-reversedMsg">
+
+<p>我们也可以打开控制台, 当我们修改 vm.msg 的值后, vm.reversedMsg 的值也会发生改变，如下控制台打印的信息可知:</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/vue/vm.msg.png"><img src="%E7%90%86%E8%A7%A3Vue%E4%B8%AD%E7%9A%84computed%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%92%8Cmethods%E3%80%81watch%E7%9A%84%E5%8C%BA%E5%88%AB(%E6%91%98%E5%BD%95)/vm.msg.png" alt="img"></a></p>
+<img src="/posts/undefined/vm-msg.png" class="" title="vm.msg">
+
+<p>如上打印的信息我们可以看得到, 我们的 vm.reversedMsg 的值依赖于 vm.msg 的值，当 vm.msg 的值发生改变时, vm.reversedMsg 的值也会得到更新。</p>
+<h3 id="computed-应用场景"><a href="#computed-应用场景" class="headerlink" title="computed 应用场景"></a>computed 应用场景</h3><ol>
+<li>适用于一些重复使用数据或复杂及费时的运算。我们可以把它放入 computed 中进行计算, 然后会在 computed 中缓存起来, 下次就可以直接获取了。</li>
+<li>如果我们需要的数据依赖于其他的数据的话, 我们可以把该数据设计为 computed 中。</li>
+</ol>
+<h2 id="二：computed-和-methods-的区别"><a href="#二：computed-和-methods-的区别" class="headerlink" title="二：computed 和 methods 的区别?"></a>二：computed 和 methods 的区别?</h2><p>如上 demo 代码, 如果我们通过在表达式中调用方法也可以达到同样的效果, 现在我们把代码改成方法, 如下代码:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>原来的数据: &#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>反转后的数据为: &#123;&#123; reversedMsg() &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          msg: <span class="string">&#x27;hello&#x27;</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        /*</span><br><span class="line">      computed: &#123;</span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">reversedMsg</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="comment">// this 指向 vm 实例</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">return</span> <span class="built_in">this</span>.msg.split(<span class="string">&#x27;&#x27;</span>).reverse().join(<span class="string">&#x27;&#x27;</span>)</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      */</span><br><span class="line">        methods: &#123;</span><br><span class="line"><span class="javascript">          <span class="function"><span class="title">reversedMsg</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// this 指向 vm 实例</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="built_in">this</span>.msg.split(<span class="string">&#x27;&#x27;</span>).reverse().join(<span class="string">&#x27;&#x27;</span>);</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line"><span class="javascript">      <span class="built_in">console</span>.log(vm);</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 我们反转后的数据在模板中调用的是方法 reversedMsg(); 该方法在 methods 中也定义了。那么也可以实现同样的效果, 那么他们之间到底有什么区别呢?</p>
+<h3 id="computed-和-methods-区别是"><a href="#computed-和-methods-区别是" class="headerlink" title="computed 和 methods 区别是"></a>computed 和 methods 区别是</h3><ol>
+<li>computed 是基于响应性依赖来进行缓存的。只有在响应式依赖发生改变时它们才会重新求值, 也就是说, 当 msg 属性值没有发生改变时, 多次访问 reversedMsg 计算属性会立即返回之前缓存的计算结果, 而不会再次执行 computed 中的函数。但是 methods 方法中是每次调用, 都会执行函数的, methods 它不是响应式的。</li>
+<li>computed 中的成员可以只定义一个函数作为只读属性, 也可以定义成 get/set 变成可读写属性, 但是 methods 中的成员没有这样的。</li>
+</ol>
+<p>我们可以再看下如下 demo：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第一次调用computed属性: &#123;&#123; reversedMsg &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第二次调用computed属性: &#123;&#123; reversedMsg &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第三次调用computed属性: &#123;&#123; reversedMsg &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 下面是methods调用 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第一次调用methods方法: &#123;&#123; reversedMsg1() &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第二次调用methods方法: &#123;&#123; reversedMsg1() &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span>第三次调用methods方法: &#123;&#123; reversedMsg1() &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          msg: <span class="string">&#x27;hello&#x27;</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        computed: &#123;</span><br><span class="line"><span class="javascript">          <span class="function"><span class="title">reversedMsg</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">console</span>.log(<span class="number">1111</span>);</span></span><br><span class="line"><span class="javascript">            <span class="comment">// this 指向 vm 实例</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="built_in">this</span>.msg.split(<span class="string">&#x27;&#x27;</span>).reverse().join(<span class="string">&#x27;&#x27;</span>);</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        methods: &#123;</span><br><span class="line"><span class="javascript">          <span class="function"><span class="title">reversedMsg1</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">console</span>.log(<span class="number">2222</span>);</span></span><br><span class="line"><span class="javascript">            <span class="comment">// this 指向 vm 实例</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> <span class="built_in">this</span>.msg.split(<span class="string">&#x27;&#x27;</span>).reverse().join(<span class="string">&#x27;&#x27;</span>);</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line"><span class="javascript">      <span class="built_in">console</span>.log(vm);</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>执行后的结果如下所示:</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/vue/mul-computed.png"><img src="%E7%90%86%E8%A7%A3Vue%E4%B8%AD%E7%9A%84computed%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%92%8Cmethods%E3%80%81watch%E7%9A%84%E5%8C%BA%E5%88%AB(%E6%91%98%E5%BD%95)/mul-computed.png" alt="img"></a></p>
+<p>如上代码我们可以看到, 在 computed 中有属性 reversedMsg, 然后在该方法中会打印 1111; 信息出来, 在 methods 中的方法 reversedMsg1 也会打印 2222 信息出来, 但是在 computed 中, 我们除了第一次之后，再次获取 reversedMsg 值后拿得是缓存里面的数据, 因此就不会再执行该 reversedMsg 函数了。但是在 methods 中, 并没有缓存, 每次执行 reversedMsg1()方法后，都会打印信息。<br>从上面截图信息我们就可以验证的。</p>
+<p>那么我们现在再来理解下缓存的作用是什么呢? computed 为什么需要缓存呢? 我们都知道我们的 http 也有缓存, 对于一些静态资源, 我们 nginx 服务器会缓存我们的静态资源，如果静态资源没有发生任何改变的话, 会直接从缓存里面去读取,这样就不会重新去请求服务器数据, 也就是避免了一些无畏的请求, 提高了访问速度, 优化了用户体验。</p>
+<p>对于我们 computed 的也是一样的。如上面代码, 我们调用了 computed 中的 reversedMsg 方法一共有三次，如果我们也有上百次调用或上千次调用的话, 如果依赖的数据没有改变, 那么每次调用都要去计算一遍, 那么肯定会造成很大的浪费。因此 computed 就是来优化这件事的。</p>
+<h2 id="三：Vue-中的-watch-的用法"><a href="#三：Vue-中的-watch-的用法" class="headerlink" title="三：Vue 中的 watch 的用法"></a>三：Vue 中的 watch 的用法</h2><p>watch 它是一个对 data 的数据监听回调, 当依赖的 data 的数据变化时, 会执行回调。在回调中会传入 newVal 和 oldVal 两个参数。<br>Vue 实列将会在实例化时调用$watch(), 他会遍历 watch 对象的每一个属性。</p>
+<h3 id="watch-的使用场景是"><a href="#watch-的使用场景是" class="headerlink" title="watch 的使用场景是"></a>watch 的使用场景是</h3><p>当在 data 中的某个数据发生变化时, 我们需要做一些操作, 或者当需要在数据变化时执行异步或开销较大的操作时. 我们就可以使用 watch 来进行监听。</p>
+<h4 id="watch-普通监听和深度监听"><a href="#watch-普通监听和深度监听" class="headerlink" title="watch 普通监听和深度监听"></a>watch 普通监听和深度监听</h4><p>如下普通监听数据的基本测试代码如下:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>空智个人信息情况: &#123;&#123; basicMsg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">        空智今年的年龄:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">v-model</span>=<span class="string">&quot;age&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          basicMsg: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line">          age: 31,</span><br><span class="line"><span class="javascript">          single: <span class="string">&#x27;单身&#x27;</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        watch: &#123;</span><br><span class="line"><span class="javascript">          <span class="function"><span class="title">age</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.basicMsg = <span class="string">&#x27;今年&#x27;</span> + newVal + <span class="string">&#x27;岁&#x27;</span> + <span class="string">&#x27; &#x27;</span> + <span class="built_in">this</span>.single;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>显示效果如下：</p>
+<img src="/posts/undefined/single.png" class="" title="single">
+
+<p>如上代码, 当我们在 input 输入框中输入年龄后, 比如 32, 那么 watch 就能对 ‘age’ 这个属性进行监听，当值发生改变的时候, 就会把最新的计算结果赋值给 ‘basicMsg’ 属性值, 因此最后在页面上就会显示 ‘basicMsg’ 属性值了。</p>
+<h4 id="理解-handler-方法及-immediate-属性"><a href="#理解-handler-方法及-immediate-属性" class="headerlink" title="理解 handler 方法及 immediate 属性"></a>理解 handler 方法及 immediate 属性</h4><p>如上 watch 有一个特点是: 第一次初始化页面的时候, 是不会去执行 age 这个属性监听的, 只有当 age 值发生改变的时候才会执行监听计算. 因此我们上面第一次初始化页面的时候, ‘basicMsg’ 属性值默认为空字符串。那么我们现在想要第一次初始化页面的时候也希望它能够执行 ‘age’ 进行监听, 最后能把结果返回给 ‘basicMsg’ 值来。因此我们需要修改下我们的 watch 的方法，需要引入 handler 方法和 immediate 属性, 代码如下所示:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>空智个人信息情况: &#123;&#123; basicMsg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">        空智今年的年龄:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">v-model</span>=<span class="string">&quot;age&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line"><span class="javascript">          basicMsg: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line">          age: 31,</span><br><span class="line"><span class="javascript">          single: <span class="string">&#x27;单身&#x27;</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        watch: &#123;</span><br><span class="line">          age: &#123;</span><br><span class="line"><span class="javascript">            <span class="function"><span class="title">handler</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.basicMsg = <span class="string">&#x27;今年&#x27;</span> + newVal + <span class="string">&#x27;岁&#x27;</span> + <span class="string">&#x27; &#x27;</span> + <span class="built_in">this</span>.single;</span></span><br><span class="line">            &#125;,</span><br><span class="line"><span class="javascript">            immediate: <span class="literal">true</span></span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 我们给我们的 age 属性绑定了一个 handler 方法。其实我们之前的 watch 当中的方法默认就是这个 handler 方法。但是在这里我们使用了 immediate: true; 属性，含义是: 如果在 watch 里面声明了 age 的话, 就会立即执行里面的 handler 方法。如果 immediate 值为 false 的话,那么效果就和之前的一样, 就不会立即执行 handler 这个方法的。因此设置了 immediate:true 的话,第一次页面加载的时候也会执行该 handler 函数的。即第一次 basicMsg 有值。</p>
+<p>因此第一次页面初始化效果如下：</p>
+<img src="/posts/undefined/single-2.png" class="" title="single-2">
+
+<h4 id="理解-deep-属性"><a href="#理解-deep-属性" class="headerlink" title="理解 deep 属性"></a>理解 deep 属性</h4><p>watch 里面有一个属性为 deep，含义是：是否深度监听某个对象的值, 该值默认为 false。</p>
+<p>如下测试代码:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>空智个人信息情况: &#123;&#123; basicMsg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">        空智今年的年龄:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">v-model</span>=<span class="string">&quot;obj.age&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line">          obj: &#123;</span><br><span class="line"><span class="javascript">            basicMsg: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line">            age: 31,</span><br><span class="line"><span class="javascript">            single: <span class="string">&#x27;单身&#x27;</span></span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        watch: &#123;</span><br><span class="line">          obj: &#123;</span><br><span class="line"><span class="javascript">            <span class="function"><span class="title">handler</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.basicMsg =</span></span><br><span class="line"><span class="javascript">                <span class="string">&#x27;今年&#x27;</span> + newVal.age + <span class="string">&#x27;岁&#x27;</span> + <span class="string">&#x27; &#x27;</span> + <span class="built_in">this</span>.obj.single;</span></span><br><span class="line">            &#125;,</span><br><span class="line"><span class="javascript">            immediate: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">            deep: <span class="literal">true</span> <span class="comment">// 需要添加deep为true即可对obj进行深度监听</span></span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上测试代码, 如果我们不把 deep: true 添加的话,当我们在输入框中输入值的时候，改变 obj.age 值后，obj 对象中的 handler 函数是不会被执行到的。受 JS 的限制, Vue 不能检测到对象属性的添加或删除的。它只能监听到 obj 这个对象的变化,比如说对 obj 赋值操作会被监听到。比如在 mounted 事件钩子函数中对我们的 obj 进行重新赋值操作, 如下代码:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="built_in">this</span>.obj = &#123;</span><br><span class="line">    age: <span class="number">22</span>,</span><br><span class="line">    basicMsg: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    single: <span class="string">&#x27;单身&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后我们的页面会被渲染到 age 为 22; 因此这样我们的 handler 函数才会被执行到。如果我们需要监听对象中的某个属性值的话, 我们可以使用 deep 设置为 true 即可生效。deep 实现机制是: 监听器会一层层的往下遍历, 给对象的所有属性都加上这个监听器。当然性能开销会非常大的。</p>
+<p>当然我们可以直接对对象中的某个属性进行监听的，比如就对 ‘obj.age’ 来进行监听， 如下代码也是可以生效的。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>vue<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    &lt;script</span><br><span class="line">      type=&quot;text/javascript&quot;</span><br><span class="line">      src=&quot;https://cn.vuejs.org/js/vue.js&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>空智个人信息情况: &#123;&#123; basicMsg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">        空智今年的年龄:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">v-model</span>=<span class="string">&quot;obj.age&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">        el: <span class="string">&#x27;#app&#x27;</span>,</span></span><br><span class="line">        data: &#123;</span><br><span class="line">          obj: &#123;</span><br><span class="line"><span class="javascript">            basicMsg: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line">            age: 31,</span><br><span class="line"><span class="javascript">            single: <span class="string">&#x27;单身&#x27;</span></span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        watch: &#123;</span><br><span class="line"><span class="javascript">          <span class="string">&#x27;obj.age&#x27;</span>: &#123;</span></span><br><span class="line"><span class="javascript">            <span class="function"><span class="title">handler</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.basicMsg = <span class="string">&#x27;今年&#x27;</span> + newVal + <span class="string">&#x27;岁&#x27;</span> + <span class="string">&#x27; &#x27;</span> + <span class="built_in">this</span>.obj.single;</span></span><br><span class="line">            &#125;,</span><br><span class="line"><span class="javascript">            immediate: <span class="literal">true</span></span></span><br><span class="line"><span class="javascript">            <span class="comment">// deep: true // 需要添加deep为true即可对obj进行深度监听</span></span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="watch-和-computed-的区别"><a href="#watch-和-computed-的区别" class="headerlink" title="watch 和 computed 的区别"></a>watch 和 computed 的区别</h4><p>相同点：他们两者都是观察页面数据变化的。</p>
+<p>不同点：computed 只有当依赖的数据变化时才会计算, 当数据没有变化时, 它会读取缓存数据。<br>watch 每次都需要执行函数。watch 更适用于数据变化时的异步操作。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/64509/" rel="prev" title="Tree-Shaking性能优化实践(笔记)">
+                  <i class="fa fa-chevron-left"></i> Tree-Shaking性能优化实践(笔记)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/29270/" rel="next" title="Webpack4-Shimming(垫片)">
+                  Webpack4-Shimming(垫片) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>

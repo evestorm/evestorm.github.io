@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="cookie 与 本地存储 相关cookie、session、localStorage 分别是什么？cookie 是存储在浏览器上的一小段数据，用来记录某些当页面关闭或者刷新后仍然需要记录的信息。 用户在输入用户名密码提交给服务端，服务端验证通过后会创建一个 session 用于记录用户的相关信息，这个 session 可保存在服务器内存中，也可保存在数据库中。 localStorage HTML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浏览器面试题（面试系列）">
+<meta property="og:url" content="https://evestorm.github.io/posts/46105/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="cookie 与 本地存储 相关cookie、session、localStorage 分别是什么？cookie 是存储在浏览器上的一小段数据，用来记录某些当页面关闭或者刷新后仍然需要记录的信息。 用户在输入用户名密码提交给服务端，服务端验证通过后会创建一个 session 用于记录用户的相关信息，这个 session 可保存在服务器内存中，也可保存在数据库中。 localStorage HTML">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1549091602173-872e7ae7-1532-4933-a7e6-4f53f2e9ceb8.jpeg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1549091477928-50957a41-1e84-437f-8f6e-992f430730f4.jpeg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1550494473608-b1c458fe-f534-4674-ba30-32fc27deffd6.jpeg">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/53062591-3d846300-34fc-11e9-8d0f-4063d9ff3398.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1550471555226-f1590db6-b11b-4e76-8eb5-9fed21299719.png">
+<meta property="article:published_time" content="2019-06-09T05:44:29.000Z">
+<meta property="article:modified_time" content="2020-12-17T05:50:56.569Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/46105/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>浏览器面试题（面试系列） | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie-%E4%B8%8E-%E6%9C%AC%E5%9C%B0%E5%AD%98%E5%82%A8-%E7%9B%B8%E5%85%B3"><span class="nav-number">1.</span> <span class="nav-text">cookie 与 本地存储 相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie%E3%80%81session%E3%80%81localStorage-%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">cookie、session、localStorage 分别是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">cookie 的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie-localStorage-%E5%92%8C-sessionStorage-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.</span> <span class="nav-text">cookie, localStorage 和 sessionStorage 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8%E9%80%94"><span class="nav-number">1.3.1.</span> <span class="nav-text">用途</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%A4%A7%E5%B0%8F"><span class="nav-number">1.3.2.</span> <span class="nav-text">存储大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E6%95%88%E6%9C%9F"><span class="nav-number">1.3.3.</span> <span class="nav-text">有效期</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie-%E4%B8%8E-session-%E5%8C%BA%E5%88%AB"><span class="nav-number">1.4.</span> <span class="nav-text">cookie 与 session 区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%90%8C%E4%B8%80%E4%B8%AA%E6%B5%8F%E8%A7%88%E5%99%A8%E5%A4%9A%E4%B8%AA%E6%A0%87%E7%AD%BE%E9%A1%B5%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1%EF%BC%9F"><span class="nav-number">1.5.</span> <span class="nav-text">如何实现同一个浏览器多个标签页之间的通信？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML5-%E7%9A%84%E7%A6%BB%E7%BA%BF%E5%82%A8%E5%AD%98%E4%BD%BF%E7%94%A8%EF%BC%8C%E8%A7%A3%E9%87%8A%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%EF%BC%9F"><span class="nav-number">1.6.</span> <span class="nav-text">HTML5 的离线储存使用，解释工作原理？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AF%B9-HTML5-%E7%A6%BB%E7%BA%BF%E5%82%A8%E5%AD%98%E8%B5%84%E6%BA%90%E7%9A%84%E7%AE%A1%E7%90%86%E5%92%8C%E5%8A%A0%E8%BD%BD%EF%BC%9F"><span class="nav-number">1.7.</span> <span class="nav-text">浏览器对 HTML5 离线储存资源的管理和加载？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%82%B9%E5%A4%96%E5%8D%96%E7%9A%84%E4%BB%BD%E6%95%B0%E6%80%8E%E4%B9%88%E5%92%8C%E5%90%8E%E5%8F%B0%E9%80%9A%E4%BF%A1%EF%BC%9F%E4%B8%87%E4%B8%80%E7%94%A8%E6%88%B7%E4%B8%AD%E6%96%AD%E4%BA%86%E5%86%8D%E8%BF%9B%E4%BA%86%E6%80%8E%E4%B9%88%E8%8E%B7%E5%8F%96%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8-cookie%EF%BC%9F"><span class="nav-number">1.8.</span> <span class="nav-text">用户点外卖的份数怎么和后台通信？万一用户中断了再进了怎么获取？为什么不用 cookie？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">兼容性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E5%B8%B8%E9%81%87%E5%88%B0%E7%9A%84%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%85%BC%E5%AE%B9%E6%80%A7%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">经常遇到的浏览器的兼容性有哪些？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%85%BC%E5%AE%B9%E6%80%A7%E5%91%A2%EF%BC%9F"><span class="nav-number">2.2.</span> <span class="nav-text">移动端兼容性呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#position-fixed-%E5%9C%A8-android-%E4%B8%8B%E6%97%A0%E6%95%88%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%EF%BC%9F%E3%80%90%E2%9D%8C-%E5%BE%85%E9%AA%8C%E8%AF%81%E3%80%91"><span class="nav-number">2.2.1.</span> <span class="nav-text">position:fixed; 在 android 下无效怎么处理？【❌ 待验证】</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%9A%84%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6%E7%9A%84%E6%9C%89%E5%BB%B6%E8%BF%9F%EF%BC%8C%E6%97%B6%E9%97%B4%E6%98%AF%E5%A4%9A%E4%B9%85%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%EF%BC%9F-%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3%E8%BF%99%E4%B8%AA%E5%BB%B6%E6%97%B6%EF%BC%9F%E2%9D%8C"><span class="nav-number">2.2.2.</span> <span class="nav-text">移动端的点击事件的有延迟，时间是多久，为什么会有？ 怎么解决这个延时？❌</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E5%81%9A%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%A1%B9%E7%9B%AE%E6%97%B6%E9%81%87%E5%88%B0%E8%BF%87%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">2.2.3.</span> <span class="nav-text">在做移动端项目时遇到过什么问题？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Polyfill"><span class="nav-number">2.3.</span> <span class="nav-text">Polyfill</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Polyfill"><span class="nav-number">2.3.1.</span> <span class="nav-text">什么是 Polyfill</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%9A%E7%9A%84%E9%A1%B9%E7%9B%AE%E4%B8%AD%EF%BC%8C%E6%9C%89%E6%B2%A1%E6%9C%89%E7%94%A8%E8%BF%87%E6%88%96%E8%87%AA%E5%B7%B1%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%BA%9B-polyfill-%E6%96%B9%E6%A1%88%EF%BC%88%E5%85%BC%E5%AE%B9%E6%80%A7%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88%EF%BC%89%EF%BC%9F%E2%9D%8C"><span class="nav-number">2.3.2.</span> <span class="nav-text">做的项目中，有没有用过或自己实现一些 polyfill 方案（兼容性处理方案）？❌</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%97%E4%B8%BE-IE-%E4%B8%8E%E5%85%B6%E4%BB%96%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E7%89%B9%E6%80%A7%EF%BC%9F"><span class="nav-number">2.4.</span> <span class="nav-text">列举 IE 与其他浏览器不一样的特性？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E7%9B%AE%E6%A0%87%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.4.1.</span> <span class="nav-text">事件目标对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%AD%97%E7%AC%A6%E4%BB%A3%E7%A0%81"><span class="nav-number">2.4.2.</span> <span class="nav-text">获取字符代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%BB%E6%AD%A2%E6%9F%90%E4%B8%AA%E4%BA%8B%E4%BB%B6%E7%9A%84%E9%BB%98%E8%AE%A4%E8%A1%8C%E4%B8%BA"><span class="nav-number">2.4.3.</span> <span class="nav-text">阻止某个事件的默认行为</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E4%BA%8B%E4%BB%B6%E5%86%92%E6%B3%A1"><span class="nav-number">2.4.4.</span> <span class="nav-text">停止事件冒泡</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E4%BF%A1"><span class="nav-number">3.</span> <span class="nav-text">通信</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E5%A4%9A%E4%B8%AA%E6%A0%87%E7%AD%BE%E9%A1%B5%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1-%E9%98%BF%E9%87%8C"><span class="nav-number">3.1.</span> <span class="nav-text">如何实现浏览器内多个标签页之间的通信? (阿里)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webSocket-%E5%A6%82%E4%BD%95%E5%85%BC%E5%AE%B9%E4%BD%8E%E6%B5%8F%E8%A7%88%E5%99%A8%EF%BC%9F-%E9%98%BF%E9%87%8C"><span class="nav-number">3.2.</span> <span class="nav-text">webSocket 如何兼容低浏览器？(阿里)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E6%B8%B2%E6%9F%93%E4%B8%8E%E7%BC%93%E5%AD%98"><span class="nav-number">4.</span> <span class="nav-text">页面渲染与缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E8%BE%93%E5%85%A5-URL-%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%8E%B0%E4%B8%AD%E9%97%B4%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">4.1.</span> <span class="nav-text">从输入 URL 到页面展现中间发生了什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#style-%E6%A0%87%E7%AD%BE%E5%86%99%E5%9C%A8-body-%E5%90%8E%E4%B8%8E-body-%E5%89%8D%EF%BC%88head%EF%BC%89%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">style 标签写在 body 后与 body 前（head）有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">4.3.</span> <span class="nav-text">缓存策略执行过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA-Response-Header-%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.3.1.</span> <span class="nav-text">一个 Response Header 示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%BA%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98%E7%9A%84%E5%BC%82%E5%90%8C"><span class="nav-number">4.4.</span> <span class="nav-text">强缓存与协商缓存的异同</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">4.4.1.</span> <span class="nav-text">基本原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%B5%E9%9D%A2%E6%AF%8F%E6%AC%A1%E6%89%93%E5%BC%80%E6%97%B6%E6%B8%85%E9%99%A4%E6%9C%AC%E9%A1%B5%E7%BC%93%E5%AD%98%EF%BC%9F"><span class="nav-number">4.5.</span> <span class="nav-text">如何实现页面每次打开时清除本页缓存？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expires-%E5%92%8C-cache-control-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.6.</span> <span class="nav-text">expires 和 cache-control 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http-get-%E5%92%8C-post-%E5%8C%BA%E5%88%AB"><span class="nav-number">4.7.</span> <span class="nav-text">http get 和 post 区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cache-control-%E5%92%8C-Etag-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.8.</span> <span class="nav-text">cache-control 和 Etag 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http-%E5%92%8C-https-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.9.</span> <span class="nav-text">http 和 https 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTPS"><span class="nav-number">4.9.1.</span> <span class="nav-text">HTTPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTPS-%E4%BD%9C%E7%94%A8"><span class="nav-number">4.9.2.</span> <span class="nav-text">HTTPS 作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%BA%E5%88%AB"><span class="nav-number">4.9.3.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E9%9D%9E%E5%AF%B9%E7%A7%B0%E6%80%A7%E5%8A%A0%E5%AF%86%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">4.9.4.</span> <span class="nav-text">对非对称性加密的理解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D-HTTPS-%E6%8F%A1%E6%89%8B%E8%BF%87%E7%A8%8B"><span class="nav-number">4.9.5.</span> <span class="nav-text">介绍 HTTPS 握手过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP1-1-%E4%B8%8E-HTTP2-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.10.</span> <span class="nav-text">HTTP1.1 与 HTTP2 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E8%AE%B2%E8%A7%A3%E4%B8%80%E4%B8%8B-http2-%E7%9A%84%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="nav-number">4.10.1.</span> <span class="nav-text">简单讲解一下 http2 的多路复用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%A0%E6%9C%89%E7%94%A8%E8%BF%87%E5%93%AA%E4%BA%9B%E5%89%8D%E7%AB%AF%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%9F"><span class="nav-number">5.1.</span> <span class="nav-text">你有用过哪些前端性能优化的方法？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E5%90%88%E5%B9%B6%E5%8E%8B%E7%BC%A9"><span class="nav-number">5.1.1.</span> <span class="nav-text">资源合并压缩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E4%BC%98%E5%8C%96"><span class="nav-number">5.1.2.</span> <span class="nav-text">浏览器加载原理优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%BC%98%E5%8C%96"><span class="nav-number">5.2.</span> <span class="nav-text">缓存优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E4%BC%98%E5%8C%96"><span class="nav-number">5.3.</span> <span class="nav-text">渲染优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E5%AE%83"><span class="nav-number">6.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E7%89%88%E6%9C%AC%E7%89%88%E6%9C%AC%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="nav-number">6.1.</span> <span class="nav-text">检测浏览器版本版本有哪些方式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E7%94%A8%E6%88%B7%E7%9A%84%E6%B5%8F%E8%A7%88%E5%99%A8%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.2.</span> <span class="nav-text">判断用户的浏览器类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D%E4%B8%80%E4%B8%8B%E4%BD%A0%E5%AF%B9%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E6%A0%B8%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">6.3.</span> <span class="nav-text">介绍一下你对浏览器内核的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">6.4.</span> <span class="nav-text">常见状态码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%88%E8%B0%88%E4%BD%A0%E5%AF%B9-TCP-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">6.5.</span> <span class="nav-text">谈谈你对 TCP 三次握手和四次挥手的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%81%E6%80%A7-Page-Visibility-API-%E6%9C%89%E5%93%AA%E4%BA%9B%E7%94%A8%E9%80%94"><span class="nav-number">6.6.</span> <span class="nav-text">页面可见性(Page Visibility API)有哪些用途</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E9%A1%B5%E9%AA%8C%E8%AF%81%E7%A0%81%E5%B9%B2%E5%98%9B%E7%9A%84-%E6%98%AF%E4%B8%BA%E4%BA%86%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98"><span class="nav-number">6.7.</span> <span class="nav-text">网页验证码干嘛的,是为了解决什么安全问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E9%9C%80%E8%A6%81%E6%89%8B%E5%8A%A8%E5%86%99%E5%8A%A8%E7%94%BB%EF%BC%8C%E4%BD%A0%E8%AE%A4%E4%B8%BA%E6%9C%80%E5%B0%8F%E6%97%B6%E9%97%B4%E9%97%B4%E9%9A%94%E6%98%AF%E5%A4%9A%E4%B9%85%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">6.8.</span> <span class="nav-text">如果需要手动写动画，你认为最小时间间隔是多久，为什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%AE%BF%E9%97%AE%E9%A1%B5%E9%9D%A2%E4%B8%AD%E6%97%B6%E5%BC%B9%E5%87%BA%E5%BC%95%E5%AF%BC%EF%BC%8C%E7%94%A8%E6%88%B7%E5%85%B3%E9%97%AD%E5%BC%95%E5%AF%BC%EF%BC%8C%E4%B9%8B%E5%90%8E%E5%86%8D%E6%AC%A1%E8%BF%9B%E5%85%A5%E9%A1%B5%E9%9D%A2%E6%97%B6%E4%B8%8D%E5%B8%8C%E6%9C%9B%E5%87%BA%E7%8E%B0%E5%BC%95%E5%AF%BC%EF%BC%8C%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%EF%BC%9F%E2%9D%8C"><span class="nav-number">6.9.</span> <span class="nav-text">第一次访问页面中时弹出引导，用户关闭引导，之后再次进入页面时不希望出现引导，如何实现？❌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E9%A1%B5%E9%9D%A2%E6%93%8D%E4%BD%9C%E4%B8%8D%E4%BC%9A%E6%95%B4%E9%A1%B5%E5%88%B7%E6%96%B0%E7%9A%84%E7%BD%91%E7%AB%99%EF%BC%8C%E5%B9%B6%E4%B8%94%E8%83%BD%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%89%8D%E8%BF%9B%EF%BC%8C%E5%90%8E%E9%80%80%E6%97%B6%E6%AD%A3%E7%A1%AE%E5%93%8D%E5%BA%94%E3%80%82%E7%BB%99%E5%87%BA%E4%BD%A0%E7%9A%84%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%EF%BC%9F"><span class="nav-number">6.10.</span> <span class="nav-text">实现一个页面操作不会整页刷新的网站，并且能在浏览器的前进，后退时正确响应。给出你的技术实现方案？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#websocket"><span class="nav-number">6.11.</span> <span class="nav-text">websocket</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8E-HTTP-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.11.1.</span> <span class="nav-text">与 HTTP 的区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-%E5%92%8C-UDP"><span class="nav-number">6.12.</span> <span class="nav-text">TCP 和 UDP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP%EF%BC%88Transmission-Control-Protocol%EF%BC%8C%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE%EF%BC%89"><span class="nav-number">6.12.1.</span> <span class="nav-text">TCP（Transmission Control Protocol，传输控制协议）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#TCP-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E8%BF%87%E7%A8%8B"><span class="nav-number">6.12.1.1.</span> <span class="nav-text">TCP 三次握手过程</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E6%96%AD%E5%BC%80%E8%BF%9E%E6%8E%A5%E8%A6%81%E8%BF%9B%E8%A1%8C-4-%E6%AC%A1"><span class="nav-number">6.12.2.</span> <span class="nav-text">TCP 断开连接要进行 4 次</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP%EF%BC%88User-Data-Protocol%EF%BC%8C%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%8D%8F%E8%AE%AE%EF%BC%89"><span class="nav-number">6.12.3.</span> <span class="nav-text">UDP（User Data Protocol，用户数据报协议）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E4%B8%8E-UDP-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.12.4.</span> <span class="nav-text">TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.12.5.</span> <span class="nav-text">使用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%B8%83%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="nav-number">6.13.</span> <span class="nav-text">网络七层协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CDN-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">6.14.</span> <span class="nav-text">CDN 是什么</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/46105/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          浏览器面试题（面试系列）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-09 13:44:29" itemprop="dateCreated datePublished" datetime="2019-06-09T13:44:29+08:00">2019-06-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-12-17 13:50:56" itemprop="dateModified" datetime="2020-12-17T13:50:56+08:00">2020-12-17</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">面试</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/46105/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/46105/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="cookie-与-本地存储-相关"><a href="#cookie-与-本地存储-相关" class="headerlink" title="cookie 与 本地存储 相关"></a>cookie 与 本地存储 相关</h2><h3 id="cookie、session、localStorage-分别是什么？"><a href="#cookie、session、localStorage-分别是什么？" class="headerlink" title="cookie、session、localStorage 分别是什么？"></a>cookie、session、localStorage 分别是什么？</h3><p>cookie 是存储在浏览器上的一小段数据，用来记录某些当页面关闭或者刷新后仍然需要记录的信息。</p>
+<p>用户在输入用户名密码提交给服务端，服务端验证通过后会创建一个 session 用于记录用户的相关信息，这个 session 可保存在服务器内存中，也可保存在数据库中。</p>
+<p>localStorage HTML5 本地存储 web storage 特性的 API 之一，用于将大量数据（最大 5M）保存在浏览器中，保存后数据永远存在不会失效过期，除非用 JS 手动清除。</p>
+<a id="more"></a>
+
+<h3 id="cookie-的使用"><a href="#cookie-的使用" class="headerlink" title="cookie 的使用"></a>cookie 的使用</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置</span></span><br><span class="line"><span class="built_in">document</span>.cookie = <span class="string">&#x27;age=16&#x27;</span>; <span class="comment">// 每次只能设置一对cookie</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取</span></span><br><span class="line"><span class="built_in">document</span>.cookie; <span class="comment">// 获取全部cookie值，获取特定用循环</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除</span></span><br><span class="line"><span class="built_in">document</span>.cookie = <span class="string">&#x27;name=xiaoming; max-age=-1000&#x27;</span>; <span class="comment">// 设置一个当前之前的时间即可</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置过期时间</span></span><br><span class="line"><span class="keyword">var</span> name = <span class="string">&#x27;one_name&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> value = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> exp = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">exp.setTime(exp.getTime() + <span class="number">60</span> * <span class="number">2000</span>); <span class="comment">// 过期时间 2分钟</span></span><br><span class="line"><span class="built_in">document</span>.cookie = name + <span class="string">&#x27;=&#x27;</span> + <span class="built_in">escape</span>(value) + <span class="string">&#x27;;expires=&#x27;</span> + exp.toGMTString();</span><br><span class="line"><span class="built_in">console</span>.log(name + <span class="string">&#x27;=&#x27;</span> + <span class="built_in">escape</span>(value) + <span class="string">&#x27;;expires=&#x27;</span> + exp.toGMTString());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果不在浏览器中设置过期时间，cookie 被保存在内存中，生命周期随浏览器的关闭而结束，</span></span><br><span class="line"><span class="comment">// 这种 cookie 简称会话 cookie。</span></span><br><span class="line"><span class="comment">// 如果在浏览器中设置了 cookie 的过期时间，cookie 被保存在硬盘中，</span></span><br><span class="line"><span class="comment">// 关闭浏览器后，cookie 数据仍然存在，直到过期时间结束才消失。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="cookie-localStorage-和-sessionStorage-的区别"><a href="#cookie-localStorage-和-sessionStorage-的区别" class="headerlink" title="cookie, localStorage 和 sessionStorage 的区别"></a>cookie, localStorage 和 sessionStorage 的区别</h3><h4 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h4><ul>
+<li>cookie：是服务器发给浏览器保存的（字符串）数据，一般用来记录用户信息方便服务端确认用户身份</li>
+<li>localStorage、sessionStorage：本地存储，可以保存一些不太重要的数据，例如当前用户坐标，购物车信息等</li>
+</ul>
+<h4 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h4><ul>
+<li>cookie：4k</li>
+<li>localStorage, sessionStorage：5M</li>
+</ul>
+<h4 id="有效期"><a href="#有效期" class="headerlink" title="有效期"></a>有效期</h4><ul>
+<li>cookie：关闭浏览器失效（默认）</li>
+<li>localStorage：永久，除非 js 手动删和清除浏览器缓存</li>
+<li>sessionStorage：页面不关闭就不失效，包括重新加载或恢复页面也不失效。但在新标签或窗口打开一个页面，则会重新生成</li>
+</ul>
+<h3 id="cookie-与-session-区别"><a href="#cookie-与-session-区别" class="headerlink" title="cookie 与 session 区别"></a>cookie 与 session 区别</h3><p>都是用来确认用户身份的，区别在于 cookie 保存在客户端，session 保存在服务端。</p>
+<p>另外，session 是基于 cookie 的。服务器端在生成 session 后，会让客户端的 cookie 代为保存 sessionID 。</p>
+<img src="/posts/undefined/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908.png" class="" title="cookie">
+
+<img src="/posts/undefined/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a.png" class="" title="session">
+
+<p>阅读：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000017332168">一文带你看懂 cookie，面试前端不用愁</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5b18d322e51d4506cf10af7c">聊一聊 cookie</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/q/1010000007715137">Cookie 禁用了，Session 还能用吗？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/cc951b6a75e3">session,cookie,sessionStorage,localStorage 的区别及应用场景</a></li>
+</ul>
+<h3 id="如何实现同一个浏览器多个标签页之间的通信？"><a href="#如何实现同一个浏览器多个标签页之间的通信？" class="headerlink" title="如何实现同一个浏览器多个标签页之间的通信？"></a>如何实现同一个浏览器多个标签页之间的通信？</h3><p><strong>1. websocket 通讯</strong></p>
+<p>全双工（full-duplex）通信自然可以实现多个标签页之间的通信。</p>
+<p><strong>2. 定时器 setInterval+cookie</strong></p>
+<p>在页面 A 设置一个使用 setInterval 定时器不断刷新，检查 Cookies 的值是否发生变化，如果变化就进行刷新的操作。</p>
+<p><strong>3. 使用 localStorage</strong></p>
+<p>localStorage 是浏览器多个标签共用的存储空间，所以可以用来实现多标签之间的通信（ps：session 是会话级的存储空间，每个标签页都是单独的）。</p>
+<p>直接在 window 对象上添加监听即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onstorage = <span class="function"><span class="params">e</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者这样</span></span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">&#x27;storage&#x27;</span>, <span class="function"><span class="params">e</span> =&gt;</span> <span class="built_in">console</span>.log(e));</span><br></pre></td></tr></table></figure>
+
+<h3 id="HTML5-的离线储存使用，解释工作原理？"><a href="#HTML5-的离线储存使用，解释工作原理？" class="headerlink" title="HTML5 的离线储存使用，解释工作原理？"></a>HTML5 的离线储存使用，解释工作原理？</h3><blockquote>
+<p>在用户没有与因特网连接时，可以正常访问站点或应用，在用户与因特网连接时，更新用户机器上的缓存文件。 原理：HTML5 的离线存储是基于一个新建的 .appcache 文件的缓存机制(不是存储技术)，通过这个文件上的解析清单离线存储资源，这些资源就会像 cookie 一样被存储了下来。之后当网络在处于离线状态下时，浏览器会通过被离线存储的数据进行页面展示。</p>
+</blockquote>
+<p>如何使用：</p>
+<ol>
+<li>页面头部像下面一样加入一个 manifest 的属性</li>
+<li>在 cache.manifest 文件的编写离线存储的资源</li>
+<li>在离线状态时，操作 window.applicationCache 进行需求实现。</li>
+</ol>
+<p>详细的使用请参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://yanhaijing.com/html/2014/12/28/html5-manifest/">HTML5 离线缓存-manifest 简介</a></li>
+<li><a target="_blank" rel="noopener" href="http://segmentfault.com/a/1190000000732617">有趣的 HTML5：离线存储</a></li>
+</ul>
+<h3 id="浏览器对-HTML5-离线储存资源的管理和加载？"><a href="#浏览器对-HTML5-离线储存资源的管理和加载？" class="headerlink" title="浏览器对 HTML5 离线储存资源的管理和加载？"></a>浏览器对 HTML5 离线储存资源的管理和加载？</h3><p>在线的情况下:</p>
+<p>浏览器发现 html 头部有 manifest 属性，它会请求 manifest 文件，如果是第一次访问 app ，那么浏览器就会根据 manifest 文件的内容下载相应的资源并且进行离线存储。如果已经访问过 app 并且资源已经离线存储了，那么浏览器就会使用离线的资源加载页面，然后浏览器会对比新的 manifest 文件与旧的 manifest 文件，如果文件没有发生改变，就不做任何操作，如果文件改变了，那么就会重新下载文件中的资源并进行离线存储。</p>
+<p>离线的情况下:</p>
+<p>浏览器就直接使用离线存储的资源。</p>
+<h3 id="用户点外卖的份数怎么和后台通信？万一用户中断了再进了怎么获取？为什么不用-cookie？"><a href="#用户点外卖的份数怎么和后台通信？万一用户中断了再进了怎么获取？为什么不用-cookie？" class="headerlink" title="用户点外卖的份数怎么和后台通信？万一用户中断了再进了怎么获取？为什么不用 cookie？"></a>用户点外卖的份数怎么和后台通信？万一用户中断了再进了怎么获取？为什么不用 cookie？</h3><ul>
+<li>将购物车信息存在 localStorage</li>
+<li>从 localStorage 中获取</li>
+<li>用户禁用 cookie 时无法使用</li>
+</ul>
+<h2 id="兼容性"><a href="#兼容性" class="headerlink" title="兼容性"></a>兼容性</h2><h3 id="经常遇到的浏览器的兼容性有哪些？"><a href="#经常遇到的浏览器的兼容性有哪些？" class="headerlink" title="经常遇到的浏览器的兼容性有哪些？"></a>经常遇到的浏览器的兼容性有哪些？</h3><ul>
+<li>IE 浏览器不支持 Promise<ul>
+<li>babel-polyfill → webpack.config.js 的 entry 中设置 [‘babel-polyfill’, ‘./src/main.js’]</li>
+</ul>
+</li>
+<li>各浏览器之间默认样式的差异<ul>
+<li>normalize.css<ul>
+<li>与 reset 区别 → normalize.css 消除各浏览器之间默认样式的差异、保留有用的默认样式；而 reset 会清除所有的默认样式，过于暴力，例如会让 h 标题标签不再默认加粗，ul li 前面默认的小圆点也没了）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>html5 某些新增标签不被识别<ul>
+<li>html5shiv.js - 解决 ie9 以下对 html5 某些新增标签不识别的问题（e.g. video 标签不识别不显示）<ul>
+<li>用法：<code>[if lt IE 9]&gt;&lt;script&gt; src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&lt;/script&gt;&lt;![endif]</code></li>
+</ul>
+</li>
+<li>通过 document.createElement 方法产生的标签， 可以利用这一特性让这些浏览器支持 HTML5 新标签，浏览器支持新标签后，还需要添加标签默认的样式。</li>
+</ul>
+</li>
+<li>CSS3 媒体查询失效<ul>
+<li>respond.js - 能解决 ie9 以下不支持媒体查询问题</li>
+</ul>
+</li>
+<li>自动添加浏览器前缀<ul>
+<li>posscss-loader+autoprefixer</li>
+</ul>
+</li>
+<li>ie6 不支持 min-height/width<ul>
+<li>添加额外的 <code>_min-height</code> ie6 识别</li>
+</ul>
+</li>
+<li>常见 hack（针对特定 ie 版本的样式控制）<ul>
+<li>_color - ie6 识别</li>
+<li>*color - ie6/7 识别</li>
+<li>color: red\9; ie8 及以下识别</li>
+</ul>
+</li>
+<li>ie 条件注释写法：(lt 小于 | gt 大于 | lte 小于等于 | gte 大于等于 | ! 不等于)</li>
+</ul>
+<h3 id="移动端兼容性呢？"><a href="#移动端兼容性呢？" class="headerlink" title="移动端兼容性呢？"></a>移动端兼容性呢？</h3><ul>
+<li>移动端点透问题<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhuzhenwei918/p/7588553.html">解决方案</a></li>
+</ul>
+</li>
+<li>ios 滚动卡顿<ul>
+<li>使用 better-scroll 插件</li>
+</ul>
+</li>
+<li>ios 顶部输入框 fixed 布局失效（当键盘弹起时）❌</li>
+<li>安卓 键盘遮挡输入框 ❌</li>
+</ul>
+<h4 id="position-fixed-在-android-下无效怎么处理？【❌-待验证】"><a href="#position-fixed-在-android-下无效怎么处理？【❌-待验证】" class="headerlink" title="position:fixed; 在 android 下无效怎么处理？【❌ 待验证】"></a>position:fixed; 在 android 下无效怎么处理？【❌ 待验证】</h4><p>原因：</p>
+<p>fixed 的元素是相对整个页面固定位置的，你在屏幕上滑动只是在移动这个所谓的 viewport ，<br>原来的网页还好好的在那，fixed 的内容也没有变过位置。</p>
+<p>解决：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta</span><br><span class="line">  name=&quot;viewport&quot;</span><br><span class="line">  content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="移动端的点击事件的有延迟，时间是多久，为什么会有？-怎么解决这个延时？❌"><a href="#移动端的点击事件的有延迟，时间是多久，为什么会有？-怎么解决这个延时？❌" class="headerlink" title="移动端的点击事件的有延迟，时间是多久，为什么会有？ 怎么解决这个延时？❌"></a>移动端的点击事件的有延迟，时间是多久，为什么会有？ 怎么解决这个延时？❌</h4><p>click 有 300ms 延迟,为了实现 safari 的双击事件的设计，浏览器要知道你是不是要双击操作。</p>
+<h4 id="在做移动端项目时遇到过什么问题？"><a href="#在做移动端项目时遇到过什么问题？" class="headerlink" title="在做移动端项目时遇到过什么问题？"></a>在做移动端项目时遇到过什么问题？</h4><p>参考阅读：<a target="_blank" rel="noopener" href="https://juejin.im/post/5aa8b00c51882555627cfa0e">H5 与 APP 混合开发遇到的问题总结</a></p>
+<h3 id="Polyfill"><a href="#Polyfill" class="headerlink" title="Polyfill"></a>Polyfill</h3><h4 id="什么是-Polyfill"><a href="#什么是-Polyfill" class="headerlink" title="什么是 Polyfill"></a>什么是 Polyfill</h4><p>polyfill 是“在旧版浏览器上复制标准 API 的 JavaScript 补充”,可以动态地加载 JavaScript 代码或库，在不支持这些标准 API 的浏览器中模拟它们。</p>
+<p>例如，geolocation（地理位置）polyfill 可以在 navigator 对象上添加全局的 geolocation 对象，还能添加 getCurrentPosition 函数以及“坐标”回调对象，<br>所有这些都是 W3C 地理位置 API 定义的对象和函数。</p>
+<p>因为 polyfill 模拟标准 API，所以能够以一种面向所有浏览器未来的方式针对这些 API 进行开发，<br>一旦对这些 API 的支持变成绝对大多数，则可以方便地去掉 polyfill，无需做任何额外工作。</p>
+<h4 id="做的项目中，有没有用过或自己实现一些-polyfill-方案（兼容性处理方案）？❌"><a href="#做的项目中，有没有用过或自己实现一些-polyfill-方案（兼容性处理方案）？❌" class="headerlink" title="做的项目中，有没有用过或自己实现一些 polyfill 方案（兼容性处理方案）？❌"></a>做的项目中，有没有用过或自己实现一些 polyfill 方案（兼容性处理方案）？❌</h4><p>比如： html5shiv、Geolocation、Placeholder</p>
+<h3 id="列举-IE-与其他浏览器不一样的特性？"><a href="#列举-IE-与其他浏览器不一样的特性？" class="headerlink" title="列举 IE 与其他浏览器不一样的特性？"></a>列举 IE 与其他浏览器不一样的特性？</h3><h4 id="事件目标对象"><a href="#事件目标对象" class="headerlink" title="事件目标对象"></a>事件目标对象</h4><p>触发事件的元素被认为是目标（target）。而在 IE 中，目标包含在 event 对象的 srcElement 属性</p>
+<h4 id="获取字符代码"><a href="#获取字符代码" class="headerlink" title="获取字符代码"></a>获取字符代码</h4><p>如果按键代表一个字符（shift、ctrl、alt 除外），IE 的 keyCode 会返回字符代码（Unicode），DOM 中按键的代码和字符是分离的，要获取字符代码，需要使用 charCode 属性</p>
+<h4 id="阻止某个事件的默认行为"><a href="#阻止某个事件的默认行为" class="headerlink" title="阻止某个事件的默认行为"></a>阻止某个事件的默认行为</h4><p>IE 中阻止某个事件的默认行为，必须将 returnValue 属性设置为 false，Mozilla 中，需要调用 preventDefault() 方法</p>
+<h4 id="停止事件冒泡"><a href="#停止事件冒泡" class="headerlink" title="停止事件冒泡"></a>停止事件冒泡</h4><p>IE 中阻止事件进一步冒泡，需要设置 cancelBubble 为 true，Mozzilla 中，需要调用 stopPropagation()</p>
+<h2 id="通信"><a href="#通信" class="headerlink" title="通信"></a>通信</h2><h3 id="如何实现浏览器内多个标签页之间的通信-阿里"><a href="#如何实现浏览器内多个标签页之间的通信-阿里" class="headerlink" title="如何实现浏览器内多个标签页之间的通信? (阿里)"></a>如何实现浏览器内多个标签页之间的通信? (阿里)</h3><p>WebSocket、SharedWorker；</p>
+<p>也可以调用 localStorage 、cookies 等本地存储方式；</p>
+<p>localStorage 另一个浏览上下文里被添加、修改或删除时，它都会触发一个事件， 我们通过监听事件，控制它的值来进行页面信息通信；</p>
+<p>注意：Safari 在无痕模式下设置 localStorage 值时会抛出 QuotaExceededError 的异常；</p>
+<h3 id="webSocket-如何兼容低浏览器？-阿里"><a href="#webSocket-如何兼容低浏览器？-阿里" class="headerlink" title="webSocket 如何兼容低浏览器？(阿里)"></a>webSocket 如何兼容低浏览器？(阿里)</h3><p>Adobe Flash Socket 、 ActiveX HTMLFile (IE) 、 基于 multipart 编码发送 XHR 、 基于长轮询的 XHR</p>
+<h2 id="页面渲染与缓存"><a href="#页面渲染与缓存" class="headerlink" title="页面渲染与缓存"></a>页面渲染与缓存</h2><h3 id="从输入-URL-到页面展现中间发生了什么？"><a href="#从输入-URL-到页面展现中间发生了什么？" class="headerlink" title="从输入 URL 到页面展现中间发生了什么？"></a>从输入 URL 到页面展现中间发生了什么？</h3><ol>
+<li><p>DNS 查询</p>
+</li>
+<li><p>建立 TCP 连接（三次握手）</p>
+</li>
+<li><p>发送 HTTP 请求</p>
+</li>
+<li><p>服务端 web 服务器对请求做处理（监听 80 端口 路由 渲染 HTML 模板 生成响应）</p>
+</li>
+<li><p>发送 HTTP 响应</p>
+</li>
+<li><p>关闭 TCP 连接（四次挥手）</p>
+</li>
+<li><p>浏览器解析 HTML，CSS，图片，JS</p>
+<ol>
+<li><p>处理 HTML 标记并构建 DOM 树</p>
+</li>
+<li><p>处理 CSS 标记并构建 CSS 规则树</p>
+</li>
+<li><p>将 DOM 树 与 CSS 规则树 合并成一个渲染树。</p>
+</li>
+<li><p>根据渲染树来布局，以计算每个节点的几何信息。</p>
+</li>
+<li><p>将各个节点绘制到屏幕上</p>
+<blockquote>
+<p>这五个步骤并不一定一次性顺序完成。如果 DOM 或 CSSOM 被修改，以上过程需要重复执行，这样才能计算出哪些像素需要在屏幕上进行重新渲染。实际页面中，CSS 与 JavaScript 往往会多次修改 DOM 和 CSSOM</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<p>阅读更多：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/entry/59e1d31f51882578c3411c77">浏览器的渲染：过程与原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.xuecaijie.com/it/157.html">细说浏览器输入 URL 后发生了什么</a></li>
+</ul>
+<h3 id="style-标签写在-body-后与-body-前（head）有什么区别？"><a href="#style-标签写在-body-后与-body-前（head）有什么区别？" class="headerlink" title="style 标签写在 body 后与 body 前（head）有什么区别？"></a>style 标签写在 body 后与 body 前（head）有什么区别？</h3><p>style 标签放在 body 后，会导致当加载到此样式时，页面将停止之前的渲染。此样式表被解析后，将重新渲染页面，也就出现了短暂的花屏现象。</p>
+<p>所以不要写在 body 后，要把样式放在 head 中。</p>
+<h3 id="缓存策略执行过程"><a href="#缓存策略执行过程" class="headerlink" title="缓存策略执行过程"></a>缓存策略执行过程</h3><img src="/posts/undefined/1549091602173-872e7ae7-1532-4933-a7e6-4f53f2e9ceb8.jpeg" class="" title="http缓存策略">
+
+<h4 id="一个-Response-Header-示例"><a href="#一个-Response-Header-示例" class="headerlink" title="一个 Response Header 示例"></a>一个 Response Header 示例</h4><img src="/posts/undefined/1549091477928-50957a41-1e84-437f-8f6e-992f430730f4.jpeg" class="" title="res-header">
+
+<h3 id="强缓存与协商缓存的异同"><a href="#强缓存与协商缓存的异同" class="headerlink" title="强缓存与协商缓存的异同"></a>强缓存与协商缓存的异同</h3><ul>
+<li>相同点：最终都是走的本地缓存</li>
+<li>不同点：强缓存不发请求，直接读本地缓存。协商缓存发请求到服务器</li>
+</ul>
+<h4 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h4><ul>
+<li>1）浏览器在加载资源时，根据请求头的 <code>expires</code> 和 <code>cache-control</code> 判断是否命中强缓存，是则直接从缓存读取资源，不会发请求到服务器。</li>
+<li>2）如果没有命中强缓存，浏览器一定会发送一个请求到服务器，通过 <code>last-modified</code> 和 <code>Etag</code> 验证资源是否命中协商缓存，如果命中，服务器会将这个请求返回，但是不会返回这个资源的数据，依然是从缓存中读取资源</li>
+<li>3）如果前面两者都没有命中，直接从服务器加载资源</li>
+</ul>
+<img src="/posts/undefined/1550494473608-b1c458fe-f534-4674-ba30-32fc27deffd6.jpeg" class="" title="强缓存vs协商缓存">
+
+<h3 id="如何实现页面每次打开时清除本页缓存？"><a href="#如何实现页面每次打开时清除本页缓存？" class="headerlink" title="如何实现页面每次打开时清除本页缓存？"></a>如何实现页面每次打开时清除本页缓存？</h3><ol>
+<li>用 HTML 标签设置 HTTP 头信息：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;Pragma&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-cache&quot;</span> /&gt;</span></span><br><span class="line">header(&quot;Cache-Control: no-cache, must-revalidate&quot;)</span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;Cache-Control&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-cache&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;Expires&quot;</span> <span class="attr">content</span>=<span class="string">&quot;0&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>说明：HTTP 头信息 Expires 和 Cache-Control 为应用程序服务器提供了一个控制浏览器和代理服务器上缓存的机制。</p>
+<p>HTTP 头信息 Expires 告诉代理服务器它的缓存页面何时将过期。</p>
+<p>HTTP1.1 规范中新定义的头信息 Cache-Control 可以通知浏览器不缓存任何页面。当点击后退按钮时，浏览器重新访问服务器已获取页面。</p>
+<p>如下是使用 Cache-Control 的基本方法：</p>
+<p>1）no-cache：强制缓存从服务器上获取新的页面；</p>
+<p>2）no-store：在任何环境下缓存不保存任何页面。</p>
+<p>HTTP1.0 规范中的 Pragma: no-cache 等同于 HTTP1.1 规范中的 Cache-Control: no-cache，同样可以包含在头信息中。</p>
+<ol>
+<li>在需要打开的 url 后面增加一个随机的参数：<br>增加参数前：url=test/test.jsp<br>增加参数后：url=test/test.jsp?ranparam=random()</li>
+</ol>
+<h3 id="expires-和-cache-control-的区别"><a href="#expires-和-cache-control-的区别" class="headerlink" title="expires 和 cache-control 的区别"></a>expires 和 cache-control 的区别</h3><p>都是用的本地系统时间，但</p>
+<ul>
+<li>expires 存的是个服务端绝对时间，修改客户端系统时间会有影响</li>
+<li>cache-control 是相对时间，即使客户端时间发生改变，相对时间也不会随之改变。例如设置 max-age = 10s，那么在 10s 以内，使用浏览器缓存的资源</li>
+<li>cache-control 的优先级高于 expires</li>
+</ul>
+<h3 id="http-get-和-post-区别"><a href="#http-get-和-post-区别" class="headerlink" title="http get 和 post 区别"></a>http get 和 post 区别</h3><ol>
+<li>语义：GET 用来读数据，POST 用来写数据</li>
+<li>参数：GET 放在 url 里，POST 放消息体里</li>
+<li>大小：GET 长度有限制，一般 1024 个字符。POST 4~10Mb 限制</li>
+<li>缓存：GET 请求可以被浏览器缓存，POST 不能</li>
+</ol>
+<h3 id="cache-control-和-Etag-的区别"><a href="#cache-control-和-Etag-的区别" class="headerlink" title="cache-control 和 Etag 的区别"></a>cache-control 和 Etag 的区别</h3><p>一个不发请求，一个发请求。超过缓存时间，只要 if-None-Match 和服务器端 etag 相同，仍然缓存。并且 Etag 比 cache-control 的优先级更高。</p>
+<h3 id="http-和-https-的区别"><a href="#http-和-https-的区别" class="headerlink" title="http 和 https 的区别"></a>http 和 https 的区别</h3><h4 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h4><blockquote>
+<p>是以安全为目标的 HTTP 通道，简单讲是 HTTP 的安全版，即 HTTP 下加入 SSL 层，HTTPS 的安全基础是 SSL，因此加密的详细内容就需要 SSL。</p>
+</blockquote>
+<h4 id="HTTPS-作用"><a href="#HTTPS-作用" class="headerlink" title="HTTPS 作用"></a>HTTPS 作用</h4><ul>
+<li>一种是建立一个信息安全通道，来保证数据传输的安全</li>
+<li>另一种就是确认网站的真实性。</li>
+</ul>
+<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4><ul>
+<li>https 协议需要到 ca 申请证书，有免费付费可选</li>
+<li>http 是明文传输，https 则是具有安全性的 ssl 加密传输协议。<ul>
+<li>非对称加密</li>
+</ul>
+</li>
+<li>性能问题：https 做了加密就意味着客户端服务端也需要附带解密步骤，相比来说，在通讯快捷上，性能有所不如 http 。</li>
+</ul>
+<h4 id="对非对称性加密的理解"><a href="#对非对称性加密的理解" class="headerlink" title="对非对称性加密的理解"></a>对非对称性加密的理解</h4><blockquote>
+<p>不要去硬记。 你只要想：既然是加密，那肯定是不希望别人知道我的消息，所以只有我才能解密，所以可得出<strong>公钥负责加密，私钥负责解密</strong>；同理，既然是签名，那肯定是不希望有人冒充我发消息，只有我才能发布这个签名，所以可得出<strong>私钥负责签名，公钥负责验证</strong>。</p>
+</blockquote>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/37738632">非对称加密与 HTTPS</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/fi3ework/blog/issues/17">完全理解 HTTPS 如何做到传输安全</a></li>
+</ul>
+<h4 id="介绍-HTTPS-握手过程"><a href="#介绍-HTTPS-握手过程" class="headerlink" title="介绍 HTTPS 握手过程"></a>介绍 HTTPS 握手过程</h4><ol>
+<li>客户端使用 https 的 url 访问 web 服务器,要求与服务器建立 ssl 连接</li>
+<li>web 服务器收到客户端请求后, 会将网站的证书(包含公钥)传送一份给客户端</li>
+<li>客户端收到网站证书后会检查证书的颁发机构以及过期时间, 如果没有问题就随机产生一个秘钥</li>
+<li>客户端利用公钥将会话秘钥加密, 并传送给服务端, 服务端利用自己的私钥解密出会话秘钥</li>
+<li>之后服务器与客户端使用秘钥加密传输</li>
+</ol>
+<p>参考来源：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/70#issuecomment-478214738">第 44 题：介绍 HTTPS 握手过程</a></li>
+</ul>
+<p>阅读更多：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developers.weixin.qq.com/community/develop/article/doc/000046a5fdc7802a15f7508b556413">一次安全可靠的通信——HTTPS 原理</a></li>
+</ul>
+<h3 id="HTTP1-1-与-HTTP2-的区别"><a href="#HTTP1-1-与-HTTP2-的区别" class="headerlink" title="HTTP1.1 与 HTTP2 的区别"></a>HTTP1.1 与 HTTP2 的区别</h3><ul>
+<li>基于 HTTPS 的</li>
+<li>多路复用</li>
+<li>服务端推送</li>
+</ul>
+<h4 id="简单讲解一下-http2-的多路复用"><a href="#简单讲解一下-http2-的多路复用" class="headerlink" title="简单讲解一下 http2 的多路复用"></a>简单讲解一下 http2 的多路复用</h4><p>阅读更多：<a target="_blank" rel="noopener" href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/14">多路复用</a></p>
+<p>HTTP2 采用二进制格式传输，取代了 HTTP1.x 的文本格式，二进制格式解析更高效。</p>
+<p>多路复用代替了 HTTP1.x 的序列和阻塞机制，所有的相同域名请求都通过同一个 TCP 连接并发完成。在 HTTP1.x 中，并发多个请求需要多个 TCP 连接，浏览器为了控制资源会有 6-8 个 TCP 连接都限制。</p>
+<p>HTTP2 中：</p>
+<ul>
+<li>同域名下所有通信都在单个连接上完成，消除了因多个 TCP 连接而带来的延时和内存消耗。</li>
+<li>单个连接上可以并行交错的请求和响应，之间互不干扰。</li>
+</ul>
+<p>阅读更多：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/entry/5981c5df518825359a2b9476">HTTP1.0、HTTP1.1 和 HTTP2.0 的区别</a></li>
+</ul>
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><h3 id="你有用过哪些前端性能优化的方法？"><a href="#你有用过哪些前端性能优化的方法？" class="headerlink" title="你有用过哪些前端性能优化的方法？"></a>你有用过哪些前端性能优化的方法？</h3><h4 id="资源合并压缩"><a href="#资源合并压缩" class="headerlink" title="资源合并压缩"></a>资源合并压缩</h4><ul>
+<li>压缩<ul>
+<li>html，css，js【html-webpack/optimize-css-assets/webpack-parallel-uglify】-plugin</li>
+<li>图片：image-webpack-loader，雪碧图，iconfont 图标字体</li>
+</ul>
+</li>
+<li>合并<ul>
+<li>减少 http 请求，每个 http 请求都带来慢启动，三次握手，连接建立，所以资源合并由为重要</li>
+</ul>
+</li>
+<li>服务端启用 gzip（压缩率 80%）<ul>
+<li>浏览器请求 header 设置 accept-encoding: gzip</li>
+<li>服务器响应 header 返回 content-encoding: gzip【apache 的 httpd.conf】</li>
+</ul>
+</li>
+</ul>
+<h4 id="浏览器加载原理优化"><a href="#浏览器加载原理优化" class="headerlink" title="浏览器加载原理优化"></a>浏览器加载原理优化</h4><p>原理：html 在转 DOM 时，节点引用 css/img 不影响继续转化，但 js 会阻塞，因为 js 有可能修改 dom 树</p>
+<ul>
+<li>css 放 head</li>
+<li>js 尽量不放 head，如果放则 js 内嵌，且在所有 css 前面 | 对于会阻塞后续内容的外部 js ，用 defer</li>
+<li>首屏优化<ul>
+<li>懒加载：列表滚动图片懒加载</li>
+<li>按需加载 webpack codespliting</li>
+</ul>
+</li>
+<li>使用 cdn 加速：把静态资源（能被浏览器缓存的 js/css）分发到离用户最近节点就近获取，提高响应速度和成功率</li>
+</ul>
+<h3 id="缓存优化"><a href="#缓存优化" class="headerlink" title="缓存优化"></a>缓存优化</h3><ul>
+<li>http 协议缓存：强缓存/协商缓存</li>
+<li>使用浏览器缓存来减少请求数量<ul>
+<li>css，js 加 MD5 后缀</li>
+<li>本地存储 localStorage （地理位置，购物车）</li>
+</ul>
+</li>
+<li>app cache ❌</li>
+<li>service worker ❌</li>
+</ul>
+<h3 id="渲染优化"><a href="#渲染优化" class="headerlink" title="渲染优化"></a>渲染优化</h3><ul>
+<li>减少重绘和重排<ul>
+<li>集中改变样式（cssText，类名切换）</li>
+<li>批量修改 DOM（display:none，createDocumentFragment）</li>
+<li>读写分离（尽量不要一行代码又读又写 div.style.left = div.offsetLeft + 1 + ‘px’; &lt;=重复两次就是两次重排，先存起来就只会导致一次重排）</li>
+</ul>
+</li>
+<li>动画<ul>
+<li>css3 动画<ul>
+<li>webkit-transform: translateZ(0); / will-change: transform;<ul>
+<li>GPU 渲染，浏览器生成 DOM 元素快照，在 GPU 的层上缓存起来做单独做动画</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>js 动画<ul>
+<li>使用 requestAnimationFrame 提升流畅度（确保 js 尽早在每一帧开始时执行）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>列表滚动重用（类似 ios cell 复用）❌</li>
+<li>使用 SSR（server side rendering）后端渲染，数据直接输出到 HTML ❌</li>
+</ul>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><h3 id="检测浏览器版本版本有哪些方式？"><a href="#检测浏览器版本版本有哪些方式？" class="headerlink" title="检测浏览器版本版本有哪些方式？"></a>检测浏览器版本版本有哪些方式？</h3><p>功能检测、userAgent 特征检测</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">比如：navigator.userAgent</span><br><span class="line"><span class="comment">//&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36</span></span><br><span class="line">(KHTML, like Gecko) Chrome/<span class="number">41.0</span><span class="number">.2272</span><span class="number">.101</span> Safari/<span class="number">537.36</span><span class="string">&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="判断用户的浏览器类型"><a href="#判断用户的浏览器类型" class="headerlink" title="判断用户的浏览器类型"></a>判断用户的浏览器类型</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isAndroid</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/Android/</span>.test(navigator.userAgent);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isiPhone</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/iPhone/</span>.test(navigator.userAgent);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isiPad</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/iPad/</span>.test(navigator.userAgent);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isiOS</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/(iPhone)|(iPad)/i</span>.test(navigator.userAgent);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="介绍一下你对浏览器内核的理解"><a href="#介绍一下你对浏览器内核的理解" class="headerlink" title="介绍一下你对浏览器内核的理解"></a>介绍一下你对浏览器内核的理解</h3><p>主要分成两部分：</p>
+<p>渲染引擎(Layout engineer 或 Rendering Engine)和 JS 引擎。</p>
+<ul>
+<li>渲染引擎：负责取得网页的内容（HTML、XML、图像等等）、整理讯息（例如加入 CSS 等），以及计算网页的显示方式，然后会输出至显示器或打印机。浏览器的内核的不同对于网页的语法解释会有不同，所以渲染的效果也不相同。所有网页浏览器、电子邮件客户端以及其它需要编辑、显示网络内容的应用程序都需要内核。</li>
+<li>JS 引擎则：解析和执行 javascript 来实现网页的动态效果。 最开始渲染引擎和 JS 引擎并没有区分的很明确，后来 JS 引擎越来越独立，内核就倾向于只指渲染引擎。</li>
+</ul>
+<blockquote>
+<p>详细文章：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/fullhouse/archive/2011/12/19/2293455.html">浏览器内核的解析和对比</a></p>
+</blockquote>
+<h3 id="常见状态码"><a href="#常见状态码" class="headerlink" title="常见状态码"></a>常见状态码</h3><p>形象记忆：<a target="_blank" rel="noopener" href="https://http.cat/">https://http.cat/</a></p>
+<ul>
+<li>200 服务器成功返回请求</li>
+<li>301 永久重定向，浏览器会记住 | 302 临时重定向 | 304 请求页面未修改</li>
+<li>400 请求错误，服务器不理解 | 401 请求未授权 | 403 服务器拒绝请求 | 404 资源不存在 | 405 方法禁用</li>
+<li>500 服务器内部错误 | 503 服务暂时不可用（超载 or 停机维护）</li>
+</ul>
+<h3 id="谈谈你对-TCP-三次握手和四次挥手的理解"><a href="#谈谈你对-TCP-三次握手和四次挥手的理解" class="headerlink" title="谈谈你对 TCP 三次握手和四次挥手的理解"></a>谈谈你对 TCP 三次握手和四次挥手的理解</h3><img src="/posts/undefined/53062591-3d846300-34fc-11e9-8d0f-4063d9ff3398.png" class="" title="answer">
+
+<p><a target="_blank" rel="noopener" href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/15">答案地址</a></p>
+<h3 id="页面可见性-Page-Visibility-API-有哪些用途"><a href="#页面可见性-Page-Visibility-API-有哪些用途" class="headerlink" title="页面可见性(Page Visibility API)有哪些用途"></a>页面可见性(Page Visibility API)有哪些用途</h3><ul>
+<li>通过 visibilityState 的值检测页面当前是否可见，以及打开网页的时间等;</li>
+<li>在页面被切换到其他后台进程的时候，自动暂停音乐或视频的播放；</li>
+</ul>
+<h3 id="网页验证码干嘛的-是为了解决什么安全问题"><a href="#网页验证码干嘛的-是为了解决什么安全问题" class="headerlink" title="网页验证码干嘛的,是为了解决什么安全问题"></a>网页验证码干嘛的,是为了解决什么安全问题</h3><p>区分用户是计算机还是人的公共全自动程序。可以防止恶意破解密码、刷票、论坛灌水；<br>有效防止黑客对某一个特定注册用户用特定程序暴力破解方式进行不断的登陆尝试。</p>
+<h3 id="如果需要手动写动画，你认为最小时间间隔是多久，为什么？"><a href="#如果需要手动写动画，你认为最小时间间隔是多久，为什么？" class="headerlink" title="如果需要手动写动画，你认为最小时间间隔是多久，为什么？"></a>如果需要手动写动画，你认为最小时间间隔是多久，为什么？</h3><p>多数显示器默认频率是 60Hz，即 1 秒刷新 60 次，所以理论上最小间隔为 1/60＊1000ms ＝ 16.7ms</p>
+<h3 id="第一次访问页面中时弹出引导，用户关闭引导，之后再次进入页面时不希望出现引导，如何实现？❌"><a href="#第一次访问页面中时弹出引导，用户关闭引导，之后再次进入页面时不希望出现引导，如何实现？❌" class="headerlink" title="第一次访问页面中时弹出引导，用户关闭引导，之后再次进入页面时不希望出现引导，如何实现？❌"></a>第一次访问页面中时弹出引导，用户关闭引导，之后再次进入页面时不希望出现引导，如何实现？❌</h3><p>localStorage</p>
+<h3 id="实现一个页面操作不会整页刷新的网站，并且能在浏览器的前进，后退时正确响应。给出你的技术实现方案？"><a href="#实现一个页面操作不会整页刷新的网站，并且能在浏览器的前进，后退时正确响应。给出你的技术实现方案？" class="headerlink" title="实现一个页面操作不会整页刷新的网站，并且能在浏览器的前进，后退时正确响应。给出你的技术实现方案？"></a>实现一个页面操作不会整页刷新的网站，并且能在浏览器的前进，后退时正确响应。给出你的技术实现方案？</h3><ul>
+<li>onhashchange</li>
+<li>window.history.pushState（添加新的历史记录）/replaceState(state,title, url)【改掉当前历史记录】<ul>
+<li>配合 onpopstate 事件来监听历史记录的改变</li>
+</ul>
+</li>
+</ul>
+<h3 id="websocket"><a href="#websocket" class="headerlink" title="websocket"></a>websocket</h3><p>实现了客户端与服务端之间的全双工通信，当服务端数据变化时，可以第一时间通知到客户端。</p>
+<h4 id="与-HTTP-的区别"><a href="#与-HTTP-的区别" class="headerlink" title="与 HTTP 的区别"></a>与 HTTP 的区别</h4><ul>
+<li>http 只能由客户端发起，而 webSocket 是双向的</li>
+<li>webSocket 传输的数据包相对于 http 而言很小，很适合移动端使用</li>
+<li>没有同源限制，可以跨域共享资源</li>
+</ul>
+<h3 id="TCP-和-UDP"><a href="#TCP-和-UDP" class="headerlink" title="TCP 和 UDP"></a>TCP 和 UDP</h3><h4 id="TCP（Transmission-Control-Protocol，传输控制协议）"><a href="#TCP（Transmission-Control-Protocol，传输控制协议）" class="headerlink" title="TCP（Transmission Control Protocol，传输控制协议）"></a>TCP（Transmission Control Protocol，传输控制协议）</h4><p>是面向连接的协议，也就是说，在收发数据前，必须和对方建立可靠的连接。 一个 TCP 连接必须要经过三次“对话”才能建立起来</p>
+<h5 id="TCP-三次握手过程"><a href="#TCP-三次握手过程" class="headerlink" title="TCP 三次握手过程"></a>TCP 三次握手过程</h5><ul>
+<li>第一次握手：主机 A 通过向主机 B 发送一个含有同步序列号的标志位的数据段给主机 B ，向主机 B 请求建立连接，通过这个数据段， 主机 A 告诉主机 B 两件事：我想要和你通信；你可以用哪个序列号作为起始数据段来回应我。</li>
+<li>第二次握手：主机 B 收到主机 A 的请求后，用一个带有确认应答（ACK）和同步序列号（SYN）标志位的数据段响应主机 A，也告诉主机 A 两件事：我已经收到你的请求了，你可以传输数据了；你要用那个序列号作为起始数据段来回应我</li>
+<li>第三次握手：主机 A 收到这个数据段后，再发送一个确认应答，确认已收到主机 B 的数据段：”我已收到回复，我现在要开始传输实际数据了，这样 3 次握手就完成了，主机 A 和主机 B 就可以传输数据了。</li>
+</ul>
+<h4 id="TCP-断开连接要进行-4-次"><a href="#TCP-断开连接要进行-4-次" class="headerlink" title="TCP 断开连接要进行 4 次"></a>TCP 断开连接要进行 4 次</h4><ul>
+<li>第一次： 当主机 A 完成数据传输后,将控制位 FIN 置 1，提出停止 TCP 连接的请求 ；</li>
+<li>第二次： 主机 B 收到 FIN 后对其作出响应，确认这一方向上的 TCP 连接将关闭,将 ACK 置 1；</li>
+<li>第三次： 由 B 端再提出反方向的关闭请求，将 FIN 置 1 ；</li>
+<li>第四次： 主机 A 对主机 B 的请求进行确认，将 ACK 置 1 ，双方向的关闭结束。</li>
+</ul>
+<h4 id="UDP（User-Data-Protocol，用户数据报协议）"><a href="#UDP（User-Data-Protocol，用户数据报协议）" class="headerlink" title="UDP（User Data Protocol，用户数据报协议）"></a>UDP（User Data Protocol，用户数据报协议）</h4><p>UDP 是一个非连接的协议，传输数据之前源端和终端不建立连接， 当它想传送时就简单地去抓取来自应用程序的数据，并尽可能快地把它扔到网络上。</p>
+<h4 id="TCP-与-UDP-的区别"><a href="#TCP-与-UDP-的区别" class="headerlink" title="TCP 与 UDP 的区别"></a>TCP 与 UDP 的区别</h4><p>1、TCP 面向连接；UDP 不面向连接；</p>
+<p>2、TCP 传输可靠（三次握手），UDP 则不可靠，不保证正确性（UDP 传送数据前并不与对方建立连接，对接收到的数据也不发送确认信号，发送端不知道数据是否会正确接收，当然也不用重发）；</p>
+<p>3、UDP 开销小，传输快；</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><ul>
+<li>TCP：效率要求相对低，但对准确性要求相对高的场景（文件传输，邮件接收，远程登录）</li>
+<li>UDP：效率要求相对高，但对准确性要求相对低的场景（在线视频，语音电话）</li>
+</ul>
+<p>参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24860273">TCP 和 UDP 的区别</a></p>
+<h3 id="网络七层协议"><a href="#网络七层协议" class="headerlink" title="网络七层协议"></a>网络七层协议</h3><img src="/posts/undefined/1550471555226-f1590db6-b11b-4e76-8eb5-9fed21299719.png" class="" title="七层模型">
+
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/taotongning/article/details/81352985">OSI 七层协议大白话解读</a></p>
+<h3 id="CDN-是什么"><a href="#CDN-是什么" class="headerlink" title="CDN 是什么"></a>CDN 是什么</h3><p>Content Delivery Network，简称 CDN，翻译成中文是内容分发网络。</p>
+<p>CDN 是通过在网络上的各个地方放置一定数量的节点服务器，构成在现有的互联网基础之上的一层智能虚拟网络，这层网络的主要功能是将信息（源站内容）分发至靠近用户的各个节点服务器上，让用户可以就近获取所需信息。</p>
+<p>通过 CDN，可以有效降低源站的访问压力，减轻骨干网络的拥塞，提升用户的访问速度，从而提升用户体验。还可在一定程度上保障源站的安全。</p>
+<p>CDN 的用途可以说很窄，也可以说很广。说窄是因为 CDN 只是基于互联网之上的一种服务，只是给网络/网站加速的；说广是因为几乎所有的互联网业务（如网页、电商、APP、游戏、下载、影视点播、直播等等）都需要用到 CDN ，而如今互联网又无处不在。</p>
+<p>来源：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/282510029/answer/427307826">https://www.zhihu.com/question/282510029/answer/427307826</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/40707/" rel="prev" title="CSS知识点（面试系列）">
+                  <i class="fa fa-chevron-left"></i> CSS知识点（面试系列）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/55598/" rel="next" title="HTML知识点（面试系列）">
+                  HTML知识点（面试系列） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
