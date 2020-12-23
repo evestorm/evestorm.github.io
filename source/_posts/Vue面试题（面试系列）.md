@@ -611,7 +611,7 @@ nextTick 的回调函数会等到同步任务执行完毕，DOM 更新后才触�
 
 阅读更多：[Vue.nextTick 的原理和用途](https://segmentfault.com/a/1190000012861862)
 
-#### 让你自己实现一个 nextTick,说说你的思路？（TODO）
+### 让你自己实现一个 nextTick,说说你的思路？（TODO）
 
 待续...
 
@@ -627,7 +627,7 @@ nextTick 的回调函数会等到同步任务执行完毕，DOM 更新后才触�
 
 另外 props 传入的值如果对象的话，是可以直接在子组件里更改的，因为是同一个引用。
 
-### 如果修改了，Vue 是如何监控到属性的修改并给出警告的
+### 如果修改了，Vue 是如何监控到属性的修改并给出警告的？
 
 ```js
 if (process.env.NODE_ENV !== 'production') {
