@@ -124,81 +124,6 @@ date: 2019-06-11 13:23:28
 }
 ```
 
-## 请解释一下 CSS3 的 Flexbox（弹性盒布局模型）,以及适用场景？
-
-该布局模型的目的是提供一种更加高效的方式来对容器中的条目进行布局、对齐和分配空间。
-
-在传统的布局方式中:
-
-- block 布局是把块在垂直方向从上到下依次排列的；
-- inline 布局则是在水平方向来排列。
-- flex 弹性盒布局并没有这样内在的方向限制，可以由开发人员自由操作。
-
-适用场景：弹性布局适合于移动前端开发，在 Android 和 iOS 上也完美支持。
-
-参考：http://www.w3cplus.com/css3/flexbox-basics.html
-
-### 如何使用 flex 实现三列等宽布局
-
-父元素 display: flex，子元素 flex: 1
-
-#### 解释
-
-子元素的设置等同于：flex: 1 1 auto
-
-flex 的默认值是：0 1 auto
-
-意思是项目默认有剩余空间也不放大（0），但空间不足会缩小（1）
-
-现在改为了值 1 ，就可以放大了，所以三栏可以平分宽度
-
-阅读：[flex 设置成 1 和 auto 有什么区别](https://segmentfault.com/q/1010000004080910)
-
-### 如何使用 flex 实现下列布局
-
-{% asset_img flex-left.png flex %}
-
-> HTML
-
-```html
-<div id="container">
-  <div class="box box1">1</div>
-  <div class="box box2">2</div>
-  <div class="box box3">3</div>
-  <div class="box box4">4</div>
-  <div class="box box5">5</div>
-</div>
-<p>margin-right: auto</p>
-```
-
-> CSS
-
-```css
-#container {
-  display: flex;
-  justify-content: flex-end;
-  background-color: lightyellow;
-}
-.box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  width: 75px;
-  background-color: springgreen;
-  border: 1px solid #333;
-}
-.box1 {
-  margin-right: auto;
-}
-p {
-  width: 100%;
-  text-align: center;
-}
-```
-
-摘自：[css flex 布局中妙用 margin: auto](https://juejin.im/post/5bde54ce51882516e840a8af)
-
 ## 用纯 CSS 创建一个三角形的原理是什么？
 
 ```css
@@ -965,6 +890,81 @@ span {
 - inline 布局则是在水平方向来排列
 - flex 弹性盒布局并没有这样内在的方向限制，可以由开发人员自由操作
 
+### 请解释一下 CSS3 的 Flexbox（弹性盒布局模型）,以及适用场景？
+
+该布局模型的目的是提供一种更加高效的方式来对容器中的条目进行布局、对齐和分配空间。
+
+在传统的布局方式中:
+
+- block 布局是把块在垂直方向从上到下依次排列的；
+- inline 布局则是在水平方向来排列。
+- flex 弹性盒布局并没有这样内在的方向限制，可以由开发人员自由操作。
+
+适用场景：弹性布局适合于移动前端开发，在 Android 和 iOS 上也完美支持。
+
+参考：http://www.w3cplus.com/css3/flexbox-basics.html
+
+### 如何使用 flex 实现三列等宽布局
+
+父元素 display: flex，子元素 flex: 1
+
+#### 解释
+
+子元素的设置等同于：flex: 1 1 auto
+
+flex 的默认值是：0 1 auto
+
+意思是项目默认有剩余空间也不放大（0），但空间不足会缩小（1）
+
+现在改为了值 1 ，就可以放大了，所以三栏可以平分宽度
+
+阅读：[flex 设置成 1 和 auto 有什么区别](https://segmentfault.com/q/1010000004080910)
+
+### 如何使用 flex 实现下列布局
+
+{% asset_img flex-left.png flex %}
+
+> HTML
+
+```html
+<div id="container">
+  <div class="box box1">1</div>
+  <div class="box box2">2</div>
+  <div class="box box3">3</div>
+  <div class="box box4">4</div>
+  <div class="box box5">5</div>
+</div>
+<p>margin-right: auto</p>
+```
+
+> CSS
+
+```css
+#container {
+  display: flex;
+  justify-content: flex-end;
+  background-color: lightyellow;
+}
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 75px;
+  background-color: springgreen;
+  border: 1px solid #333;
+}
+.box1 {
+  margin-right: auto;
+}
+p {
+  width: 100%;
+  text-align: center;
+}
+```
+
+摘自：[css flex 布局中妙用 margin: auto](https://juejin.im/post/5bde54ce51882516e840a8af)
+
 ## 如何解决移动端 Retina 屏 1px 像素问题
 
 ### 原理：媒体查询 + 变换缩放
@@ -1046,6 +1046,39 @@ span {
     ...
     border1px(black) /* 2. 通过border1px设置边框 */
 </style>
+```
+
+## CSS 实现宽度自适应 100%，宽高 16:9 比例的矩形
+
+```html
+<style>
+  /* box 用来控制宽度 */
+  .box {
+    width: 100%;
+  }
+  /* scale 用来实现宽高等比例 1:1 padding-bottom:100%; 4:3 padding-bottom:75%; 16:9 padding-bottom:56.25%; */
+  .scale {
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    position: relative;
+  }
+  /* item 用来放置全部的子元素 */
+  .item {
+    width: 100%;
+    height: 100%;
+    background-color: #e1e1e1;
+    position: absolute;
+  }
+</style>
+
+<div class="box">
+  <div class="scale">
+    <div class="item">
+      <img src="" />
+    </div>
+  </div>
+</div>
 ```
 
 ## 其它

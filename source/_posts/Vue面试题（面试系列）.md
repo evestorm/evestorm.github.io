@@ -16,7 +16,9 @@ date: 2019-06-11 22:02:46
 
 <!-- more -->
 
-## 讲一下 Vue 的生命周期？
+## 生命周期
+
+### 讲一下 Vue 的生命周期？
 
 创建期间的生命周期函数：
 
@@ -50,6 +52,92 @@ date: 2019-06-11 22:02:46
 
 总结：从外到内，再从内到外
 
+### Vue 中父组件如何监听子组件的生命周期？
+
+#### v-on / $emit
+
+```html
+<div id="app">
+  <child-comp @child-event="handleChildEvent"></child-comp>
+</div>
+```
+
+```js
+Vue.component('child-comp', {
+  template: '<div></div>',
+  data: function () {
+    return {
+      childMsg: 'Hello, I am Child'
+    };
+  },
+  methods: {},
+  mounted() {
+    this.$emit('child-event');
+  }
+});
+const app = new Vue({
+  el: '#app',
+  data: function () {
+    return {
+      parentData: 'parent Message'
+    };
+  },
+  beforeCreate: function () {
+    console.log('before created');
+  },
+  methods: {
+    handleChildEvent() {
+      console.log('child mounted');
+    }
+  }
+});
+```
+
+在子组件中的 `mounted` 钩子函数中调用 `this.$emit("child-event");` 向父组件发送 `child-event` 消息。 父组件 `@child-event="handleChildEvent"` 监听了此消息。
+
+#### @hook
+
+假如我们这里的子组件是外部的，是不可更改的。那我们父组件监听这个外部子组件中的生命周期钩子函数怎么办呢?
+
+```html
+<div id="app">
+  <child-comp @hook:mounted="handleChildEvent"></child-comp>
+</div>
+```
+
+```js
+Vue.component('child-comp', {
+  template: '<div></div>',
+  data: function () {
+    return {
+      childMsg: 'Hello, I am Child'
+    };
+  },
+  methods: {},
+  mounted() {
+    //this.$emit("child-event");
+  }
+});
+const app = new Vue({
+  el: '#app',
+  data: function () {
+    return {
+      parentData: 'parent Message'
+    };
+  },
+  beforeCreate: function () {
+    console.log('before created');
+  },
+  methods: {
+    handleChildEvent() {
+      console.log('child mounted');
+    }
+  }
+});
+```
+
+把子组件中的 `mounted` 钩子函数中的 `$emit` 方法去掉， 在父组件中使用 `@hook:mounted`
+
 ### 更多阅读
 
 - [包你理解—vue 的生命周期](https://segmentfault.com/a/1190000014640577)
@@ -81,7 +169,9 @@ date: 2019-06-11 22:02:46
 - EventBus: 通过 EventBus 进行信息的发布与订阅
 - Vuex: 是全局数据管理库，可以通过 Vuex 管理全局的数据流
 - `$attrs/$listeners`: Vue2.4 中加入的`$attrs/$listeners`可以进行跨级的组件通信
-- provide/inject：以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效，这成为了跨组件通信的基础
+- `provide/inject`：以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效，这成为了跨组件通信的基础
+
+[Vue 组件间通信六种方式](https://mp.weixin.qq.com/s/XZ3BmZLY4OwwGm2Hbbepbg)
 
 ### this.$emit 的返回值是什么？如果需要返回值该怎么办？
 
@@ -133,6 +223,12 @@ this.$emit 的返回值就是 this ，即当前子组件 VueComponent 。
   }
 </script>
 ```
+
+## filter 过滤器
+
+### filter 中的 this 是什么？
+
+this 是 undefined，在 filter 中拿不到 vue 实例。filter 应该是个纯函数，不应该依赖外界或者对外界有所影响。如果需要用到 this，可以用 computed 或者 method 代替。
 
 ## vue 指令
 
@@ -291,6 +387,18 @@ Vue.set(this.obj, 'b', 233) or this.$set(this.obj, 'b', 233)
 
 答案参考：[Daily-Interview-Question - 第 51 题](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/90)
 更多阅读：[实现双向绑定 Proxy 比 defineproperty 优劣如何](https://www.jianshu.com/p/2df6dcddb0d7)
+
+## Vue 模板渲染的原理是什么？
+
+vue 中的模板 template 无法被浏览器解析并渲染，因为这不属于浏览器的标准，不是正确的 HTML 语法，所有需要将 template 转化成一个 JavaScript 函数，这样浏览器就可以执行这一个函数并渲染出对应的 HTML 元素，就可以让视图跑起来了，这一个转化的过程，就成为模板编译。
+
+模板编译又分三个阶段，解析 parse，优化 optimize，生成 generate，最终生成可执行函数 render。
+
+- parse 阶段：使用大量的正则表达式对 template 字符串进行解析，将标签、指令、属性等转化为抽象语法树 AST。
+- optimize 阶段：遍历 AST，找到其中的一些静态节点并进行标记，方便在页面重渲染的时候进行 diff 比较时，直接跳过这一些静态节点，优化 runtime 的性能。
+- generate 阶段：将最终的 AST 转化为 render 函数字符串。
+
+来源：https://juejin.im/post/6870374238760894472
 
 ## Vuex 用过吗？
 
@@ -490,6 +598,11 @@ module.exports = {
 
 阅读更多：[深入理解 vue 中的 slot 与 slot-scope](https://segmentfault.com/a/1190000012996217)
 
+### 相同名称的插槽是合并还是替换？
+
+- Vue 2.5 版本，匿名和具名插槽都是合并，作用域插槽是替换
+- Vue 2.6 版本，都是替换（因为新版底层原理一样）
+
 ## nextTick 的更新原理
 
 Vue 在修改数据后，视图不会立刻更新，而是等同一事件循环中的所有数据变化完成之后，再统一进行视图更新。
@@ -498,9 +611,21 @@ nextTick 的回调函数会等到同步任务执行完毕，DOM 更新后才触�
 
 阅读更多：[Vue.nextTick 的原理和用途](https://segmentfault.com/a/1190000012861862)
 
+#### 让你自己实现一个 nextTick,说说你的思路？（TODO）
+
+待续...
+
 ## 在 Vue 中，子组件为何不可以修改父组件传递的 Prop
 
-因为 prop 的传递是单向数据流，这样易于监测数据的流动，出现了错误可以更加迅速的定位到错误发生的位置。另外 props 传入的值如果对象的话，是可以直接在子组件里更改的，因为是同一个引用。
+为了保证数据的单向流动，便于对数据进行追踪，避免数据混乱。官网有详细的信息 [prop](https://cn.vuejs.org/v2/guide/components-props.html#单向数据流)
+
+> 所有的 prop 都使得其父子 prop 之间形成了一个**单向下行绑定**：父级 prop 的更新会向下流动到子组件中，但是反过来则不行。这样会**防止从子组件意外改变父级组件的状态**，从而导致你的应用的数据流向难以理解。
+
+设想一个场景，某个父组件下不只使用了一个子组件。而且都使用到了这份 prop 数据，那么一旦某个子组件更改了这个 prop 数据，会连带着其他子组件的 prop 数据也被更改。这会导致数据混乱，而且由于修改数据的源头不止一处，在出错后 debug 时难以定位错误原因。
+
+**所以我们需要将修改数据的源头统一为父组件，子组件想要改 prop 只能委托父组件帮它。从而保证数据修改源唯一**
+
+另外 props 传入的值如果对象的话，是可以直接在子组件里更改的，因为是同一个引用。
 
 ### 如果修改了，Vue 是如何监控到属性的修改并给出警告的
 
@@ -559,6 +684,10 @@ if (process.env.NODE_ENV !== 'production') {
 缺点:
 
 - 无法进行极致优化: 在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化,比如 VScode 采用直接手动操作 DOM 的方式进行极端的性能优化
+
+## Vue 项目能进行哪些性能优化
+
+链接：https://juejin.im/post/6857856269488193549
 
 ## 其它
 
@@ -700,3 +829,45 @@ V 用户操作 => VM => M 数据同步更新
 - 4.合理使用 web worker 优化一些计算
 - 5.缓存一定要使用，但是请注意合理使用
 - 6.最后可以借助一些工具进行性能评测，重点调优，例如 chrome 开发者工具的 performance 或 Google PageSpeed Insights 插件协助测试。
+
+### 说说 Vue2.0 和 Vue3.0 有什么区别
+
+1. 重构响应式系统，使用 Proxy 替换 Object.defineProperty，使用 Proxy 优势：
+
+- 可直接监听数组类型的数据变化
+- 监听的目标为对象本身，不需要像 Object.defineProperty 一样遍历每个属性，有一定的性能提升
+- 可拦截 apply、ownKeys、has 等 13 种方法，而 Object.defineProperty 不行
+- 直接实现对象属性的新增/删除
+
+1. 新增 Composition API，更好的逻辑复用和代码组织
+2. 重构 Virtual DOM
+
+- 模板编译时的优化，将一些静态节点编译成常量
+- slot 优化，将 slot 编译为 lazy 函数，将 slot 的渲染的决定权交给子组件
+- 模板中内联事件的提取并重用（原本每次渲染都重新生成内联函数）
+
+1. 代码结构调整，更便于 Tree shaking，使得体积更小
+2. 使用 Typescript 替换 Flow
+
+### 为什么要新增 Composition API，它能解决什么问题
+
+Vue2.0 中，随着功能的增加，组件变得越来越复杂，越来越难维护，而难以维护的根本原因是 Vue 的 API 设计迫使开发者使用 watch，computed，methods 选项组织代码，而不是实际的业务逻辑。
+
+另外 Vue2.0 缺少一种较为简洁的低成本的机制来完成逻辑复用，虽然可以 minxis 完成逻辑复用，但是当 mixin 变多的时候，会使得难以找到对应的 data、computed 或者 method 来源于哪个 mixin，使得类型推断难以进行。
+
+所以 Composition API 的出现，主要是也是为了解决 Option API 带来的问题，第一个是代码组织问题，Compostion API 可以让开发者根据业务逻辑组织自己的代码，让代码具备更好的可读性和可扩展性，也就是说当下一个开发者接触这一段不是他自己写的代码时，他可以更好的利用代码的组织反推出实际的业务逻辑，或者根据业务逻辑更好的理解代码。
+
+第二个是实现代码的逻辑提取与复用，当然 mixin 也可以实现逻辑提取与复用，但是像前面所说的，多个 mixin 作用在同一个组件时，很难看出 property 是来源于哪个 mixin，来源不清楚，另外，多个 mixin 的 property 存在变量命名冲突的风险。而 Composition API 刚好解决了这两个问题。
+
+## SSR 有了解吗？原理是什么？
+
+在客户端请求服务器的时候，服务器到数据库中获取到相关的数据，并且在服务器内部将 Vue 组件渲染成 HTML，并且将数据、HTML 一并返回给客户端，这个在服务器将数据和组件转化为 HTML 的过程，叫做服务端渲染 SSR。
+
+而当客户端拿到服务器渲染的 HTML 和数据之后，由于数据已经有了，客户端不需要再一次请求数据，而只需要将数据同步到组件或者 Vuex 内部即可。除了数据以外，HTML 也结构已经有了，客户端在渲染组件的时候，也只需要将 HTML 的 DOM 节点映射到 Virtual DOM 即可，不需要重新创建 DOM 节点，这个将数据和 HTML 同步的过程，又叫做客户端激活。
+
+使用 SSR 的好处：
+
+- 有利于 SEO：其实就是有利于爬虫来爬你的页面，因为部分页面爬虫是不支持执行 JavaScript 的，这种不支持执行 JavaScript 的爬虫抓取到的非 SSR 的页面会是一个空的 HTML 页面，而有了 SSR 以后，这些爬虫就可以获取到完整的 HTML 结构的数据，进而收录到搜索引擎中。
+- 白屏时间更短：相对于客户端渲染，服务端渲染在浏览器请求 URL 之后已经得到了一个带有数据的 HTML 文本，浏览器只需要解析 HTML，直接构建 DOM 树就可以。而客户端渲染，需要先得到一个空的 HTML 页面，这个时候页面已经进入白屏，之后还需要经过加载并执行 JavaScript、请求后端服务器获取数据、JavaScript 渲染页面几个过程才可以看到最后的页面。特别是在复杂应用中，由于需要加载 JavaScript 脚本，越是复杂的应用，需要加载的 JavaScript 脚本就越多、越大，这会导致应用的首屏加载时间非常长，进而降低了体验感。
+
+更多详情查看[彻底理解服务端渲染 - SSR 原理](https://github.com/yacan8/blog/issues/30)
