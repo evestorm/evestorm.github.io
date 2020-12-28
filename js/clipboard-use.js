@@ -1,12 +1,22 @@
 /*页面载入完成后，创建复制按钮*/
-!function (e, t, a) { 
+document.addEventListener('DOMContentLoaded', () => {
+  'use strict';
   var initCopyCode = function(){
-    var copyHtml = '';
-    copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
-    //fa fa-globe可以去字体库替换自己想要的图标
-    copyHtml += '  <i class="fa fa-clipboard"></i><span>copy</span>';
-    copyHtml += '</button>';
-    $(".highlight .code pre").before(copyHtml);
+    let parents = document.querySelectorAll(".highlight .code");
+    parents.forEach(parent => {
+      let btn = document.createElement('button');
+      let i = document.createElement('i');
+      let span = document.createElement('span');
+      btn.classList.add('btn-copy');
+      btn.setAttribute("data-clipboard-snippet", "");
+      i.classList.add('fa', 'fa-clipboard');
+      span.innerText = '复制';
+      i.appendChild(span);
+      btn.appendChild(i);
+      console.log(parent)
+      parent.insertBefore(btn, parent.firstChild);
+    })
+    
     new ClipboardJS('.btn-copy', {
         target: function(trigger) {
             return trigger.nextElementSibling;
@@ -14,4 +24,4 @@
     });
   }
   initCopyCode();
-}(window, document);
+});
