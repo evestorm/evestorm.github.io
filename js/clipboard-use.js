@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
       span.innerText = '复制';
       i.appendChild(span);
       btn.appendChild(i);
-      console.log(parent)
       parent.insertBefore(btn, parent.firstChild);
     })
     
