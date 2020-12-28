@@ -1500,90 +1500,6 @@
       </categories>
   </entry>
   <entry>
-    <title>JS垃圾回收机制</title>
-    <url>/posts/20229/</url>
-    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
-<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
-<a id="more"></a>
-
-<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
-
-<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
-<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
-
-<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
-<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
-<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
-
-<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
-
-<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
-<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
-
-<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
-<blockquote>
-<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
-</blockquote>
-<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
-<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
-
-<p>接着我们执行下面操作：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
-
-<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
-<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
-
-<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
-
-<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
-<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
-
-<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
-<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
-<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
-
-<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
-<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
-<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
-<ul>
-<li>新一代（e.g. 一个函数中的临时变量）</li>
-<li>老一代（e.g. window 对象）</li>
-</ul>
-<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
-<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
-<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
-<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
-<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
-<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
-
-<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
-<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
-<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
-<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
-<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>JS数组有哪些常用方法</title>
     <url>/posts/21501/</url>
     <content><![CDATA[<h2 id="改变原数组的方法"><a href="#改变原数组的方法" class="headerlink" title="改变原数组的方法"></a>改变原数组的方法</h2><h3 id="splice-添加-删除数组元素"><a href="#splice-添加-删除数组元素" class="headerlink" title="splice() 添加/删除数组元素"></a>splice() 添加/删除数组元素</h3><blockquote>
@@ -1715,6 +1631,90 @@
 </ol>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a=[<span class="string">&#x27;OB&#x27;</span>,<span class="string">&#x27;Koro1&#x27;</span>,<span class="number">1</span>,<span class="literal">NaN</span>];</span><br><span class="line"><span class="comment">// let b=a.includes(NaN); // true 识别NaN</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,100); // false 超过数组长度 不搜索</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-3);  // true 从倒数第三个元素开始搜索 </span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-100);  // true 负值绝对值超过数组长度，搜索整个数组</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>JS垃圾回收机制</title>
+    <url>/posts/20229/</url>
+    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
+<a id="more"></a>
+
+<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
+
+<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
+
+<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
+<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
+<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
+
+<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
+
+<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
+<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
+
+<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
+<blockquote>
+<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
+</blockquote>
+<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
+<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
+
+<p>接着我们执行下面操作：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
+
+<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
+<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
+
+<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
+
+<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
+<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
+
+<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
+<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
+<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
+
+<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
+<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
+<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
+<ul>
+<li>新一代（e.g. 一个函数中的临时变量）</li>
+<li>老一代（e.g. window 对象）</li>
+</ul>
+<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
+<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
+<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
+<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
+<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
+
+<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
+<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
+<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
+</ul>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -2105,6 +2105,23 @@
       </tags>
   </entry>
   <entry>
+    <title>Swift记录通话时间</title>
+    <url>/posts/32380/</url>
+    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
+<a id="more"></a>
+
+<p>代码如下：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Tree-Shaking性能优化实践(笔记)</title>
     <url>/posts/64509/</url>
     <content><![CDATA[<h2 id="何为-Tree-Shaking"><a href="#何为-Tree-Shaking" class="headerlink" title="何为 Tree-Shaking"></a>何为 Tree-Shaking</h2><blockquote>
@@ -2126,23 +2143,6 @@
       <tags>
         <tag>转载</tag>
         <tag>Webpack</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Swift记录通话时间</title>
-    <url>/posts/32380/</url>
-    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
-<a id="more"></a>
-
-<p>代码如下：</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2840,6 +2840,63 @@
       </tags>
   </entry>
   <entry>
+    <title>Vue组件化常用技术总结(笔记)</title>
+    <url>/posts/27829/</url>
+    <content><![CDATA[<h1 id="组件化常用技术"><a href="#组件化常用技术" class="headerlink" title="组件化常用技术"></a>组件化常用技术</h1><h2 id="组件传值、通信"><a href="#组件传值、通信" class="headerlink" title="组件传值、通信"></a>组件传值、通信</h2><h3 id="父组件-gt-子组件"><a href="#父组件-gt-子组件" class="headerlink" title="父组件 =&gt; 子组件"></a>父组件 =&gt; 子组件</h3><ul>
+<li>属性 props</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123;</span><br><span class="line">  msg: <span class="built_in">String</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;HelloWorld msg=<span class="string">&quot;Welcome to Your Vue.js App&quot;</span> /&gt;;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<ul>
+<li>引用 refs</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">HelloWorld</span> <span class="attr">ref</span>=<span class="string">&quot;hw&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">this.$refs.hw.xx // P.S. • 如果ref放在了原生DOM元素上，获取的数据就是原生DOM对象</span><br><span class="line">- 可以直接操作 • 如果ref放在了组件对象上，获取的就是组件对象 -</span><br><span class="line">可以获取到组件内data、methods，通过 this.$refs.refName.data名称/method名称 -</span><br><span class="line">可以获取到DOM对象，通过 this.$refs.refName.$el进行操作</span><br></pre></td></tr></table></figure>
+
+<h3 id="子组件-gt-父组件：自定义事件"><a href="#子组件-gt-父组件：自定义事件" class="headerlink" title="子组件 =&gt; 父组件：自定义事件"></a>子组件 =&gt; 父组件：自定义事件</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123; <span class="attr">add</span>: <span class="built_in">Function</span> &#125;</span><br><span class="line"><span class="built_in">this</span>.$emit(<span class="string">&#x27;add&#x27;</span>, good)</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;Cart @add=<span class="string">&quot;cartAdd($event)&quot;</span>&gt;&lt;/Cart&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="兄弟组件：通过共同祖辈组件"><a href="#兄弟组件：通过共同祖辈组件" class="headerlink" title="兄弟组件：通过共同祖辈组件"></a>兄弟组件：通过共同祖辈组件</h3><p>通过共同的祖辈组件搭桥，<code>$parent</code> 或 <code>$root</code>。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// brother1</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$on(<span class="string">&#x27;foo&#x27;</span>, handle);</span><br><span class="line"></span><br><span class="line"><span class="comment">// brother2</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$emit(<span class="string">&#x27;foo&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="祖先和后代之间"><a href="#祖先和后代之间" class="headerlink" title="祖先和后代之间"></a>祖先和后代之间</h3><ul>
+<li>provide/inject：能够实现祖先给后代传值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ancestor</span></span><br><span class="line"><span class="function"><span class="title">provide</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">   <span class="keyword">return</span> &#123;<span class="attr">foo</span>: <span class="string">&#x27;foo&#x27;</span>&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// descendant</span></span><br><span class="line">inject: [<span class="string">&#x27;foo&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>dispatch：后代给祖先传值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 定义一个dispatch方法，指定要派发事件名称和数据</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dispatch</span>(<span class="params">eventName, data</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> parent = <span class="built_in">this</span>.$parent</span><br><span class="line">  <span class="comment">// 只要还存在父元素就继续往上查找</span></span><br><span class="line">  <span class="keyword">while</span> (parent) &#123;</span><br><span class="line">    <span class="comment">// 父元素用$emit触发</span></span><br><span class="line">    parent.$emit(eventName,data)</span><br><span class="line">    <span class="comment">// 递归查找父元素</span></span><br><span class="line">    parent = parent.$parent</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用，HelloWorld.vue</span></span><br><span class="line">&lt;h1 @click=<span class="string">&quot;dispatch(&#x27;hello&#x27;, &#x27;hello,world&#x27;)&quot;</span>&gt;&#123;&#123; msg &#125;&#125;&lt;/h1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// App.vue</span></span><br><span class="line"><span class="built_in">this</span>.$on(<span class="string">&#x27;hello&#x27;</span>, <span class="built_in">this</span>.sayHello)</span><br></pre></td></tr></table></figure>
+
+<h3 id="任意两个组件之间：事件总线-或-vuex"><a href="#任意两个组件之间：事件总线-或-vuex" class="headerlink" title="任意两个组件之间：事件总线 或 vuex"></a>任意两个组件之间：事件总线 或 vuex</h3><ul>
+<li>事件总线：创建一个 Bus 类负责事件派发、监听和回调管理</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 自定义Bus：事件派发、监听和回调管理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bus</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   eventName1:[fn1,fn2],</span></span><br><span class="line">    <span class="comment">//   eventName2:[fn3,fn4],</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line">    <span class="built_in">this</span>.callbacks = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  $on(name, fn)&#123;</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name] = <span class="built_in">this</span>.callbacks[name] || []</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name].push(fn)</span><br><span class="line">  &#125;</span><br><span class="line">  $emit(name, args)&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">this</span>.callbacks[name])&#123;</span><br><span class="line">      <span class="built_in">this</span>.callbacks[name].forEach(<span class="function"><span class="params">cb</span> =&gt;</span> cb(args))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.js</span></span><br><span class="line">Vue.prototype.$bus = <span class="keyword">new</span> Bus()</span><br><span class="line"><span class="comment">// child1</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$on(<span class="string">&#x27;foo&#x27;</span>, handle)</span><br><span class="line"><span class="comment">// child2</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$emit(<span class="string">&#x27;foo&#x27;</span>)</span><br><span class="line">copy<span class="comment">// 封装 vueEvent.js</span></span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> VueEvent = <span class="keyword">new</span> Vue();</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> VueEvent;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line">methods: &#123;</span><br><span class="line">  <span class="function"><span class="title">emitNews</span>(<span class="params"></span>)</span> &#123; VueEvent.$emit(<span class="string">&#x27;to-news&#x27;</span>, <span class="built_in">this</span>.msg) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  VueEvent.$on(<span class="string">&#x27;to-news&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;...接收到了data...&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Vuex：创建唯一的全局数据管理者 store，通过它管理数据并通知组件状态变更</li>
+</ul>
+<h2 id="插槽"><a href="#插槽" class="headerlink" title="插槽"></a>插槽</h2><blockquote>
+<p>Vue 2.6.0 之后采用全新 v-slot 语法取代之前的 slot、slot-scope</p>
+</blockquote>
+<h3 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp1</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">comp</span>&gt;</span>hello<span class="tag">&lt;/<span class="name">comp</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="具名插槽"><a href="#具名插槽" class="headerlink" title="具名插槽"></a>具名插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp2</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">name</span>=<span class="string">&quot;content&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp2</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 默认插槽用default做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>&gt;</span>具名插槽<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 具名插槽用插槽名做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:content</span>&gt;</span>内容...<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp2</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp3</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">:foo</span>=<span class="string">&quot;foo&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp3</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 把v-slot的值指定为作用域上下文对象(e.g. &#123;foo: foo&#125;) --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>=<span class="string">&quot;ctx&quot;</span>&gt;</span>来自子组件数据：&#123;&#123;ctx.foo&#125;&#125;<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp3</span>&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Vue组件开发——无限菜单</title>
     <url>/posts/23904/</url>
     <content><![CDATA[<h2 id="vue-cli-service-global-插件介绍"><a href="#vue-cli-service-global-插件介绍" class="headerlink" title="@vue/cli-service-global 插件介绍"></a>@vue/cli-service-global 插件介绍</h2><p>该 npm 包可以让你在零配置情况下，直接使用 <code>vue serve</code> 和 <code>vue build</code> 命令跑 <code>*.vue</code> 文件，并且可以把它编译打包成一个 Vue 插件。</p>
@@ -2949,63 +3006,6 @@
         <category>Vue</category>
       </categories>
       <tags>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue组件化常用技术总结(笔记)</title>
-    <url>/posts/27829/</url>
-    <content><![CDATA[<h1 id="组件化常用技术"><a href="#组件化常用技术" class="headerlink" title="组件化常用技术"></a>组件化常用技术</h1><h2 id="组件传值、通信"><a href="#组件传值、通信" class="headerlink" title="组件传值、通信"></a>组件传值、通信</h2><h3 id="父组件-gt-子组件"><a href="#父组件-gt-子组件" class="headerlink" title="父组件 =&gt; 子组件"></a>父组件 =&gt; 子组件</h3><ul>
-<li>属性 props</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123;</span><br><span class="line">  msg: <span class="built_in">String</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;HelloWorld msg=<span class="string">&quot;Welcome to Your Vue.js App&quot;</span> /&gt;;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<ul>
-<li>引用 refs</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">HelloWorld</span> <span class="attr">ref</span>=<span class="string">&quot;hw&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">this.$refs.hw.xx // P.S. • 如果ref放在了原生DOM元素上，获取的数据就是原生DOM对象</span><br><span class="line">- 可以直接操作 • 如果ref放在了组件对象上，获取的就是组件对象 -</span><br><span class="line">可以获取到组件内data、methods，通过 this.$refs.refName.data名称/method名称 -</span><br><span class="line">可以获取到DOM对象，通过 this.$refs.refName.$el进行操作</span><br></pre></td></tr></table></figure>
-
-<h3 id="子组件-gt-父组件：自定义事件"><a href="#子组件-gt-父组件：自定义事件" class="headerlink" title="子组件 =&gt; 父组件：自定义事件"></a>子组件 =&gt; 父组件：自定义事件</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123; <span class="attr">add</span>: <span class="built_in">Function</span> &#125;</span><br><span class="line"><span class="built_in">this</span>.$emit(<span class="string">&#x27;add&#x27;</span>, good)</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;Cart @add=<span class="string">&quot;cartAdd($event)&quot;</span>&gt;&lt;/Cart&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="兄弟组件：通过共同祖辈组件"><a href="#兄弟组件：通过共同祖辈组件" class="headerlink" title="兄弟组件：通过共同祖辈组件"></a>兄弟组件：通过共同祖辈组件</h3><p>通过共同的祖辈组件搭桥，<code>$parent</code> 或 <code>$root</code>。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// brother1</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$on(<span class="string">&#x27;foo&#x27;</span>, handle);</span><br><span class="line"></span><br><span class="line"><span class="comment">// brother2</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$emit(<span class="string">&#x27;foo&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="祖先和后代之间"><a href="#祖先和后代之间" class="headerlink" title="祖先和后代之间"></a>祖先和后代之间</h3><ul>
-<li>provide/inject：能够实现祖先给后代传值</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ancestor</span></span><br><span class="line"><span class="function"><span class="title">provide</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">   <span class="keyword">return</span> &#123;<span class="attr">foo</span>: <span class="string">&#x27;foo&#x27;</span>&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// descendant</span></span><br><span class="line">inject: [<span class="string">&#x27;foo&#x27;</span>]</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>dispatch：后代给祖先传值</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 定义一个dispatch方法，指定要派发事件名称和数据</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dispatch</span>(<span class="params">eventName, data</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> parent = <span class="built_in">this</span>.$parent</span><br><span class="line">  <span class="comment">// 只要还存在父元素就继续往上查找</span></span><br><span class="line">  <span class="keyword">while</span> (parent) &#123;</span><br><span class="line">    <span class="comment">// 父元素用$emit触发</span></span><br><span class="line">    parent.$emit(eventName,data)</span><br><span class="line">    <span class="comment">// 递归查找父元素</span></span><br><span class="line">    parent = parent.$parent</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用，HelloWorld.vue</span></span><br><span class="line">&lt;h1 @click=<span class="string">&quot;dispatch(&#x27;hello&#x27;, &#x27;hello,world&#x27;)&quot;</span>&gt;&#123;&#123; msg &#125;&#125;&lt;/h1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// App.vue</span></span><br><span class="line"><span class="built_in">this</span>.$on(<span class="string">&#x27;hello&#x27;</span>, <span class="built_in">this</span>.sayHello)</span><br></pre></td></tr></table></figure>
-
-<h3 id="任意两个组件之间：事件总线-或-vuex"><a href="#任意两个组件之间：事件总线-或-vuex" class="headerlink" title="任意两个组件之间：事件总线 或 vuex"></a>任意两个组件之间：事件总线 或 vuex</h3><ul>
-<li>事件总线：创建一个 Bus 类负责事件派发、监听和回调管理</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 自定义Bus：事件派发、监听和回调管理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bus</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   eventName1:[fn1,fn2],</span></span><br><span class="line">    <span class="comment">//   eventName2:[fn3,fn4],</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line">    <span class="built_in">this</span>.callbacks = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  $on(name, fn)&#123;</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name] = <span class="built_in">this</span>.callbacks[name] || []</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name].push(fn)</span><br><span class="line">  &#125;</span><br><span class="line">  $emit(name, args)&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">this</span>.callbacks[name])&#123;</span><br><span class="line">      <span class="built_in">this</span>.callbacks[name].forEach(<span class="function"><span class="params">cb</span> =&gt;</span> cb(args))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.js</span></span><br><span class="line">Vue.prototype.$bus = <span class="keyword">new</span> Bus()</span><br><span class="line"><span class="comment">// child1</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$on(<span class="string">&#x27;foo&#x27;</span>, handle)</span><br><span class="line"><span class="comment">// child2</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$emit(<span class="string">&#x27;foo&#x27;</span>)</span><br><span class="line">copy<span class="comment">// 封装 vueEvent.js</span></span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> VueEvent = <span class="keyword">new</span> Vue();</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> VueEvent;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line">methods: &#123;</span><br><span class="line">  <span class="function"><span class="title">emitNews</span>(<span class="params"></span>)</span> &#123; VueEvent.$emit(<span class="string">&#x27;to-news&#x27;</span>, <span class="built_in">this</span>.msg) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  VueEvent.$on(<span class="string">&#x27;to-news&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;...接收到了data...&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>Vuex：创建唯一的全局数据管理者 store，通过它管理数据并通知组件状态变更</li>
-</ul>
-<h2 id="插槽"><a href="#插槽" class="headerlink" title="插槽"></a>插槽</h2><blockquote>
-<p>Vue 2.6.0 之后采用全新 v-slot 语法取代之前的 slot、slot-scope</p>
-</blockquote>
-<h3 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp1</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">comp</span>&gt;</span>hello<span class="tag">&lt;/<span class="name">comp</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="具名插槽"><a href="#具名插槽" class="headerlink" title="具名插槽"></a>具名插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp2</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">name</span>=<span class="string">&quot;content&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp2</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 默认插槽用default做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>&gt;</span>具名插槽<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 具名插槽用插槽名做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:content</span>&gt;</span>内容...<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp2</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">// comp3</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">:foo</span>=<span class="string">&quot;foo&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp3</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 把v-slot的值指定为作用域上下文对象(e.g. &#123;foo: foo&#125;) --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>=<span class="string">&quot;ctx&quot;</span>&gt;</span>来自子组件数据：&#123;&#123;ctx.foo&#125;&#125;<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp3</span>&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
         <tag>Vue</tag>
       </tags>
   </entry>
@@ -3812,26 +3812,6 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS启动页图片无法全屏显示</title>
-    <url>/posts/58404/</url>
-    <content><![CDATA[<p>在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满：</p>
-<img src="/posts/58404/safearea.png" class="" title="安全区域未填满">
-
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>设置相应约束的 FirstItem ，改 <code>Safe Area</code> 为 <code>SuperView</code> ：</p>
-<img src="/posts/58404/safearea2superview.png" class="" title="安全区域未填满">
-
-<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><img src="/posts/58404/superview.png" class="" title="安全区域未填满">
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-        <tag>Xcode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>iOS微信端字体图标iconfont显示不正常</title>
     <url>/posts/5764/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>iOS 中微信端打开项目发现图标显示成一个个方框；切换页面也同样没显示。但是在 Android 端、IOS 的浏览器显示正常。</p>
@@ -3856,6 +3836,26 @@
       <tags>
         <tag>iOS</tag>
         <tag>解决方案</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS启动页图片无法全屏显示</title>
+    <url>/posts/58404/</url>
+    <content><![CDATA[<p>在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满：</p>
+<img src="/posts/58404/safearea.png" class="" title="安全区域未填满">
+
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>设置相应约束的 FirstItem ，改 <code>Safe Area</code> 为 <code>SuperView</code> ：</p>
+<img src="/posts/58404/safearea2superview.png" class="" title="安全区域未填满">
+
+<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><img src="/posts/58404/superview.png" class="" title="安全区域未填满">
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>Xcode</tag>
       </tags>
   </entry>
   <entry>
@@ -3995,26 +3995,6 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS的App语言设置为中文</title>
-    <url>/posts/64032/</url>
-    <content><![CDATA[<p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
-<img src="/posts/64032/language.jpeg" class="" title="拍照为英文">
-
-<p>但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 <code>Localization native development region</code> 为 <code>China</code> ：</p>
-<img src="/posts/64032/plist.png" class="" title="plist设置">
-
-<p>效果：</p>
-<img src="/posts/64032/plist-china.png" class="" title="效果">
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>input效果汇总</title>
     <url>/posts/32435/</url>
     <content><![CDATA[<h2 id="text-文本框"><a href="#text-文本框" class="headerlink" title="text 文本框"></a>text 文本框</h2><h3 id="focus-时底部下划线展开动画"><a href="#focus-时底部下划线展开动画" class="headerlink" title="focus 时底部下划线展开动画"></a>focus 时底部下划线展开动画</h3><iframe height="310" scrolling="no" title="Input Boxes" src="https://codepen.io/JingW/embed/NWWERVy?height=265&amp;theme-id=default&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
@@ -4072,6 +4052,26 @@
       </categories>
       <tags>
         <tag>跨域</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS的App语言设置为中文</title>
+    <url>/posts/64032/</url>
+    <content><![CDATA[<p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
+<img src="/posts/64032/language.jpeg" class="" title="拍照为英文">
+
+<p>但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 <code>Localization native development region</code> 为 <code>China</code> ：</p>
+<img src="/posts/64032/plist.png" class="" title="plist设置">
+
+<p>效果：</p>
+<img src="/posts/64032/plist-china.png" class="" title="效果">
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -4150,23 +4150,6 @@
       </tags>
   </entry>
   <entry>
-    <title>macbookpro15款更新Catalina系统导致wifi不可用解决方案</title>
-    <url>/posts/21881/</url>
-    <content><![CDATA[<p>公司搞了个 15 款的 mbp，需要升级到最新的 macOS Catalina 10.15.17 版本。</p>
-<p>然而当我升级完毕后却发现 wifi 不可用。其表现就是右上角菜单中的 wifi 变灰，在「系统——&gt;网络」中，当我尝试手动添加 wifi 时，弹窗中的接口下拉选项中并没有显示 wifi 。</p>
-<p>在网上搜了各种方案而且在咨询了 apple 技术服务后都没法解决此问题。后来不愿放弃的我继续 google，最终发现了一篇国外的帖子，帮助我成功找回了 wifi：</p>
-<p><a href="https://kozyatnikov.com/mac-os-x-catalina-wifi-not-working-fix">https://kozyatnikov.com/mac-os-x-catalina-wifi-not-working-fix</a></p>
-<p>如果你也遇到过此问题，可以根据上面文章的步骤执行来找回 wifi。</p>
-]]></content>
-      <categories>
-        <category>操作系统</category>
-        <category>macOS</category>
-      </categories>
-      <tags>
-        <tag>macOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mac安装homebrew出错-Failed to connect to raw.githubusercontent.com port 443/Connection refused error</title>
     <url>/posts/24685/</url>
     <content><![CDATA[<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><p>安装 homebrew 时总是报错：（Failed to connect to raw.githubusercontent.com port 443:Connection refused error）</p>
@@ -4189,37 +4172,20 @@
       </tags>
   </entry>
   <entry>
-    <title>mac网线转接头连接网线无法上网</title>
-    <url>/posts/45588/</url>
-    <content><![CDATA[<p>mac 笔记本电脑没有直接插网线的接口，所以需要一个转接头。我在某东下单了一个绿联转接头并连上了网线，说明书上说即插即用不用配置，然而我发现并不能直接上网。所以搜索了绿联的外置网卡驱动，下载了一个我这个型号转接头能用的驱动。安装完毕重启 mac 就能直接上网了。</p>
-<h3 id="绿联驱动下载地址"><a href="#绿联驱动下载地址" class="headerlink" title="绿联驱动下载地址"></a>绿联驱动下载地址</h3><p><a href="https://www.lulian.cn/download/list-34-cn.html">绿联-驱动下载中心</a></p>
-<img src="/posts/45588/image-20201119105228757.png" class="" title="image-20201119105228757">
-
-<p>Ctrl/CMD + F 搜索你的设备型号，然后下载对应平台下的驱动安装就好。</p>
+    <title>macbookpro15款更新Catalina系统导致wifi不可用解决方案</title>
+    <url>/posts/21881/</url>
+    <content><![CDATA[<p>公司搞了个 15 款的 mbp，需要升级到最新的 macOS Catalina 10.15.17 版本。</p>
+<p>然而当我升级完毕后却发现 wifi 不可用。其表现就是右上角菜单中的 wifi 变灰，在「系统——&gt;网络」中，当我尝试手动添加 wifi 时，弹窗中的接口下拉选项中并没有显示 wifi 。</p>
+<p>在网上搜了各种方案而且在咨询了 apple 技术服务后都没法解决此问题。后来不愿放弃的我继续 google，最终发现了一篇国外的帖子，帮助我成功找回了 wifi：</p>
+<p><a href="https://kozyatnikov.com/mac-os-x-catalina-wifi-not-working-fix">https://kozyatnikov.com/mac-os-x-catalina-wifi-not-working-fix</a></p>
+<p>如果你也遇到过此问题，可以根据上面文章的步骤执行来找回 wifi。</p>
 ]]></content>
       <categories>
         <category>操作系统</category>
         <category>macOS</category>
       </categories>
-  </entry>
-  <entry>
-    <title>node14+版本下hexo部署失败</title>
-    <url>/posts/430/</url>
-    <content><![CDATA[<p>最近升级了 node14，发现在用 hexo 写博客部署时失败了，报错大致如下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">FATAL Something&#x27;s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span><br><span class="line">TypeError [ERR_INVALID_ARG_TYPE]: The &quot;mode&quot; argument must be integer. Received an instance of Object</span><br><span class="line">    at copyFile (fs.js:1890:10)</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at ret (eval at makeNodePromisifiedEval (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span><br><span class="line">    at C:\Users\Administrator\blog\node_modules\hexo-deployer-git\node_modules\hexo-fs\lib\fs.js:144:39</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:517:31)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br><span class="line">    at Promise._resolveCallback (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:437:57)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:529:17)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br></pre></td></tr></table></figure>
-
-<p>google 了下发现是 hexo 不支持最新 node14+，issue<a href="https://github.com/hexojs/hexo/issues/4263">见此</a>，解决方案两种：降低 node 版本或者升级最新<a href="mailto:hexo@4.2.1">hexo@4.2.1</a>+。</p>
-<p>我尝试了升级 hexo 到 4.2.1 发现并没有什么卵用，照样报相同的错，所以选择了降低 node 版本到稳定版：</p>
-<p>直接到官网下载最新稳定版：<a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a></p>
-<p>然后重新执行 <code>hexo clean &amp;&amp; hexo deploy</code> 打包命令就好了。</p>
-<p>P.S. 如果打包成功后，最好验证下 hexo 下的分类和标签是否正常工作，我就遇到了点击自己博客首页的「分类」和「标签」后，跳转的页面报 404，原因是打开的路由最后多了个空格：<code>./categories/%20</code> 。不知道啥原因，所以我把 hexo 版本退回到了 3.8.0。这样路由就正确了。</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-        <category>博客</category>
-      </categories>
       <tags>
-        <tag>Node</tag>
+        <tag>macOS</tag>
       </tags>
   </entry>
   <entry>
@@ -4242,6 +4208,40 @@
         <tag>笔记</tag>
         <tag>解决方案</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>node14+版本下hexo部署失败</title>
+    <url>/posts/430/</url>
+    <content><![CDATA[<p>最近升级了 node14，发现在用 hexo 写博客部署时失败了，报错大致如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">FATAL Something&#x27;s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span><br><span class="line">TypeError [ERR_INVALID_ARG_TYPE]: The &quot;mode&quot; argument must be integer. Received an instance of Object</span><br><span class="line">    at copyFile (fs.js:1890:10)</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at ret (eval at makeNodePromisifiedEval (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span><br><span class="line">    at C:\Users\Administrator\blog\node_modules\hexo-deployer-git\node_modules\hexo-fs\lib\fs.js:144:39</span><br><span class="line">    at tryCatcher (C:\Users\Administrator\blog\node_modules\bluebird\js\release\util.js:16:23)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:517:31)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br><span class="line">    at Promise._resolveCallback (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:437:57)</span><br><span class="line">    at Promise._settlePromiseFromHandler (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:529:17)</span><br><span class="line">    at Promise._settlePromise (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:574:18)</span><br><span class="line">    at Promise._settlePromise0 (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:619:10)</span><br><span class="line">    at Promise._settlePromises (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:699:18)</span><br><span class="line">    at Promise._fulfill (C:\Users\Administrator\blog\node_modules\bluebird\js\release\promise.js:643:18)</span><br></pre></td></tr></table></figure>
+
+<p>google 了下发现是 hexo 不支持最新 node14+，issue<a href="https://github.com/hexojs/hexo/issues/4263">见此</a>，解决方案两种：降低 node 版本或者升级最新<a href="mailto:hexo@4.2.1">hexo@4.2.1</a>+。</p>
+<p>我尝试了升级 hexo 到 4.2.1 发现并没有什么卵用，照样报相同的错，所以选择了降低 node 版本到稳定版：</p>
+<p>直接到官网下载最新稳定版：<a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a></p>
+<p>然后重新执行 <code>hexo clean &amp;&amp; hexo deploy</code> 打包命令就好了。</p>
+<p>P.S. 如果打包成功后，最好验证下 hexo 下的分类和标签是否正常工作，我就遇到了点击自己博客首页的「分类」和「标签」后，跳转的页面报 404，原因是打开的路由最后多了个空格：<code>./categories/%20</code> 。不知道啥原因，所以我把 hexo 版本退回到了 3.8.0。这样路由就正确了。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Node</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mac网线转接头连接网线无法上网</title>
+    <url>/posts/45588/</url>
+    <content><![CDATA[<p>mac 笔记本电脑没有直接插网线的接口，所以需要一个转接头。我在某东下单了一个绿联转接头并连上了网线，说明书上说即插即用不用配置，然而我发现并不能直接上网。所以搜索了绿联的外置网卡驱动，下载了一个我这个型号转接头能用的驱动。安装完毕重启 mac 就能直接上网了。</p>
+<h3 id="绿联驱动下载地址"><a href="#绿联驱动下载地址" class="headerlink" title="绿联驱动下载地址"></a>绿联驱动下载地址</h3><p><a href="https://www.lulian.cn/download/list-34-cn.html">绿联-驱动下载中心</a></p>
+<img src="/posts/45588/image-20201119105228757.png" class="" title="image-20201119105228757">
+
+<p>Ctrl/CMD + F 搜索你的设备型号，然后下载对应平台下的驱动安装就好。</p>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+        <category>macOS</category>
+      </categories>
   </entry>
   <entry>
     <title>null 和 undefined 的区别</title>
@@ -4449,6 +4449,52 @@
       </tags>
   </entry>
   <entry>
+    <title>transition过渡（一）</title>
+    <url>/posts/41749/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/24967/">transition过渡（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/13167/">transition过渡（二）</a></li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
+<p>CSS3 过渡是元素从一种样式逐渐改变为另一种的效果。<br>要实现这一点，必须规定两项内容：</p>
+<ul>
+<li>指定要添加效果的CSS属性</li>
+<li>指定效果的持续时间。</li>
+</ul>
+</blockquote>
+<p>———— 出自 <a href="http://www.runoob.com/css3/css3-transitions.html">菜鸟教程</a></p>
+<a id="more"></a>
+
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 分开写：*/</span></span><br><span class="line"><span class="selector-tag">transition-property</span>: <span class="selector-tag">css</span>属性名称;</span><br><span class="line"><span class="selector-tag">transition-duration</span>: 过渡所花时间(默认0);</span><br><span class="line"><span class="selector-tag">transition-timing-function</span>: 过渡的时间曲线(默认<span class="selector-tag">ease</span>);</span><br><span class="line"><span class="selector-tag">transition-delay</span>: 延迟时间(默认0);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 简写形式： */</span></span><br><span class="line"><span class="selector-tag">transition</span>： <span class="selector-tag">CSS</span>属性，花费时间，效果曲线(默认<span class="selector-tag">ease</span>)，延迟时间(默认0)</span><br></pre></td></tr></table></figure>
+
+<h2 id="栗子-🌰"><a href="#栗子-🌰" class="headerlink" title="栗子 🌰"></a>栗子 🌰</h2><h3 id="单个属性的变化-—-gt-按钮-hover-效果"><a href="#单个属性的变化-—-gt-按钮-hover-效果" class="headerlink" title="单个属性的变化 —&gt; 按钮 :hover 效果"></a>单个属性的变化 —&gt; 按钮 :hover 效果</h3><p>下面的两个按钮，在鼠标移入时都被设置了 <code>background: yellow;</code> 样式。但只给第一个加上了 <code>transition: background 2s;</code> 属性，意思是如果背景发生变化，则给2s的过渡效果。</p>
+<iframe height="265" scrolling="no" title="XGvqMB" src="https://codepen.io/JingW/embed/XGvqMB/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="多个属性的变化-—-gt-单独设置"><a href="#多个属性的变化-—-gt-单独设置" class="headerlink" title="多个属性的变化 —&gt; 单独设置"></a>多个属性的变化 —&gt; 单独设置</h3><p>针对多个属性设置过渡效果，用逗号隔开就好。下面案例鼠标移入后，使正方形过渡到圆形，且颜色逐渐变浅，核心代码：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">background</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-out</span>, <span class="selector-tag">border-radius</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-in</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<iframe height="265" scrolling="no" title="transition-多属性" src="https://codepen.io/JingW/embed/dLyWKM/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="多个属性的变化-gt-all"><a href="#多个属性的变化-gt-all" class="headerlink" title="多个属性的变化 -&gt; all"></a>多个属性的变化 -&gt; all</h3><p>如果要过渡的css属性较多，可以尝试使用 all 一步搞定。下面案例中将鼠标移入正方形盒子，会使其慢慢缩小为一个圆形，且颜色逐渐变深，核心代码：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">all</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-out</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<iframe height="265" scrolling="no" title="transition-多属性-all" src="https://codepen.io/JingW/embed/GLRmXm/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="实用-demo"><a href="#实用-demo" class="headerlink" title="实用 demo"></a>实用 demo</h2><h3 id="下拉导航菜单"><a href="#下拉导航菜单" class="headerlink" title="下拉导航菜单"></a>下拉导航菜单</h3><iframe height="265" scrolling="no" title="transition-下拉导航" src="https://codepen.io/JingW/embed/MxNXex/?height=265&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>transform转换（一）</title>
     <url>/posts/45420/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
@@ -4505,49 +4551,31 @@
       </tags>
   </entry>
   <entry>
-    <title>transition过渡（一）</title>
-    <url>/posts/41749/</url>
-    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
-<li><a href="https://evestorm.github.io/posts/24967/">transition过渡（一）</a></li>
-<li><a href="https://evestorm.github.io/posts/13167/">transition过渡（二）</a></li>
-</ul>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
-<p>CSS3 过渡是元素从一种样式逐渐改变为另一种的效果。<br>要实现这一点，必须规定两项内容：</p>
-<ul>
-<li>指定要添加效果的CSS属性</li>
-<li>指定效果的持续时间。</li>
-</ul>
-</blockquote>
-<p>———— 出自 <a href="http://www.runoob.com/css3/css3-transitions.html">菜鸟教程</a></p>
+    <title>ubuntu下开启/关闭防火墙及端口的命令(笔记)</title>
+    <url>/posts/60660/</url>
+    <content><![CDATA[<h2 id="开启防火墙"><a href="#开启防火墙" class="headerlink" title="开启防火墙"></a>开启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw enable</span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw disable</span><br></pre></td></tr></table></figure>
+
 <a id="more"></a>
 
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 分开写：*/</span></span><br><span class="line"><span class="selector-tag">transition-property</span>: <span class="selector-tag">css</span>属性名称;</span><br><span class="line"><span class="selector-tag">transition-duration</span>: 过渡所花时间(默认0);</span><br><span class="line"><span class="selector-tag">transition-timing-function</span>: 过渡的时间曲线(默认<span class="selector-tag">ease</span>);</span><br><span class="line"><span class="selector-tag">transition-delay</span>: 延迟时间(默认0);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 简写形式： */</span></span><br><span class="line"><span class="selector-tag">transition</span>： <span class="selector-tag">CSS</span>属性，花费时间，效果曲线(默认<span class="selector-tag">ease</span>)，延迟时间(默认0)</span><br></pre></td></tr></table></figure>
+<h2 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw reload</span><br></pre></td></tr></table></figure>
 
-<h2 id="栗子-🌰"><a href="#栗子-🌰" class="headerlink" title="栗子 🌰"></a>栗子 🌰</h2><h3 id="单个属性的变化-—-gt-按钮-hover-效果"><a href="#单个属性的变化-—-gt-按钮-hover-效果" class="headerlink" title="单个属性的变化 —&gt; 按钮 :hover 效果"></a>单个属性的变化 —&gt; 按钮 :hover 效果</h3><p>下面的两个按钮，在鼠标移入时都被设置了 <code>background: yellow;</code> 样式。但只给第一个加上了 <code>transition: background 2s;</code> 属性，意思是如果背景发生变化，则给2s的过渡效果。</p>
-<iframe height="265" scrolling="no" title="XGvqMB" src="https://codepen.io/JingW/embed/XGvqMB/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+<h2 id="查看端口开启状态"><a href="#查看端口开启状态" class="headerlink" title="查看端口开启状态"></a>查看端口开启状态</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
 
-<h3 id="多个属性的变化-—-gt-单独设置"><a href="#多个属性的变化-—-gt-单独设置" class="headerlink" title="多个属性的变化 —&gt; 单独设置"></a>多个属性的变化 —&gt; 单独设置</h3><p>针对多个属性设置过渡效果，用逗号隔开就好。下面案例鼠标移入后，使正方形过渡到圆形，且颜色逐渐变浅，核心代码：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">background</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-out</span>, <span class="selector-tag">border-radius</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-in</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="开启某个端口"><a href="#开启某个端口" class="headerlink" title="开启某个端口"></a>开启某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw allow 8001/tcp</span><br></pre></td></tr></table></figure>
 
+<h2 id="禁止外部某个端口"><a href="#禁止外部某个端口" class="headerlink" title="禁止外部某个端口"></a>禁止外部某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw delete allow 8001/tcp</span><br></pre></td></tr></table></figure>
 
-
-<iframe height="265" scrolling="no" title="transition-多属性" src="https://codepen.io/JingW/embed/dLyWKM/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="多个属性的变化-gt-all"><a href="#多个属性的变化-gt-all" class="headerlink" title="多个属性的变化 -&gt; all"></a>多个属性的变化 -&gt; all</h3><p>如果要过渡的css属性较多，可以尝试使用 all 一步搞定。下面案例中将鼠标移入正方形盒子，会使其慢慢缩小为一个圆形，且颜色逐渐变深，核心代码：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">transition</span>: <span class="selector-tag">all</span> .5<span class="selector-tag">s</span> <span class="selector-tag">ease-out</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<iframe height="265" scrolling="no" title="transition-多属性-all" src="https://codepen.io/JingW/embed/GLRmXm/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="实用-demo"><a href="#实用-demo" class="headerlink" title="实用 demo"></a>实用 demo</h2><h3 id="下拉导航菜单"><a href="#下拉导航菜单" class="headerlink" title="下拉导航菜单"></a>下拉导航菜单</h3><iframe height="265" scrolling="no" title="transition-下拉导航" src="https://codepen.io/JingW/embed/MxNXex/?height=265&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+<h2 id="查看端口-ip"><a href="#查看端口-ip" class="headerlink" title="查看端口 ip"></a>查看端口 ip</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">netstat -ltn</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>CSS</category>
+        <category>后端</category>
+        <category>服务器</category>
       </categories>
       <tags>
-        <tag>CSS3</tag>
+        <tag>笔记</tag>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -4732,36 +4760,8 @@
       </categories>
       <tags>
         <tag>笔记</tag>
+        <tag>Ubuntu</tag>
         <tag>Nginx</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ubuntu下开启/关闭防火墙及端口的命令(笔记)</title>
-    <url>/posts/60660/</url>
-    <content><![CDATA[<h2 id="开启防火墙"><a href="#开启防火墙" class="headerlink" title="开启防火墙"></a>开启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw enable</span><br></pre></td></tr></table></figure>
-
-<h2 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw disable</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw reload</span><br></pre></td></tr></table></figure>
-
-<h2 id="查看端口开启状态"><a href="#查看端口开启状态" class="headerlink" title="查看端口开启状态"></a>查看端口开启状态</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
-
-<h2 id="开启某个端口"><a href="#开启某个端口" class="headerlink" title="开启某个端口"></a>开启某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw allow 8001/tcp</span><br></pre></td></tr></table></figure>
-
-<h2 id="禁止外部某个端口"><a href="#禁止外部某个端口" class="headerlink" title="禁止外部某个端口"></a>禁止外部某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw delete allow 8001/tcp</span><br></pre></td></tr></table></figure>
-
-<h2 id="查看端口-ip"><a href="#查看端口-ip" class="headerlink" title="查看端口 ip"></a>查看端口 ip</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">netstat -ltn</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>服务器</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -5348,6 +5348,108 @@
       </tags>
   </entry>
   <entry>
+    <title>【转载】git配置ssh服务</title>
+    <url>/posts/1071/</url>
+    <content><![CDATA[<p>原文：<a href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在管理 Git 项目上，很多时候都是直接使用<code>https url</code>克隆到本地，当然也有有些人使用<code>SSH url</code>克隆到本地。</p>
+<p>这两种方式的主要区别在于：</p>
+<ul>
+<li>使用<code>https url</code>克隆对初学者来说会比较方便，复制<code>https url</code>然后到 git Bash 里面直接用 clone 命令克隆到本地就好了，但是每次 fetch 和 push 代码都需要输入账号和密码，这也是 https 方式的麻烦之处。</li>
+<li>而使用<code>SSH url</code>克隆却需要在克隆之前先配置和添加好<code>SSH key</code>，因此，如果你想要使用<code>SSH url</code>克隆的话，你必须是这个项目的拥有者。否则你是无法添加<code>SSH key</code>的，另外 ssh 默认是每次 fetch 和 push 代码都不需要输入账号和密码，如果你想要每次都输入账号密码才能进行 fetch 和 push 也可以另外进行设置。</li>
+</ul>
+<p>下面主要是讲述如何配置使用 ssh 方式来提交和克隆代码。</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="配置本机-ssh"><a href="#配置本机-ssh" class="headerlink" title="配置本机 ssh"></a>配置本机 ssh</h2><h3 id="一、确定的是你的电脑上是安装过-Git"><a href="#一、确定的是你的电脑上是安装过-Git" class="headerlink" title="一、确定的是你的电脑上是安装过 Git"></a>一、确定的是你的电脑上是安装过 Git</h3><p>打开<code>cmd</code>，查看 git 版本：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git --version</span><br><span class="line">显示：git version 2.20.1.windows.1</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果显示类似<code>git version 2.20.1.windows.1</code>的 Git 版本，说明你的电脑是安装过 Git 的；否则请左转<a href="https://juejin.im/post/6844903749631098893#heading-4">打开 Git 的正确姿势</a>，把 Git 安装完了再来，不送。</p>
+<h3 id="二、查看是否配置了-git-用户名和邮箱"><a href="#二、查看是否配置了-git-用户名和邮箱" class="headerlink" title="二、查看是否配置了 git 用户名和邮箱"></a>二、查看是否配置了 git 用户名和邮箱</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config user.name</span><br><span class="line">显示：用户名</span><br><span class="line">输入：git config user.email</span><br><span class="line">显示用户邮箱</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果没有配置，那么需要配置用户名和邮箱：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config --global user.name &quot;xxx&quot;</span><br><span class="line"></span><br><span class="line">输入：git config --global user.email &quot;xxx&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、查看是否配置过-SSH-Key-密钥"><a href="#三、查看是否配置过-SSH-Key-密钥" class="headerlink" title="三、查看是否配置过 SSH Key(密钥)"></a>三、查看是否配置过 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cd ~/.ssh</span><br><span class="line">输入：ls，</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>查看该文件下的文件，看是否存在 <code>id_isa</code> 和 <code>id_isa.pub</code> 文件（也可以是别的文件名，只要 <code>yourName</code> 和 <code>yourName.pub</code> 成对存在就可以），如果存在的话，证明已经存在 ssh key 了，可以直接跳过<code>4、生成SSH Key</code>这一步骤，</p>
+<h3 id="四、生成-SSH-Key-密钥"><a href="#四、生成-SSH-Key-密钥" class="headerlink" title="四、生成 SSH Key(密钥)"></a>四、生成 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入: ssh-keygen -t rsa -C &quot;你的邮箱&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>此处会提示<code>Enter file in which to save the key (/Users/shutong/.ssh/id_rsa):</code>这样一段内容,让我们输入文件名，如果第 3 步的文件存在的话最好在这里修改一下文件名以防覆盖之前的内容；如果第 3 步的文件不存在的话则直接按<code>enter</code>键就好了。</p>
+<p>之后会有提示你是否需要设置密码，如果设置了每次使用 Git 都会用到密码，一般都是直接不写为空，直接<code>enter</code>就好了。</p>
+<p>上述操作执行完毕后，在<code>~/.ssh/</code>目录会生成<code>XXX-rsa</code>(私钥)和<code>XXX-rsa.pub</code>(公钥)，它们默认的存储路径是：</p>
+<blockquote>
+<p>C:\Users\Administrator.ssh</p>
+</blockquote>
+<p><strong>注意</strong></p>
+<blockquote>
+<p>个人建议生成的 rsa 最好单独命名不要使用默认名称，因为有可能 sshkey 可能会用在多个地方，一不小心就可能被覆盖然后导致 git 功能异常</p>
+</blockquote>
+<h3 id="五、添加公钥到你的远程仓库（github）"><a href="#五、添加公钥到你的远程仓库（github）" class="headerlink" title="五、添加公钥到你的远程仓库（github）"></a>五、添加公钥到你的远程仓库（github）</h3><h4 id="1-、查看你生成的公钥："><a href="#1-、查看你生成的公钥：" class="headerlink" title="1 、查看你生成的公钥："></a>1 、查看你生成的公钥：</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>这里会把公钥显示出来，我们把这段内容复制出来。</p>
+<h4 id="2、添加公钥到远程仓库"><a href="#2、添加公钥到远程仓库" class="headerlink" title="2、添加公钥到远程仓库:"></a>2、添加公钥到远程仓库:</h4><p>登陆你的 github 帐户 -&gt; 点击你的头像，然后点击 <code>Settings</code> -&gt; 左栏点击 <code>SSH and GPG keys</code> -&gt; 点击 <code>New SSH key</code></p>
+<p>然后将复制的公钥内容，粘贴进<code>Key</code>文本域内。 <code>title</code>域，自己随便起个名字。</p>
+<p>点击 <code>Add SSH key</code>。</p>
+<h4 id="2、查看-ssh-文件是否配置成功"><a href="#2、查看-ssh-文件是否配置成功" class="headerlink" title="2、查看 ssh 文件是否配置成功"></a>2、查看 ssh 文件是否配置成功</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： ssh -T git@github.com</span><br><span class="line">输出： Hi danygitgit! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>恭喜你，你的设置已经成功了。</p>
+<h3 id="六、修改-git-的-remote-url"><a href="#六、修改-git-的-remote-url" class="headerlink" title="六、修改 git 的 remote url"></a>六、修改 git 的 remote url</h3><p>如果之前添加的是<code>HTTPS</code>协议的 github 仓库地址，那么每次 push 或者 pull 仍然需要密码，所以，我们需要将其修改为<code>ssh</code>协议的，这样，就不需要这么麻烦了。</p>
+<p>那么我们应该怎么办呢？</p>
+<h4 id="1、查看当前的-remote-url"><a href="#1、查看当前的-remote-url" class="headerlink" title="1、查看当前的 remote url"></a>1、查看当前的 remote url</h4><p>首先进入本地仓库，右键 -&gt; <code>Git Bash Here</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： git remote -v</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (fetch)</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (push)</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
+<h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
+<blockquote>
+<p><a href="mailto:&#103;&#105;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#x62;&#x2e;&#x63;&#111;&#109;">&#103;&#105;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#x62;&#x2e;&#x63;&#111;&#109;</a>:danygitgit/document-library.git</p>
+</blockquote>
+<p>复制此 ssh 链接。</p>
+<h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
+<ol>
+<li>修改命令</li>
+</ol>
+<blockquote>
+<p>git remote origin set-url [url]</p>
+</blockquote>
+<ol>
+<li>先删后加</li>
+</ol>
+<blockquote>
+<p>git remote rm origin git remote add origin [url]</p>
+</blockquote>
+<ol>
+<li>直接修改<code>config</code>文件</li>
+</ol>
+<p>找到仓库下 <code>.git</code> 文件夹下的<code>config</code>文件，打开，可以看到以下内容</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url =<a href="https://github.com/danygitgit/document-library.git">https://github.com/danygitgit/document-library.git</a> fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
+<p>修改后的文件如下</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#116;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#x2e;&#99;&#x6f;&#109;">&#x67;&#105;&#116;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#x2e;&#99;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
+<h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
+<p>关于<code>SourceTree</code>的安装及配置就不赘述了，具体请参考</p>
+<ul>
+<li><a href="https://blog.csdn.net/wangjiangrong/article/details/80287041">Git SourceTree 免登陆安装及配置 生成 ssh</a></li>
+<li><a href="https://www.cnblogs.com/liuxin-673855200/p/11151835.html">SOURCETREE 3.1.3 版本跳过 BITBUCKET 注册方法（亲测好用） | 淡忘&amp;天涯</a></li>
+<li><a href="https://jingyan.baidu.com/article/9faa7231cdec65473d28cb11.html">Sourcetree 配置 ssh 密钥</a></li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>磨刀不误砍柴工。勇于尝试，善于总结。开启你的 Git 踩坑之旅吧！</p>
+<p>路漫漫其修远兮，希望 Git 可以帮我们记录每一个脚印，每一步成长。与诸君共勉。</p>
+<p>祝大家 2020 更上一层楼！</p>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>版本控制</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【转载】使用Object键值替换Switch</title>
     <url>/posts/10849/</url>
     <content><![CDATA[<p>转载地址：<a href="https://www.cnblogs.com/ZerlinM/p/13595810.html">https://www.cnblogs.com/ZerlinM/p/13595810.html</a><br>原文地址：<a href="https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals">https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals</a></p>
@@ -5404,108 +5506,6 @@
       <tags>
         <tag>技巧</tag>
         <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【转载】git配置ssh服务</title>
-    <url>/posts/1071/</url>
-    <content><![CDATA[<p>原文：<a href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在管理 Git 项目上，很多时候都是直接使用<code>https url</code>克隆到本地，当然也有有些人使用<code>SSH url</code>克隆到本地。</p>
-<p>这两种方式的主要区别在于：</p>
-<ul>
-<li>使用<code>https url</code>克隆对初学者来说会比较方便，复制<code>https url</code>然后到 git Bash 里面直接用 clone 命令克隆到本地就好了，但是每次 fetch 和 push 代码都需要输入账号和密码，这也是 https 方式的麻烦之处。</li>
-<li>而使用<code>SSH url</code>克隆却需要在克隆之前先配置和添加好<code>SSH key</code>，因此，如果你想要使用<code>SSH url</code>克隆的话，你必须是这个项目的拥有者。否则你是无法添加<code>SSH key</code>的，另外 ssh 默认是每次 fetch 和 push 代码都不需要输入账号和密码，如果你想要每次都输入账号密码才能进行 fetch 和 push 也可以另外进行设置。</li>
-</ul>
-<p>下面主要是讲述如何配置使用 ssh 方式来提交和克隆代码。</p>
-<a id="more"></a>
-
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="配置本机-ssh"><a href="#配置本机-ssh" class="headerlink" title="配置本机 ssh"></a>配置本机 ssh</h2><h3 id="一、确定的是你的电脑上是安装过-Git"><a href="#一、确定的是你的电脑上是安装过-Git" class="headerlink" title="一、确定的是你的电脑上是安装过 Git"></a>一、确定的是你的电脑上是安装过 Git</h3><p>打开<code>cmd</code>，查看 git 版本：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git --version</span><br><span class="line">显示：git version 2.20.1.windows.1</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果显示类似<code>git version 2.20.1.windows.1</code>的 Git 版本，说明你的电脑是安装过 Git 的；否则请左转<a href="https://juejin.im/post/6844903749631098893#heading-4">打开 Git 的正确姿势</a>，把 Git 安装完了再来，不送。</p>
-<h3 id="二、查看是否配置了-git-用户名和邮箱"><a href="#二、查看是否配置了-git-用户名和邮箱" class="headerlink" title="二、查看是否配置了 git 用户名和邮箱"></a>二、查看是否配置了 git 用户名和邮箱</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config user.name</span><br><span class="line">显示：用户名</span><br><span class="line">输入：git config user.email</span><br><span class="line">显示用户邮箱</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果没有配置，那么需要配置用户名和邮箱：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config --global user.name &quot;xxx&quot;</span><br><span class="line"></span><br><span class="line">输入：git config --global user.email &quot;xxx&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<h3 id="三、查看是否配置过-SSH-Key-密钥"><a href="#三、查看是否配置过-SSH-Key-密钥" class="headerlink" title="三、查看是否配置过 SSH Key(密钥)"></a>三、查看是否配置过 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cd ~/.ssh</span><br><span class="line">输入：ls，</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>查看该文件下的文件，看是否存在 <code>id_isa</code> 和 <code>id_isa.pub</code> 文件（也可以是别的文件名，只要 <code>yourName</code> 和 <code>yourName.pub</code> 成对存在就可以），如果存在的话，证明已经存在 ssh key 了，可以直接跳过<code>4、生成SSH Key</code>这一步骤，</p>
-<h3 id="四、生成-SSH-Key-密钥"><a href="#四、生成-SSH-Key-密钥" class="headerlink" title="四、生成 SSH Key(密钥)"></a>四、生成 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入: ssh-keygen -t rsa -C &quot;你的邮箱&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>此处会提示<code>Enter file in which to save the key (/Users/shutong/.ssh/id_rsa):</code>这样一段内容,让我们输入文件名，如果第 3 步的文件存在的话最好在这里修改一下文件名以防覆盖之前的内容；如果第 3 步的文件不存在的话则直接按<code>enter</code>键就好了。</p>
-<p>之后会有提示你是否需要设置密码，如果设置了每次使用 Git 都会用到密码，一般都是直接不写为空，直接<code>enter</code>就好了。</p>
-<p>上述操作执行完毕后，在<code>~/.ssh/</code>目录会生成<code>XXX-rsa</code>(私钥)和<code>XXX-rsa.pub</code>(公钥)，它们默认的存储路径是：</p>
-<blockquote>
-<p>C:\Users\Administrator.ssh</p>
-</blockquote>
-<p><strong>注意</strong></p>
-<blockquote>
-<p>个人建议生成的 rsa 最好单独命名不要使用默认名称，因为有可能 sshkey 可能会用在多个地方，一不小心就可能被覆盖然后导致 git 功能异常</p>
-</blockquote>
-<h3 id="五、添加公钥到你的远程仓库（github）"><a href="#五、添加公钥到你的远程仓库（github）" class="headerlink" title="五、添加公钥到你的远程仓库（github）"></a>五、添加公钥到你的远程仓库（github）</h3><h4 id="1-、查看你生成的公钥："><a href="#1-、查看你生成的公钥：" class="headerlink" title="1 、查看你生成的公钥："></a>1 、查看你生成的公钥：</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>这里会把公钥显示出来，我们把这段内容复制出来。</p>
-<h4 id="2、添加公钥到远程仓库"><a href="#2、添加公钥到远程仓库" class="headerlink" title="2、添加公钥到远程仓库:"></a>2、添加公钥到远程仓库:</h4><p>登陆你的 github 帐户 -&gt; 点击你的头像，然后点击 <code>Settings</code> -&gt; 左栏点击 <code>SSH and GPG keys</code> -&gt; 点击 <code>New SSH key</code></p>
-<p>然后将复制的公钥内容，粘贴进<code>Key</code>文本域内。 <code>title</code>域，自己随便起个名字。</p>
-<p>点击 <code>Add SSH key</code>。</p>
-<h4 id="2、查看-ssh-文件是否配置成功"><a href="#2、查看-ssh-文件是否配置成功" class="headerlink" title="2、查看 ssh 文件是否配置成功"></a>2、查看 ssh 文件是否配置成功</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： ssh -T git@github.com</span><br><span class="line">输出： Hi danygitgit! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>恭喜你，你的设置已经成功了。</p>
-<h3 id="六、修改-git-的-remote-url"><a href="#六、修改-git-的-remote-url" class="headerlink" title="六、修改 git 的 remote url"></a>六、修改 git 的 remote url</h3><p>如果之前添加的是<code>HTTPS</code>协议的 github 仓库地址，那么每次 push 或者 pull 仍然需要密码，所以，我们需要将其修改为<code>ssh</code>协议的，这样，就不需要这么麻烦了。</p>
-<p>那么我们应该怎么办呢？</p>
-<h4 id="1、查看当前的-remote-url"><a href="#1、查看当前的-remote-url" class="headerlink" title="1、查看当前的 remote url"></a>1、查看当前的 remote url</h4><p>首先进入本地仓库，右键 -&gt; <code>Git Bash Here</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： git remote -v</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (fetch)</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (push)</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
-<h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
-<blockquote>
-<p><a href="mailto:&#103;&#105;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#x62;&#x2e;&#x63;&#111;&#x6d;">&#103;&#105;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#x62;&#x2e;&#x63;&#111;&#x6d;</a>:danygitgit/document-library.git</p>
-</blockquote>
-<p>复制此 ssh 链接。</p>
-<h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
-<ol>
-<li>修改命令</li>
-</ol>
-<blockquote>
-<p>git remote origin set-url [url]</p>
-</blockquote>
-<ol>
-<li>先删后加</li>
-</ol>
-<blockquote>
-<p>git remote rm origin git remote add origin [url]</p>
-</blockquote>
-<ol>
-<li>直接修改<code>config</code>文件</li>
-</ol>
-<p>找到仓库下 <code>.git</code> 文件夹下的<code>config</code>文件，打开，可以看到以下内容</p>
-<blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url =<a href="https://github.com/danygitgit/document-library.git">https://github.com/danygitgit/document-library.git</a> fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
-</blockquote>
-<p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
-<p>修改后的文件如下</p>
-<blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#116;&#64;&#103;&#105;&#116;&#x68;&#117;&#x62;&#46;&#x63;&#x6f;&#109;">&#x67;&#105;&#116;&#64;&#103;&#105;&#116;&#x68;&#117;&#x62;&#46;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
-</blockquote>
-<p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
-<h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
-<p>关于<code>SourceTree</code>的安装及配置就不赘述了，具体请参考</p>
-<ul>
-<li><a href="https://blog.csdn.net/wangjiangrong/article/details/80287041">Git SourceTree 免登陆安装及配置 生成 ssh</a></li>
-<li><a href="https://www.cnblogs.com/liuxin-673855200/p/11151835.html">SOURCETREE 3.1.3 版本跳过 BITBUCKET 注册方法（亲测好用） | 淡忘&amp;天涯</a></li>
-<li><a href="https://jingyan.baidu.com/article/9faa7231cdec65473d28cb11.html">Sourcetree 配置 ssh 密钥</a></li>
-</ul>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>磨刀不误砍柴工。勇于尝试，善于总结。开启你的 Git 踩坑之旅吧！</p>
-<p>路漫漫其修远兮，希望 Git 可以帮我们记录每一个脚印，每一步成长。与诸君共勉。</p>
-<p>祝大家 2020 更上一层楼！</p>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>版本控制</category>
-      </categories>
-      <tags>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -5630,6 +5630,52 @@
       </categories>
       <tags>
         <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一些有用的npm包</title>
+    <url>/posts/44396/</url>
+    <content><![CDATA[<h2 id="runjs"><a href="#runjs" class="headerlink" title="runjs"></a>runjs</h2><blockquote>
+<p>已改名为 tasksfile ，<code>npm install tasksfile</code> 代替</p>
+</blockquote>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>一个小型构件工具</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install runjs -D</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>在根项目目录中创建 <code>runfile.js</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; run &#125; = <span class="built_in">require</span>(<span class="string">&#x27;runjs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params">name = <span class="string">&#x27;Mysterious&#x27;</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Hello <span class="subst">$&#123;name&#125;</span>!`</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makedir</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  run(<span class="string">&#x27;mkdir somedir&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  hello,</span><br><span class="line">  makedir</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在你的终端中执行：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> npx run hello Tommy</span></span><br><span class="line">Hello Tommy!</span><br><span class="line"><span class="meta">$</span><span class="bash"> npx run makedir</span></span><br><span class="line">mkdir somedir</span><br></pre></td></tr></table></figure>
+
+<h2 id="chalk"><a href="#chalk" class="headerlink" title="chalk"></a>chalk</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>给 <code>终端</code> 字符串设置样式</p>
+<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install chalk</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> chalk = <span class="built_in">require</span>(<span class="string">&#x27;chalk&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(chalk.blue(<span class="string">&#x27;Hello world!&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>Connect 是一个可扩展的 HTTP 服务器框架，用于 node，使用称为中间件的“插件”。</p>
+<h3 id="安装-2"><a href="#安装-2" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install connect</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-2"><a href="#使用-2" class="headerlink" title="使用"></a>使用</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">var connect = require(&#x27;connect&#x27;);</span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line"></span><br><span class="line">var app = connect();</span><br><span class="line"></span><br><span class="line">// gzip/deflate outgoing responses</span><br><span class="line">var compression = require(&#x27;compression&#x27;);</span><br><span class="line">app.use(compression());</span><br><span class="line"></span><br><span class="line">// store session state in browser cookie</span><br><span class="line">var cookieSession = require(&#x27;cookie-session&#x27;);</span><br><span class="line">app.use(cookieSession(&#123;</span><br><span class="line">    keys: [&#x27;secret1&#x27;, &#x27;secret2&#x27;]</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">// parse urlencoded request bodies into req.body</span><br><span class="line">var bodyParser = require(&#x27;body-parser&#x27;);</span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended: false&#125;));</span><br><span class="line"></span><br><span class="line">// respond to all requests</span><br><span class="line">app.use(function(req, res)&#123;</span><br><span class="line">  res.end(&#x27;Hello from Connect!\n&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//create node.js http server and listen on port</span><br><span class="line">http.createServer(app).listen(3000);</span><br></pre></td></tr></table></figure>
+
+<h2 id="serve-static"><a href="#serve-static" class="headerlink" title="serve-static"></a>serve-static</h2><h3 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h3><p>一款静态资源管理器</p>
+<h3 id="安装-3"><a href="#安装-3" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install serve-static</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-3"><a href="#使用-3" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>),</span><br><span class="line">  url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>),</span><br><span class="line">  fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> serveStatic = <span class="built_in">require</span>(<span class="string">&#x27;serve-static&#x27;</span>),</span><br><span class="line">  <span class="comment">//finalhandler 是 serveStatic 的依赖，不需要特意安装。</span></span><br><span class="line">  finalhandler = <span class="built_in">require</span>(<span class="string">&#x27;finalhandler&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置静态资源服务 (&quot;要静态化的文件路径&quot;,&#123;默认主页的配置&#125;);</span></span><br><span class="line"><span class="keyword">var</span> serve = serveStatic(<span class="string">&#x27;public&#x27;</span>, &#123; <span class="attr">index</span>: [<span class="string">&#x27;index.html&#x27;</span>, <span class="string">&#x27;index.htm&#x27;</span>] &#125;);</span><br><span class="line">http</span><br><span class="line">  .createServer(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//路由清单</span></span><br><span class="line">    <span class="keyword">if</span> (req.url == <span class="string">&#x27;/music&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">//也让其显示 根目录public 下的主页</span></span><br><span class="line">      fs.readFile(<span class="string">&#x27;./public/index.html&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (err) &#123;</span><br><span class="line">          res.end(<span class="string">&#x27;没有此文件!&#x27;</span>);</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(data.toString());</span><br><span class="line">        res.end(data.toString());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="comment">//读取并呈递完毕之后,在路由中加上return,</span></span><br><span class="line">      <span class="comment">//否则下面的静态资源服务里面会一直寻找这个路由，</span></span><br><span class="line">      <span class="comment">//这个路由是虚拟出来的，因此不会呈递上面我们去读的文件</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用静态资源服务，一般放在中间件最下方，不至于遮蔽中间件的路由</span></span><br><span class="line">    serve(req, res, finalhandler(req, res));</span><br><span class="line">  &#125;)</span><br><span class="line">  .listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;ok&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="mockjs"><a href="#mockjs" class="headerlink" title="mockjs"></a>mockjs</h2><h3 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h3><p>生成随机数据，拦截 Ajax 请求</p>
+<h3 id="安装-4"><a href="#安装-4" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install mockjs</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-4"><a href="#使用-4" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 Mock</span></span><br><span class="line"><span class="keyword">var</span> Mock = <span class="built_in">require</span>(<span class="string">&#x27;mockjs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> data = Mock.mock(&#123;</span><br><span class="line">  <span class="comment">// 属性 list 的值是一个数组，其中含有 1 到 10 个元素</span></span><br><span class="line">  <span class="string">&#x27;list|1-10&#x27;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 属性 id 是一个自增数，起始值为 1，每次增 1</span></span><br><span class="line">      <span class="string">&#x27;id|+1&#x27;</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data, <span class="literal">null</span>, <span class="number">4</span>));</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>构建工具</category>
+        <category>npm</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -5773,52 +5819,6 @@
       </categories>
       <tags>
         <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一些有用的npm包</title>
-    <url>/posts/44396/</url>
-    <content><![CDATA[<h2 id="runjs"><a href="#runjs" class="headerlink" title="runjs"></a>runjs</h2><blockquote>
-<p>已改名为 tasksfile ，<code>npm install tasksfile</code> 代替</p>
-</blockquote>
-<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>一个小型构件工具</p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install runjs -D</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>在根项目目录中创建 <code>runfile.js</code></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; run &#125; = <span class="built_in">require</span>(<span class="string">&#x27;runjs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params">name = <span class="string">&#x27;Mysterious&#x27;</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Hello <span class="subst">$&#123;name&#125;</span>!`</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makedir</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  run(<span class="string">&#x27;mkdir somedir&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  hello,</span><br><span class="line">  makedir</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>在你的终端中执行：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> npx run hello Tommy</span></span><br><span class="line">Hello Tommy!</span><br><span class="line"><span class="meta">$</span><span class="bash"> npx run makedir</span></span><br><span class="line">mkdir somedir</span><br></pre></td></tr></table></figure>
-
-<h2 id="chalk"><a href="#chalk" class="headerlink" title="chalk"></a>chalk</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>给 <code>终端</code> 字符串设置样式</p>
-<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install chalk</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> chalk = <span class="built_in">require</span>(<span class="string">&#x27;chalk&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(chalk.blue(<span class="string">&#x27;Hello world!&#x27;</span>));</span><br></pre></td></tr></table></figure>
-
-<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>Connect 是一个可扩展的 HTTP 服务器框架，用于 node，使用称为中间件的“插件”。</p>
-<h3 id="安装-2"><a href="#安装-2" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install connect</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-2"><a href="#使用-2" class="headerlink" title="使用"></a>使用</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">var connect = require(&#x27;connect&#x27;);</span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line"></span><br><span class="line">var app = connect();</span><br><span class="line"></span><br><span class="line">// gzip/deflate outgoing responses</span><br><span class="line">var compression = require(&#x27;compression&#x27;);</span><br><span class="line">app.use(compression());</span><br><span class="line"></span><br><span class="line">// store session state in browser cookie</span><br><span class="line">var cookieSession = require(&#x27;cookie-session&#x27;);</span><br><span class="line">app.use(cookieSession(&#123;</span><br><span class="line">    keys: [&#x27;secret1&#x27;, &#x27;secret2&#x27;]</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">// parse urlencoded request bodies into req.body</span><br><span class="line">var bodyParser = require(&#x27;body-parser&#x27;);</span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended: false&#125;));</span><br><span class="line"></span><br><span class="line">// respond to all requests</span><br><span class="line">app.use(function(req, res)&#123;</span><br><span class="line">  res.end(&#x27;Hello from Connect!\n&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//create node.js http server and listen on port</span><br><span class="line">http.createServer(app).listen(3000);</span><br></pre></td></tr></table></figure>
-
-<h2 id="serve-static"><a href="#serve-static" class="headerlink" title="serve-static"></a>serve-static</h2><h3 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h3><p>一款静态资源管理器</p>
-<h3 id="安装-3"><a href="#安装-3" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install serve-static</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-3"><a href="#使用-3" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>),</span><br><span class="line">  url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>),</span><br><span class="line">  fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> serveStatic = <span class="built_in">require</span>(<span class="string">&#x27;serve-static&#x27;</span>),</span><br><span class="line">  <span class="comment">//finalhandler 是 serveStatic 的依赖，不需要特意安装。</span></span><br><span class="line">  finalhandler = <span class="built_in">require</span>(<span class="string">&#x27;finalhandler&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置静态资源服务 (&quot;要静态化的文件路径&quot;,&#123;默认主页的配置&#125;);</span></span><br><span class="line"><span class="keyword">var</span> serve = serveStatic(<span class="string">&#x27;public&#x27;</span>, &#123; <span class="attr">index</span>: [<span class="string">&#x27;index.html&#x27;</span>, <span class="string">&#x27;index.htm&#x27;</span>] &#125;);</span><br><span class="line">http</span><br><span class="line">  .createServer(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//路由清单</span></span><br><span class="line">    <span class="keyword">if</span> (req.url == <span class="string">&#x27;/music&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">//也让其显示 根目录public 下的主页</span></span><br><span class="line">      fs.readFile(<span class="string">&#x27;./public/index.html&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (err) &#123;</span><br><span class="line">          res.end(<span class="string">&#x27;没有此文件!&#x27;</span>);</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(data.toString());</span><br><span class="line">        res.end(data.toString());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="comment">//读取并呈递完毕之后,在路由中加上return,</span></span><br><span class="line">      <span class="comment">//否则下面的静态资源服务里面会一直寻找这个路由，</span></span><br><span class="line">      <span class="comment">//这个路由是虚拟出来的，因此不会呈递上面我们去读的文件</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用静态资源服务，一般放在中间件最下方，不至于遮蔽中间件的路由</span></span><br><span class="line">    serve(req, res, finalhandler(req, res));</span><br><span class="line">  &#125;)</span><br><span class="line">  .listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;ok&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h2 id="mockjs"><a href="#mockjs" class="headerlink" title="mockjs"></a>mockjs</h2><h3 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h3><p>生成随机数据，拦截 Ajax 请求</p>
-<h3 id="安装-4"><a href="#安装-4" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install mockjs</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-4"><a href="#使用-4" class="headerlink" title="使用"></a>使用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 Mock</span></span><br><span class="line"><span class="keyword">var</span> Mock = <span class="built_in">require</span>(<span class="string">&#x27;mockjs&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> data = Mock.mock(&#123;</span><br><span class="line">  <span class="comment">// 属性 list 的值是一个数组，其中含有 1 到 10 个元素</span></span><br><span class="line">  <span class="string">&#x27;list|1-10&#x27;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 属性 id 是一个自增数，起始值为 1，每次增 1</span></span><br><span class="line">      <span class="string">&#x27;id|+1&#x27;</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data, <span class="literal">null</span>, <span class="number">4</span>));</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>构建工具</category>
-        <category>npm</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -6695,7 +6695,7 @@ callee</code></pre>
 </ul>
 <a id="more"></a>
 
-<h4 id="预览"><a href="#预览" class="headerlink" title="预览"></a>预览</h4><img src="/posts/11039/163001_02d3ddb2_1203301.png" class="" title="UI-Show">
+<h4 id="预览"><a href="#预览" class="headerlink" title="预览"></a>预览</h4><img src="/posts/11039/vscode-theme.png" class="" title="UI-Show">
 
 <h3 id="风格检查、格式化"><a href="#风格检查、格式化" class="headerlink" title="风格检查、格式化"></a>风格检查、格式化</h3><ul>
 <li><strong><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></strong></li>
