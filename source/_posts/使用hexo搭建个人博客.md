@@ -19,11 +19,11 @@ date: 2018-03-13 14:10:09
 - NodeJS [如何安装](http://www.runoob.com/nodejs/nodejs-install-setup.html)
 - Git [如何安装](http://www.runoob.com/git/git-install-setup.html)
 
-或者直接查看hexo的[官方文档](https://hexo.io/zh-cn/docs/#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90)查看安装教程。
+或者直接查看 hexo 的[官方文档](https://hexo.io/zh-cn/docs/#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90)查看安装教程。
 
 <!-- more -->
 
-## 安装Hexo
+## 安装 Hexo
 
 > [安装文档](https://hexo.io/zh-cn/docs/)
 
@@ -47,7 +47,7 @@ npm install
 
 下方是三个常见命令，可以先执行前俩看看效果，最后一个部署命令待会再执行。
 
-- `hexo server -p 5000` 本地启动服务器，5000端口
+- `hexo server -p 5000` 本地启动服务器，5000 端口
 - `hexo new '你想要创建的文章名称'` 创建文章
 - `hexo clean && hexo deploy` 部署网站
 
@@ -56,7 +56,7 @@ npm install
 - [Next](https://github.com/iissnan/hexo-theme-next) 【推荐】
 - [Yilia](https://github.com/litten/hexo-theme-yilia)
 
-#### 安装Next主题
+#### 安装 Next 主题
 
 ```shell
 cd 你的站点目录
@@ -75,20 +75,20 @@ git clone https://github.com/next-theme/hexo-theme-next themes/next
 hexo new page "categories"
 ```
 
-p.s. 命名为 `categories` 原因是 `categories` 在next主题中是一个关键词对应着分类。
+p.s. 命名为 `categories` 原因是 `categories` 在 next 主题中是一个关键词对应着分类。
 
-在主站根目录下,也就是你hexo的目录下找到 `/source/categories/index.md`，打开后的效果类似下方代码：
+在主站根目录下,也就是你 hexo 的目录下找到 `/source/categories/index.md`，打开后的效果类似下方代码：
 
 ```markdown
 ---
-title: categories  #本页标题
-date: 2018-03-13 23:02:50  #创建日期
-type: "categories" 	#分类属于
-comments: false  #如果有启用多说 或者 Disqus评论，默认页面也会带有评论。需要关闭的话，请添加字段 comments 并将值设置为 false
+title: categories #本页标题
+date: 2018-03-13 23:02:50 #创建日期
+type: 'categories' #分类属于
+comments: false #如果有启用多说 或者 Disqus评论，默认页面也会带有评论。需要关闭的话，请添加字段 comments 并将值设置为 false
 ---
 ```
 
-接着在 themes 主题文件夹下找到 next 文件夹，修改 _config.yml 文件：
+接着在 themes 主题文件夹下找到 next 文件夹，修改 \_config.yml 文件：
 
 ```yaml
 menu:
@@ -105,14 +105,14 @@ menu:
 hexo new '你想要创建的文章名称'
 ```
 
-根目录(主站目录下)/source/_posts/<刚创建的文章名称>.md，双击打开：
+根目录(主站目录下)/source/\_posts/<刚创建的文章名称>.md，双击打开：
 
 ```markdown
 ---
 title: 文章标题
 date: 2018-03-13 23:13:23
-tags: html    #属于哪个标签
-categories: interview   #属于哪个分类
+tags: html #属于哪个标签
+categories: interview #属于哪个分类
 ---
 ```
 
@@ -139,7 +139,7 @@ date: 2018-03-14 00:02:05
 ---
 ```
 
-添加type: “tags”到内容中，添加后是这样的：
+添加 type: “tags”到内容中，添加后是这样的：
 
 ```markdown
 ---
@@ -174,6 +174,10 @@ categories:
 
 参考：[分类和标签](https://hexo.io/zh-cn/docs/front-matter.html#分类和标签)
 
+##### 修改文章底部 # 号标签，改为图标
+
+寻找 `themes/next/_config.yml` 中的 tag_icon ，改为 true
+
 ### 头像设置
 
 把头像放在站点根目录的 `source/uploads/` 下，然后在 `theme/next/_config.yml` 下修改配置：
@@ -201,7 +205,7 @@ menu:
   #commonweal: /404/ || fa fa-heartbeat
 ```
 
- #### 社交
+#### 社交
 
 ```yaml
 social:
@@ -223,15 +227,15 @@ social:
 
 ## 第三方插件
 
-### 永久URL生成：hexo-abbrlink
+### 永久 URL 生成：hexo-abbrlink
 
-- 用来生成每篇博客永久URL链接的
+- 用来生成每篇博客永久 URL 链接的
 - Repo: https://github.com/rozbo/hexo-abbrlink
 - 执行： `npm install hexo-abbrlink --save`
 
-### 部署到GitHub：hexo-deployer-git
+### 部署到 GitHub：hexo-deployer-git
 
-- 将本地博客部署到GitHub
+- 将本地博客部署到 GitHub
 - Repo: https://hexo.io/zh-cn/docs/one-command-deployment)
 - 执行： `npm install hexo-deployer-git --save`
 
@@ -242,16 +246,16 @@ social:
 ```yaml
 deploy:
   type: git
-  repo: "https://github.com/evestorm/evestorm.github.io"
-  branch: "gh-pages"
+  repo: 'https://github.com/evestorm/evestorm.github.io'
+  branch: 'gh-pages'
 ```
 
-然后在你的githubpages的repo下新建 `gh-pages` 分支，最后执行：`hexo clean && hexo deploy` 即可部署。
+然后在你的 githubpages 的 repo 下新建 `gh-pages` 分支，最后执行：`hexo clean && hexo deploy` 即可部署。
 
 ### 本地热更新：hexo-server
 
 - 服务器模块。在启动期间，Hexo 会监视文件变动并自动更新
-- Repo: https://github.com/hexojs/hexo-server)
+- Repo: https://github.com/hexojs/hexo-server
 - 执行： `npm install hexo-server –save`
 
 ### 关键词搜索：LocalSearch
@@ -300,16 +304,19 @@ local_search:
 
 NexT 主题集成了不蒜子（busuanzi_count）统计功能，在 NexT 配置文件中找到关键词 `busuanzi_count:` ，把 enable 设置为 true
 
-p.s. 除此之外，如果设置为true后仍然无效，且打开控制台显示js报错。有可能是不蒜子链接失效的原因，需要在Next主题配置文件位置：
+p.s. 除此之外，如果设置为 true 后仍然无效，且打开控制台显示 js 报错。有可能是不蒜子链接失效的原因，需要在 Next 主题配置文件位置：
 
 ```
 themes\next\layout\_third-party\analytics\busuanzi-counter.swig
 ```
 
-修改script链接为：
+修改 script 链接为：
 
 ```html
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script
+  async
+  src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
+></script>
 ```
 
 ### 评论功能：ChangYan
@@ -330,11 +337,9 @@ themes\next\layout\_third-party\analytics\busuanzi-counter.swig
     appkey:
   ```
 
-  
-
 ### 常用配置
 
-[Hexo瞎折腾系列(4) - 站点首页不显示文章全文](https://blog.csdn.net/lewky_liu/article/details/81277337)
+[Hexo 瞎折腾系列(4) - 站点首页不显示文章全文](https://blog.csdn.net/lewky_liu/article/details/81277337)
 
 ### 常用命令
 
@@ -363,9 +368,9 @@ hexo clean && hexo deploy
 ## 相关配置及资源
 
 - [Hexo+NexT 打造一个炫酷博客](https://juejin.im/post/5bcd2d395188255c3b7dc1db#heading-42)
-- [这应该是最全的hexo博客搭建以及next美化教程](https://me.idealli.com/post/e8d13fc.html)
+- [这应该是最全的 hexo 博客搭建以及 next 美化教程](https://me.idealli.com/post/e8d13fc.html)
 - [LeanCloud](https://leancloud.cn/)
-- [Hexo搭建GitHub博客—打造炫酷的NexT主题–高级(四)](https://eirunye.github.io/2018/09/15/Hexo搭建GitHub博客—打造炫酷的NexT主题—高级—四/)
-- [Hexo NexT主题代码块添加复制功能](http://www.missfli.com/2018/06/19/github-hexo-next-08.html)
-- [修改hexo博客next主题文章页面宽度](https://ihaoming.top/archives/9a935f57.html)
-- [在Hexo中使用资源文件夹添加图片](https://hexo.io/zh-cn/docs/asset-folders.html)
+- [Hexo 搭建 GitHub 博客—打造炫酷的 NexT 主题–高级(四)](https://eirunye.github.io/2018/09/15/Hexo搭建GitHub博客—打造炫酷的NexT主题—高级—四/)
+- [Hexo NexT 主题代码块添加复制功能](http://www.missfli.com/2018/06/19/github-hexo-next-08.html)
+- [修改 hexo 博客 next 主题文章页面宽度](https://ihaoming.top/archives/9a935f57.html)
+- [在 Hexo 中使用资源文件夹添加图片](https://hexo.io/zh-cn/docs/asset-folders.html)

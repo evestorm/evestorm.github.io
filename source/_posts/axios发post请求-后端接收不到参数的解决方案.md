@@ -1,12 +1,13 @@
 ---
 title: axios发post请求-后端接收不到参数的解决方案
-date: 2020-04-25 16:15:57
 tags:
   - axios
 categories:
   - 前端
   - 框架
   - Vue
+abbrlink: 32468
+date: 2020-04-25 16:15:57
 ---
 
 转载自：https://blog.csdn.net/csdn_yudong/article/details/79668655

@@ -16,6 +16,8 @@ categories:
 
 但是我的这个路径是动态的，我在 `computed` 给出一个拼接了变量的路径，项目启动在浏览器下死活出不了这个图片，死活都是 404。
 
+<!-- more -->
+
 ```js
 computed: {
   fullURL() {
