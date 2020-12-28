@@ -22,24 +22,24 @@ date: 2018-05-06 12:14:33
 
 #### 预览
 
-{% asset_img 163001_02d3ddb2_1203301.png UI-Show %}
+{% asset_img vscode-theme.png UI-Show %}
 
 ### 风格检查、格式化
 
-- **[ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)**
-- **[StyleLint](https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint)**
-- **[MarkdownLint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)**
-- **[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)**
-- **[Beautify](https://marketplace.visualstudio.com/items?itemName=HookyQR.beautify)**
-- **[Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur)**（使用 Vue 必装）
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) JS 代码审查工具
+- [StyleLint](https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint) CSS 代码审查工具
+- [MarkdownLint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) Markdown 代码审查工具
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) 代码格式化工具
+- [Beautify](https://marketplace.visualstudio.com/items?itemName=HookyQR.beautify) 代码格式化工具
+- [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur) Vue 开发工具
 
 ### 编码效率
 
 #### 代码片段
 
-- [HTML Snippets](https://marketplace.visualstudio.com/items?itemName=abusaidm.html-snippets)
-- [Javascript (ES6) Code Snippets](https://marketplace.visualstudio.com/items?itemName=xabikos.JavaScriptSnippets)
-- [Javascript Patterns Snippets](https://marketplace.visualstudio.com/items?itemName=nikhilkumar80.js-patterns-snippets)
+- [HTML Snippets](https://marketplace.visualstudio.com/items?itemName=abusaidm.html-snippets) HTML 代码智能提示
+- [Javascript (ES6) Code Snippets](https://marketplace.visualstudio.com/items?itemName=xabikos.JavaScriptSnippets) ES6 代码智能提示
+- [Javascript Patterns Snippets](https://marketplace.visualstudio.com/items?itemName=nikhilkumar80.js-patterns-snippets) JavaScript 代码提示
 - [Document This](https://marketplace.visualstudio.com/items?itemName=joelday.docthis)，一键给代码中的类、函数加上注释，支持函数声明、函数表达式、箭头函数等；
 
 #### 代码补全
@@ -51,26 +51,26 @@ date: 2018-05-06 12:14:33
 - [IntelliSense for CSS class names in HTML](https://marketplace.visualstudio.com/items?itemName=Zignd.html-css-class-completion)，CSS 类名补全，会自动扫描整个项目里面的 CSS 类名并在你输入类名时做智能提示。
 - [Emmet](https://link.juejin.im/?target=https%3A%2F%2Femmet.io)，VSCode 已经内置，官方介绍文档[参见](https://link.juejin.im/?target=https%3A%2F%2Fcode.visualstudio.com%2Fdocs%2Feditor%2Femmet)。
 - [Auto Import](https://marketplace.visualstudio.com/items?itemName=steoates.autoimport)，自动查找、解析并提供所有可导入（import）的代码文件
-- [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
-- [Import Cost](https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost)
-- [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense)
-- [Template String Converter](https://marketplace.visualstudio.com/items?itemName=meganrogge.template-string-converter)
-- [Vue VSCode Snippets](https://marketplace.visualstudio.com/items?itemName=sdras.vue-vscode-snippets)
+- [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) 代码注释高亮
+- [Import Cost](https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost) 显示导入的包的大小
+- [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense) 智能识别引用文件路径
+- [Template String Converter](https://marketplace.visualstudio.com/items?itemName=meganrogge.template-string-converter) 字符串中添加变量时，自动转为模板字符串形式
+- [Vue VSCode Snippets](https://marketplace.visualstudio.com/items?itemName=sdras.vue-vscode-snippets) Vue 代码补全
 
 #### 代码运行
 
-- [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
+- [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner) 代码一键运行
   <!-- [![Code Runner](前端vscode插件配置/162c15a64b468fd8.gif)](https://user-gold-cdn.xitu.io/2018/4/14/162c15a64b468fd8?imageslim) -->
   {% asset_img 162c15a64b468fd8.gif Code-Runner %}
 
 ### 功能增强
 
 - [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync)，基于 Gist 实现 VSCode 用户配置、快捷键配置、已安装插件列表等的备份和恢复功能，配置过程有详细精确的操作步骤文档。生成的备份 Gist 默认是私密的，如果你想设置为共享的，也可以一键切换。
-- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
-- [Git History](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory)
-- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
-- [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync)
-- [GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) 代码拼写检查
+- [Git History](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory) 查看文件 Git 历史记录
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 开启本地服务器
+- [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync) 同步 vscode 配置
+- [GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) Git 源代码管理工具
 
 ### 外观增强
 

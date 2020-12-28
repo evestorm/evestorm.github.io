@@ -337,6 +337,99 @@ themes\next\layout\_third-party\analytics\busuanzi-counter.swig
     appkey:
   ```
 
+### 代码块复制
+
+下载[clipboard.min.js](https://raw.githubusercontent.com/zenorocha/clipboard.js/master/dist/clipboard.min.js)并保存至`themes\next\source\js\clipboard.min.js`
+
+在 `.\themes\next\source\js\` 下创建 `clipboard-use.js` , 添加如下内容：
+
+```js
+/*页面载入完成后，创建复制按钮*/
+document.addEventListener('DOMContentLoaded', () => {
+  'use strict';
+  var initCopyCode = function () {
+    let parents = document.querySelectorAll('.highlight .code');
+    parents.forEach(parent => {
+      let btn = document.createElement('button');
+      let i = document.createElement('i');
+      let span = document.createElement('span');
+      btn.classList.add('btn-copy');
+      btn.setAttribute('data-clipboard-snippet', '');
+      i.classList.add('fa', 'fa-clipboard');
+      span.innerText = '复制';
+      i.appendChild(span);
+      btn.appendChild(i);
+      parent.insertBefore(btn, parent.firstChild);
+    });
+
+    new ClipboardJS('.btn-copy', {
+      target: function (trigger) {
+        return trigger.nextElementSibling;
+      }
+    });
+  };
+  initCopyCode();
+});
+```
+
+在 `根目录\source\_data\` 下创建 `styles.styl` ，添加如下内容：
+
+```css
+// 代码块复制按钮
+// --------------------------------------------------
+.highlight {
+  //方便copy代码按钮（btn-copy）的定位
+  position: relative;
+}
+.btn-copy {
+  display: inline-block;
+  cursor: pointer;
+  background-color: #eee;
+  background-image: linear-gradient(#fcfcfc, #eee);
+  border: 1px solid #d5d5d5;
+  border-radius: 3px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #333;
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -o-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+  padding: 2px 6px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  opacity: 0;
+}
+.btn-copy span {
+  margin-left: 5px;
+}
+.highlight:hover .btn-copy {
+  opacity: 1;
+}
+```
+
+在 `source\_data\` 下创建 `body-end.swig` ，添加如下内容：
+
+```html
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+```
+
+在 next 配置文件中启用 `styles.styl` 和 `body-end.swig`：
+
+```json
+custom_file_path:
+  bodyEnd: source/_data/body-end.swig
+  style: source/_data/styles.styl
+```
+
 ### 常用配置
 
 [Hexo 瞎折腾系列(4) - 站点首页不显示文章全文](https://blog.csdn.net/lewky_liu/article/details/81277337)
