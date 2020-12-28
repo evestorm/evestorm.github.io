@@ -52,54 +52,6 @@
       </tags>
   </entry>
   <entry>
-    <title>BFC的理解与应用</title>
-    <url>/posts/9722/</url>
-    <content><![CDATA[<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先上MDN上对 BFC 的定义：</p>
-<blockquote>
-<p>块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。</p>
-</blockquote>
-<p>———— <a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">BFC | MDN</a></p>
-<p>不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的认知。</p>
-<a id="more"></a>
-
-<h2 id="理解"><a href="#理解" class="headerlink" title="理解"></a>理解</h2><p>这里谈下我对BFC的理解：BFC其实是一个独立的，与外界隔离了的容器，容器里面的子元素不会影响到外面的元素，外面的也同样不会影响到容器内部的元素。我们可以利用这个特性，来解决一些布局上的问题。</p>
-<h2 id="BFC触发条件"><a href="#BFC触发条件" class="headerlink" title="BFC触发条件"></a>BFC触发条件</h2><p>BFC的触发条件有很多，想要知道所有细节可以移步上面给出的 MDN 链接。这里我只列出一些常见触发条件：</p>
-<ul>
-<li>根元素（HTML元素）</li>
-<li>浮动元素（float不为none）</li>
-<li>绝对定位元素（position 为 absolute 或 fixed）</li>
-<li>display 为 block, inline-block, flex, inline-flex, list-item, table</li>
-<li>overflow 值不为 visible 的块元素</li>
-</ul>
-<h2 id="BFC布局特性"><a href="#BFC布局特性" class="headerlink" title="BFC布局特性"></a>BFC布局特性</h2><p>对于一个BFC容器来说：</p>
-<ul>
-<li>内部相邻的两个元素垂直方向上的 margin 会发生重叠</li>
-<li>不会与外界的浮动元素产生交集，而是紧贴浮动元素的边缘</li>
-<li>元素从容器的顶端开始垂直地一个接一个地排列</li>
-<li>每一个元素的左外边缘（margin-left）会触碰到容器的左边缘（border-left）（如果设置了容器内部的元素从右到左的格式排布，则触碰的是右边缘）</li>
-<li>在计算它的高度时，还会检测内部浮动或者定位元素的高度</li>
-</ul>
-<h2 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h2><h3 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a>清除浮动</h3><p>利用BFC “在计算它的高度时，还会检测内部浮动或者定位元素的高度” 这条特性，我们可以触发父元素的BFC来清除子元素浮动带来的影响。常见的用法是给父元素设置 <code>overflow: hidden</code> 样式（如果考虑IE6版本，还需设置 <code>zoom: 1</code>，因为IE6不支持 <code>overflow: hidden</code> 来清除浮动）：</p>
-<iframe height="265" scrolling="no" title="利用BFC清除浮动" src="https://codepen.io/JingW/embed/BbxEGP/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="解决外边距合并问题"><a href="#解决外边距合并问题" class="headerlink" title="解决外边距合并问题"></a>解决外边距合并问题</h3><p>如果看上面标题不知道在说什么，请很戳<a href="http://www.w3school.com.cn/css/css_margin_collapsing.asp">这里</a>了解详情。由于属于同一个BFC的两个相邻盒子的垂直margin会发生重叠，那么我们可以隔离开这两个元素，让它们不属于同一个BFC，这样就不会发生margin重叠了。</p>
-<iframe height="265" scrolling="no" title="解决外边距合并问题" src="https://codepen.io/JingW/embed/YgLbzY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="两栏布局，右边宽度自适应"><a href="#两栏布局，右边宽度自适应" class="headerlink" title="两栏布局，右边宽度自适应"></a>两栏布局，右边宽度自适应</h3><p>我们常常在开发中有这样类似的需求：两栏布局，左边定宽，右边自适应。<br>这时我们就可以利用BFC特性来实现需求：左边设置定宽+左浮动；右边给自己加上 <code>overflow: hidden</code> 。<br>原理就是：给元素设置BFC后，为了和浮动元素不产生任何交集，它会顺着浮动元素的边缘形成自己的封闭上下文。直接上代码看效果：</p>
-<iframe height="265" scrolling="no" title="利用BFC实现两栏布局" src="https://codepen.io/JingW/embed/MxGdEe/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<p>以上是我对BFC的一些理解以及实际应用，希望能够帮助大家了解BFC这个听起来摸不着头脑的东西。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Axios异步请求跨域解决方案</title>
     <url>/posts/29963/</url>
     <content><![CDATA[<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><blockquote>
@@ -149,6 +101,54 @@
       <tags>
         <tag>axios</tag>
         <tag>跨域</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>BFC的理解与应用</title>
+    <url>/posts/9722/</url>
+    <content><![CDATA[<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先上MDN上对 BFC 的定义：</p>
+<blockquote>
+<p>块格式化上下文（Block Formatting Context，BFC） 是Web页面的可视化CSS渲染的一部分，是块盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。</p>
+</blockquote>
+<p>———— <a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">BFC | MDN</a></p>
+<p>不知道别人看完这段定义有何感受，反正我是懵逼的。不过我在这儿还是建议各位认真阅读上面给出的MDN链接至少两遍，这能让你对一个陌生的概念有一个基本的认知。</p>
+<a id="more"></a>
+
+<h2 id="理解"><a href="#理解" class="headerlink" title="理解"></a>理解</h2><p>这里谈下我对BFC的理解：BFC其实是一个独立的，与外界隔离了的容器，容器里面的子元素不会影响到外面的元素，外面的也同样不会影响到容器内部的元素。我们可以利用这个特性，来解决一些布局上的问题。</p>
+<h2 id="BFC触发条件"><a href="#BFC触发条件" class="headerlink" title="BFC触发条件"></a>BFC触发条件</h2><p>BFC的触发条件有很多，想要知道所有细节可以移步上面给出的 MDN 链接。这里我只列出一些常见触发条件：</p>
+<ul>
+<li>根元素（HTML元素）</li>
+<li>浮动元素（float不为none）</li>
+<li>绝对定位元素（position 为 absolute 或 fixed）</li>
+<li>display 为 block, inline-block, flex, inline-flex, list-item, table</li>
+<li>overflow 值不为 visible 的块元素</li>
+</ul>
+<h2 id="BFC布局特性"><a href="#BFC布局特性" class="headerlink" title="BFC布局特性"></a>BFC布局特性</h2><p>对于一个BFC容器来说：</p>
+<ul>
+<li>内部相邻的两个元素垂直方向上的 margin 会发生重叠</li>
+<li>不会与外界的浮动元素产生交集，而是紧贴浮动元素的边缘</li>
+<li>元素从容器的顶端开始垂直地一个接一个地排列</li>
+<li>每一个元素的左外边缘（margin-left）会触碰到容器的左边缘（border-left）（如果设置了容器内部的元素从右到左的格式排布，则触碰的是右边缘）</li>
+<li>在计算它的高度时，还会检测内部浮动或者定位元素的高度</li>
+</ul>
+<h2 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h2><h3 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a>清除浮动</h3><p>利用BFC “在计算它的高度时，还会检测内部浮动或者定位元素的高度” 这条特性，我们可以触发父元素的BFC来清除子元素浮动带来的影响。常见的用法是给父元素设置 <code>overflow: hidden</code> 样式（如果考虑IE6版本，还需设置 <code>zoom: 1</code>，因为IE6不支持 <code>overflow: hidden</code> 来清除浮动）：</p>
+<iframe height="265" scrolling="no" title="利用BFC清除浮动" src="https://codepen.io/JingW/embed/BbxEGP/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="解决外边距合并问题"><a href="#解决外边距合并问题" class="headerlink" title="解决外边距合并问题"></a>解决外边距合并问题</h3><p>如果看上面标题不知道在说什么，请很戳<a href="http://www.w3school.com.cn/css/css_margin_collapsing.asp">这里</a>了解详情。由于属于同一个BFC的两个相邻盒子的垂直margin会发生重叠，那么我们可以隔离开这两个元素，让它们不属于同一个BFC，这样就不会发生margin重叠了。</p>
+<iframe height="265" scrolling="no" title="解决外边距合并问题" src="https://codepen.io/JingW/embed/YgLbzY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="两栏布局，右边宽度自适应"><a href="#两栏布局，右边宽度自适应" class="headerlink" title="两栏布局，右边宽度自适应"></a>两栏布局，右边宽度自适应</h3><p>我们常常在开发中有这样类似的需求：两栏布局，左边定宽，右边自适应。<br>这时我们就可以利用BFC特性来实现需求：左边设置定宽+左浮动；右边给自己加上 <code>overflow: hidden</code> 。<br>原理就是：给元素设置BFC后，为了和浮动元素不产生任何交集，它会顺着浮动元素的边缘形成自己的封闭上下文。直接上代码看效果：</p>
+<iframe height="265" scrolling="no" title="利用BFC实现两栏布局" src="https://codepen.io/JingW/embed/MxGdEe/?height=265&amp;theme-id=0&amp;default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>以上是我对BFC的一些理解以及实际应用，希望能够帮助大家了解BFC这个听起来摸不着头脑的东西。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -348,28 +348,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CSS超出部分省略号</title>
-    <url>/posts/26295/</url>
-    <content><![CDATA[<h2 id="CSS-实现单行省略号"><a href="#CSS-实现单行省略号" class="headerlink" title="CSS 实现单行省略号"></a>CSS 实现单行省略号</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">overflow</span>: hidden;</span><br><span class="line">  <span class="attribute">text-overflow</span>: ellipsis;</span><br><span class="line">  <span class="attribute">white-space</span>: nowrap;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="CSS-实现多行省略号"><a href="#CSS-实现多行省略号" class="headerlink" title="CSS 实现多行省略号"></a>CSS 实现多行省略号</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: -webkit-box;</span><br><span class="line">  <span class="attribute">-webkit-box-orient</span>: vertical;</span><br><span class="line">  -webkit-line-clamp: 3; //行数</span><br><span class="line">  <span class="selector-tag">overflow</span>: <span class="selector-tag">hidden</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<p>-webkit-line-clamp 用来限制在一个块元素显示的文本的行数。 为了实现该效果，它需要组合其他的 WebKit 属性。常见结合属性：</p>
-<p>display: -webkit-box; 必须结合的属性 ，将对象作为弹性伸缩盒子模型显示 。</p>
-<p>-webkit-box-orient 必须结合的属性 ，设置或检索伸缩盒对象的子元素的排列方式 。</p>
-<p><a href="http://www.daqianduan.com/6179.html">http://www.daqianduan.com/6179.html</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CSS粘住固定底部的5种方法(转载)</title>
     <url>/posts/52603/</url>
     <content><![CDATA[<p>译文地址：<a href="http://caibaojian.com/css-5-ways-sticky-footer.html">http://caibaojian.com/css-5-ways-sticky-footer.html</a><br>原文地址：<a href="https://css-tricks.com/couple-takes-sticky-footer/">https://css-tricks.com/couple-takes-sticky-footer/</a><br>译者：前端开发博客-Jack</p>
@@ -435,6 +413,28 @@
         <tag>布局</tag>
         <tag>技巧</tag>
         <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CSS超出部分省略号</title>
+    <url>/posts/26295/</url>
+    <content><![CDATA[<h2 id="CSS-实现单行省略号"><a href="#CSS-实现单行省略号" class="headerlink" title="CSS 实现单行省略号"></a>CSS 实现单行省略号</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">overflow</span>: hidden;</span><br><span class="line">  <span class="attribute">text-overflow</span>: ellipsis;</span><br><span class="line">  <span class="attribute">white-space</span>: nowrap;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="CSS-实现多行省略号"><a href="#CSS-实现多行省略号" class="headerlink" title="CSS 实现多行省略号"></a>CSS 实现多行省略号</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: -webkit-box;</span><br><span class="line">  <span class="attribute">-webkit-box-orient</span>: vertical;</span><br><span class="line">  -webkit-line-clamp: 3; //行数</span><br><span class="line">  <span class="selector-tag">overflow</span>: <span class="selector-tag">hidden</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>-webkit-line-clamp 用来限制在一个块元素显示的文本的行数。 为了实现该效果，它需要组合其他的 WebKit 属性。常见结合属性：</p>
+<p>display: -webkit-box; 必须结合的属性 ，将对象作为弹性伸缩盒子模型显示 。</p>
+<p>-webkit-box-orient 必须结合的属性 ，设置或检索伸缩盒对象的子元素的排列方式 。</p>
+<p><a href="http://www.daqianduan.com/6179.html">http://www.daqianduan.com/6179.html</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1240,6 +1240,116 @@
       </tags>
   </entry>
   <entry>
+    <title>HTML5的自定义属性</title>
+    <url>/posts/39974/</url>
+    <content><![CDATA[<blockquote>
+<p>在 HTML5 中我们可以自定义属性，其格式为 <code>data-*=&quot;&quot;</code></p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;demo&quot;</span> <span class="attr">data-my-name</span>=<span class="string">&quot;sw&quot;</span> <span class="attr">data-age</span>=<span class="string">&quot;10&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">/*</span><br><span class="line">  Node.dataset 是以对象形式存在的，当我们为同一个 DOM 节点指定了多个自定义属性时，</span><br><span class="line">  Node.dataset 则存储了所有的自定义属性的值。</span><br><span class="line">  */</span><br><span class="line"><span class="javascript"><span class="keyword">var</span> demo = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#demo&quot;</span>);</span></span><br><span class="line"><span class="javascript"><span class="comment">//获取</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//注：当我们如下格式设置时，则需要以驼峰格式才能正确获取</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> name = demo.dataset[<span class="string">&#x27;myName&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> age = demo.dataset[<span class="string">&#x27;age&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="comment">//设置</span></span></span><br><span class="line"><span class="javascript">demo.dataset[<span class="string">&#x27;name&#x27;</span>] = <span class="string">&#x27;web developer&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml"><span class="tag">&lt;<span class="name">script</span>/&gt;</span></span></span></span><br></pre></td></tr></table></figure>
+
+<p><strong>资源</strong></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/data-*">mdn - data-*</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>JS严格模式vs非严格模式</title>
+    <url>/posts/15966/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以下为《JavaScript 高级程序设计（第 3 版）》中有关 <code>严格模式</code> 的笔记。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>“严格模式” 是 ECMAScript5 最早引入的概念。可以在函数内部选择进行较为严格的全局或局部的错误条件检测。使用严格模式的好处是可以提早知道代码中存在的错误，及时捕获一些可能导致编程错误的 ECMAScript 行为。</p>
+<a id="more"></a>
+
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>在 JS 文件代码的顶部或者函数中输入下面字符串来开启严格模式：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &quot;use strict&quot;</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="严格模式-VS-非严格模式"><a href="#严格模式-VS-非严格模式" class="headerlink" title="严格模式 VS 非严格模式"></a>严格模式 VS 非严格模式</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><p>在严格模式下，不允许意外的创建全局变量：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 未声明变量</span></span><br><span class="line">message = <span class="string">&#x27;Hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 创建全局变量</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出 ReferenceError</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>不能对变量调用 delete 操作符：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copyvar color &#x3D; &quot;red&quot;;</span><br><span class="line">&#x2F;&#x2F; 删除变量</span><br><span class="line">delete color;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 非严格模式: 静默失败</span><br><span class="line">&#x2F;&#x2F; 严格模式: 抛出 ReferenceError</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>严格模式下对变量名也有限制。</p>
+<p>不能使用 implements、interface、let、package、 private、protected、public、static 和 yield 作为变量名。这些都是保留字，将来的 ECMAScript 版本中可能会用到它们。在严格模式下，用以上标识符作为变量名会导致语法错误。</p>
+<h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>在严格模式下操作对象比在非严格模式下更容易导致错误。一般来说，非严格模式下会静默失败的 情形，在严格模式下就会抛出错误。因此，在开发中使用严格模式会加大早发现错误的可能性。</p>
+<p>在下列情形下操作对象的属性会导致错误:</p>
+<ul>
+<li>为只读属性赋值会抛出 TypeError;</li>
+<li>对不可配置的(nonconfigurable)的属性使用 delete 操作符会抛出 TypeError;</li>
+<li>为不可扩展的(nonextensible)的对象添加属性会抛出 TypeError。</li>
+<li>使用对象的另一个限制与通过对象字面量声明对象有关。在使用对象字面量时，属性名必须唯一。</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重名属性</span></span><br><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: <span class="string">&#x27;Nicholas&#x27;</span>,</span><br><span class="line">  name: <span class="string">&#x27;Greg&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有错误，以第二个属性为准</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><h4 id="函数的命名参数"><a href="#函数的命名参数" class="headerlink" title="函数的命名参数"></a>函数的命名参数</h4><p>严格模式要求命名函数的参数必须唯一。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重名参数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">num, num</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有错误，只能访问第二个参数</span></span><br><span class="line"><span class="comment">//严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<p>在<strong>非严格模式</strong>下，这个函数声明不会抛出错误。通过参数名只能访问第二个参数，要访问第一个参数必须通过 <code>arguments</code> 对象。</p>
+<h4 id="arguments"><a href="#arguments" class="headerlink" title="arguments"></a>arguments</h4><p>arguments 对象的行为所不同。</p>
+<ul>
+<li>在非严格模式下，修改命名参数的值也会反映到 arguments 对象中。</li>
+<li>而严格模式下这两个值是完全独立的。</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 修改命名参数的值</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showValue</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">  value = <span class="string">&#x27;Foo&#x27;</span>;</span><br><span class="line">  alert(value); <span class="comment">//&quot;Foo&quot;</span></span><br><span class="line">  alert(<span class="built_in">arguments</span>[<span class="number">0</span>]); <span class="comment">// 非严格模式: &quot;Foo&quot; &lt;---&gt; 严格模式: &quot;Hi&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">showValue(<span class="string">&#x27;Hi&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码中，函数 showValue() 只有一个命名参数 value。调用这个函数时传入了一个参数”Hi”， 这个值赋给了 value。而在函数内部，value 被改为”Foo”。在非严格模式下，这个修改也会改变 arguments[0] 的值，但在严格模式下，arguments[0] 的值仍然是传入的值。</p>
+<hr>
+<p>另一个变化是淘汰了 arguments.callee 和 arguments.caller。在非严格模式下，这两个属性一个引用函数本身，一个引用调用函数。而在严格模式下，访问哪个属性都会抛出 TypeError。</p>
+<p>例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 访问 arguments.callee</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">factorial</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (num &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> num * <span class="built_in">arguments</span>.callee(num - <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> result = factorial(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有问题</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出 TypeError</span></span><br></pre></td></tr></table></figure>
+
+<p>类似地，尝试读写函数的 caller 属性，也会导致抛出 TypeError。所以，对于上面的例子而言， 访问 factorial.caller 也会抛出错误。</p>
+<h4 id="函数名"><a href="#函数名" class="headerlink" title="函数名"></a>函数名</h4><p>与变量类似，严格模式对函数名也做出了限制，不允许用 implements、interface、let、package、private、protected、public、static 和 yield 作为函数名。</p>
+<h4 id="函数声明的位置"><a href="#函数声明的位置" class="headerlink" title="函数声明的位置"></a>函数声明的位置</h4><p>只能在脚本的顶级和在函数内部声明函数。也就是说，在 if 语句中声明函数会导致语法错误：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//在 if 语句中声明函数</span></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">doSomething</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 将函数提升到 if 语句外部</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="eval"><a href="#eval" class="headerlink" title="eval()"></a>eval()</h3><p>eval 在包含上下文中不再创建变量或函数。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用 eval() 创建变量</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSomething</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">eval</span>(<span class="string">&#x27;var x=10&#x27;</span>);</span><br><span class="line">  alert(x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 弹出对话框显示 10</span></span><br><span class="line"><span class="comment">// 严格模式: 调用 alert(x) 时会抛出 ReferenceError</span></span><br></pre></td></tr></table></figure>
+
+<p>如果是在非严格模式下，以上代码会在函数 doSomething() 中创建一个局部变量 x，然后 alert() 还会显示该变量的值。但在严格模式下，在 doSomething() 函数中调用 eval() 不会创建变量 x，因此 调用 alert() 会导致抛出 ReferenceError，因为 x 没有定义。</p>
+<hr>
+<p>可以在 eval() 中声明变量和函数，但这些变量或函数只能在被求值的特殊作用域中有效，随后就 将被销毁。因此，以下代码可以运行，没有问题：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> result = <span class="built_in">eval</span>(<span class="string">&#x27;var x=10, y=11; x+y&#x27;</span>);</span><br><span class="line">alert(result); <span class="comment">//21</span></span><br></pre></td></tr></table></figure>
+
+<p>这里在 eval() 中声明了变量 x 和 y，然后将它们加在一起，返回了它们的和。于是，result 变 量的值是 21，即 x 和 y 相加的结果。而在调用 alert() 时，尽管 x 和 y 已经不存在了，result 变量的值仍然是有效的。</p>
+<h3 id="eval-与-arguments"><a href="#eval-与-arguments" class="headerlink" title="eval 与 arguments"></a>eval 与 arguments</h3><p>严格模式已经明确禁止使用 eval 和 arguments 作为标识符，也不允许读写它们的值。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 把 eval 和 arguments 作为变量引用</span></span><br><span class="line"><span class="keyword">var</span> <span class="built_in">eval</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">var</span> <span class="built_in">arguments</span> = <span class="string">&#x27;Hello world!&#x27;</span>;</span><br><span class="line"><span class="comment">// 非严格模式: 没问题，不出错</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<p>在非严格模式下，可以重写 eval，也可以给 arguments 赋值。但在严格模式下，这样做会导致语 法错误。不能将它们用作标识符，意味着以下几种使用方式都会抛出语法错误：</p>
+<ul>
+<li>使用 var 声明</li>
+<li>赋予另一个值</li>
+<li>尝试修改包含的值，如使用++</li>
+<li>用作函数名</li>
+<li>用作命名的函数参数</li>
+<li>在 try-catch 语句中用作例外名</li>
+</ul>
+<h3 id="抑制-this"><a href="#抑制-this" class="headerlink" title="抑制 this"></a>抑制 this</h3><p>在非严格模式下使用函数的 apply() 或 call() 方法时，null 或 undefined 值会被转换为全局对象。而在严格模式下，函数的 this 值始终是指定的值，无论指定的是什么值。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//访问属性</span></span><br><span class="line"><span class="keyword">var</span> color = <span class="string">&#x27;red&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">displayColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  alert(<span class="built_in">this</span>.color);</span><br><span class="line">&#125;</span><br><span class="line">displayColor.call(<span class="literal">null</span>);</span><br><span class="line"><span class="comment">// 非严格模式: 访问全局属性</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出错误，因为 this 的值为 null</span></span><br></pre></td></tr></table></figure>
+
+<p>以上代码向 displayColor.call() 中传入了 null，如果在是非严格模式下，这意味着函数的 this 值是全局对象。结果就是弹出对话框显示”red”。而在严格模式下，这个函数的 this 的值是 null，因 此在访问 null 的属性时就会抛出错误。</p>
+<h3 id="其他变化"><a href="#其他变化" class="headerlink" title="其他变化"></a>其他变化</h3><h4 id="with"><a href="#with" class="headerlink" title="with"></a>with</h4><p>抛弃了 with 语句。非严格模式下的 with 语句能够改变解析标识符的路径，但在严格模式下，with 被简化掉了。因此，在严格模式下使用 with 会导致语法错误。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//with 的语句用法</span></span><br><span class="line"><span class="keyword">with</span> (location) &#123;</span><br><span class="line">  alert(href);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 允许</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="八进制字面量"><a href="#八进制字面量" class="headerlink" title="八进制字面量"></a>八进制字面量</h4><p>严格模式也去掉了 JavaScript 中的八进制字面量。以 0 开头的八进制字面量过去经常会导致很多错 误。在严格模式下，八进制字面量已经成为无效的语法了。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用八进制字面量</span></span><br><span class="line"><span class="keyword">var</span> value = <span class="number">010</span>;</span><br><span class="line"><span class="comment">// 非严格模式: 值为 8</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>ECMAScript5 也修改了严格模式下 parseInt() 的行为。如今，八进制字面量在严格模式下会被当作以 0 开头的十进制字面量。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用 parseInt() 解析八进制字面量</span></span><br><span class="line"><span class="keyword">var</span> value = <span class="built_in">parseInt</span>(<span class="string">&#x27;010&#x27;</span>);</span><br><span class="line"><span class="comment">// 非严格模式: 值为 8</span></span><br><span class="line"><span class="comment">// 严格模式: 值为 10</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
     <title>HTML知识点（面试系列）</title>
     <url>/posts/55598/</url>
     <content><![CDATA[<h2 id="你对语义化的理解"><a href="#你对语义化的理解" class="headerlink" title="你对语义化的理解"></a>你对语义化的理解</h2><p>用正确的标签做正确的事情</p>
@@ -1342,22 +1452,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTML5的自定义属性</title>
-    <url>/posts/39974/</url>
-    <content><![CDATA[<blockquote>
-<p>在 HTML5 中我们可以自定义属性，其格式为 <code>data-*=&quot;&quot;</code></p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;demo&quot;</span> <span class="attr">data-my-name</span>=<span class="string">&quot;sw&quot;</span> <span class="attr">data-age</span>=<span class="string">&quot;10&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">/*</span><br><span class="line">  Node.dataset 是以对象形式存在的，当我们为同一个 DOM 节点指定了多个自定义属性时，</span><br><span class="line">  Node.dataset 则存储了所有的自定义属性的值。</span><br><span class="line">  */</span><br><span class="line"><span class="javascript"><span class="keyword">var</span> demo = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#demo&quot;</span>);</span></span><br><span class="line"><span class="javascript"><span class="comment">//获取</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//注：当我们如下格式设置时，则需要以驼峰格式才能正确获取</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> name = demo.dataset[<span class="string">&#x27;myName&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> age = demo.dataset[<span class="string">&#x27;age&#x27;</span>];</span></span><br><span class="line"><span class="javascript"><span class="comment">//设置</span></span></span><br><span class="line"><span class="javascript">demo.dataset[<span class="string">&#x27;name&#x27;</span>] = <span class="string">&#x27;web developer&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml"><span class="tag">&lt;<span class="name">script</span>/&gt;</span></span></span></span><br></pre></td></tr></table></figure>
-
-<p><strong>资源</strong></p>
-<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/data-*">mdn - data-*</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>HTML</category>
-      </categories>
-  </entry>
-  <entry>
     <title>JS中如何实现继承</title>
     <url>/posts/2751/</url>
     <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
@@ -1399,100 +1493,6 @@
 <h2 id="阅读更多"><a href="#阅读更多" class="headerlink" title="阅读更多"></a>阅读更多</h2><p><a href="https://segmentfault.com/q/1010000002637728">https://segmentfault.com/q/1010000002637728</a></p>
 <h2 id="可视化地址"><a href="#可视化地址" class="headerlink" title="可视化地址"></a>可视化地址</h2><p><a href="http://pythontutor.com/visualize.html#mode=display">http://pythontutor.com/visualize.html#mode=display</a></p>
 <h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a = &#123;</span><br><span class="line">  n: <span class="number">1</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> b = a;</span><br><span class="line">a = a.x = &#123;</span><br><span class="line">  n: <span class="number">2</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a.x);</span><br><span class="line"><span class="built_in">console</span>.log(b);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>JS严格模式vs非严格模式</title>
-    <url>/posts/15966/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以下为《JavaScript 高级程序设计（第 3 版）》中有关 <code>严格模式</code> 的笔记。</p>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>“严格模式” 是 ECMAScript5 最早引入的概念。可以在函数内部选择进行较为严格的全局或局部的错误条件检测。使用严格模式的好处是可以提早知道代码中存在的错误，及时捕获一些可能导致编程错误的 ECMAScript 行为。</p>
-<a id="more"></a>
-
-<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>在 JS 文件代码的顶部或者函数中输入下面字符串来开启严格模式：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &quot;use strict&quot;</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="严格模式-VS-非严格模式"><a href="#严格模式-VS-非严格模式" class="headerlink" title="严格模式 VS 非严格模式"></a>严格模式 VS 非严格模式</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><p>在严格模式下，不允许意外的创建全局变量：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 未声明变量</span></span><br><span class="line">message = <span class="string">&#x27;Hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 创建全局变量</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出 ReferenceError</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>不能对变量调用 delete 操作符：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">copyvar color &#x3D; &quot;red&quot;;</span><br><span class="line">&#x2F;&#x2F; 删除变量</span><br><span class="line">delete color;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 非严格模式: 静默失败</span><br><span class="line">&#x2F;&#x2F; 严格模式: 抛出 ReferenceError</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>严格模式下对变量名也有限制。</p>
-<p>不能使用 implements、interface、let、package、 private、protected、public、static 和 yield 作为变量名。这些都是保留字，将来的 ECMAScript 版本中可能会用到它们。在严格模式下，用以上标识符作为变量名会导致语法错误。</p>
-<h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>在严格模式下操作对象比在非严格模式下更容易导致错误。一般来说，非严格模式下会静默失败的 情形，在严格模式下就会抛出错误。因此，在开发中使用严格模式会加大早发现错误的可能性。</p>
-<p>在下列情形下操作对象的属性会导致错误:</p>
-<ul>
-<li>为只读属性赋值会抛出 TypeError;</li>
-<li>对不可配置的(nonconfigurable)的属性使用 delete 操作符会抛出 TypeError;</li>
-<li>为不可扩展的(nonextensible)的对象添加属性会抛出 TypeError。</li>
-<li>使用对象的另一个限制与通过对象字面量声明对象有关。在使用对象字面量时，属性名必须唯一。</li>
-</ul>
-<p>例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重名属性</span></span><br><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: <span class="string">&#x27;Nicholas&#x27;</span>,</span><br><span class="line">  name: <span class="string">&#x27;Greg&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有错误，以第二个属性为准</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><h4 id="函数的命名参数"><a href="#函数的命名参数" class="headerlink" title="函数的命名参数"></a>函数的命名参数</h4><p>严格模式要求命名函数的参数必须唯一。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重名参数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">num, num</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有错误，只能访问第二个参数</span></span><br><span class="line"><span class="comment">//严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<p>在<strong>非严格模式</strong>下，这个函数声明不会抛出错误。通过参数名只能访问第二个参数，要访问第一个参数必须通过 <code>arguments</code> 对象。</p>
-<h4 id="arguments"><a href="#arguments" class="headerlink" title="arguments"></a>arguments</h4><p>arguments 对象的行为所不同。</p>
-<ul>
-<li>在非严格模式下，修改命名参数的值也会反映到 arguments 对象中。</li>
-<li>而严格模式下这两个值是完全独立的。</li>
-</ul>
-<p>例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 修改命名参数的值</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showValue</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">  value = <span class="string">&#x27;Foo&#x27;</span>;</span><br><span class="line">  alert(value); <span class="comment">//&quot;Foo&quot;</span></span><br><span class="line">  alert(<span class="built_in">arguments</span>[<span class="number">0</span>]); <span class="comment">// 非严格模式: &quot;Foo&quot; &lt;---&gt; 严格模式: &quot;Hi&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">showValue(<span class="string">&#x27;Hi&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码中，函数 showValue() 只有一个命名参数 value。调用这个函数时传入了一个参数”Hi”， 这个值赋给了 value。而在函数内部，value 被改为”Foo”。在非严格模式下，这个修改也会改变 arguments[0] 的值，但在严格模式下，arguments[0] 的值仍然是传入的值。</p>
-<hr>
-<p>另一个变化是淘汰了 arguments.callee 和 arguments.caller。在非严格模式下，这两个属性一个引用函数本身，一个引用调用函数。而在严格模式下，访问哪个属性都会抛出 TypeError。</p>
-<p>例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 访问 arguments.callee</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">factorial</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (num &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> num * <span class="built_in">arguments</span>.callee(num - <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> result = factorial(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非严格模式: 没有问题</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出 TypeError</span></span><br></pre></td></tr></table></figure>
-
-<p>类似地，尝试读写函数的 caller 属性，也会导致抛出 TypeError。所以，对于上面的例子而言， 访问 factorial.caller 也会抛出错误。</p>
-<h4 id="函数名"><a href="#函数名" class="headerlink" title="函数名"></a>函数名</h4><p>与变量类似，严格模式对函数名也做出了限制，不允许用 implements、interface、let、package、private、protected、public、static 和 yield 作为函数名。</p>
-<h4 id="函数声明的位置"><a href="#函数声明的位置" class="headerlink" title="函数声明的位置"></a>函数声明的位置</h4><p>只能在脚本的顶级和在函数内部声明函数。也就是说，在 if 语句中声明函数会导致语法错误：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//在 if 语句中声明函数</span></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">doSomething</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 将函数提升到 if 语句外部</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="eval"><a href="#eval" class="headerlink" title="eval()"></a>eval()</h3><p>eval 在包含上下文中不再创建变量或函数。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用 eval() 创建变量</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSomething</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">eval</span>(<span class="string">&#x27;var x=10&#x27;</span>);</span><br><span class="line">  alert(x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 弹出对话框显示 10</span></span><br><span class="line"><span class="comment">// 严格模式: 调用 alert(x) 时会抛出 ReferenceError</span></span><br></pre></td></tr></table></figure>
-
-<p>如果是在非严格模式下，以上代码会在函数 doSomething() 中创建一个局部变量 x，然后 alert() 还会显示该变量的值。但在严格模式下，在 doSomething() 函数中调用 eval() 不会创建变量 x，因此 调用 alert() 会导致抛出 ReferenceError，因为 x 没有定义。</p>
-<hr>
-<p>可以在 eval() 中声明变量和函数，但这些变量或函数只能在被求值的特殊作用域中有效，随后就 将被销毁。因此，以下代码可以运行，没有问题：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> result = <span class="built_in">eval</span>(<span class="string">&#x27;var x=10, y=11; x+y&#x27;</span>);</span><br><span class="line">alert(result); <span class="comment">//21</span></span><br></pre></td></tr></table></figure>
-
-<p>这里在 eval() 中声明了变量 x 和 y，然后将它们加在一起，返回了它们的和。于是，result 变 量的值是 21，即 x 和 y 相加的结果。而在调用 alert() 时，尽管 x 和 y 已经不存在了，result 变量的值仍然是有效的。</p>
-<h3 id="eval-与-arguments"><a href="#eval-与-arguments" class="headerlink" title="eval 与 arguments"></a>eval 与 arguments</h3><p>严格模式已经明确禁止使用 eval 和 arguments 作为标识符，也不允许读写它们的值。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 把 eval 和 arguments 作为变量引用</span></span><br><span class="line"><span class="keyword">var</span> <span class="built_in">eval</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">var</span> <span class="built_in">arguments</span> = <span class="string">&#x27;Hello world!&#x27;</span>;</span><br><span class="line"><span class="comment">// 非严格模式: 没问题，不出错</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<p>在非严格模式下，可以重写 eval，也可以给 arguments 赋值。但在严格模式下，这样做会导致语 法错误。不能将它们用作标识符，意味着以下几种使用方式都会抛出语法错误：</p>
-<ul>
-<li>使用 var 声明</li>
-<li>赋予另一个值</li>
-<li>尝试修改包含的值，如使用++</li>
-<li>用作函数名</li>
-<li>用作命名的函数参数</li>
-<li>在 try-catch 语句中用作例外名</li>
-</ul>
-<h3 id="抑制-this"><a href="#抑制-this" class="headerlink" title="抑制 this"></a>抑制 this</h3><p>在非严格模式下使用函数的 apply() 或 call() 方法时，null 或 undefined 值会被转换为全局对象。而在严格模式下，函数的 this 值始终是指定的值，无论指定的是什么值。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//访问属性</span></span><br><span class="line"><span class="keyword">var</span> color = <span class="string">&#x27;red&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">displayColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  alert(<span class="built_in">this</span>.color);</span><br><span class="line">&#125;</span><br><span class="line">displayColor.call(<span class="literal">null</span>);</span><br><span class="line"><span class="comment">// 非严格模式: 访问全局属性</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出错误，因为 this 的值为 null</span></span><br></pre></td></tr></table></figure>
-
-<p>以上代码向 displayColor.call() 中传入了 null，如果在是非严格模式下，这意味着函数的 this 值是全局对象。结果就是弹出对话框显示”red”。而在严格模式下，这个函数的 this 的值是 null，因 此在访问 null 的属性时就会抛出错误。</p>
-<h3 id="其他变化"><a href="#其他变化" class="headerlink" title="其他变化"></a>其他变化</h3><h4 id="with"><a href="#with" class="headerlink" title="with"></a>with</h4><p>抛弃了 with 语句。非严格模式下的 with 语句能够改变解析标识符的路径，但在严格模式下，with 被简化掉了。因此，在严格模式下使用 with 会导致语法错误。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//with 的语句用法</span></span><br><span class="line"><span class="keyword">with</span> (location) &#123;</span><br><span class="line">  alert(href);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 非严格模式: 允许</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="八进制字面量"><a href="#八进制字面量" class="headerlink" title="八进制字面量"></a>八进制字面量</h4><p>严格模式也去掉了 JavaScript 中的八进制字面量。以 0 开头的八进制字面量过去经常会导致很多错 误。在严格模式下，八进制字面量已经成为无效的语法了。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用八进制字面量</span></span><br><span class="line"><span class="keyword">var</span> value = <span class="number">010</span>;</span><br><span class="line"><span class="comment">// 非严格模式: 值为 8</span></span><br><span class="line"><span class="comment">// 严格模式: 抛出语法错误</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>ECMAScript5 也修改了严格模式下 parseInt() 的行为。如今，八进制字面量在严格模式下会被当作以 0 开头的十进制字面量。例如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//使用 parseInt() 解析八进制字面量</span></span><br><span class="line"><span class="keyword">var</span> value = <span class="built_in">parseInt</span>(<span class="string">&#x27;010&#x27;</span>);</span><br><span class="line"><span class="comment">// 非严格模式: 值为 8</span></span><br><span class="line"><span class="comment">// 严格模式: 值为 10</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -2173,6 +2173,33 @@
       </tags>
   </entry>
   <entry>
+    <title>Uniapp实时监听input输入为数字</title>
+    <url>/posts/47344/</url>
+    <content><![CDATA[<p>测试要求提现的输入只能为数字+小数点，不许为其他：</p>
+
+
+<a id="more"></a>
+
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
+<p>Wxml</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&lt;input</span><br><span class="line">  type=&quot;number&quot;</span><br><span class="line">  :placeholder=&quot;placeTips&quot;</span><br><span class="line">  placeholder-style=&quot;font-size:24rpx&quot;</span><br><span class="line">  v-model=&quot;amount&quot;</span><br><span class="line">  @input=&quot;checkNum($event)&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>JS</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">checkNum</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">	<span class="keyword">let</span> val = e.target.value.replace(<span class="regexp">/(^\s*)|(\s*$)/g</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="built_in">console</span>.log(val)</span><br><span class="line">	<span class="keyword">if</span> (!val) &#123;</span><br><span class="line">		<span class="built_in">this</span>.amount = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> reg = <span class="regexp">/[^\d.]/g</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 只能是数字和小数点，不能是其他输入</span></span><br><span class="line">	val = val.replace(reg, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="comment">// // 保证第一位只能是数字，不能是点</span></span><br><span class="line">	val = val.replace(<span class="regexp">/^\./g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">	<span class="comment">// // 小数只能出现1位</span></span><br><span class="line">	val = val.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;$#$&quot;</span>).replace(<span class="regexp">/\./g</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;$#$&quot;</span>, <span class="string">&quot;.&quot;</span>);</span><br><span class="line">	<span class="comment">// // 小数点后面保留2位</span></span><br><span class="line">	val = val.replace(<span class="regexp">/^(\-)*(\d+)\.(\d\d).*$/</span>, <span class="string">&#x27;$1$2.$3&#x27;</span>);</span><br><span class="line">	<span class="built_in">console</span>.log(val);</span><br><span class="line">	<span class="built_in">this</span>.$nextTick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.amount = val;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Uni-app踩坑日常</title>
     <url>/posts/34936/</url>
     <content><![CDATA[<h2 id="图片路径问题"><a href="#图片路径问题" class="headerlink" title="图片路径问题"></a>图片路径问题</h2><h3 id="在-vue-文件中"><a href="#在-vue-文件中" class="headerlink" title="在 .vue 文件中"></a>在 .vue 文件中</h3><p>使用本地图片可以用绝对路径或者相对路径：</p>
@@ -2305,33 +2332,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Uniapp实时监听input输入为数字</title>
-    <url>/posts/47344/</url>
-    <content><![CDATA[<p>测试要求提现的输入只能为数字+小数点，不许为其他：</p>
-
-
-<a id="more"></a>
-
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
-<p>Wxml</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&lt;input</span><br><span class="line">  type=&quot;number&quot;</span><br><span class="line">  :placeholder=&quot;placeTips&quot;</span><br><span class="line">  placeholder-style=&quot;font-size:24rpx&quot;</span><br><span class="line">  v-model=&quot;amount&quot;</span><br><span class="line">  @input=&quot;checkNum($event)&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>JS</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">checkNum</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">	<span class="keyword">let</span> val = e.target.value.replace(<span class="regexp">/(^\s*)|(\s*$)/g</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="built_in">console</span>.log(val)</span><br><span class="line">	<span class="keyword">if</span> (!val) &#123;</span><br><span class="line">		<span class="built_in">this</span>.amount = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> reg = <span class="regexp">/[^\d.]/g</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 只能是数字和小数点，不能是其他输入</span></span><br><span class="line">	val = val.replace(reg, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="comment">// // 保证第一位只能是数字，不能是点</span></span><br><span class="line">	val = val.replace(<span class="regexp">/^\./g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">	<span class="comment">// // 小数只能出现1位</span></span><br><span class="line">	val = val.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;$#$&quot;</span>).replace(<span class="regexp">/\./g</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;$#$&quot;</span>, <span class="string">&quot;.&quot;</span>);</span><br><span class="line">	<span class="comment">// // 小数点后面保留2位</span></span><br><span class="line">	val = val.replace(<span class="regexp">/^(\-)*(\d+)\.(\d\d).*$/</span>, <span class="string">&#x27;$1$2.$3&#x27;</span>);</span><br><span class="line">	<span class="built_in">console</span>.log(val);</span><br><span class="line">	<span class="built_in">this</span>.$nextTick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.amount = val;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>解决方案</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VSCode+Vue项目Ctrl加V自动格式化代码</title>
     <url>/posts/22469/</url>
     <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。</p>
@@ -2367,6 +2367,31 @@
       </categories>
       <tags>
         <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode配置TypeScript自动编译报错</title>
+    <url>/posts/15303/</url>
+    <content><![CDATA[<p>2020.10.02 更新：</p>
+<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
+<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
+<hr>
+<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
+
+<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
+
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
+<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
+        <tag>TypeScript</tag>
       </tags>
   </entry>
   <entry>
@@ -2429,31 +2454,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VSCode配置TypeScript自动编译报错</title>
-    <url>/posts/15303/</url>
-    <content><![CDATA[<p>2020.10.02 更新：</p>
-<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
-<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
-<hr>
-<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
-
-<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
-
-<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
-<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
-        <tag>TypeScript</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vue+Koa实现cookie传输</title>
     <url>/posts/26486/</url>
     <content><![CDATA[<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>登录接口设置 cookie：</p>
@@ -2495,6 +2495,37 @@
       <tags>
         <tag>Koa</tag>
         <tag>Cookie</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue使用全局filter</title>
+    <url>/posts/7498/</url>
+    <content><![CDATA[<h3 id="1-Vue-中-Filter-声明方式"><a href="#1-Vue-中-Filter-声明方式" class="headerlink" title="1. Vue 中 Filter 声明方式"></a>1. Vue 中 Filter 声明方式</h3><p>Vue 中存在两种声明 Filter 过滤器的方式:</p>
+<p><strong>全局过滤器</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>, <span class="function"><span class="params">val</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;全局过滤器&#x27;</span>, val);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这种方式将过滤器声明到了 Vue 类型上，所有 Vue 对象即可访问这个过滤器</p>
+<a id="more"></a>
+
+<p><strong>本地过滤器</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  filters: &#123;</span><br><span class="line">    <span class="function"><span class="title">testFilter2</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;本地过滤器&#x27;</span>, val);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这种方式将过滤器声明到这个 Vue 对象中，所以只能这个 Vue 对象进行访问</p>
+<h3 id="2-Vue-中在-Methods-中访问-Filter"><a href="#2-Vue-中在-Methods-中访问-Filter" class="headerlink" title="2. Vue 中在 Methods 中访问 Filter"></a>2. Vue 中在 Methods 中访问 Filter</h3><p>Vue 中在 Methods 中访问 Filter 有两种方式,分别对应两种 Filter 的声明方式</p>
+<p><strong>访问全局过滤器</strong></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;body&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;getGlobal()&quot;</span>&gt;</span>调用全局过滤器<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>, <span class="function"><span class="params">val</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">    <span class="built_in">console</span>.log(<span class="string">&#x27;全局过滤器&#x27;</span>, val);</span></span><br><span class="line">  &#125;);</span><br><span class="line"><span class="javascript">  <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">    el: <span class="string">&#x27;#body&#x27;</span>,</span></span><br><span class="line">    methods: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">getGlobal</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//使用Vue.Filter()方式获取全局过滤器</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> te = Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>);</span></span><br><span class="line"><span class="javascript">        <span class="comment">//调用全局过滤器</span></span></span><br><span class="line"><span class="javascript">        te(<span class="string">&#x27;filter&#x27;</span>);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>访问本地过滤器</strong></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;body&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;getLocal()&quot;</span>&gt;</span>调用本地过滤器<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">    el: <span class="string">&#x27;#body&#x27;</span>,</span></span><br><span class="line">    filters: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">testFilter2</span>(<span class="params">val</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(<span class="string">&#x27;本地过滤器&#x27;</span>, val);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">getLocal</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//使用this.$options.filters[]方式获取本地过滤器</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> te = <span class="built_in">this</span>.$options.filters[<span class="string">&#x27;testFilter2&#x27;</span>];</span></span><br><span class="line"><span class="javascript">        <span class="comment">//调用本地过滤器</span></span></span><br><span class="line"><span class="javascript">        te(<span class="string">&#x27;filter&#x27;</span>);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -2615,37 +2646,6 @@
       </categories>
       <tags>
         <tag>Vuex</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue使用全局filter</title>
-    <url>/posts/7498/</url>
-    <content><![CDATA[<h3 id="1-Vue-中-Filter-声明方式"><a href="#1-Vue-中-Filter-声明方式" class="headerlink" title="1. Vue 中 Filter 声明方式"></a>1. Vue 中 Filter 声明方式</h3><p>Vue 中存在两种声明 Filter 过滤器的方式:</p>
-<p><strong>全局过滤器</strong></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>, <span class="function"><span class="params">val</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;全局过滤器&#x27;</span>, val);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>这种方式将过滤器声明到了 Vue 类型上，所有 Vue 对象即可访问这个过滤器</p>
-<a id="more"></a>
-
-<p><strong>本地过滤器</strong></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  filters: &#123;</span><br><span class="line">    <span class="function"><span class="title">testFilter2</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;本地过滤器&#x27;</span>, val);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>这种方式将过滤器声明到这个 Vue 对象中，所以只能这个 Vue 对象进行访问</p>
-<h3 id="2-Vue-中在-Methods-中访问-Filter"><a href="#2-Vue-中在-Methods-中访问-Filter" class="headerlink" title="2. Vue 中在 Methods 中访问 Filter"></a>2. Vue 中在 Methods 中访问 Filter</h3><p>Vue 中在 Methods 中访问 Filter 有两种方式,分别对应两种 Filter 的声明方式</p>
-<p><strong>访问全局过滤器</strong></p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;body&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;getGlobal()&quot;</span>&gt;</span>调用全局过滤器<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>, <span class="function"><span class="params">val</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">    <span class="built_in">console</span>.log(<span class="string">&#x27;全局过滤器&#x27;</span>, val);</span></span><br><span class="line">  &#125;);</span><br><span class="line"><span class="javascript">  <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">    el: <span class="string">&#x27;#body&#x27;</span>,</span></span><br><span class="line">    methods: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">getGlobal</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//使用Vue.Filter()方式获取全局过滤器</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> te = Vue.filter(<span class="string">&#x27;testFilter1&#x27;</span>);</span></span><br><span class="line"><span class="javascript">        <span class="comment">//调用全局过滤器</span></span></span><br><span class="line"><span class="javascript">        te(<span class="string">&#x27;filter&#x27;</span>);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>访问本地过滤器</strong></p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;body&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;getLocal()&quot;</span>&gt;</span>调用本地过滤器<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="javascript">    el: <span class="string">&#x27;#body&#x27;</span>,</span></span><br><span class="line">    filters: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">testFilter2</span>(<span class="params">val</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(<span class="string">&#x27;本地过滤器&#x27;</span>, val);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">getLocal</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//使用this.$options.filters[]方式获取本地过滤器</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> te = <span class="built_in">this</span>.$options.filters[<span class="string">&#x27;testFilter2&#x27;</span>];</span></span><br><span class="line"><span class="javascript">        <span class="comment">//调用本地过滤器</span></span></span><br><span class="line"><span class="javascript">        te(<span class="string">&#x27;filter&#x27;</span>);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -2897,55 +2897,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Vue组件通讯$attrs/$listeners</title>
-    <url>/posts/47247/</url>
-    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
-<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
-<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
-<a id="more"></a>
-
-<p>图解</p>
-<img src="/posts/47247/attrs1.png" class="" title="图解">
-
-<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
-<p>{ age: “20”, gender: “man” }</p>
-<img src="/posts/47247/attrs2.png" class="" title="attrs2">
-
-<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
-<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
-<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
-<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
-<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
-<img src="/posts/47247/listeners1.png" class="" title="listeners1">
-
-<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
-<p>{ customEvent: fn }</p>
-<img src="/posts/47247/listeners2.png" class="" title="listeners2">
-
-<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
-<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
-<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
-<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
-<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
-<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vue组件开发——无限菜单</title>
     <url>/posts/23904/</url>
     <content><![CDATA[<h2 id="vue-cli-service-global-插件介绍"><a href="#vue-cli-service-global-插件介绍" class="headerlink" title="@vue/cli-service-global 插件介绍"></a>@vue/cli-service-global 插件介绍</h2><p>该 npm 包可以让你在零配置情况下，直接使用 <code>vue serve</code> 和 <code>vue build</code> 命令跑 <code>*.vue</code> 文件，并且可以把它编译打包成一个 Vue 插件。</p>
@@ -3059,6 +3010,55 @@
       </tags>
   </entry>
   <entry>
+    <title>Vue组件通讯$attrs/$listeners</title>
+    <url>/posts/47247/</url>
+    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
+<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
+<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
+<a id="more"></a>
+
+<p>图解</p>
+<img src="/posts/47247/attrs1.png" class="" title="图解">
+
+<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
+<p>{ age: “20”, gender: “man” }</p>
+<img src="/posts/47247/attrs2.png" class="" title="attrs2">
+
+<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
+<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
+<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
+<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
+<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
+<img src="/posts/47247/listeners1.png" class="" title="listeners1">
+
+<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
+<p>{ customEvent: fn }</p>
+<img src="/posts/47247/listeners2.png" class="" title="listeners2">
+
+<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
+<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
+<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
+<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
+<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
+<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Vue自定义create方法用于通过JS创建组件实例</title>
     <url>/posts/6559/</url>
     <content><![CDATA[<h3 id="方案一：Vue-extend-Component-获取组件构造函数"><a href="#方案一：Vue-extend-Component-获取组件构造函数" class="headerlink" title="方案一：Vue.extend(Component) 获取组件构造函数"></a>方案一：Vue.extend(Component) 获取组件构造函数</h3><p><code>Vue.extend</code> 是 Vue 全局 API，<a href="https://cn.vuejs.org/v2/api/#Vue-extend">官方文档</a> 对其描述如下：</p>
@@ -3132,6 +3132,21 @@
       </tags>
   </entry>
   <entry>
+    <title>WKWebView通过监听获取加载进度和标题</title>
+    <url>/posts/63756/</url>
+    <content><![CDATA[<p>转载：<a href="https://www.jianshu.com/p/548a772f433e">https://www.jianshu.com/p/548a772f433e</a></p>
+<p>WKWebView 提供了可以监听页面加载进度，以及页面的标题的方法。</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> webView = <span class="type">WKWebView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: screenWidth, height: screenHeight - navigationHeight ), configuration: <span class="type">WKWebViewConfiguration</span>())</span><br><span class="line"></span><br><span class="line"><span class="built_in">lazy</span> <span class="keyword">private</span> <span class="keyword">var</span> progressView: <span class="type">UIProgressView</span> = &#123;</span><br><span class="line">        <span class="keyword">let</span> progress = <span class="type">UIProgressView</span>.<span class="keyword">init</span>(frame: <span class="type">CGRect</span>(x: <span class="type">CGFloat</span>(<span class="number">0</span>), y: <span class="type">CGFloat</span>(<span class="number">0</span>), width: <span class="type">UIScreen</span>.main.bounds.width, height: <span class="number">2</span>))</span><br><span class="line">        progress.tintColor = <span class="type">UIColor</span>.green</span><br><span class="line">        progress.trackTintColor = <span class="type">UIColor</span>.white</span><br><span class="line">        <span class="keyword">return</span> progress</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">    webView.addObserver(<span class="keyword">self</span>, forKeyPath: <span class="string">&quot;title&quot;</span>, options: .new, context: <span class="literal">nil</span>)</span><br><span class="line">    webView.addObserver(<span class="keyword">self</span>, forKeyPath: <span class="string">&quot;estimatedProgress&quot;</span>, options: .new, context: <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//添加观察者方法</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">observeValue</span><span class="params">(forKeyPath keyPath: String?, of object: <span class="keyword">Any</span>?, change: [NSKeyValueChangeKey : <span class="keyword">Any</span>]?, context: UnsafeMutableRawPointer?)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//设置进度条</span></span><br><span class="line">   <span class="keyword">if</span> keyPath == <span class="string">&quot;estimatedProgress&quot;</span>&#123;</span><br><span class="line">      progressView.alpha = <span class="number">1.0</span></span><br><span class="line">      progressView.setProgress(<span class="type">Float</span>(webView.estimatedProgress), animated: <span class="literal">true</span>)</span><br><span class="line">      <span class="keyword">if</span> webView.estimatedProgress &gt;= <span class="number">1.0</span> &#123;</span><br><span class="line">            <span class="type">UIView</span>.animate(withDuration: <span class="number">0.3</span>, delay: <span class="number">0.1</span>, options: .curveEaseOut, animations: &#123;</span><br><span class="line">               <span class="keyword">self</span>.progressView.alpha = <span class="number">0</span></span><br><span class="line">            &#125;, completion: &#123; (finish) <span class="keyword">in</span></span><br><span class="line">               <span class="keyword">self</span>.progressView.setProgress(<span class="number">0.0</span>, animated: <span class="literal">false</span>)</span><br><span class="line">            &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//重设标题</span></span><br><span class="line">   <span class="keyword">else</span> <span class="keyword">if</span> keyPath == <span class="string">&quot;title&quot;</span> &#123;</span><br><span class="line">      <span class="keyword">self</span>.title = <span class="keyword">self</span>.webView.title</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Webpack4-Shimming(垫片)</title>
     <url>/posts/29270/</url>
     <content><![CDATA[<h2 id="先举个栗子-🌰"><a href="#先举个栗子-🌰" class="headerlink" title="先举个栗子 🌰"></a>先举个栗子 🌰</h2><p>假设我们一个用 webpack 打包的项目有以下场景</p>
@@ -3172,11 +3187,28 @@
       </tags>
   </entry>
   <entry>
-    <title>WKWebView通过监听获取加载进度和标题</title>
-    <url>/posts/63756/</url>
-    <content><![CDATA[<p>转载：<a href="https://www.jianshu.com/p/548a772f433e">https://www.jianshu.com/p/548a772f433e</a></p>
-<p>WKWebView 提供了可以监听页面加载进度，以及页面的标题的方法。</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> webView = <span class="type">WKWebView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: screenWidth, height: screenHeight - navigationHeight ), configuration: <span class="type">WKWebViewConfiguration</span>())</span><br><span class="line"></span><br><span class="line"><span class="built_in">lazy</span> <span class="keyword">private</span> <span class="keyword">var</span> progressView: <span class="type">UIProgressView</span> = &#123;</span><br><span class="line">        <span class="keyword">let</span> progress = <span class="type">UIProgressView</span>.<span class="keyword">init</span>(frame: <span class="type">CGRect</span>(x: <span class="type">CGFloat</span>(<span class="number">0</span>), y: <span class="type">CGFloat</span>(<span class="number">0</span>), width: <span class="type">UIScreen</span>.main.bounds.width, height: <span class="number">2</span>))</span><br><span class="line">        progress.tintColor = <span class="type">UIColor</span>.green</span><br><span class="line">        progress.trackTintColor = <span class="type">UIColor</span>.white</span><br><span class="line">        <span class="keyword">return</span> progress</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">    webView.addObserver(<span class="keyword">self</span>, forKeyPath: <span class="string">&quot;title&quot;</span>, options: .new, context: <span class="literal">nil</span>)</span><br><span class="line">    webView.addObserver(<span class="keyword">self</span>, forKeyPath: <span class="string">&quot;estimatedProgress&quot;</span>, options: .new, context: <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//添加观察者方法</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">observeValue</span><span class="params">(forKeyPath keyPath: String?, of object: <span class="keyword">Any</span>?, change: [NSKeyValueChangeKey : <span class="keyword">Any</span>]?, context: UnsafeMutableRawPointer?)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//设置进度条</span></span><br><span class="line">   <span class="keyword">if</span> keyPath == <span class="string">&quot;estimatedProgress&quot;</span>&#123;</span><br><span class="line">      progressView.alpha = <span class="number">1.0</span></span><br><span class="line">      progressView.setProgress(<span class="type">Float</span>(webView.estimatedProgress), animated: <span class="literal">true</span>)</span><br><span class="line">      <span class="keyword">if</span> webView.estimatedProgress &gt;= <span class="number">1.0</span> &#123;</span><br><span class="line">            <span class="type">UIView</span>.animate(withDuration: <span class="number">0.3</span>, delay: <span class="number">0.1</span>, options: .curveEaseOut, animations: &#123;</span><br><span class="line">               <span class="keyword">self</span>.progressView.alpha = <span class="number">0</span></span><br><span class="line">            &#125;, completion: &#123; (finish) <span class="keyword">in</span></span><br><span class="line">               <span class="keyword">self</span>.progressView.setProgress(<span class="number">0.0</span>, animated: <span class="literal">false</span>)</span><br><span class="line">            &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//重设标题</span></span><br><span class="line">   <span class="keyword">else</span> <span class="keyword">if</span> keyPath == <span class="string">&quot;title&quot;</span> &#123;</span><br><span class="line">      <span class="keyword">self</span>.title = <span class="keyword">self</span>.webView.title</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <title>Xcode11手写代码入口启动黑屏解决方案</title>
+    <url>/posts/33273/</url>
+    <content><![CDATA[<p>环境：Xcode11</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>用 Swift 编写后发现编译通过但启动黑屏。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
+<li>Xcode11 默认是会创建通过 UIScene 管理多个 UIWindow 的应用，工程中除了 AppDelegate 外会多一个 SceneDelegate</li>
+<li>AppDelegate 和 SceneDelegate 这是 iPadOS 带来的新的多窗口支持的结果，并且有效地将应用程序委托的工作分成两部分</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
+<li>删除掉 info.plist 中 <code>Application Scene Manifest</code> 和 <code>Main storyboard file base name</code> 选项</li>
+</ol>
+<img src="/posts/33273/scene.png" class="" title="scene">
+
+<img src="/posts/33273/mainstoryboard.png" class="" title="mainstoryboard">
+
+<ol>
+<li>删除 <code>SceneDelegate.swift</code> 文件</li>
+<li>Appdelegate 新增 windows 属性</li>
+</ol>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span> </span>&#123;</span><br><span class="line">   <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions <span class="keyword">_</span>: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">      <span class="comment">// Override point for customization after application launch.</span></span><br><span class="line"></span><br><span class="line">      window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">      window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">      window?.makeKeyAndVisible()</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>移动端</category>
@@ -3184,6 +3216,7 @@
       </categories>
       <tags>
         <tag>iOS</tag>
+        <tag>Xcode</tag>
       </tags>
   </entry>
   <entry>
@@ -3269,27 +3302,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Webpack面试题（面试系列）</title>
-    <url>/posts/6706/</url>
-    <content><![CDATA[<p>下面的题目都摘自各种 webpack 面试相关的文章，我只选择了感觉很重要的一些题，想要了解更多，可以查看本文最后的参考链接。</p>
-<h2 id="webpack-有什么用"><a href="#webpack-有什么用" class="headerlink" title="webpack 有什么用"></a>webpack 有什么用</h2><ul>
-<li>静态资源的合并/打包/压缩</li>
-<li>解决加载慢，错综复杂的依赖关系</li>
-</ul>
-<h2 id="有哪些常见-loader-和-plugin，你用过哪些"><a href="#有哪些常见-loader-和-plugin，你用过哪些" class="headerlink" title="有哪些常见 loader 和 plugin，你用过哪些"></a>有哪些常见 loader 和 plugin，你用过哪些</h2><p>loader：</p>
-<ul>
-<li>css：postcss-l+autoprefixer，style-l(js 到</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>面试</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Xcode升级12编译报错The linked library is missing one or more architectures required by this target</title>
     <url>/posts/45158/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>升级 Xcode12 后编译报错，报错提示类似：</p>
@@ -3341,36 +3353,54 @@
       </tags>
   </entry>
   <entry>
-    <title>Xcode11手写代码入口启动黑屏解决方案</title>
-    <url>/posts/33273/</url>
-    <content><![CDATA[<p>环境：Xcode11</p>
-<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>用 Swift 编写后发现编译通过但启动黑屏。</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
-<li>Xcode11 默认是会创建通过 UIScene 管理多个 UIWindow 的应用，工程中除了 AppDelegate 外会多一个 SceneDelegate</li>
-<li>AppDelegate 和 SceneDelegate 这是 iPadOS 带来的新的多窗口支持的结果，并且有效地将应用程序委托的工作分成两部分</li>
+    <title>animation动画（二）</title>
+    <url>/posts/20298/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
 </ul>
+<p>老规矩，二系列来谈谈具体每个动画属性的含义和用法，算是一个对知识点的总结吧。</p>
+<h2 id="animation-name-动画名称"><a href="#animation-name-动画名称" class="headerlink" title="animation-name 动画名称"></a>animation-name 动画名称</h2><p>CSS语法：<code>animation-name: shrink</code></p>
+<p>用来设置元素的动画名称。</p>
 <a id="more"></a>
 
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
-<li>删除掉 info.plist 中 <code>Application Scene Manifest</code> 和 <code>Main storyboard file base name</code> 选项</li>
-</ol>
-<img src="/posts/33273/scene.png" class="" title="scene">
+<h2 id="animation-duration-持续时间"><a href="#animation-duration-持续时间" class="headerlink" title="animation-duration 持续时间"></a>animation-duration 持续时间</h2><p>CSS语法：<code>animation-duration: 1s</code></p>
+<p>用来指定动画在一个周期内所花费的时间。</p>
+<h2 id="animation-timing-function-运动曲线"><a href="#animation-timing-function-运动曲线" class="headerlink" title="animation-timing-function 运动曲线"></a>animation-timing-function 运动曲线</h2><p>CSS语法：<code>animation-timing-function: ease-in-out</code></p>
+<p>用来设置元素的动画速度曲线，它的用法和 <a href="https://evestorm.github.io/posts/13167/#transition-timing-function-%E6%95%88%E6%9E%9C%E6%9B%B2%E7%BA%BF">transition-timing-function</a> 类似，想要了解详情的直接点这个链接吧。</p>
+<blockquote>
+<p>DEMO</p>
+</blockquote>
+<iframe height="521" scrolling="no" title="animation-timing-function" src="https://codepen.io/JingW/embed/qwbVgB/?height=521&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
 
-<img src="/posts/33273/mainstoryboard.png" class="" title="mainstoryboard">
+<h2 id="animation-delay-动画延迟"><a href="#animation-delay-动画延迟" class="headerlink" title="animation-delay 动画延迟"></a>animation-delay 动画延迟</h2><p>CSS语法：<code>animation-delay: 1s</code></p>
+<p>用来设置动画延迟多少秒/毫秒后才开始执行。正值（例如2s）将在2s后启动动画；负值（例如-2s）将立即执行动画，但是动画会从它的动画序列中的第2s位置处立即开始。</p>
+<h2 id="animation-iteration-count-循环次数"><a href="#animation-iteration-count-循环次数" class="headerlink" title="animation-iteration-count 循环次数"></a>animation-iteration-count 循环次数</h2><p>CSS语法：<code>animation-iteration-count: 1s</code></p>
+<p>用来设置动画循环的次数，默认值是1，表示动画只播放一次。除了使用正整数来设置次数外，还可以将值设置为 <code>infinite</code> ，表示无限循环。</p>
+<h2 id="animation-direction-是否反向"><a href="#animation-direction-是否反向" class="headerlink" title="animation-direction 是否反向"></a>animation-direction 是否反向</h2><p>CSS语法：<code>animation-direction: normal | reverse | alternate | alternate-reverse</code></p>
+<p>用来设置动画在循环过程中是否反向运动，默认值为 <code>normal</code> ，即正常模式，动画会从第一帧播放到最后一帧；<code>reverse</code> 表示反向模式，动画会从最后一帧倒着播放到第一帧；<code>alternate</code> 设置动画先正向播放，第二次再从反向播放，交替进行，例如 animation 系列一中的案例；<code>alternate-reverse</code> 则是先让动画反向播放，第二次再正向播放，交替进行。</p>
+<h2 id="animation-fill-mode-动画填充模式"><a href="#animation-fill-mode-动画填充模式" class="headerlink" title="animation-fill-mode 动画填充模式"></a>animation-fill-mode 动画填充模式</h2><p>CSS语法：<code>animation-fill-mode: none | forwards | backwards | both</code></p>
+<p>用来指定在动画执行之前和之后如何给动画的目标应用样式。这个属性在我第一次接触时没太理解，直到我看了 <a href="https://segmentfault.com/">segmentfault</a> 上的 <a href="https://segmentfault.com/q/1010000003867335">这篇文章</a> 。</p>
+<p>在理解它之前，我们需要在脑海里有个概念，那就是一个动画是分为初始状态、等待期、动画执行期、完成期四个阶段的。而上面 animation-fill-mode 接收的四个值则分别对应：</p>
+<ul>
+<li>none 表示 等待期和完成期，元素样式都为初始状态样式，不受动画定义（@keyframes）的影响</li>
+<li>forwards 表示等待期保持初始样式，完成期间保持最后一帧样式</li>
+<li>backwards 表示等待期为第一帧样式，完成期跳转为初始样式</li>
+<li>both 表示 等待期样式为第一帧样式，完成期保持最后一帧样式</li>
+</ul>
+<p>单纯的文字不直观？相信下面的这个demo能让你豁然开朗：</p>
+<iframe height="435" scrolling="no" title="animation-fill-mode" src="https://codepen.io/JingW/embed/qwNLJE/?height=435&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
 
-<ol>
-<li>删除 <code>SceneDelegate.swift</code> 文件</li>
-<li>Appdelegate 新增 windows 属性</li>
-</ol>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span> </span>&#123;</span><br><span class="line">   <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions <span class="keyword">_</span>: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">      <span class="comment">// Override point for customization after application launch.</span></span><br><span class="line"></span><br><span class="line">      window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">      window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">      window?.makeKeyAndVisible()</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="animation-play-state-动画播放状态"><a href="#animation-play-state-动画播放状态" class="headerlink" title="animation-play-state 动画播放状态"></a>animation-play-state 动画播放状态</h2><p>CSS语法：<code>animation-play-state: running | paused</code></p>
+<p>用来设置动画的播放或者暂停。比如希望在鼠标经过的时候，让动画先停止下来，鼠标移开之后再继续播放，就可以通过设置 <code>.element:hover &#123; animation-play-state: paused; &#125;</code> 来实现。下面是一个案例，在鼠标移入时钟后指针暂停旋转；移出后时钟继续旋转。</p>
+<iframe height="339" scrolling="no" title="animation-play-state闹钟示例" src="https://codepen.io/JingW/embed/rbMWjB/?height=339&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
 ]]></content>
       <categories>
-        <category>移动端</category>
-        <category>iOS</category>
+        <category>前端</category>
+        <category>CSS</category>
       </categories>
       <tags>
-        <tag>iOS</tag>
-        <tag>Xcode</tag>
+        <tag>CSS3</tag>
       </tags>
   </entry>
   <entry>
@@ -3439,57 +3469,6 @@
 </ul>
 </li>
 </ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>animation动画（二）</title>
-    <url>/posts/20298/</url>
-    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
-<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
-<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
-</ul>
-<p>老规矩，二系列来谈谈具体每个动画属性的含义和用法，算是一个对知识点的总结吧。</p>
-<h2 id="animation-name-动画名称"><a href="#animation-name-动画名称" class="headerlink" title="animation-name 动画名称"></a>animation-name 动画名称</h2><p>CSS语法：<code>animation-name: shrink</code></p>
-<p>用来设置元素的动画名称。</p>
-<a id="more"></a>
-
-<h2 id="animation-duration-持续时间"><a href="#animation-duration-持续时间" class="headerlink" title="animation-duration 持续时间"></a>animation-duration 持续时间</h2><p>CSS语法：<code>animation-duration: 1s</code></p>
-<p>用来指定动画在一个周期内所花费的时间。</p>
-<h2 id="animation-timing-function-运动曲线"><a href="#animation-timing-function-运动曲线" class="headerlink" title="animation-timing-function 运动曲线"></a>animation-timing-function 运动曲线</h2><p>CSS语法：<code>animation-timing-function: ease-in-out</code></p>
-<p>用来设置元素的动画速度曲线，它的用法和 <a href="https://evestorm.github.io/posts/13167/#transition-timing-function-%E6%95%88%E6%9E%9C%E6%9B%B2%E7%BA%BF">transition-timing-function</a> 类似，想要了解详情的直接点这个链接吧。</p>
-<blockquote>
-<p>DEMO</p>
-</blockquote>
-<iframe height="521" scrolling="no" title="animation-timing-function" src="https://codepen.io/JingW/embed/qwbVgB/?height=521&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="animation-delay-动画延迟"><a href="#animation-delay-动画延迟" class="headerlink" title="animation-delay 动画延迟"></a>animation-delay 动画延迟</h2><p>CSS语法：<code>animation-delay: 1s</code></p>
-<p>用来设置动画延迟多少秒/毫秒后才开始执行。正值（例如2s）将在2s后启动动画；负值（例如-2s）将立即执行动画，但是动画会从它的动画序列中的第2s位置处立即开始。</p>
-<h2 id="animation-iteration-count-循环次数"><a href="#animation-iteration-count-循环次数" class="headerlink" title="animation-iteration-count 循环次数"></a>animation-iteration-count 循环次数</h2><p>CSS语法：<code>animation-iteration-count: 1s</code></p>
-<p>用来设置动画循环的次数，默认值是1，表示动画只播放一次。除了使用正整数来设置次数外，还可以将值设置为 <code>infinite</code> ，表示无限循环。</p>
-<h2 id="animation-direction-是否反向"><a href="#animation-direction-是否反向" class="headerlink" title="animation-direction 是否反向"></a>animation-direction 是否反向</h2><p>CSS语法：<code>animation-direction: normal | reverse | alternate | alternate-reverse</code></p>
-<p>用来设置动画在循环过程中是否反向运动，默认值为 <code>normal</code> ，即正常模式，动画会从第一帧播放到最后一帧；<code>reverse</code> 表示反向模式，动画会从最后一帧倒着播放到第一帧；<code>alternate</code> 设置动画先正向播放，第二次再从反向播放，交替进行，例如 animation 系列一中的案例；<code>alternate-reverse</code> 则是先让动画反向播放，第二次再正向播放，交替进行。</p>
-<h2 id="animation-fill-mode-动画填充模式"><a href="#animation-fill-mode-动画填充模式" class="headerlink" title="animation-fill-mode 动画填充模式"></a>animation-fill-mode 动画填充模式</h2><p>CSS语法：<code>animation-fill-mode: none | forwards | backwards | both</code></p>
-<p>用来指定在动画执行之前和之后如何给动画的目标应用样式。这个属性在我第一次接触时没太理解，直到我看了 <a href="https://segmentfault.com/">segmentfault</a> 上的 <a href="https://segmentfault.com/q/1010000003867335">这篇文章</a> 。</p>
-<p>在理解它之前，我们需要在脑海里有个概念，那就是一个动画是分为初始状态、等待期、动画执行期、完成期四个阶段的。而上面 animation-fill-mode 接收的四个值则分别对应：</p>
-<ul>
-<li>none 表示 等待期和完成期，元素样式都为初始状态样式，不受动画定义（@keyframes）的影响</li>
-<li>forwards 表示等待期保持初始样式，完成期间保持最后一帧样式</li>
-<li>backwards 表示等待期为第一帧样式，完成期跳转为初始样式</li>
-<li>both 表示 等待期样式为第一帧样式，完成期保持最后一帧样式</li>
-</ul>
-<p>单纯的文字不直观？相信下面的这个demo能让你豁然开朗：</p>
-<iframe height="435" scrolling="no" title="animation-fill-mode" src="https://codepen.io/JingW/embed/qwNLJE/?height=435&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="animation-play-state-动画播放状态"><a href="#animation-play-state-动画播放状态" class="headerlink" title="animation-play-state 动画播放状态"></a>animation-play-state 动画播放状态</h2><p>CSS语法：<code>animation-play-state: running | paused</code></p>
-<p>用来设置动画的播放或者暂停。比如希望在鼠标经过的时候，让动画先停止下来，鼠标移开之后再继续播放，就可以通过设置 <code>.element:hover &#123; animation-play-state: paused; &#125;</code> 来实现。下面是一个案例，在鼠标移入时钟后指针暂停旋转；移出后时钟继续旋转。</p>
-<iframe height="339" scrolling="no" title="animation-play-state闹钟示例" src="https://codepen.io/JingW/embed/rbMWjB/?height=339&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -3645,47 +3624,6 @@
       </tags>
   </entry>
   <entry>
-    <title>cookie与session区别</title>
-    <url>/posts/63891/</url>
-    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
-<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
-
-<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
-
-<a id="more"></a>
-
-<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
-<ul>
-<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
-<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
-</ul>
-<p>session机制：</p>
-<ul>
-<li>每次请求，服务器会检查是否有 sessionid<ul>
-<li>有，服务器根据 id 返回对应 session 对象</li>
-<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
-</ul>
-</li>
-<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
-<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
-</ul>
-</li>
-</ul>
-<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
-<li>cookie 只能保存字符串类型，以文本的方式</li>
-<li>session 能支持任何类型的对象</li>
-</ul>
-<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
-<li>cookie单个不超过4kb</li>
-<li>session没限制</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>css扩大元素点击区域</title>
     <url>/posts/1303/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>项目中遇到使用滑动条的地方，但设计稿上的按钮面积非常小，用户在手机上由于不容易精确触摸到按钮导致拖动滚动条困难：</p>
@@ -3766,6 +3704,68 @@
         <tag>Git</tag>
         <tag>笔记</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Webpack面试题（面试系列）</title>
+    <url>/posts/6706/</url>
+    <content><![CDATA[<p>下面的题目都摘自各种 webpack 面试相关的文章，我只选择了感觉很重要的一些题，想要了解更多，可以查看本文最后的参考链接。</p>
+<h2 id="webpack-有什么用"><a href="#webpack-有什么用" class="headerlink" title="webpack 有什么用"></a>webpack 有什么用</h2><ul>
+<li>静态资源的合并/打包/压缩</li>
+<li>解决加载慢，错综复杂的依赖关系</li>
+</ul>
+<h2 id="有哪些常见-loader-和-plugin，你用过哪些"><a href="#有哪些常见-loader-和-plugin，你用过哪些" class="headerlink" title="有哪些常见 loader 和 plugin，你用过哪些"></a>有哪些常见 loader 和 plugin，你用过哪些</h2><p>loader：</p>
+<ul>
+<li>css：postcss-l+autoprefixer，style-l(js 到</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>面试</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>cookie与session区别</title>
+    <url>/posts/63891/</url>
+    <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
+<img src="/posts/63891/1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png" class="" title="cookie">
+
+<img src="/posts/63891/1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png" class="" title="session">
+
+<a id="more"></a>
+
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>cookie机制：</p>
+<ul>
+<li>默认情况下，cookie 保存在内存中，<strong>浏览器关闭</strong>就没了；设置过期时间后，cookie 保存在硬盘上，关闭浏览器仍然存在，直到过期时间结束才消失。</li>
+<li>cookie 以<strong>文本形式</strong>保存在客户端，每次请求时都带上它。</li>
+</ul>
+<p>session机制：</p>
+<ul>
+<li>每次请求，服务器会检查是否有 sessionid<ul>
+<li>有，服务器根据 id 返回对应 session 对象</li>
+<li>无，服务器创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。</li>
+</ul>
+</li>
+<li>通常使用 cookie 方式存储 sessionid 到客户端<ul>
+<li>用户禁用 cookie 时，则服务端可以使用URL重写，可以通过 response.encodeURL(url) 进行实现</li>
+</ul>
+</li>
+</ul>
+<h2 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h2><ul>
+<li>cookie 只能保存字符串类型，以文本的方式</li>
+<li>session 能支持任何类型的对象</li>
+</ul>
+<h2 id="存储大小"><a href="#存储大小" class="headerlink" title="存储大小"></a>存储大小</h2><ul>
+<li>cookie单个不超过4kb</li>
+<li>session没限制</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
   </entry>
   <entry>
     <title>iOS13.4+版本h5拍照图片旋转问题的解决方案</title>
@@ -4333,6 +4333,21 @@
       </tags>
   </entry>
   <entry>
+    <title>swift5获取remoteNotification</title>
+    <url>/posts/23085/</url>
+    <content><![CDATA[<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> userInfo = launchOptions?[<span class="type">UIApplication</span>.<span class="type">LaunchOptionsKey</span>.remoteNotification] <span class="keyword">as</span>? [<span class="type">AnyHashable</span>: <span class="type">Any</span>]</span><br><span class="line"><span class="keyword">if</span> userInfo != <span class="literal">nil</span> &#123;</span><br><span class="line">   <span class="type">JPUSHService</span>.handleRemoteNotification(userInfo)</span><br><span class="line">   <span class="keyword">let</span> notification = <span class="type">NSNotification</span>.<span class="type">Name</span>(rawValue: <span class="string">&quot;jpush&quot;</span>)</span><br><span class="line">   <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.post(name: notification, object: <span class="literal">nil</span>, userInfo: userInfo)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>来源：<a href="https://stackoverflow.com/questions/40209234/how-to-handle-launch-options-in-swift-3-when-a-notification-is-tapped-getting-s">https://stackoverflow.com/questions/40209234/how-to-handle-launch-options-in-swift-3-when-a-notification-is-tapped-getting-s</a></p>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>select标签样式调整技巧</title>
     <url>/posts/46310/</url>
     <content><![CDATA[<h2 id="重置丑陋样式"><a href="#重置丑陋样式" class="headerlink" title="重置丑陋样式"></a>重置丑陋样式</h2><p>项目中使用到了 select 标签，但在 Android 和 iOS 上默认展示的效果都很丑而且不一致，网上搜到一个 css 样式可以重置效果，这里记下笔记：</p>
@@ -4368,21 +4383,6 @@
       <tags>
         <tag>技巧</tag>
         <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>swift5获取remoteNotification</title>
-    <url>/posts/23085/</url>
-    <content><![CDATA[<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> userInfo = launchOptions?[<span class="type">UIApplication</span>.<span class="type">LaunchOptionsKey</span>.remoteNotification] <span class="keyword">as</span>? [<span class="type">AnyHashable</span>: <span class="type">Any</span>]</span><br><span class="line"><span class="keyword">if</span> userInfo != <span class="literal">nil</span> &#123;</span><br><span class="line">   <span class="type">JPUSHService</span>.handleRemoteNotification(userInfo)</span><br><span class="line">   <span class="keyword">let</span> notification = <span class="type">NSNotification</span>.<span class="type">Name</span>(rawValue: <span class="string">&quot;jpush&quot;</span>)</span><br><span class="line">   <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.post(name: notification, object: <span class="literal">nil</span>, userInfo: userInfo)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>来源：<a href="https://stackoverflow.com/questions/40209234/how-to-handle-launch-options-in-swift-3-when-a-notification-is-tapped-getting-s">https://stackoverflow.com/questions/40209234/how-to-handle-launch-options-in-swift-3-when-a-notification-is-tapped-getting-s</a></p>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -4623,6 +4623,34 @@
       </tags>
   </entry>
   <entry>
+    <title>ubuntu下开启/关闭防火墙及端口的命令(笔记)</title>
+    <url>/posts/60660/</url>
+    <content><![CDATA[<h2 id="开启防火墙"><a href="#开启防火墙" class="headerlink" title="开启防火墙"></a>开启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw enable</span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw disable</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw reload</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看端口开启状态"><a href="#查看端口开启状态" class="headerlink" title="查看端口开启状态"></a>查看端口开启状态</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
+
+<h2 id="开启某个端口"><a href="#开启某个端口" class="headerlink" title="开启某个端口"></a>开启某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw allow 8001/tcp</span><br></pre></td></tr></table></figure>
+
+<h2 id="禁止外部某个端口"><a href="#禁止外部某个端口" class="headerlink" title="禁止外部某个端口"></a>禁止外部某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw delete allow 8001/tcp</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看端口-ip"><a href="#查看端口-ip" class="headerlink" title="查看端口 ip"></a>查看端口 ip</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">netstat -ltn</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>服务器</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ubuntu下nginx基本使用</title>
     <url>/posts/36876/</url>
     <content><![CDATA[<h2 id="安装-Nginx"><a href="#安装-Nginx" class="headerlink" title="安装 Nginx"></a>安装 Nginx</h2><p>终端键入以下命令：</p>
@@ -4732,36 +4760,8 @@
       </categories>
       <tags>
         <tag>笔记</tag>
+        <tag>Ubuntu</tag>
         <tag>Nginx</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ubuntu下开启/关闭防火墙及端口的命令(笔记)</title>
-    <url>/posts/60660/</url>
-    <content><![CDATA[<h2 id="开启防火墙"><a href="#开启防火墙" class="headerlink" title="开启防火墙"></a>开启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw enable</span><br></pre></td></tr></table></figure>
-
-<h2 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw disable</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw reload</span><br></pre></td></tr></table></figure>
-
-<h2 id="查看端口开启状态"><a href="#查看端口开启状态" class="headerlink" title="查看端口开启状态"></a>查看端口开启状态</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
-
-<h2 id="开启某个端口"><a href="#开启某个端口" class="headerlink" title="开启某个端口"></a>开启某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw allow 8001/tcp</span><br></pre></td></tr></table></figure>
-
-<h2 id="禁止外部某个端口"><a href="#禁止外部某个端口" class="headerlink" title="禁止外部某个端口"></a>禁止外部某个端口</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw delete allow 8001/tcp</span><br></pre></td></tr></table></figure>
-
-<h2 id="查看端口-ip"><a href="#查看端口-ip" class="headerlink" title="查看端口 ip"></a>查看端口 ip</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">netstat -ltn</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>服务器</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -4802,6 +4802,21 @@
 <h3 id="获取当前定位信息"><a href="#获取当前定位信息" class="headerlink" title="获取当前定位信息"></a>获取当前定位信息</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">this</span>.myAmapFun.getRegeo(&#123;</span><br><span class="line">  citylimit: <span class="literal">true</span>, <span class="comment">//仅返回指定城市数据</span></span><br><span class="line">  success: <span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res[<span class="number">0</span>].regeocodeData.addressComponent); <span class="comment">// 获取当前位置提示信息</span></span><br><span class="line">    <span class="built_in">console</span>.log(res[<span class="number">0</span>].regeocodeData.pois); <span class="comment">//获取的周边提示信息</span></span><br><span class="line">  &#125;,</span><br><span class="line">  fail: <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    uni.showToast(&#123;</span><br><span class="line">      title: <span class="string">&#x27;获取当前定位失败,请手动输入查询&#x27;</span>,</span><br><span class="line">      icon: <span class="string">&#x27;none&#x27;</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <h3 id="通过输入词，查询周边地址"><a href="#通过输入词，查询周边地址" class="headerlink" title="通过输入词，查询周边地址"></a>通过输入词，查询周边地址</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">myAmapFun.getInputtips(&#123;</span><br><span class="line">  keywords: <span class="string">&#x27;&#x27;</span>, <span class="comment">//输入的words</span></span><br><span class="line">  city: <span class="built_in">this</span>.addressData.cityName, <span class="comment">//指定城市数据</span></span><br><span class="line">  extensions: <span class="string">&#x27;all&#x27;</span>, <span class="comment">//返回地址描述以及附近兴趣点和道路信息，默认&quot;base&quot;</span></span><br><span class="line">  success: <span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (res &amp;&amp; res.tips) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(res);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>uniapp</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>uniapp-全局变量四种方式</title>
+    <url>/posts/61889/</url>
+    <content><![CDATA[<p><a href="https://uniapp.dcloud.io/collocation/frame/window?id=getapp">https://uniapp.dcloud.io/collocation/frame/window?id=getapp</a></p>
+<p><a href="https://ask.dcloud.net.cn/article/35021">https://ask.dcloud.net.cn/article/35021</a></p>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -4912,21 +4927,6 @@
       </tags>
   </entry>
   <entry>
-    <title>uniapp-全局变量四种方式</title>
-    <url>/posts/61889/</url>
-    <content><![CDATA[<p><a href="https://uniapp.dcloud.io/collocation/frame/window?id=getapp">https://uniapp.dcloud.io/collocation/frame/window?id=getapp</a></p>
-<p><a href="https://ask.dcloud.net.cn/article/35021">https://ask.dcloud.net.cn/article/35021</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>uniapp</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>uniapp路由拦截配置</title>
     <url>/posts/30988/</url>
     <content><![CDATA[<p>项目的百度埋点需要做路由拦截，找了个路由插件 <code>uni-simple-router</code> 。下面是按照和基本使用步骤：</p>
@@ -4960,6 +4960,41 @@
       </categories>
       <tags>
         <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vscode自定义snippet片段</title>
+    <url>/posts/17235/</url>
+    <content><![CDATA[<p>最近我有个需求，想要在 github 上使用 markdown 语法时居中图片，然而搜了几种办法都无效，最后在 <a href="https://gist.github.com/DavidWells/7d2e0e1bc78f4ac59a123ddf8b74932d">DavidWells 的 gist</a> 中找到了答案（p.s. 如果无法翻墙，你还可以参考 <a href="https://blog.csdn.net/jingbin_/article/details/52960826">这篇博客</a>）</p>
+<p>解决了一个问题又出现了另一个，其实我已经把博客写完了，但其中需要居中的图片比较多，而居中代码还比较繁琐，要是一个个手动替换也太麻烦了。然后就想到了使用 snippet ，官网教程在这里：<a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets">Creating your own snippets</a></p>
+<a id="more"></a>
+
+<p>具体该如何实现呢：</p>
+<ol>
+<li><p>Code → 首选项 → 用户代码片段</p>
+</li>
+<li><p>在弹出的下拉列表中输入你想要在哪种文件中使用这种片段（例如我只希望在 markdown 文件中使用，就键入 markdown）</p>
+</li>
+<li><p>此时 vs code 就会帮我们自动新建一个名为 markdown.json 的文件，我们在这个 json 文件中定义我们的代码片段就好了</p>
+</li>
+<li><p>接着我们进入该文件，编写 snippet 配置：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;Img centered&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prefix&quot;</span>: <span class="string">&quot;mimg&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;body&quot;</span>: [</span><br><span class="line">      <span class="string">&quot;&lt;div align=center&gt;&quot;</span>,</span><br><span class="line">      <span class="string">&quot;\t&lt;img src=&#x27;$1&#x27; alt=&#x27;$2&#x27; width=&#x27;$3&#x27;&gt;&quot;</span>,</span><br><span class="line">      <span class="string">&quot;&lt;/div&gt;&quot;</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Centered image in markdown&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然而当我保存后在 md 文件中使用时，按下 tab 并没有效果，经过阅读官方文档，发现有这样一句话：<code>Enable it with &quot;editor.tabCompletion&quot;: &quot;on&quot;, type a snippet prefix, and press Tab to insert a snippet.</code></p>
+</li>
+<li><p>所以你还需要进入 首选项 → 设置 ，在顶部输入框键入 <code>editor.tabCompletion</code> 来搜索此配置，将 <code>off</code> 改为 <code>on</code> 就 OK 了</p>
+</li>
+<li><p>现在大功告成，在 md 文件中，键入 mimg 后按下 tab 键，先前写好的 snippet 就能够使用了</p>
+</li>
+</ol>
+<p>结语：关于 vs code 的 snippet 片段，网上非常多教程，大家自行搜索就好，这篇笔记的重点是上方第 6 步把 <code>editor.tabCompletion</code> 改为 <code>on</code> 。这一步至关重要，不修改会导致你以为自己的 snippet 设置没生效。</p>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -5055,6 +5090,38 @@
       </tags>
   </entry>
   <entry>
+    <title>vue项目如何动态配置后端api地址</title>
+    <url>/posts/47242/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
+<a id="more"></a>
+
+<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>vue-cli</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue项目中枚举值统一维护管理</title>
     <url>/posts/56971/</url>
     <content><![CDATA[<p>转载自：<a href="https://www.jianshu.com/p/75516ec4f366">https://www.jianshu.com/p/75516ec4f366</a></p>
@@ -5086,38 +5153,6 @@
         <tag>技巧</tag>
         <tag>Vue</tag>
         <tag>枚举</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vue项目如何动态配置后端api地址</title>
-    <url>/posts/47242/</url>
-    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
-<a id="more"></a>
-
-<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>vue.config.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
-<p>vue.config.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>vue-cli</tag>
       </tags>
   </entry>
   <entry>
@@ -5366,7 +5401,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#x67;&#105;&#116;&#x40;&#103;&#x69;&#116;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#x6d;">&#x67;&#105;&#116;&#x40;&#103;&#x69;&#116;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#103;&#105;&#x74;&#64;&#103;&#105;&#116;&#x68;&#117;&#x62;&#x2e;&#99;&#111;&#x6d;">&#103;&#105;&#x74;&#64;&#103;&#105;&#116;&#x68;&#117;&#x62;&#x2e;&#99;&#111;&#x6d;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -5392,7 +5427,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#105;&#x74;&#x40;&#x67;&#105;&#x74;&#x68;&#x75;&#x62;&#x2e;&#x63;&#111;&#109;">&#103;&#105;&#x74;&#x40;&#x67;&#105;&#x74;&#x68;&#x75;&#x62;&#x2e;&#x63;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#x74;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#99;&#x6f;&#109;">&#x67;&#105;&#x74;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#99;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -5595,41 +5630,6 @@
       </categories>
       <tags>
         <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vscode自定义snippet片段</title>
-    <url>/posts/17235/</url>
-    <content><![CDATA[<p>最近我有个需求，想要在 github 上使用 markdown 语法时居中图片，然而搜了几种办法都无效，最后在 <a href="https://gist.github.com/DavidWells/7d2e0e1bc78f4ac59a123ddf8b74932d">DavidWells 的 gist</a> 中找到了答案（p.s. 如果无法翻墙，你还可以参考 <a href="https://blog.csdn.net/jingbin_/article/details/52960826">这篇博客</a>）</p>
-<p>解决了一个问题又出现了另一个，其实我已经把博客写完了，但其中需要居中的图片比较多，而居中代码还比较繁琐，要是一个个手动替换也太麻烦了。然后就想到了使用 snippet ，官网教程在这里：<a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets">Creating your own snippets</a></p>
-<a id="more"></a>
-
-<p>具体该如何实现呢：</p>
-<ol>
-<li><p>Code → 首选项 → 用户代码片段</p>
-</li>
-<li><p>在弹出的下拉列表中输入你想要在哪种文件中使用这种片段（例如我只希望在 markdown 文件中使用，就键入 markdown）</p>
-</li>
-<li><p>此时 vs code 就会帮我们自动新建一个名为 markdown.json 的文件，我们在这个 json 文件中定义我们的代码片段就好了</p>
-</li>
-<li><p>接着我们进入该文件，编写 snippet 配置：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;Img centered&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;prefix&quot;</span>: <span class="string">&quot;mimg&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;body&quot;</span>: [</span><br><span class="line">      <span class="string">&quot;&lt;div align=center&gt;&quot;</span>,</span><br><span class="line">      <span class="string">&quot;\t&lt;img src=&#x27;$1&#x27; alt=&#x27;$2&#x27; width=&#x27;$3&#x27;&gt;&quot;</span>,</span><br><span class="line">      <span class="string">&quot;&lt;/div&gt;&quot;</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Centered image in markdown&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>然而当我保存后在 md 文件中使用时，按下 tab 并没有效果，经过阅读官方文档，发现有这样一句话：<code>Enable it with &quot;editor.tabCompletion&quot;: &quot;on&quot;, type a snippet prefix, and press Tab to insert a snippet.</code></p>
-</li>
-<li><p>所以你还需要进入 首选项 → 设置 ，在顶部输入框键入 <code>editor.tabCompletion</code> 来搜索此配置，将 <code>off</code> 改为 <code>on</code> 就 OK 了</p>
-</li>
-<li><p>现在大功告成，在 md 文件中，键入 mimg 后按下 tab 键，先前写好的 snippet 就能够使用了</p>
-</li>
-</ol>
-<p>结语：关于 vs code 的 snippet 片段，网上非常多教程，大家自行搜索就好，这篇笔记的重点是上方第 6 步把 <code>editor.tabCompletion</code> 改为 <code>on</code> 。这一步至关重要，不修改会导致你以为自己的 snippet 设置没生效。</p>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -6100,36 +6100,6 @@
       </tags>
   </entry>
   <entry>
-    <title>两栏布局方案汇总</title>
-    <url>/posts/44541/</url>
-    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
-<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<a id="more"></a>
-
-<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
-<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>不常用css样式总结</title>
     <url>/posts/10974/</url>
     <content><![CDATA[<h2 id="设置-input-的-placeholder-的字体样式"><a href="#设置-input-的-placeholder-的字体样式" class="headerlink" title="设置 input 的 placeholder 的字体样式"></a>设置 input 的 placeholder 的字体样式</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">input</span><span class="selector-pseudo">::-webkit-input-placeholder</span> &#123;</span><br><span class="line">  <span class="comment">/* Chrome/Opera/Safari */</span></span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">input</span><span class="selector-pseudo">::-moz-placeholder</span> &#123;</span><br><span class="line">  <span class="comment">/* Firefox 19+ */</span></span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">input</span><span class="selector-pseudo">:-ms-input-placeholder</span> &#123;</span><br><span class="line">  <span class="comment">/* IE 10+ */</span></span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">input</span><span class="selector-pseudo">:-moz-placeholder</span> &#123;</span><br><span class="line">  <span class="comment">/* Firefox 18- */</span></span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -6161,6 +6131,36 @@
       <tags>
         <tag>技巧</tag>
         <tag>CSS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>两栏布局方案汇总</title>
+    <url>/posts/44541/</url>
+    <content><![CDATA[<p>记录下常见的两栏布局方式。</p>
+<h2 id="左边定宽，右边自适应"><a href="#左边定宽，右边自适应" class="headerlink" title="左边定宽，右边自适应"></a>左边定宽，右边自适应</h2><h3 id="模拟table"><a href="#模拟table" class="headerlink" title="模拟table"></a>模拟table</h3><p>父元素 <code>display: table</code> ，子元素左右 <code>table-cell</code> ，左边定宽。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）模拟table" src="https://codepen.io/JingW/embed/zbWYMO/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<h3 id="左浮-右Margin"><a href="#左浮-右Margin" class="headerlink" title="左浮 + 右Margin"></a>左浮 + 右Margin</h3><p>子元素的左边浮动脱标，右边设置 <code>margin-left: 左边元素宽度</code></p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子元素绝对定位" src="https://codepen.io/JingW/embed/bZvGRY/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="左浮-右BFC"><a href="#左浮-右BFC" class="headerlink" title="左浮 + 右BFC"></a>左浮 + 右BFC</h3><p>子元素左边设置浮动+定宽，右边子元素设置 <code>overflow: hidden</code> 触发自身BFC</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）左浮 + 右BFC" src="https://codepen.io/JingW/embed/rRdNYR/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="子绝父相"><a href="#子绝父相" class="headerlink" title="子绝父相"></a>子绝父相</h3><p>子绝父相，左边 <code>top, left: 0</code>，右边 <code>top, right: 0</code>，left等于左边宽度。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）子绝父相" src="https://codepen.io/JingW/embed/gEeONo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="flex布局"><a href="#flex布局" class="headerlink" title="flex布局"></a>flex布局</h3><p>父元素 <code>display: flex</code> ，左边定宽，右边 <code>flex: 1</code>。</p>
+<iframe height="460" scrolling="no" title="两栏布局（左定右自适应）flex" src="https://codepen.io/JingW/embed/bZvNGx/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -7384,34 +7384,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>安卓模拟器跑不了项目</title>
-    <url>/posts/56861/</url>
-    <content><![CDATA[<p>下了个 Android Studio 准备跑 App，但发现 run 之后只启动了模拟器却并没有安装上 App 。后来发现选择模拟器设备一栏显示如图所示文字：</p>
-<img src="/posts/56861/x86_not_support.png" class="" title="x86_not_support">
-
-<p>网上搜了下上图红框内容，找到了解决方案：</p>
-<p><a href="https://stackoverflow.com/questions/41775988/what-is-the-reason-for-the-error-device-supports-x86-but-apk-only-supports-arm">https://stackoverflow.com/questions/41775988/what-is-the-reason-for-the-error-device-supports-x86-but-apk-only-supports-arm</a></p>
-<p>在项目中找到对应注释代码：</p>
-<img src="/posts/56861/comment_x86.png" class="" title="comment_x86">
-
-<p>解开注释：</p>
-<img src="/posts/56861/support_x86.png" class="" title="support_x86">
-
-<p>然后重新编译下就好了：</p>
-<img src="/posts/56861/rebuild.png" class="" title="rebuild">
-
-<p>最后点击运行就能把 app 跑到模拟器上了：</p>
-<img src="/posts/56861/x86_disappear.png" class="" title="x86_disappear">
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>宏任务&amp;微任务</title>
     <url>/posts/20664/</url>
     <content><![CDATA[<h2 id="先-Mark-一下，抽空再写…"><a href="#先-Mark-一下，抽空再写…" class="headerlink" title="先 Mark 一下，抽空再写…"></a>先 Mark 一下，抽空再写…</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;sync1&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeout1&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;setTimeoutPromise&#x27;</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;promise&#x27;</span>);</span><br><span class="line">  resolve();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">promise.then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;pro_then&#x27;</span>);</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;pro_timeout&#x27;</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;last_setTimeout&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;sync2&#x27;</span>);</span><br></pre></td></tr></table></figure>
@@ -7453,6 +7425,34 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
+    <title>安卓模拟器跑不了项目</title>
+    <url>/posts/56861/</url>
+    <content><![CDATA[<p>下了个 Android Studio 准备跑 App，但发现 run 之后只启动了模拟器却并没有安装上 App 。后来发现选择模拟器设备一栏显示如图所示文字：</p>
+<img src="/posts/56861/x86_not_support.png" class="" title="x86_not_support">
+
+<p>网上搜了下上图红框内容，找到了解决方案：</p>
+<p><a href="https://stackoverflow.com/questions/41775988/what-is-the-reason-for-the-error-device-supports-x86-but-apk-only-supports-arm">https://stackoverflow.com/questions/41775988/what-is-the-reason-for-the-error-device-supports-x86-but-apk-only-supports-arm</a></p>
+<p>在项目中找到对应注释代码：</p>
+<img src="/posts/56861/comment_x86.png" class="" title="comment_x86">
+
+<p>解开注释：</p>
+<img src="/posts/56861/support_x86.png" class="" title="support_x86">
+
+<p>然后重新编译下就好了：</p>
+<img src="/posts/56861/rebuild.png" class="" title="rebuild">
+
+<p>最后点击运行就能把 app 跑到模拟器上了：</p>
+<img src="/posts/56861/x86_disappear.png" class="" title="x86_disappear">
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>对this指向的判定</title>
     <url>/posts/33207/</url>
     <content><![CDATA[<h2 id="对-this-的理解"><a href="#对-this-的理解" class="headerlink" title="对 this 的理解"></a>对 this 的理解</h2><p>对于this指向的判定，时刻记住下面两点就好：</p>
@@ -7483,52 +7483,6 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>this</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>小程序formId获取</title>
-    <url>/posts/35316/</url>
-    <content><![CDATA[<img src="/posts/35316/pushmessage.jpeg" class="" title="效果截图">
-
-<h2 id="1-什么是-formId"><a href="#1-什么是-formId" class="headerlink" title="1. 什么是 formId"></a>1. 什么是 formId</h2><p><code>formId</code> 是小程序可以向用户发送模板消息的通行证，简单而言，你只有获取到 <code>formId</code>，把它交给后台，后台同学才能向用户发送通知消息，而这个通行证的有效期只有七天。这是微信为了防止小程序滥用通知消息骚扰用户而提出的一种策略。</p>
-<h2 id="2-formId-的获取"><a href="#2-formId-的获取" class="headerlink" title="2. formId 的获取"></a>2. formId 的获取</h2><p>小程序的 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html">模板消息文档</a> 中说，获取 <code>formId</code> 有以下两种途径：</p>
-<ul>
-<li>支付</li>
-<li>提交表单</li>
-</ul>
-<p>用户支付一次，能获取 3 个 <code>formId</code>，用户提交表单一次可得到一个 <code>formId</code> 。如果小程序中没有支付行为，但又有需要向用户发送消息的需求，这个时候就只能依靠提交表单了。</p>
-<h3 id="2-1-下发条件说明"><a href="#2-1-下发条件说明" class="headerlink" title="2. 1 下发条件说明"></a>2. 1 下发条件说明</h3><p>以下摘自 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html#%E4%B8%8B%E5%8F%91%E6%9D%A1%E4%BB%B6%E8%AF%B4%E6%98%8E">模板消息文档 - 下发条件说明</a></p>
-<h4 id="2-1-1-支付"><a href="#2-1-1-支付" class="headerlink" title="2.1.1 支付"></a>2.1.1 支付</h4><p>当用户在小程序内完成过支付行为，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次支付可下发 3 条，多次支付下发条数独立，互相不影响）</p>
-<h4 id="2-1-2-提交表单"><a href="#2-1-2-提交表单" class="headerlink" title="2.1.2 提交表单"></a>2.1.2 提交表单</h4><p>当用户在小程序内发生过提交表单行为且该表单声明为要发模板消息的，开发者需要向用户提供服务时，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次提交表单可下发 1 条，多次提交下发条数独立，相互不影响）</p>
-<h3 id="2-2-代码示例"><a href="#2-2-代码示例" class="headerlink" title="2.2 代码示例"></a>2.2 代码示例</h3><p>获取 <code>formId</code> 必须使用小程序/uni-app 的 <code>form</code> 组件，它本身有个属性叫 <code>report-submit</code> ，当在标签中加入这个属性时，一旦表单提交，<code>submit</code> 回调中就可以拿到 <code>formId</code> 了。</p>
-<blockquote>
-<p>html</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 微信小程序代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">bindsubmit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">formType</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>Submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- uni-app 代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">:report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">form-type</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>提交表单<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  // formSubmit 为提交事件触发的自定义方法</span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">formSubmit: <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获取表单id</span></span><br><span class="line">  <span class="keyword">const</span> formId = e.detail.formId;</span><br><span class="line">  <span class="comment">// 非真机运行时 formId 应该为 &#x27;the formId is a mock one&#x27;</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;表单id:&#x27;</span>, formId);</span><br><span class="line">  <span class="comment">// 获取后可通过异步请求将 formId 传递给后端</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>重要：</strong></p>
-<p>在微信开发者工具中运行获取的 <code>formId</code> 为 <code>the formId is a mock one</code> ，要获得真实有效的 <code>formId</code> 需要在真机上运行。</p>
-<h3 id="2-3-获取尽可能多的-formId"><a href="#2-3-获取尽可能多的-formId" class="headerlink" title="2.3 获取尽可能多的 formId"></a>2.3 获取尽可能多的 formId</h3><p>从运营的角度而言，<code>formId</code> 肯定是越多越好。所以每一个页面上用户的每一次点击我们都巴不得触发一次表单提交。哪怕从界面上讲，这次点击可能是跳转，弹窗的功能，跟表单完全无关，都要把 <code>button</code> 放在一个 <code>form</code> 中。但是这样无疑增加了前端的工作量，因为需要为每个页面的 <code>submit</code> 事件绑定一个上传 <code>formId</code> 的方法。一个可行的方法是借助 <code>vue</code> 的 <code>mixin</code>，为每一个页面实例混入一个上传 <code>formId</code> 的方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// app.js</span></span><br><span class="line">Vue.mixin(&#123;</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">uploadFormId</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.req(&#123;</span><br><span class="line">        url: <span class="string">&#x27;/api/v1/formid?formId=&#x27;</span> + e.target.formId</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>另外一个方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_collectWeChatFormId</span>(<span class="params">formId</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> token = wx.getStorageSync(<span class="string">&#x27;token_/cookies&#x27;</span>),</span><br><span class="line">    openId = wx.getStorageSync(<span class="string">&#x27;openid_cookies&#x27;</span>),</span><br><span class="line">    orign = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;formId&#x27;</span>, formId);</span><br><span class="line">  <span class="keyword">if</span> (formId == <span class="string">&#x27;the formId is a mock one&#x27;</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`模拟器中运行！`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (formId.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`formId不能为空`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> site = <span class="string">&#x27;你的收集接口&#x27;</span>,</span><br><span class="line">    dates = &#123;</span><br><span class="line">      token: token,</span><br><span class="line">      openId: openId,</span><br><span class="line">      formId: formId,</span><br><span class="line">      orign: orign</span><br><span class="line">    &#125;,</span><br><span class="line">    md =</span><br><span class="line">      <span class="string">&#x27;token=&#x27;</span> +</span><br><span class="line">      token +</span><br><span class="line">      <span class="string">&#x27;&amp;openId=&#x27;</span> +</span><br><span class="line">      openId +</span><br><span class="line">      <span class="string">&#x27;&amp;formId=&#x27;</span> +</span><br><span class="line">      formId +</span><br><span class="line">      <span class="string">&#x27;&amp;orign=&#x27;</span> +</span><br><span class="line">      orign;</span><br><span class="line">  requestHttp(site, dates, md, <span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">    <span class="built_in">console</span>.log(res.data);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-小程序模板消息接口更新"><a href="#3-小程序模板消息接口更新" class="headerlink" title="3. 小程序模板消息接口更新"></a>3. 小程序模板消息接口更新</h2><p>请注意，小程序模板消息接口将于 2020 年 1 月 10 日下线，开发者可使用<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html">订阅消息功能</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>移动端</category>
-        <category>小程序</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-        <tag>小程序</tag>
       </tags>
   </entry>
   <entry>
@@ -7583,6 +7537,100 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>闭包</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>小程序formId获取</title>
+    <url>/posts/35316/</url>
+    <content><![CDATA[<img src="/posts/35316/pushmessage.jpeg" class="" title="效果截图">
+
+<h2 id="1-什么是-formId"><a href="#1-什么是-formId" class="headerlink" title="1. 什么是 formId"></a>1. 什么是 formId</h2><p><code>formId</code> 是小程序可以向用户发送模板消息的通行证，简单而言，你只有获取到 <code>formId</code>，把它交给后台，后台同学才能向用户发送通知消息，而这个通行证的有效期只有七天。这是微信为了防止小程序滥用通知消息骚扰用户而提出的一种策略。</p>
+<h2 id="2-formId-的获取"><a href="#2-formId-的获取" class="headerlink" title="2. formId 的获取"></a>2. formId 的获取</h2><p>小程序的 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html">模板消息文档</a> 中说，获取 <code>formId</code> 有以下两种途径：</p>
+<ul>
+<li>支付</li>
+<li>提交表单</li>
+</ul>
+<p>用户支付一次，能获取 3 个 <code>formId</code>，用户提交表单一次可得到一个 <code>formId</code> 。如果小程序中没有支付行为，但又有需要向用户发送消息的需求，这个时候就只能依靠提交表单了。</p>
+<h3 id="2-1-下发条件说明"><a href="#2-1-下发条件说明" class="headerlink" title="2. 1 下发条件说明"></a>2. 1 下发条件说明</h3><p>以下摘自 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html#%E4%B8%8B%E5%8F%91%E6%9D%A1%E4%BB%B6%E8%AF%B4%E6%98%8E">模板消息文档 - 下发条件说明</a></p>
+<h4 id="2-1-1-支付"><a href="#2-1-1-支付" class="headerlink" title="2.1.1 支付"></a>2.1.1 支付</h4><p>当用户在小程序内完成过支付行为，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次支付可下发 3 条，多次支付下发条数独立，互相不影响）</p>
+<h4 id="2-1-2-提交表单"><a href="#2-1-2-提交表单" class="headerlink" title="2.1.2 提交表单"></a>2.1.2 提交表单</h4><p>当用户在小程序内发生过提交表单行为且该表单声明为要发模板消息的，开发者需要向用户提供服务时，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次提交表单可下发 1 条，多次提交下发条数独立，相互不影响）</p>
+<h3 id="2-2-代码示例"><a href="#2-2-代码示例" class="headerlink" title="2.2 代码示例"></a>2.2 代码示例</h3><p>获取 <code>formId</code> 必须使用小程序/uni-app 的 <code>form</code> 组件，它本身有个属性叫 <code>report-submit</code> ，当在标签中加入这个属性时，一旦表单提交，<code>submit</code> 回调中就可以拿到 <code>formId</code> 了。</p>
+<blockquote>
+<p>html</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 微信小程序代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">bindsubmit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">formType</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>Submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- uni-app 代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">:report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">form-type</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>提交表单<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  // formSubmit 为提交事件触发的自定义方法</span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">formSubmit: <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获取表单id</span></span><br><span class="line">  <span class="keyword">const</span> formId = e.detail.formId;</span><br><span class="line">  <span class="comment">// 非真机运行时 formId 应该为 &#x27;the formId is a mock one&#x27;</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;表单id:&#x27;</span>, formId);</span><br><span class="line">  <span class="comment">// 获取后可通过异步请求将 formId 传递给后端</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重要：</strong></p>
+<p>在微信开发者工具中运行获取的 <code>formId</code> 为 <code>the formId is a mock one</code> ，要获得真实有效的 <code>formId</code> 需要在真机上运行。</p>
+<h3 id="2-3-获取尽可能多的-formId"><a href="#2-3-获取尽可能多的-formId" class="headerlink" title="2.3 获取尽可能多的 formId"></a>2.3 获取尽可能多的 formId</h3><p>从运营的角度而言，<code>formId</code> 肯定是越多越好。所以每一个页面上用户的每一次点击我们都巴不得触发一次表单提交。哪怕从界面上讲，这次点击可能是跳转，弹窗的功能，跟表单完全无关，都要把 <code>button</code> 放在一个 <code>form</code> 中。但是这样无疑增加了前端的工作量，因为需要为每个页面的 <code>submit</code> 事件绑定一个上传 <code>formId</code> 的方法。一个可行的方法是借助 <code>vue</code> 的 <code>mixin</code>，为每一个页面实例混入一个上传 <code>formId</code> 的方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// app.js</span></span><br><span class="line">Vue.mixin(&#123;</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">uploadFormId</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.req(&#123;</span><br><span class="line">        url: <span class="string">&#x27;/api/v1/formid?formId=&#x27;</span> + e.target.formId</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>另外一个方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_collectWeChatFormId</span>(<span class="params">formId</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> token = wx.getStorageSync(<span class="string">&#x27;token_/cookies&#x27;</span>),</span><br><span class="line">    openId = wx.getStorageSync(<span class="string">&#x27;openid_cookies&#x27;</span>),</span><br><span class="line">    orign = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;formId&#x27;</span>, formId);</span><br><span class="line">  <span class="keyword">if</span> (formId == <span class="string">&#x27;the formId is a mock one&#x27;</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`模拟器中运行！`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (formId.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`formId不能为空`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> site = <span class="string">&#x27;你的收集接口&#x27;</span>,</span><br><span class="line">    dates = &#123;</span><br><span class="line">      token: token,</span><br><span class="line">      openId: openId,</span><br><span class="line">      formId: formId,</span><br><span class="line">      orign: orign</span><br><span class="line">    &#125;,</span><br><span class="line">    md =</span><br><span class="line">      <span class="string">&#x27;token=&#x27;</span> +</span><br><span class="line">      token +</span><br><span class="line">      <span class="string">&#x27;&amp;openId=&#x27;</span> +</span><br><span class="line">      openId +</span><br><span class="line">      <span class="string">&#x27;&amp;formId=&#x27;</span> +</span><br><span class="line">      formId +</span><br><span class="line">      <span class="string">&#x27;&amp;orign=&#x27;</span> +</span><br><span class="line">      orign;</span><br><span class="line">  requestHttp(site, dates, md, <span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">    <span class="built_in">console</span>.log(res.data);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-小程序模板消息接口更新"><a href="#3-小程序模板消息接口更新" class="headerlink" title="3. 小程序模板消息接口更新"></a>3. 小程序模板消息接口更新</h2><p>请注意，小程序模板消息接口将于 2020 年 1 月 10 日下线，开发者可使用<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html">订阅消息功能</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+        <category>小程序</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
+        <tag>小程序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>常见Shell命令</title>
+    <url>/posts/54337/</url>
+    <content><![CDATA[<h2 id="常见终端命令"><a href="#常见终端命令" class="headerlink" title="常见终端命令"></a>常见终端命令</h2><ul>
+<li><pre><code>ls
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  \- 用来列出文件和目录</span><br><span class="line"></span><br><span class="line">  - &#96;ls -l&#96; 列出文件和目录（长列表形式，更详细）</span><br><span class="line">  - &#96;ls *.png&#96; 列出后缀为 png 的图像文件</span><br><span class="line"></span><br><span class="line">- &#96;mkdir&#96; - 用来新建目录</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  mv</span><br></pre></td></tr></table></figure>
+
+\- 移动文件
+
+- `mv logo.png Project` 把 logo.png 文件移入 Project 文件夹
+- `mv Document/*.png Project` 把 Document 文件夹下所有 .png 结尾文件扔进 Project 文件夹</code></pre>
+</li>
+<li><p><code>cd</code> - 用来更换当前目录</p>
+</li>
+<li><p><code>pwd</code> - 查看当前工作目录</p>
+</li>
+<li><p><code>rm</code> - 用来删除文件和目录</p>
+</li>
+<li><p><code>rmdir</code> - 用来删除目录</p>
+</li>
+<li><pre><code>cat</code></pre>
+<p>- 查看文件内容（文件内容过多会直接定位到文件最底部）</p>
+<ul>
+<li><code>cat less</code> 只显示一屏高度的文件内容（按下 q 退出）</li>
+</ul>
+</li>
+</ul>
+<h3 id="less-分页器"><a href="#less-分页器" class="headerlink" title="less 分页器"></a>less 分页器</h3><ul>
+<li>要<strong>向下</strong>滚动，按下</li>
+<li><code>j</code> 或 <code>↓</code> 一次向下移动一行</li>
+<li><code>d</code> 按照一半的屏幕幅面移动</li>
+<li><code>f</code> 按照整个屏幕幅面移动</li>
+<li>要 <strong>向上</strong>滚动，按上</li>
+<li><code>k</code> 或 <code>↑</code> 一次向上移动一行</li>
+<li><code>u</code> 按照一半的屏幕幅面移动</li>
+<li><code>b</code> 按照整个屏幕幅面移动</li>
+<li>按下 <code>q</code> 可以<strong>退出</strong>日志（返回普通的命令提示符）</li>
+</ul>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>脚本</category>
+        <category>Shell</category>
+      </categories>
+      <tags>
+        <tag>Shell</tag>
       </tags>
   </entry>
   <entry>
@@ -8128,54 +8176,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>常见Shell命令</title>
-    <url>/posts/54337/</url>
-    <content><![CDATA[<h2 id="常见终端命令"><a href="#常见终端命令" class="headerlink" title="常见终端命令"></a>常见终端命令</h2><ul>
-<li><pre><code>ls
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  \- 用来列出文件和目录</span><br><span class="line"></span><br><span class="line">  - &#96;ls -l&#96; 列出文件和目录（长列表形式，更详细）</span><br><span class="line">  - &#96;ls *.png&#96; 列出后缀为 png 的图像文件</span><br><span class="line"></span><br><span class="line">- &#96;mkdir&#96; - 用来新建目录</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;</span><br><span class="line">  mv</span><br></pre></td></tr></table></figure>
-
-\- 移动文件
-
-- `mv logo.png Project` 把 logo.png 文件移入 Project 文件夹
-- `mv Document/*.png Project` 把 Document 文件夹下所有 .png 结尾文件扔进 Project 文件夹</code></pre>
-</li>
-<li><p><code>cd</code> - 用来更换当前目录</p>
-</li>
-<li><p><code>pwd</code> - 查看当前工作目录</p>
-</li>
-<li><p><code>rm</code> - 用来删除文件和目录</p>
-</li>
-<li><p><code>rmdir</code> - 用来删除目录</p>
-</li>
-<li><pre><code>cat</code></pre>
-<p>- 查看文件内容（文件内容过多会直接定位到文件最底部）</p>
-<ul>
-<li><code>cat less</code> 只显示一屏高度的文件内容（按下 q 退出）</li>
-</ul>
-</li>
-</ul>
-<h3 id="less-分页器"><a href="#less-分页器" class="headerlink" title="less 分页器"></a>less 分页器</h3><ul>
-<li>要<strong>向下</strong>滚动，按下</li>
-<li><code>j</code> 或 <code>↓</code> 一次向下移动一行</li>
-<li><code>d</code> 按照一半的屏幕幅面移动</li>
-<li><code>f</code> 按照整个屏幕幅面移动</li>
-<li>要 <strong>向上</strong>滚动，按上</li>
-<li><code>k</code> 或 <code>↑</code> 一次向上移动一行</li>
-<li><code>u</code> 按照一半的屏幕幅面移动</li>
-<li><code>b</code> 按照整个屏幕幅面移动</li>
-<li>按下 <code>q</code> 可以<strong>退出</strong>日志（返回普通的命令提示符）</li>
-</ul>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>脚本</category>
-        <category>Shell</category>
-      </categories>
-      <tags>
-        <tag>Shell</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>禁止uniapp&quot;v-longpress&quot;事件在滚动屏幕时也会触发</title>
     <url>/posts/27545/</url>
     <content><![CDATA[<img src="/posts/27545/lock-table.png" class="" title="锁台">
@@ -8191,44 +8191,6 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>uniapp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>移动端input类型为date的placeholder不显示</title>
-    <url>/posts/23431/</url>
-    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>在移动端项目开发中，DatetimePicker（时间选择器） 组件是非常常用的，并且市面上各大移动端 UI 框架也都帮我们封装了，然而绝大部分框架封装的该组件都是从底部弹出式滚动选择的（Android 和 iOS 真机上都如此），例如下面形式：</p>
-<img src="/posts/23431/datepicker.png" class="" title="Vant-UI中的时间选择器组件">
-
-<a id="more"></a>
-
-<p>然而这仅针对 iOS 用户友好，但对于用惯了 Android 手机的用户来说，下面形式的时间选择才是他们熟悉的形式：</p>
-<img src="/posts/23431/android-datetime-picker.png" class="" title="安卓默认时间选择器">
-
-<p>所以往往我们会放弃掉框架帮我们封装好的组件，自己用原始 <code>input[type=date]</code> 实现一个或者借助其他基于原始 input 标签封装的时间选择器。这里顺带提一个我感觉用起来还不错的库：<a href="https://flatpickr.js.org/">flatpickr</a>，github 地址为：<a href="https://github.com/flatpickr/flatpickr">flatpickr/flatpickr</a> 。</p>
-<p>我在项目中就使用到了这个库，然而在开发中遇到了一个小问题，设计稿上要求，我们的时间选择器组件默认情况下显示一段 placeholder ，然而在真机上我发现，无论 iOS 还是 Android 下，input 始终为空，设置的 placeholder 无效。原本我以为这是 flatpickr 做了手脚，简单查看了源码后发现并不是它的锅。最后 Google 后才知道，这就是 <code>input[type=date]</code> 元素在手机端上的一个 feature ，不过我感觉就是个 bug ，我设置了你凭什么不给我显示？。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>前面铺垫了这么多，其实解决方案涉及到的代码量并不多，原理就是使用 css 伪类给 input[type=date] 设置默认 content 为 placeholder ，再设置 input 状态为 focus 时移除这个 placeholder 属性，最后在触发 blur 时把 placeholder 添加回来。具体代码如下：</p>
-<blockquote>
-<p>html</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;text-date&quot;</span> <span class="attr">type</span>=<span class="string">&quot;date&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请选择日期&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>css</p>
-</blockquote>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">input</span><span class="selector-attr">[type=<span class="string">&#x27;date&#x27;</span>]</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="built_in">attr</span>(placeholder);</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#ccc</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">$(<span class="string">&#x27;text-date&#x27;</span>).focus(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="built_in">this</span>).removeAttr(<span class="string">&#x27;placeholder&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line">$(<span class="string">&#x27;text-date&#x27;</span>).blur(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">this</span>.value === <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">    $(<span class="built_in">this</span>).attr(<span class="string">&#x27;placeholder&#x27;</span>, <span class="string">&#x27;请选择日期&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>兼容性</tag>
-        <tag>移动端</tag>
       </tags>
   </entry>
   <entry>
@@ -8315,6 +8277,44 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>移动端input类型为date的placeholder不显示</title>
+    <url>/posts/23431/</url>
+    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>在移动端项目开发中，DatetimePicker（时间选择器） 组件是非常常用的，并且市面上各大移动端 UI 框架也都帮我们封装了，然而绝大部分框架封装的该组件都是从底部弹出式滚动选择的（Android 和 iOS 真机上都如此），例如下面形式：</p>
+<img src="/posts/23431/datepicker.png" class="" title="Vant-UI中的时间选择器组件">
+
+<a id="more"></a>
+
+<p>然而这仅针对 iOS 用户友好，但对于用惯了 Android 手机的用户来说，下面形式的时间选择才是他们熟悉的形式：</p>
+<img src="/posts/23431/android-datetime-picker.png" class="" title="安卓默认时间选择器">
+
+<p>所以往往我们会放弃掉框架帮我们封装好的组件，自己用原始 <code>input[type=date]</code> 实现一个或者借助其他基于原始 input 标签封装的时间选择器。这里顺带提一个我感觉用起来还不错的库：<a href="https://flatpickr.js.org/">flatpickr</a>，github 地址为：<a href="https://github.com/flatpickr/flatpickr">flatpickr/flatpickr</a> 。</p>
+<p>我在项目中就使用到了这个库，然而在开发中遇到了一个小问题，设计稿上要求，我们的时间选择器组件默认情况下显示一段 placeholder ，然而在真机上我发现，无论 iOS 还是 Android 下，input 始终为空，设置的 placeholder 无效。原本我以为这是 flatpickr 做了手脚，简单查看了源码后发现并不是它的锅。最后 Google 后才知道，这就是 <code>input[type=date]</code> 元素在手机端上的一个 feature ，不过我感觉就是个 bug ，我设置了你凭什么不给我显示？。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>前面铺垫了这么多，其实解决方案涉及到的代码量并不多，原理就是使用 css 伪类给 input[type=date] 设置默认 content 为 placeholder ，再设置 input 状态为 focus 时移除这个 placeholder 属性，最后在触发 blur 时把 placeholder 添加回来。具体代码如下：</p>
+<blockquote>
+<p>html</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;text-date&quot;</span> <span class="attr">type</span>=<span class="string">&quot;date&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请选择日期&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>css</p>
+</blockquote>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">input</span><span class="selector-attr">[type=<span class="string">&#x27;date&#x27;</span>]</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="built_in">attr</span>(placeholder);</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#ccc</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">$(<span class="string">&#x27;text-date&#x27;</span>).focus(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="built_in">this</span>).removeAttr(<span class="string">&#x27;placeholder&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line">$(<span class="string">&#x27;text-date&#x27;</span>).blur(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">this</span>.value === <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">    $(<span class="built_in">this</span>).attr(<span class="string">&#x27;placeholder&#x27;</span>, <span class="string">&#x27;请选择日期&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>兼容性</tag>
+        <tag>移动端</tag>
       </tags>
   </entry>
   <entry>
