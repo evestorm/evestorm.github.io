@@ -2038,29 +2038,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Swift注入变量给前端导致的报错问题</title>
-    <url>/posts/13655/</url>
-    <content><![CDATA[<p>在 iOS 中加载 H5 时需要注入一些 JS 变量供前端使用，例如把 App 相关的信息存进 JS ，好让 JS 调用：</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="comment">// MARK: 获取App信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">getAppInfo</span><span class="params">()</span></span> -&gt; [<span class="type">String</span>: <span class="type">String</span>] &#123;</span><br><span class="line">    <span class="keyword">let</span> infoDictionary = <span class="type">Bundle</span>.main.infoDictionary!</span><br><span class="line">    <span class="keyword">let</span> appVersion = infoDictionary[<span class="string">&quot;CFBundleShortVersionString&quot;</span>] <span class="keyword">as</span>! <span class="type">String</span></span><br><span class="line">    <span class="keyword">let</span> appName = infoDictionary[<span class="string">&quot;CFBundleName&quot;</span>] <span class="keyword">as</span>! <span class="type">String</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="string">&quot;version&quot;</span>: appVersion, <span class="string">&quot;name&quot;</span>: appName]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//        获取app信息</span></span><br><span class="line"><span class="keyword">let</span> appInfo = getAppInfo()</span><br><span class="line"><span class="keyword">let</span> scriptStr = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">   window.iOS = &#123;</span></span><br><span class="line"><span class="string">         &#x27;getAppInfo&#x27;: &#123;</span></span><br><span class="line"><span class="string">            &#x27;version&#x27;: \(appInfo[&quot;version&quot;]!),</span></span><br><span class="line"><span class="string">            &#x27;name&#x27;: \(appInfo[&quot;name&quot;]!),</span></span><br><span class="line"><span class="string">         &#125;</span></span><br><span class="line"><span class="string">   &#125;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<p>上面的代码注入到 JS 中会导致前端无法通过 <code>iOS.getAppInfo.name</code> 获取到 App 的名称，明明我的 <code>appInfo[&quot;name&quot;]</code> 是个 String 字符串类型，为什么会拿不到了？</p>
-<p>通过在 Swift 打印 <code>scriptStr</code> 变量我发现，<code>window.iOS</code> 对象中的 name 属性被解析成了：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;name&#x27;</span>: App名称</span><br></pre></td></tr></table></figure>
-
-<p>所以 JS 无法拿到，问题就出现在 <code>App名称</code> 上，这原本是个字符串，但注入到 JS 后它并没有被 <code>双引号&quot;&quot;</code> 或 <code>单引号&#39;&#39;</code> 包裹，导致 JS 会把 <code>App名称</code> 当做是个变量名而不是字符串。所以把上面代码改为下方形式就好了：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> scriptStr = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">   window.iOS = &#123;</span></span><br><span class="line"><span class="string">         &#x27;getAppInfo&#x27;: &#123;</span></span><br><span class="line"><span class="string">            &#x27;version&#x27;: &quot;</span>\(appInfo[<span class="string">&quot;version&quot;</span>]!)<span class="string">&quot;,</span></span><br><span class="line"><span class="string">            &#x27;name&#x27;: &quot;</span>\(appInfo[<span class="string">&quot;name&quot;</span>]!)<span class="string">&quot;,</span></span><br><span class="line"><span class="string">         &#125;</span></span><br><span class="line"><span class="string">   &#125;</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Swift与JS交互</title>
     <url>/posts/17227/</url>
     <content><![CDATA[<h2 id="一-环境"><a href="#一-环境" class="headerlink" title="一. 环境"></a>一. 环境</h2><p>Xcode 11，Swift 5.0, ES6</p>
@@ -2105,13 +2082,19 @@
       </tags>
   </entry>
   <entry>
-    <title>Swift记录通话时间</title>
-    <url>/posts/32380/</url>
-    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
+    <title>Swift注入变量给前端导致的报错问题</title>
+    <url>/posts/13655/</url>
+    <content><![CDATA[<p>在 iOS 中加载 H5 时需要注入一些 JS 变量供前端使用，例如把 App 相关的信息存进 JS ，好让 JS 调用：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="comment">// MARK: 获取App信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">getAppInfo</span><span class="params">()</span></span> -&gt; [<span class="type">String</span>: <span class="type">String</span>] &#123;</span><br><span class="line">    <span class="keyword">let</span> infoDictionary = <span class="type">Bundle</span>.main.infoDictionary!</span><br><span class="line">    <span class="keyword">let</span> appVersion = infoDictionary[<span class="string">&quot;CFBundleShortVersionString&quot;</span>] <span class="keyword">as</span>! <span class="type">String</span></span><br><span class="line">    <span class="keyword">let</span> appName = infoDictionary[<span class="string">&quot;CFBundleName&quot;</span>] <span class="keyword">as</span>! <span class="type">String</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="string">&quot;version&quot;</span>: appVersion, <span class="string">&quot;name&quot;</span>: appName]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//        获取app信息</span></span><br><span class="line"><span class="keyword">let</span> appInfo = getAppInfo()</span><br><span class="line"><span class="keyword">let</span> scriptStr = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">   window.iOS = &#123;</span></span><br><span class="line"><span class="string">         &#x27;getAppInfo&#x27;: &#123;</span></span><br><span class="line"><span class="string">            &#x27;version&#x27;: \(appInfo[&quot;version&quot;]!),</span></span><br><span class="line"><span class="string">            &#x27;name&#x27;: \(appInfo[&quot;name&quot;]!),</span></span><br><span class="line"><span class="string">         &#125;</span></span><br><span class="line"><span class="string">   &#125;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
 <a id="more"></a>
 
-<p>代码如下：</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码注入到 JS 中会导致前端无法通过 <code>iOS.getAppInfo.name</code> 获取到 App 的名称，明明我的 <code>appInfo[&quot;name&quot;]</code> 是个 String 字符串类型，为什么会拿不到了？</p>
+<p>通过在 Swift 打印 <code>scriptStr</code> 变量我发现，<code>window.iOS</code> 对象中的 name 属性被解析成了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;name&#x27;</span>: App名称</span><br></pre></td></tr></table></figure>
+
+<p>所以 JS 无法拿到，问题就出现在 <code>App名称</code> 上，这原本是个字符串，但注入到 JS 后它并没有被 <code>双引号&quot;&quot;</code> 或 <code>单引号&#39;&#39;</code> 包裹，导致 JS 会把 <code>App名称</code> 当做是个变量名而不是字符串。所以把上面代码改为下方形式就好了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> scriptStr = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">   window.iOS = &#123;</span></span><br><span class="line"><span class="string">         &#x27;getAppInfo&#x27;: &#123;</span></span><br><span class="line"><span class="string">            &#x27;version&#x27;: &quot;</span>\(appInfo[<span class="string">&quot;version&quot;</span>]!)<span class="string">&quot;,</span></span><br><span class="line"><span class="string">            &#x27;name&#x27;: &quot;</span>\(appInfo[<span class="string">&quot;name&quot;</span>]!)<span class="string">&quot;,</span></span><br><span class="line"><span class="string">         &#125;</span></span><br><span class="line"><span class="string">   &#125;</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>移动端</category>
@@ -2170,6 +2153,23 @@
       </categories>
       <tags>
         <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Swift记录通话时间</title>
+    <url>/posts/32380/</url>
+    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
+<a id="more"></a>
+
+<p>代码如下：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2751,6 +2751,26 @@
       </tags>
   </entry>
   <entry>
+    <title>Vue深度作用选择器</title>
+    <url>/posts/5691/</url>
+    <content><![CDATA[<p>之前写 uni-app 在修改三方深层样式时，会使用 <code>/deep/</code> ，例如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但在我的 Vue 项目中却报错，使用 <code>::v-deep</code> 则可以：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-pseudo">::v-deep</span> <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p><a href="https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors">Deep Selectors</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>scss</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Vue深度监听对象新老值如何保持不一样</title>
     <url>/posts/32592/</url>
     <content><![CDATA[<p>转载自：<a href="https://www.haorooms.com/post/vue_new_oldval">https://www.haorooms.com/post/vue_new_oldval</a></p>
@@ -2784,26 +2804,6 @@
       <tags>
         <tag>技巧</tag>
         <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue深度作用选择器</title>
-    <url>/posts/5691/</url>
-    <content><![CDATA[<p>之前写 uni-app 在修改三方深层样式时，会使用 <code>/deep/</code> ，例如：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>但在我的 Vue 项目中却报错，使用 <code>::v-deep</code> 则可以：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-pseudo">::v-deep</span> <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p><a href="https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors">Deep Selectors</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>scss</tag>
       </tags>
   </entry>
   <entry>
@@ -2893,6 +2893,55 @@
       </categories>
       <tags>
         <tag>笔记</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue组件通讯$attrs/$listeners</title>
+    <url>/posts/47247/</url>
+    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
+<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
+<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
+<a id="more"></a>
+
+<p>图解</p>
+<img src="/posts/47247/attrs1.png" class="" title="图解">
+
+<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
+<p>{ age: “20”, gender: “man” }</p>
+<img src="/posts/47247/attrs2.png" class="" title="attrs2">
+
+<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
+<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
+<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
+<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
+<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
+<img src="/posts/47247/listeners1.png" class="" title="listeners1">
+
+<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
+<p>{ customEvent: fn }</p>
+<img src="/posts/47247/listeners2.png" class="" title="listeners2">
+
+<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
+<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
+<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
+<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
+<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
+<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
         <tag>Vue</tag>
       </tags>
   </entry>
@@ -3006,55 +3055,6 @@
         <category>Vue</category>
       </categories>
       <tags>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vue组件通讯$attrs/$listeners</title>
-    <url>/posts/47247/</url>
-    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
-<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
-<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
-<a id="more"></a>
-
-<p>图解</p>
-<img src="/posts/47247/attrs1.png" class="" title="图解">
-
-<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
-<p>{ age: “20”, gender: “man” }</p>
-<img src="/posts/47247/attrs2.png" class="" title="attrs2">
-
-<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
-<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
-<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
-<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
-<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
-<img src="/posts/47247/listeners1.png" class="" title="listeners1">
-
-<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
-<p>{ customEvent: fn }</p>
-<img src="/posts/47247/listeners2.png" class="" title="listeners2">
-
-<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
-<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
-<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
-<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
-<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
-<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
         <tag>Vue</tag>
       </tags>
   </entry>
@@ -3374,81 +3374,6 @@
       </tags>
   </entry>
   <entry>
-    <title>animation动画（一）</title>
-    <url>/posts/57136/</url>
-    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
-<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
-<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
-</ul>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
-<p>CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。</p>
-</blockquote>
-<p>———— 出自 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations | MDN</a></p>
-<a id="more"></a>
-
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 简写 */</span></span><br><span class="line"><span class="selector-tag">animation</span>: 动画名称，一个周期所花费的时间，运动曲线（默认<span class="selector-tag">ease</span>），</span><br><span class="line">           动画延迟（默认0），播放次数（默认1），</span><br><span class="line">           是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br></pre></td></tr></table></figure>
-
-<p>就像在介绍中写到的那样，整个 animations 是个模块，包含很多属性来定义动画，比方说 <code>animation-name</code> 、<code>animation-duration</code> 和 <code>animation-delay</code> 等等。但本着快速上手的目的，第一篇文章主要围绕 <code>animation</code> 这个简写属性来讲，因为用它最直观，而且就经验来讲，日常使用最多的也是这个属性。</p>
-<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>一个CSS3动画由两个基本项组成：</p>
-<ol>
-<li>关键帧（Keyforames） - 用来定义动画的阶段和样式。</li>
-<li>动画属性 - 分配关键帧（@keyframes）到一个特定的css元素，来定义它的动画方式。</li>
-</ol>
-<p>我们围绕这两项讨论，并在这个过程中实现一个按钮不断放大缩小的动画效果：</p>
-<img src="/posts/57136/shrink.gif" class="" title="shrink">
-
-<h3 id="keyframes"><a href="#keyframes" class="headerlink" title="keyframes"></a>keyframes</h3><p>关键帧 keyframes 定义了动画在每个阶段的动画效果。它包括：</p>
-<ul>
-<li>动画名称：定义动画的名称</li>
-<li>动画阶段：整个动画阶段用百分比来表示。0% 表示动画的开始状态。100% 表示动画的结束状态。可以在其间添加多个中间状态，比如 20%，60%…</li>
-<li>动画属性：给动画每个阶段定义的CSS属性</li>
-</ul>
-<p>现在我们来编写一段 @keyframes 。动画名称命名为 <code>shrink</code> 。它只有简单的两个阶段：</p>
-<ul>
-<li>第一阶段（0%）：元素的缩放比例为 1:1</li>
-<li>第二阶段（100%）：元素的缩放比例为 1:0.8</li>
-</ul>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> shrink &#123;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="动画属性"><a href="#动画属性" class="headerlink" title="动画属性"></a>动画属性</h3><p>接着，我们给要设置动画的元素添加上动画属性。要使动画生效，我们至少要添加以下两个动画属性：</p>
-<ul>
-<li>animation-name: 动画的名称，在 @keyframes 中定义。</li>
-<li>animation-duration: 动画的持续时间，以秒为单位（例如 5s）或毫秒（例如 200ms）。</li>
-</ul>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="comment">/*  其他样式  */</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画名称: shrink  */</span></span><br><span class="line">  <span class="selector-tag">animation-name</span>: <span class="selector-tag">shrink</span>;</span><br><span class="line">  <span class="comment">/*  动画持续时间: 0.5秒 */</span></span><br><span class="line">  <span class="selector-tag">animation-duration</span>: .5<span class="selector-tag">s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这样我们就实现页面加载后，一个按钮从开始的原始大小，经过0.5s后变成了原始大小的0.8的动画效果。然而我们希望最终的效果是一个按钮的不断放大和缩小，交替进行。这就得添加 <code>animation-iteration-count</code> 和 <code>animation-direction</code> 两个动画属性了，它们一个用来定义元素动画的循环次数，一个用来定义动画在循环过程中是否反向运动：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画的循环次数: 无限次  */</span></span><br><span class="line">  <span class="selector-tag">animation-iteration-count</span>: <span class="selector-tag">infinite</span>;</span><br><span class="line">  <span class="comment">/*  循环是否反向：先正向后反向  */</span></span><br><span class="line">  <span class="selector-tag">animation-direction</span>: <span class="selector-tag">alternate</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>最终的简写形式如下：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="selector-tag">animation</span>: <span class="selector-tag">shrink</span> .5<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整效果：</p>
-<iframe height="265" scrolling="no" title="animation-shrink" src="https://codepen.io/JingW/embed/MRaJrz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="资源-📚"><a href="#资源-📚" class="headerlink" title="资源 📚"></a>资源 📚</h2><ul>
-<li><p>animation | 一个CSS3动画库</p>
-<p>【推荐】</p>
-<ul>
-<li><a href="https://daneden.github.io/animate.css/">点我查看效果</a></li>
-</ul>
-</li>
-<li><p>magic | 另一个CSS3动画库</p>
-<ul>
-<li><a href="https://www.minimamente.com/example/magic_animations/">点我查看效果</a></li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>animation动画（二）</title>
     <url>/posts/20298/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -3567,6 +3492,81 @@
       </tags>
   </entry>
   <entry>
+    <title>animation动画（一）</title>
+    <url>/posts/57136/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/31280/">animation动画（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/20298/">animation动画（二）</a></li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
+<p>CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。</p>
+</blockquote>
+<p>———— 出自 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations | MDN</a></p>
+<a id="more"></a>
+
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 简写 */</span></span><br><span class="line"><span class="selector-tag">animation</span>: 动画名称，一个周期所花费的时间，运动曲线（默认<span class="selector-tag">ease</span>），</span><br><span class="line">           动画延迟（默认0），播放次数（默认1），</span><br><span class="line">           是否反向播放动画（默认<span class="selector-tag">normal</span>），是否暂停动画（默认<span class="selector-tag">running</span>）</span><br></pre></td></tr></table></figure>
+
+<p>就像在介绍中写到的那样，整个 animations 是个模块，包含很多属性来定义动画，比方说 <code>animation-name</code> 、<code>animation-duration</code> 和 <code>animation-delay</code> 等等。但本着快速上手的目的，第一篇文章主要围绕 <code>animation</code> 这个简写属性来讲，因为用它最直观，而且就经验来讲，日常使用最多的也是这个属性。</p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>一个CSS3动画由两个基本项组成：</p>
+<ol>
+<li>关键帧（Keyforames） - 用来定义动画的阶段和样式。</li>
+<li>动画属性 - 分配关键帧（@keyframes）到一个特定的css元素，来定义它的动画方式。</li>
+</ol>
+<p>我们围绕这两项讨论，并在这个过程中实现一个按钮不断放大缩小的动画效果：</p>
+<img src="/posts/57136/shrink.gif" class="" title="shrink">
+
+<h3 id="keyframes"><a href="#keyframes" class="headerlink" title="keyframes"></a>keyframes</h3><p>关键帧 keyframes 定义了动画在每个阶段的动画效果。它包括：</p>
+<ul>
+<li>动画名称：定义动画的名称</li>
+<li>动画阶段：整个动画阶段用百分比来表示。0% 表示动画的开始状态。100% 表示动画的结束状态。可以在其间添加多个中间状态，比如 20%，60%…</li>
+<li>动画属性：给动画每个阶段定义的CSS属性</li>
+</ul>
+<p>现在我们来编写一段 @keyframes 。动画名称命名为 <code>shrink</code> 。它只有简单的两个阶段：</p>
+<ul>
+<li>第一阶段（0%）：元素的缩放比例为 1:1</li>
+<li>第二阶段（100%）：元素的缩放比例为 1:0.8</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> shrink &#123;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">-webkit-transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">    <span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">0.8</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动画属性"><a href="#动画属性" class="headerlink" title="动画属性"></a>动画属性</h3><p>接着，我们给要设置动画的元素添加上动画属性。要使动画生效，我们至少要添加以下两个动画属性：</p>
+<ul>
+<li>animation-name: 动画的名称，在 @keyframes 中定义。</li>
+<li>animation-duration: 动画的持续时间，以秒为单位（例如 5s）或毫秒（例如 200ms）。</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="comment">/*  其他样式  */</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画名称: shrink  */</span></span><br><span class="line">  <span class="selector-tag">animation-name</span>: <span class="selector-tag">shrink</span>;</span><br><span class="line">  <span class="comment">/*  动画持续时间: 0.5秒 */</span></span><br><span class="line">  <span class="selector-tag">animation-duration</span>: .5<span class="selector-tag">s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就实现页面加载后，一个按钮从开始的原始大小，经过0.5s后变成了原始大小的0.8的动画效果。然而我们希望最终的效果是一个按钮的不断放大和缩小，交替进行。这就得添加 <code>animation-iteration-count</code> 和 <code>animation-direction</code> 两个动画属性了，它们一个用来定义元素动画的循环次数，一个用来定义动画在循环过程中是否反向运动：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/*  动画的循环次数: 无限次  */</span></span><br><span class="line">  <span class="selector-tag">animation-iteration-count</span>: <span class="selector-tag">infinite</span>;</span><br><span class="line">  <span class="comment">/*  循环是否反向：先正向后反向  */</span></span><br><span class="line">  <span class="selector-tag">animation-direction</span>: <span class="selector-tag">alternate</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终的简写形式如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="selector-tag">animation</span>: <span class="selector-tag">shrink</span> .5<span class="selector-tag">s</span> <span class="selector-tag">linear</span> <span class="selector-tag">alternate</span> <span class="selector-tag">infinite</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整效果：</p>
+<iframe height="265" scrolling="no" title="animation-shrink" src="https://codepen.io/JingW/embed/MRaJrz/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="资源-📚"><a href="#资源-📚" class="headerlink" title="资源 📚"></a>资源 📚</h2><ul>
+<li><p>animation | 一个CSS3动画库</p>
+<p>【推荐】</p>
+<ul>
+<li><a href="https://daneden.github.io/animate.css/">点我查看效果</a></li>
+</ul>
+</li>
+<li><p>magic | 另一个CSS3动画库</p>
+<ul>
+<li><a href="https://www.minimamente.com/example/magic_animations/">点我查看效果</a></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【转载】chrome调试技巧-汇总</title>
     <url>/posts/62808/</url>
     <content><![CDATA[<h2 id="打印"><a href="#打印" class="headerlink" title="打印"></a>打印</h2><h3 id="console-table"><a href="#console-table" class="headerlink" title="console.table"></a>console.table</h3><p>使用 <code>console.table()</code> 可以将传入的对象，或数组以表格形式输出。适合排列整齐的元素：</p>
@@ -3629,6 +3629,22 @@
       </tags>
   </entry>
   <entry>
+    <title>cnchar.js获取汉字的拼音</title>
+    <url>/posts/38408/</url>
+    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
+<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
+<p>几种常用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>cookie与session区别</title>
     <url>/posts/63891/</url>
     <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
@@ -3668,22 +3684,6 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
-  </entry>
-  <entry>
-    <title>cnchar.js获取汉字的拼音</title>
-    <url>/posts/38408/</url>
-    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
-<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
-<p>几种常用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>解决方案</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
   </entry>
   <entry>
     <title>css扩大元素点击区域</title>
@@ -3768,25 +3768,6 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS上input输入内容拦腰截断</title>
-    <url>/posts/40889/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 ios 上 input 输入框只显示一半高度的字:</p>
-<img src="/posts/40889/input-error.jpeg" class="" title="input输入内容只显示了一半">
-
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>固定 input 输入框的高度，把 input 输入框写死高度:</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* uniapp 写法，非 uniapp 项目给 input 添加固定高度即可 */</span></span><br><span class="line"><span class="selector-tag">uni-input</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.uni-input-form</span> &#123;</span><br><span class="line">  .uni-input-input &#123;</span><br><span class="line">    <span class="selector-tag">height</span>: 50<span class="selector-tag">rpx</span> !<span class="selector-tag">important</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<img src="/posts/40889/input-suc.jpeg" class="" title="解决">
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>iOS13.4+版本h5拍照图片旋转问题的解决方案</title>
     <url>/posts/13740/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>前几天刚解决完 Safari 上 h5 拍照会旋转 90 度的问题，今天更新完苹果系统后（13.4 ——&gt; 13.6），突然发现图片又旋转了。前几天不刚测完是好的么，怎么又出问题了。拿公司测试机 12.6 版本测试了下发现没毛病，就基本定位到问题所在了：iOS13.4+版本可能都存在此问题。</p>
@@ -3809,6 +3790,25 @@
       <tags>
         <tag>iOS</tag>
         <tag>兼容性</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS上input输入内容拦腰截断</title>
+    <url>/posts/40889/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 ios 上 input 输入框只显示一半高度的字:</p>
+<img src="/posts/40889/input-error.jpeg" class="" title="input输入内容只显示了一半">
+
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>固定 input 输入框的高度，把 input 输入框写死高度:</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* uniapp 写法，非 uniapp 项目给 input 添加固定高度即可 */</span></span><br><span class="line"><span class="selector-tag">uni-input</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.uni-input-form</span> &#123;</span><br><span class="line">  .uni-input-input &#123;</span><br><span class="line">    <span class="selector-tag">height</span>: 50<span class="selector-tag">rpx</span> !<span class="selector-tag">important</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/40889/input-suc.jpeg" class="" title="解决">
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
       </tags>
   </entry>
   <entry>
@@ -3971,26 +3971,6 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS的App语言设置为中文</title>
-    <url>/posts/64032/</url>
-    <content><![CDATA[<p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
-<img src="/posts/64032/language.jpeg" class="" title="拍照为英文">
-
-<p>但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 <code>Localization native development region</code> 为 <code>China</code> ：</p>
-<img src="/posts/64032/plist.png" class="" title="plist设置">
-
-<p>效果：</p>
-<img src="/posts/64032/plist-china.png" class="" title="效果">
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>iOS版本更新后打开时提醒用户去AppStore更新</title>
     <url>/posts/12210/</url>
     <content><![CDATA[<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><ul>
@@ -4005,6 +3985,26 @@
 <p>AppDelegate.swift</p>
 </blockquote>
 <figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SwiftyJSON</span><br><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"><span class="keyword">import</span> Alamofire</span><br><span class="line"></span><br><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">UIResponder</span>, <span class="title">UIApplicationDelegate</span>, <span class="title">WXApiDelegate</span>, <span class="title">WXApiLogDelegate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> window: <span class="type">UIWindow?</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(<span class="keyword">_</span>: UIApplication, didFinishLaunchingWithOptions <span class="keyword">_</span>: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        <span class="comment">// 检测App是否需要更新</span></span><br><span class="line">        checkVersion()</span><br><span class="line"></span><br><span class="line">        window = <span class="type">UIWindow</span>(frame: <span class="type">UIScreen</span>.main.bounds)</span><br><span class="line">        window?.rootViewController = <span class="type">ViewController</span>()</span><br><span class="line">        window?.makeKeyAndVisible()</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// MARK: App更新</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取版本号</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">checkVersion</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="type">AF</span>.request(<span class="string">&quot;https://itunes.apple.com/lookup?bundleId=App的bundleId&quot;</span>, method: .<span class="keyword">get</span>, parameters: [:])</span><br><span class="line">            .responseJSON &#123; response <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(response)</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">let</span> value = response.value &#123;</span><br><span class="line">                    <span class="keyword">let</span> json = <span class="type">JSON</span>(value)</span><br><span class="line">                    <span class="keyword">self</span>.compareVersion(appStoreVersion: json[<span class="string">&quot;results&quot;</span>][<span class="number">0</span>][<span class="string">&quot;version&quot;</span>].stringValue)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 比较版本</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">compareVersion</span><span class="params">(appStoreVersion: String)</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(appStoreVersion)</span><br><span class="line">        <span class="keyword">let</span> version: <span class="type">String</span> = (<span class="type">Bundle</span>.main.infoDictionary?[<span class="string">&quot;CFBundleShortVersionString&quot;</span>] <span class="keyword">as</span>? <span class="type">String</span>)!</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> appStoreVersion == version &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;当前已是最新版&quot;</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> alertC = <span class="type">UIAlertController</span>(title: <span class="string">&quot;有新版本&quot;</span>, message: <span class="string">&quot;前去更新版本？&quot;</span>, preferredStyle: .alert)</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;去更新&quot;</span>, style: .<span class="keyword">default</span>, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">self</span>.updateApp(appId: <span class="type">AppID</span>)</span><br><span class="line">            &#125;))</span><br><span class="line">            alertC.addAction(<span class="type">UIAlertAction</span>(title: <span class="string">&quot;下次再说&quot;</span>, style: .cancel, handler: &#123; <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">            &#125;))</span><br><span class="line">            <span class="type">UIApplication</span>.shared.keyWindow?.rootViewController?.present(alertC, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新App</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">updateApp</span><span class="params">(appId <span class="keyword">_</span>: String)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">        <span class="keyword">let</span> urlString = <span class="string">&quot;itms-apps://itunes.apple.com/app/id\(AppID)&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">URL</span>(string: urlString) &#123;</span><br><span class="line">            <span class="comment">// 根据iOS系统版本，分别处理</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">#available</span>(iOS <span class="number">10</span>, *) &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url, options: [:],</span><br><span class="line">                                          completionHandler: &#123;</span><br><span class="line">                                              <span class="keyword">_</span> <span class="keyword">in</span></span><br><span class="line">                &#125;)</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">UIApplication</span>.shared.openURL(url)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS的App语言设置为中文</title>
+    <url>/posts/64032/</url>
+    <content><![CDATA[<p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
+<img src="/posts/64032/language.jpeg" class="" title="拍照为英文">
+
+<p>但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 <code>Localization native development region</code> 为 <code>China</code> ：</p>
+<img src="/posts/64032/plist.png" class="" title="plist设置">
+
+<p>效果：</p>
+<img src="/posts/64032/plist-china.png" class="" title="效果">
 ]]></content>
       <categories>
         <category>移动端</category>
@@ -4551,6 +4551,78 @@
       </tags>
   </entry>
   <entry>
+    <title>transition过渡（二）</title>
+    <url>/posts/13167/</url>
+    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
+<li><a href="https://evestorm.github.io/posts/24967/">transition过渡（一）</a></li>
+<li><a href="https://evestorm.github.io/posts/13167/">transition过渡（二）</a></li>
+</ul>
+<p>上篇文章是对 transition过渡 的一个简单介绍和使用。这篇文章就来聊聊具体属性的含义和用法。</p>
+<a id="more"></a>
+
+<h2 id="transition-property-过渡属性"><a href="#transition-property-过渡属性" class="headerlink" title="transition-property 过渡属性"></a>transition-property 过渡属性</h2><p>从上一篇文章能够知道 transition-property 是拿来设置元素中参与过渡的属性的。它的可选值为：</p>
+<ul>
+<li>none 指所有属性都不参与过渡</li>
+<li>all 指所有属性都参与过渡</li>
+<li>[IDENT] 指定个别属性参与过渡</li>
+</ul>
+<p>下面来看一个案例：</p>
+<p>👇温馨提示：为了方便看效果，可点击 <code>CSS</code> 按钮折叠代码部分，仅显示页面 👇</p>
+<iframe height="265" scrolling="no" title="transition-property-demo1" src="https://codepen.io/JingW/embed/oONwww/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>当你依次将鼠标移入上方演示demo中的三个按钮就会发现，都在各自下方显示出了一段文本。我们想要实现的，就是这段文本的显示需要有一个过渡效果，不要太生硬。最简单的一种实现方案就是鼠标移入按钮前，文本容器的 <code>height: 0</code> ，鼠标移入后固定容器高度 <code>height: 150px</code> （第一个按钮效果就用的此方案）。但在实际情况中，往往文本是自适应的，高度无法确定，所以很自然的，我们会想到将 <code>height: 150px</code> 设置为 <code>height: auto</code> ，这样不就能够实现自适应高度的容器过渡了嘛，这就是第二个按钮的一套实现方案。但结果大家都知道了，文本容器不再拥有过渡的动画，而是直接从 <code>0px</code> 瞬间变化到 <code>auto</code>，这是为什么呢？</p>
+<p><strong>答案</strong>：并不是所有的属性和属性值都能存在过渡动画。</p>
+<p>这里特别需要注意的是，如果想要指定某个属性有过渡状态，就需要保证我们能够计算出过渡过程中每个时间点的属性值。<br>比如，从 <code>height: 0;</code> 过渡到 <code>height: 150px;</code> ，过渡时间是 <code>t</code> ，那我们可以算出在 <code>x</code> 时刻的属性状态是 <code>height: (150px-0)*x/t;</code> 。（注：这里公式成立的前提是假设 <code>transition-timing-function: linear;</code> ，如果<code>transition-timing-function</code> 为其他值，一样可以计算，只不过算法不同）<br>然而刚才第二种方案设置了 <code>height: auto;</code>，则在 <code>x</code> 时刻的属性状态为 <code>height: (auto-0px)*x/t;</code> ，显然，这种状态是不存在的、无法被计算的，因此在设置高度变成 <code>auto</code> 之后，也自然不会再有过渡动画了。</p>
+<p><strong>解决方案</strong></p>
+<p>第三个按钮的效果就是我们的一种解决方案，在默认状态下，我们不设置文本容器的 <code>height: 0</code> ，而是用 <code>transform: scale(1, 0);</code> 来代替它，意思是在初始状态下，我们的文本容器比例为宽1:1，高1:0，换句话说，宽为我们设置的宽，但高度为0。在鼠标移入按钮后，用 <code>transform: scale(1, 1);</code> 来代替方案二中的 <code>height: auto</code> ，设置文本容器的宽高为1，这样就又能出现过渡动画了。</p>
+<p><strong>延伸</strong></p>
+<p>由此进行延伸，再比如日常中最常使用的控制元素显示隐藏的代码是 <code>display: block;</code> 和 <code>display: none;</code> ，这也是不存在过渡动画的，因此，可以调整改为使用 <code>opacity: 1;</code> 和 <code>opacity: 0;</code> 来替换。</p>
+<h2 id="transition-duration-过渡花费的时间"><a href="#transition-duration-过渡花费的时间" class="headerlink" title="transition-duration 过渡花费的时间"></a>transition-duration 过渡花费的时间</h2><p>这个属性没什么可讲的，用它来设置元素过渡的持续时间</p>
+<h2 id="transition-timing-function-效果曲线"><a href="#transition-timing-function-效果曲线" class="headerlink" title="transition-timing-function 效果曲线"></a>transition-timing-function 效果曲线</h2><p>这个属性是设置过渡的动画类型的，换句话说，就是设置在过渡过程中元素值的变化速度。它的可选值包含这样几组：</p>
+<ul>
+<li>ease | linear | ease-in | ease-out | ease-in-out</li>
+<li>step-start | step-end | steps([, [ start | end ] ]?)</li>
+<li>cubic-bezier(, , , )</li>
+</ul>
+<h3 id="预设的五个时间曲线"><a href="#预设的五个时间曲线" class="headerlink" title="预设的五个时间曲线"></a>预设的五个时间曲线</h3><iframe height="519" scrolling="no" title="transition-timing-function-五个预设时间曲线" src="https://codepen.io/JingW/embed/dLyjoN/?height=519&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="阶跃函数-step"><a href="#阶跃函数-step" class="headerlink" title="阶跃函数 step"></a>阶跃函数 step</h3><p>直接上案例吧，看完效果再来讲阶跃函数几个参数的具体含义：</p>
+<iframe height="413" scrolling="no" title="transition-timing-function-阶跃函数" src="https://codepen.io/JingW/embed/PgwWXd/?height=413&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>实际体验了阶跃函数带来的效果后应该对其有个大概认知了吧。阶跃函数接收两个参数，第一个参数为<strong>正整数</strong>，指定阶跃函数的间隔数，你可以理解为把整个过渡过程拆成若干份儿；第二个参数可选，值为<code>[ start | end ]</code>，叫做跃点，指定是在每个间隔的起点还是终点发生阶跃变化，默认值为<code>end</code>。<br>查看上面案例的css代码，你会发现两种 <code>steps</code> 的简写形式：<code>step-start</code> 和 <code>step-end</code> ，它们分别等同于：<code>step-start = steps(1, start)</code> 和 <code>step-end = steps(1, end)</code> 。</p>
+<h3 id="cubic-bezier-贝塞尔曲线函数"><a href="#cubic-bezier-贝塞尔曲线函数" class="headerlink" title="cubic-bezier 贝塞尔曲线函数"></a>cubic-bezier 贝塞尔曲线函数</h3><p>贝塞尔曲线函数接收四个参数，取值范围是 0 到 1 之间的数值（包括0和1）。</p>
+<p>贝塞尔曲线函数，其实定义的是 <strong>属性状态</strong> 与 <strong>时间</strong> 的一个关系函数。如下坐标轴所示：</p>
+<img src="/posts/13167/cubic05000510.png" class="" title="cubic-bezier">
+
+<p>上图坐标轴中横坐标是时间，纵坐标是属性状态，右上角的坐标是(1,1)。在时间曲线中的每一个点，表示的就是对应时刻下属性的取值，每个点的斜率表示的就是在这个时刻属性的变化速度，因此在时间曲线中<strong>斜率越小</strong>，也就是<strong>越平缓</strong>的地方，表示<strong>属性变化速度越慢</strong>；<strong>斜率越大</strong>，也就是<strong>越陡峭</strong>的地方，表示<strong>属性变化速度越快</strong>。如上图中开始跟结束的时候，斜率都比较小，而中间的阶段，斜率比较大，因此这个曲线表示的就是在变化过程中由慢到快再到慢的一个过程。</p>
+<p>回到贝塞尔曲线函数接收的四个参数上，前两个是上图中红色点的坐标(x1,y1)，后两个是图中蓝色点的坐标(x2,y2)，也就是 <code>cubic-bezier(x1, y1, x2, y2)</code> 这样的形式。我们可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 这个工具上来调整我们独特的贝塞尔曲线，通过拖拽红色跟蓝色点，可以形成不一样的贝塞尔曲线。我们发现，其实规定取值范围在[0,1]之间，针对的是<strong>x坐标</strong>，也就是<strong>时间</strong>，因为时间如果超过了这个范围，就会出现在同一个时刻对应了两个不同的属性状态，这个是没有意义的；而y坐标是可以超过这个范围的，如下我们通过拖拽两个点形成了这样一个曲线：</p>
+<img src="/posts/13167/cubic55465149.png" class="" title="cubic-bezier">
+
+<p>它表示的是在过渡过程中属性值会超过终止状态的设定值然后再回到终点位置，表现为回弹的效果。大家可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 上自己拖动两个点尝试一下，最后点击 go 按钮查看效果。</p>
+<p>上面两个图的demo效果：</p>
+<iframe height="265" scrolling="no" title="transition-timing-function-贝塞尔曲线" src="https://codepen.io/JingW/embed/KYwqgb/?height=265&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="transition-delay-延迟"><a href="#transition-delay-延迟" class="headerlink" title="transition-delay 延迟"></a>transition-delay 延迟</h2><p>这个属性同样没啥讲的，用它来设置元素延迟过渡的时间。</p>
+<h2 id="transition-的不足"><a href="#transition-的不足" class="headerlink" title="transition 的不足"></a>transition 的不足</h2><ul>
+<li>无法在页面加载的时候自动触发，因为只有当属性值发生改变的时候才会触发过渡动画。</li>
+<li>无法重复播放过渡动画，除非再次触发过渡事件。</li>
+<li>无法设置多种状态（keyframes 只有 from，to），只能从初始状态过渡到终止状态，无法再设置其他的状态。</li>
+<li>transition 规则作用的是单个属性的过渡状态，不能涉及多个属性，即使定义了 <code>transition: all 1s ease 0s;</code> 这样的规则，其对应的每个属性过渡动画也都是相互独立，相当于是定义了很多个 transition 规则，而每个 transition 只作用于一个属性。</li>
+</ul>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a href="https://easings.net/en#">Easing Functions Cheat Sheet</a></li>
+<li><a href="http://cubic-bezier.com/">cubic-bezier</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ubuntu下nginx基本使用</title>
     <url>/posts/36876/</url>
     <content><![CDATA[<h2 id="安装-Nginx"><a href="#安装-Nginx" class="headerlink" title="安装 Nginx"></a>安装 Nginx</h2><p>终端键入以下命令：</p>
@@ -4665,78 +4737,6 @@
       </tags>
   </entry>
   <entry>
-    <title>transition过渡（二）</title>
-    <url>/posts/13167/</url>
-    <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
-<li><a href="https://evestorm.github.io/posts/24967/">transition过渡（一）</a></li>
-<li><a href="https://evestorm.github.io/posts/13167/">transition过渡（二）</a></li>
-</ul>
-<p>上篇文章是对 transition过渡 的一个简单介绍和使用。这篇文章就来聊聊具体属性的含义和用法。</p>
-<a id="more"></a>
-
-<h2 id="transition-property-过渡属性"><a href="#transition-property-过渡属性" class="headerlink" title="transition-property 过渡属性"></a>transition-property 过渡属性</h2><p>从上一篇文章能够知道 transition-property 是拿来设置元素中参与过渡的属性的。它的可选值为：</p>
-<ul>
-<li>none 指所有属性都不参与过渡</li>
-<li>all 指所有属性都参与过渡</li>
-<li>[IDENT] 指定个别属性参与过渡</li>
-</ul>
-<p>下面来看一个案例：</p>
-<p>👇温馨提示：为了方便看效果，可点击 <code>CSS</code> 按钮折叠代码部分，仅显示页面 👇</p>
-<iframe height="265" scrolling="no" title="transition-property-demo1" src="https://codepen.io/JingW/embed/oONwww/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<p>当你依次将鼠标移入上方演示demo中的三个按钮就会发现，都在各自下方显示出了一段文本。我们想要实现的，就是这段文本的显示需要有一个过渡效果，不要太生硬。最简单的一种实现方案就是鼠标移入按钮前，文本容器的 <code>height: 0</code> ，鼠标移入后固定容器高度 <code>height: 150px</code> （第一个按钮效果就用的此方案）。但在实际情况中，往往文本是自适应的，高度无法确定，所以很自然的，我们会想到将 <code>height: 150px</code> 设置为 <code>height: auto</code> ，这样不就能够实现自适应高度的容器过渡了嘛，这就是第二个按钮的一套实现方案。但结果大家都知道了，文本容器不再拥有过渡的动画，而是直接从 <code>0px</code> 瞬间变化到 <code>auto</code>，这是为什么呢？</p>
-<p><strong>答案</strong>：并不是所有的属性和属性值都能存在过渡动画。</p>
-<p>这里特别需要注意的是，如果想要指定某个属性有过渡状态，就需要保证我们能够计算出过渡过程中每个时间点的属性值。<br>比如，从 <code>height: 0;</code> 过渡到 <code>height: 150px;</code> ，过渡时间是 <code>t</code> ，那我们可以算出在 <code>x</code> 时刻的属性状态是 <code>height: (150px-0)*x/t;</code> 。（注：这里公式成立的前提是假设 <code>transition-timing-function: linear;</code> ，如果<code>transition-timing-function</code> 为其他值，一样可以计算，只不过算法不同）<br>然而刚才第二种方案设置了 <code>height: auto;</code>，则在 <code>x</code> 时刻的属性状态为 <code>height: (auto-0px)*x/t;</code> ，显然，这种状态是不存在的、无法被计算的，因此在设置高度变成 <code>auto</code> 之后，也自然不会再有过渡动画了。</p>
-<p><strong>解决方案</strong></p>
-<p>第三个按钮的效果就是我们的一种解决方案，在默认状态下，我们不设置文本容器的 <code>height: 0</code> ，而是用 <code>transform: scale(1, 0);</code> 来代替它，意思是在初始状态下，我们的文本容器比例为宽1:1，高1:0，换句话说，宽为我们设置的宽，但高度为0。在鼠标移入按钮后，用 <code>transform: scale(1, 1);</code> 来代替方案二中的 <code>height: auto</code> ，设置文本容器的宽高为1，这样就又能出现过渡动画了。</p>
-<p><strong>延伸</strong></p>
-<p>由此进行延伸，再比如日常中最常使用的控制元素显示隐藏的代码是 <code>display: block;</code> 和 <code>display: none;</code> ，这也是不存在过渡动画的，因此，可以调整改为使用 <code>opacity: 1;</code> 和 <code>opacity: 0;</code> 来替换。</p>
-<h2 id="transition-duration-过渡花费的时间"><a href="#transition-duration-过渡花费的时间" class="headerlink" title="transition-duration 过渡花费的时间"></a>transition-duration 过渡花费的时间</h2><p>这个属性没什么可讲的，用它来设置元素过渡的持续时间</p>
-<h2 id="transition-timing-function-效果曲线"><a href="#transition-timing-function-效果曲线" class="headerlink" title="transition-timing-function 效果曲线"></a>transition-timing-function 效果曲线</h2><p>这个属性是设置过渡的动画类型的，换句话说，就是设置在过渡过程中元素值的变化速度。它的可选值包含这样几组：</p>
-<ul>
-<li>ease | linear | ease-in | ease-out | ease-in-out</li>
-<li>step-start | step-end | steps([, [ start | end ] ]?)</li>
-<li>cubic-bezier(, , , )</li>
-</ul>
-<h3 id="预设的五个时间曲线"><a href="#预设的五个时间曲线" class="headerlink" title="预设的五个时间曲线"></a>预设的五个时间曲线</h3><iframe height="519" scrolling="no" title="transition-timing-function-五个预设时间曲线" src="https://codepen.io/JingW/embed/dLyjoN/?height=519&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h3 id="阶跃函数-step"><a href="#阶跃函数-step" class="headerlink" title="阶跃函数 step"></a>阶跃函数 step</h3><p>直接上案例吧，看完效果再来讲阶跃函数几个参数的具体含义：</p>
-<iframe height="413" scrolling="no" title="transition-timing-function-阶跃函数" src="https://codepen.io/JingW/embed/PgwWXd/?height=413&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<p>实际体验了阶跃函数带来的效果后应该对其有个大概认知了吧。阶跃函数接收两个参数，第一个参数为<strong>正整数</strong>，指定阶跃函数的间隔数，你可以理解为把整个过渡过程拆成若干份儿；第二个参数可选，值为<code>[ start | end ]</code>，叫做跃点，指定是在每个间隔的起点还是终点发生阶跃变化，默认值为<code>end</code>。<br>查看上面案例的css代码，你会发现两种 <code>steps</code> 的简写形式：<code>step-start</code> 和 <code>step-end</code> ，它们分别等同于：<code>step-start = steps(1, start)</code> 和 <code>step-end = steps(1, end)</code> 。</p>
-<h3 id="cubic-bezier-贝塞尔曲线函数"><a href="#cubic-bezier-贝塞尔曲线函数" class="headerlink" title="cubic-bezier 贝塞尔曲线函数"></a>cubic-bezier 贝塞尔曲线函数</h3><p>贝塞尔曲线函数接收四个参数，取值范围是 0 到 1 之间的数值（包括0和1）。</p>
-<p>贝塞尔曲线函数，其实定义的是 <strong>属性状态</strong> 与 <strong>时间</strong> 的一个关系函数。如下坐标轴所示：</p>
-<img src="/posts/13167/cubic05000510.png" class="" title="cubic-bezier">
-
-<p>上图坐标轴中横坐标是时间，纵坐标是属性状态，右上角的坐标是(1,1)。在时间曲线中的每一个点，表示的就是对应时刻下属性的取值，每个点的斜率表示的就是在这个时刻属性的变化速度，因此在时间曲线中<strong>斜率越小</strong>，也就是<strong>越平缓</strong>的地方，表示<strong>属性变化速度越慢</strong>；<strong>斜率越大</strong>，也就是<strong>越陡峭</strong>的地方，表示<strong>属性变化速度越快</strong>。如上图中开始跟结束的时候，斜率都比较小，而中间的阶段，斜率比较大，因此这个曲线表示的就是在变化过程中由慢到快再到慢的一个过程。</p>
-<p>回到贝塞尔曲线函数接收的四个参数上，前两个是上图中红色点的坐标(x1,y1)，后两个是图中蓝色点的坐标(x2,y2)，也就是 <code>cubic-bezier(x1, y1, x2, y2)</code> 这样的形式。我们可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 这个工具上来调整我们独特的贝塞尔曲线，通过拖拽红色跟蓝色点，可以形成不一样的贝塞尔曲线。我们发现，其实规定取值范围在[0,1]之间，针对的是<strong>x坐标</strong>，也就是<strong>时间</strong>，因为时间如果超过了这个范围，就会出现在同一个时刻对应了两个不同的属性状态，这个是没有意义的；而y坐标是可以超过这个范围的，如下我们通过拖拽两个点形成了这样一个曲线：</p>
-<img src="/posts/13167/cubic55465149.png" class="" title="cubic-bezier">
-
-<p>它表示的是在过渡过程中属性值会超过终止状态的设定值然后再回到终点位置，表现为回弹的效果。大家可以在 <a href="http://cubic-bezier.com/">http://cubic-bezier.com/</a> 上自己拖动两个点尝试一下，最后点击 go 按钮查看效果。</p>
-<p>上面两个图的demo效果：</p>
-<iframe height="265" scrolling="no" title="transition-timing-function-贝塞尔曲线" src="https://codepen.io/JingW/embed/KYwqgb/?height=265&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<h2 id="transition-delay-延迟"><a href="#transition-delay-延迟" class="headerlink" title="transition-delay 延迟"></a>transition-delay 延迟</h2><p>这个属性同样没啥讲的，用它来设置元素延迟过渡的时间。</p>
-<h2 id="transition-的不足"><a href="#transition-的不足" class="headerlink" title="transition 的不足"></a>transition 的不足</h2><ul>
-<li>无法在页面加载的时候自动触发，因为只有当属性值发生改变的时候才会触发过渡动画。</li>
-<li>无法重复播放过渡动画，除非再次触发过渡事件。</li>
-<li>无法设置多种状态（keyframes 只有 from，to），只能从初始状态过渡到终止状态，无法再设置其他的状态。</li>
-<li>transition 规则作用的是单个属性的过渡状态，不能涉及多个属性，即使定义了 <code>transition: all 1s ease 0s;</code> 这样的规则，其对应的每个属性过渡动画也都是相互独立，相当于是定义了很多个 transition 规则，而每个 transition 只作用于一个属性。</li>
-</ul>
-<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
-<li><a href="https://easings.net/en#">Easing Functions Cheat Sheet</a></li>
-<li><a href="http://cubic-bezier.com/">cubic-bezier</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ubuntu下开启/关闭防火墙及端口的命令(笔记)</title>
     <url>/posts/60660/</url>
     <content><![CDATA[<h2 id="开启防火墙"><a href="#开启防火墙" class="headerlink" title="开启防火墙"></a>开启防火墙</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo ufw enable</span><br></pre></td></tr></table></figure>
@@ -4813,21 +4813,6 @@
       </tags>
   </entry>
   <entry>
-    <title>uniapp-全局变量四种方式</title>
-    <url>/posts/61889/</url>
-    <content><![CDATA[<p><a href="https://uniapp.dcloud.io/collocation/frame/window?id=getapp">https://uniapp.dcloud.io/collocation/frame/window?id=getapp</a></p>
-<p><a href="https://ask.dcloud.net.cn/article/35021">https://ask.dcloud.net.cn/article/35021</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>uniapp</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>uniapp-mock数据</title>
     <url>/posts/59363/</url>
     <content><![CDATA[<p>目前我们公司的页面结构规定的是一个页面一个单独文件夹，并且将页面文件拆成三个，例如：</p>
@@ -4862,6 +4847,21 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>uniapp-全局变量四种方式</title>
+    <url>/posts/61889/</url>
+    <content><![CDATA[<p><a href="https://uniapp.dcloud.io/collocation/frame/window?id=getapp">https://uniapp.dcloud.io/collocation/frame/window?id=getapp</a></p>
+<p><a href="https://ask.dcloud.net.cn/article/35021">https://ask.dcloud.net.cn/article/35021</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>uniapp</category>
+      </categories>
+      <tags>
         <tag>uniapp</tag>
       </tags>
   </entry>
@@ -5401,7 +5401,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#103;&#105;&#x74;&#x40;&#x67;&#105;&#116;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#109;">&#103;&#105;&#x74;&#x40;&#x67;&#105;&#116;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#103;&#x69;&#x74;&#64;&#103;&#x69;&#x74;&#x68;&#x75;&#98;&#x2e;&#99;&#111;&#109;">&#103;&#x69;&#x74;&#64;&#103;&#x69;&#x74;&#x68;&#x75;&#98;&#x2e;&#99;&#111;&#109;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -5427,7 +5427,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#x74;&#64;&#103;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#x69;&#x74;&#64;&#103;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#x74;&#64;&#x67;&#105;&#116;&#104;&#117;&#x62;&#46;&#x63;&#111;&#109;">&#x67;&#105;&#x74;&#64;&#x67;&#105;&#116;&#104;&#117;&#x62;&#46;&#x63;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -6694,6 +6694,104 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>前端面试系列大纲</title>
+    <url>/posts/46036/</url>
+    <content><![CDATA[<blockquote>
+<p>❗️ 持续更新中…❗️</p>
+</blockquote>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>根据网上各大前端面试题文章以及自我总结，沉淀下来的一套面试题合集，包含前端知识点 + 面试题。</p>
+<h2 id="大纲"><a href="#大纲" class="headerlink" title="大纲"></a>大纲</h2><h3 id="1-HTML"><a href="#1-HTML" class="headerlink" title="1 HTML"></a>1 HTML</h3><p>根据以往面试经验，HTML 部分很少有问到。所以这里仅列举一旦考则必问的面试题</p>
+<a id="more"></a>
+
+<h4 id="1-1-面试题"><a href="#1-1-面试题" class="headerlink" title="1.1 面试题"></a>1.1 面试题</h4><ul>
+<li><a href="https://evestorm.github.io/posts/13781/">HTML 面试题</a></li>
+</ul>
+<h3 id="2-CSS"><a href="#2-CSS" class="headerlink" title="2 CSS"></a>2 CSS</h3><p>个人经验：这部分面试题一般笔试考知识点多一些（多背），面试考布局更多一些（多实践）。所以 CSS 我拆成了两部分，把布局单独拧出来了。</p>
+<h4 id="2-1-知识点-部分面试题"><a href="#2-1-知识点-部分面试题" class="headerlink" title="2.1 知识点 + 部分面试题"></a>2.1 知识点 + 部分面试题</h4><ul>
+<li><a href="https://evestorm.github.io/posts/49170/">CSS 知识点</a></li>
+</ul>
+<h4 id="2-2-布局"><a href="#2-2-布局" class="headerlink" title="2.2 布局"></a>2.2 布局</h4><ul>
+<li><a href="https://evestorm.github.io/posts/10415/">CSS 布局面试题</a></li>
+</ul>
+<h3 id="3-JavaScript"><a href="#3-JavaScript" class="headerlink" title="3 JavaScript"></a>3 JavaScript</h3><p>这部分是面试重中之重，基本上啥都可能考。譬如比较经典的一个有关 axios 的面试题：</p>
+<ul>
+<li>问：a、b、c 三个请求，希望 c 在 a、b 获取数据后再发请求，要是你你会怎么做？</li>
+<li>答：axios.all 先请求 a、b，再在 then 的第一个回调中请求 c ，巴拉巴拉…</li>
+<li>问：那 axios.all 内部是通过什么实现的呢？</li>
+<li>答：Promise.all，巴拉巴拉…</li>
+<li>问：如果不用 Promise 该如何实现？</li>
+<li>答：可以用 高阶函数 ，巴拉巴拉…</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 示例（使用node读取文件做场景来说明）</span></span><br><span class="line"><span class="keyword">let</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">let</span> arr = [];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  arr.push(data);</span><br><span class="line">  <span class="keyword">if</span> (arr.length === <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="comment">// get ab</span></span><br><span class="line">    <span class="comment">// todo c</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">fs.readFile(<span class="string">&#x27;./a.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  fn(data);</span><br><span class="line">&#125;);</span><br><span class="line">fs.readFile(<span class="string">&#x27;./b.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  fn(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，往往 JS 面试题是层层深入的，需要你有坚实的基础，并且在平常开发时不仅满足会使用各种库和框架，还要深入了解原理。所以这一小节内容较多，各位做好抗压准备。</p>
+<h4 id="3-1-知识点"><a href="#3-1-知识点" class="headerlink" title="3.1 知识点"></a>3.1 知识点</h4><ul>
+<li><a href="https://evestorm.github.io/posts/31920/">JS 知识点</a></li>
+</ul>
+<h4 id="3-2-面试题"><a href="#3-2-面试题" class="headerlink" title="3.2 面试题"></a>3.2 面试题</h4><ul>
+<li><a href="https://evestorm.github.io/posts/41818/">JS 笔试题</a></li>
+<li><a href="https://evestorm.github.io/posts/24235/">JS 面试题</a></li>
+</ul>
+<h3 id="4-浏览器-网络"><a href="#4-浏览器-网络" class="headerlink" title="4 浏览器/网络"></a>4 浏览器/网络</h3><p>浏览器这边主要考察兼容性，当然有时候也考察下 HTTP 缓存等内容，所以我把它们归到了一起方便复习。</p>
+<ul>
+<li><a href="https://evestorm.github.io/posts/38402/">浏览器</a></li>
+</ul>
+<h3 id="5-框架-工具"><a href="#5-框架-工具" class="headerlink" title="5 框架 + 工具"></a>5 框架 + 工具</h3><h4 id="5-1-Vue"><a href="#5-1-Vue" class="headerlink" title="5.1 Vue"></a>5.1 Vue</h4><p>Vue 没什么好说的，数据响应式（双向数据绑定）是一定会问到的，其它例如生命周期之类的也常常出现，具体查看下面链接：</p>
+<ul>
+<li><a href="https://evestorm.github.io/posts/53756/">Vue 面试题</a></li>
+</ul>
+<h4 id="5-2-Webpack"><a href="#5-2-Webpack" class="headerlink" title="5.2 Webpack"></a>5.2 Webpack</h4><p>个人在面试中很少被问到 webpack 的问题？唯一一次与 webpack 相关的还是在一次面试的笔试题中，有这样一道：</p>
+<blockquote>
+<p>写出你知道的性能优化方案（不要写 webpack 工具能做到的）</p>
+</blockquote>
+<p>虽然我自己没碰到过，但保不齐其他公司不爱问，所以还是放在这儿：</p>
+<ul>
+<li><a href="https://evestorm.github.io/posts/47462/">如何使用 webpack4</a></li>
+<li><a href="https://evestorm.github.io/posts/6706/">Webpack 面试题</a></li>
+</ul>
+<h3 id="6-性能优化"><a href="#6-性能优化" class="headerlink" title="6 性能优化"></a>6 性能优化</h3><p>性能优化现在应该是必考题了，我去几家公司面就有几家会问到，常考的知识点有「首屏优化」「重排重绘优化」以及「css3 动画优化」等。不太了解这部分的童鞋可以看下面链接：</p>
+<ul>
+<li><a href="https://evestorm.github.io/posts/41624/">网站性能优化</a></li>
+<li><a href="https://evestorm.github.io/posts/47143/">web 性能优化-实践</a></li>
+</ul>
+<h3 id="7-算法"><a href="#7-算法" class="headerlink" title="7 算法"></a>7 算法</h3><p>这部分目前是我薄弱项，暂时不能给到大家更多帮助。不过对于面一般普通前端来说，也就顶多问一下常见的排序算法了。</p>
+<p>这是我之前整理的常见排序算法：可以 <a href="https://evestorm.github.io/posts/59937/">点击此处</a> 查看。</p>
+<p>其他算法面试题会在后续更新…</p>
+<h2 id="简历模板"><a href="#简历模板" class="headerlink" title="简历模板"></a>简历模板</h2><p>网上的简历模板一搜一大堆，不过大都既不实用也不好看。所以最后我再分享几个觉得不错的模板给大家参考：</p>
+<h3 id="纸质模板"><a href="#纸质模板" class="headerlink" title="纸质模板"></a>纸质模板</h3><ul>
+<li><a href="https://www.resumeviking.com/wp-content/uploads/2018/01/Dwight-Kavanagh-Resume-IT-QA-Analyst-11.pdf">https://www.resumeviking.com/wp-content/uploads/2018/01/Dwight-Kavanagh-Resume-IT-QA-Analyst-11.pdf</a><img src="/posts/46036/resume0.png" class="" title="resume0"></li>
+<li><a href="https://www.resumeviking.com/wp-content/uploads/2019/04/Emily_Carter_-_Resume_-_English_Teacher-9.pdf">https://www.resumeviking.com/wp-content/uploads/2019/04/Emily_Carter_-_Resume_-_English_Teacher-9.pdf</a><img src="/posts/46036/resume1.png" class="" title="resume1"></li>
+<li><a href="https://www.resumeviking.com/wp-content/uploads/2018/09/Karen_Philips_-_Resume_-_Web_Designer-4.pdf">https://www.resumeviking.com/wp-content/uploads/2018/09/Karen_Philips_-_Resume_-_Web_Designer-4.pdf</a><img src="/posts/46036/resume2.png" class="" title="resume2">
+
+</li>
+</ul>
+<p>上面两份模板都来自 <a href="https://www.resumeviking.com/templates/">此网站</a> ，想寻找更满意的版本可以进去逛逛。</p>
+<h3 id="在线模板"><a href="#在线模板" class="headerlink" title="在线模板"></a>在线模板</h3><ul>
+<li><a href="http://zhangwenli.com/cv/">http://zhangwenli.com/cv/</a><ul>
+<li>下载地址：<a href="https://github.com/Ovilia/cv">https://github.com/Ovilia/cv</a></li>
+</ul>
+</li>
+<li><a href="https://html5up.net/read-only">https://html5up.net/read-only</a><ul>
+<li>下载地址：上方链接右上角 Download</li>
+</ul>
+</li>
+</ul>
+<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>本项目整合了大量下方资源的面试题内容，但毕竟是按照我自己技术栈整合的，所以如果你还想查缺补漏（例如 react 相关面试题等），可以点击下方链接了解更多：</p>
+<ul>
+<li><a href="https://github.com/markyun/My-blog/tree/master/Front-end-Developer-Questions/Questions-and-Answers">前端开发面试题</a></li>
+<li><a href="https://juejin.im/post/5aae076d6fb9a028cc6100a9">前端面试考点多？看这些文章就够了</a></li>
+<li><a href="https://github.com/KieSun/Front-end-knowledge">KieSun/Front-end-knowledge</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>面试</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端vscode插件配置</title>
     <url>/posts/11039/</url>
     <content><![CDATA[<p>先把下面插件都安装下，最后使用 <code>settings.json</code> 去覆盖你本地自己的文件。</p>
@@ -6805,102 +6903,29 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>前端面试系列大纲</title>
-    <url>/posts/46036/</url>
-    <content><![CDATA[<blockquote>
-<p>❗️ 持续更新中…❗️</p>
-</blockquote>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>根据网上各大前端面试题文章以及自我总结，沉淀下来的一套面试题合集，包含前端知识点 + 面试题。</p>
-<h2 id="大纲"><a href="#大纲" class="headerlink" title="大纲"></a>大纲</h2><h3 id="1-HTML"><a href="#1-HTML" class="headerlink" title="1 HTML"></a>1 HTML</h3><p>根据以往面试经验，HTML 部分很少有问到。所以这里仅列举一旦考则必问的面试题</p>
+    <title>在vue-cli3项目中解决动态引入图片img404的问题</title>
+    <url>/posts/39457/</url>
+    <content><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>最新需要在项目中动态显示侧边栏菜单的图标。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>按照一般的开发模式，静态图片路径是相对路径还是绝对路径都可以，因为图片路径是静态的是死的，所以 webpack 去找这个图片路径的时候是能找到的。</p>
+<p>但是我的这个路径是动态的，我在 <code>computed</code> 给出一个拼接了变量的路径，项目启动在浏览器下死活出不了这个图片，死活都是 404。</p>
 <a id="more"></a>
 
-<h4 id="1-1-面试题"><a href="#1-1-面试题" class="headerlink" title="1.1 面试题"></a>1.1 面试题</h4><ul>
-<li><a href="https://evestorm.github.io/posts/13781/">HTML 面试题</a></li>
-</ul>
-<h3 id="2-CSS"><a href="#2-CSS" class="headerlink" title="2 CSS"></a>2 CSS</h3><p>个人经验：这部分面试题一般笔试考知识点多一些（多背），面试考布局更多一些（多实践）。所以 CSS 我拆成了两部分，把布局单独拧出来了。</p>
-<h4 id="2-1-知识点-部分面试题"><a href="#2-1-知识点-部分面试题" class="headerlink" title="2.1 知识点 + 部分面试题"></a>2.1 知识点 + 部分面试题</h4><ul>
-<li><a href="https://evestorm.github.io/posts/49170/">CSS 知识点</a></li>
-</ul>
-<h4 id="2-2-布局"><a href="#2-2-布局" class="headerlink" title="2.2 布局"></a>2.2 布局</h4><ul>
-<li><a href="https://evestorm.github.io/posts/10415/">CSS 布局面试题</a></li>
-</ul>
-<h3 id="3-JavaScript"><a href="#3-JavaScript" class="headerlink" title="3 JavaScript"></a>3 JavaScript</h3><p>这部分是面试重中之重，基本上啥都可能考。譬如比较经典的一个有关 axios 的面试题：</p>
-<ul>
-<li>问：a、b、c 三个请求，希望 c 在 a、b 获取数据后再发请求，要是你你会怎么做？</li>
-<li>答：axios.all 先请求 a、b，再在 then 的第一个回调中请求 c ，巴拉巴拉…</li>
-<li>问：那 axios.all 内部是通过什么实现的呢？</li>
-<li>答：Promise.all，巴拉巴拉…</li>
-<li>问：如果不用 Promise 该如何实现？</li>
-<li>答：可以用 高阶函数 ，巴拉巴拉…</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 示例（使用node读取文件做场景来说明）</span></span><br><span class="line"><span class="keyword">let</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">let</span> arr = [];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  arr.push(data);</span><br><span class="line">  <span class="keyword">if</span> (arr.length === <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="comment">// get ab</span></span><br><span class="line">    <span class="comment">// todo c</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">fs.readFile(<span class="string">&#x27;./a.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  fn(data);</span><br><span class="line">&#125;);</span><br><span class="line">fs.readFile(<span class="string">&#x27;./b.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  fn(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`../assets/icc-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>可以看出，往往 JS 面试题是层层深入的，需要你有坚实的基础，并且在平常开发时不仅满足会使用各种库和框架，还要深入了解原理。所以这一小节内容较多，各位做好抗压准备。</p>
-<h4 id="3-1-知识点"><a href="#3-1-知识点" class="headerlink" title="3.1 知识点"></a>3.1 知识点</h4><ul>
-<li><a href="https://evestorm.github.io/posts/31920/">JS 知识点</a></li>
-</ul>
-<h4 id="3-2-面试题"><a href="#3-2-面试题" class="headerlink" title="3.2 面试题"></a>3.2 面试题</h4><ul>
-<li><a href="https://evestorm.github.io/posts/41818/">JS 笔试题</a></li>
-<li><a href="https://evestorm.github.io/posts/24235/">JS 面试题</a></li>
-</ul>
-<h3 id="4-浏览器-网络"><a href="#4-浏览器-网络" class="headerlink" title="4 浏览器/网络"></a>4 浏览器/网络</h3><p>浏览器这边主要考察兼容性，当然有时候也考察下 HTTP 缓存等内容，所以我把它们归到了一起方便复习。</p>
-<ul>
-<li><a href="https://evestorm.github.io/posts/38402/">浏览器</a></li>
-</ul>
-<h3 id="5-框架-工具"><a href="#5-框架-工具" class="headerlink" title="5 框架 + 工具"></a>5 框架 + 工具</h3><h4 id="5-1-Vue"><a href="#5-1-Vue" class="headerlink" title="5.1 Vue"></a>5.1 Vue</h4><p>Vue 没什么好说的，数据响应式（双向数据绑定）是一定会问到的，其它例如生命周期之类的也常常出现，具体查看下面链接：</p>
-<ul>
-<li><a href="https://evestorm.github.io/posts/53756/">Vue 面试题</a></li>
-</ul>
-<h4 id="5-2-Webpack"><a href="#5-2-Webpack" class="headerlink" title="5.2 Webpack"></a>5.2 Webpack</h4><p>个人在面试中很少被问到 webpack 的问题？唯一一次与 webpack 相关的还是在一次面试的笔试题中，有这样一道：</p>
-<blockquote>
-<p>写出你知道的性能优化方案（不要写 webpack 工具能做到的）</p>
+<p>上述这样的路径是不行的，一直是 404，原因也讲了点，vue-cli3 中内置的 webpack 会把图片当做一个模块引用，然后打包等等，路径就不对了，我们的静态资源是不需要打包等等的，。</p>
+<p>静态资源是直接被 webpack copy 到对应的静态资源文件夹下，所以根本原因就在于，用了动态路径的图片，webpack 将它认作为一个模块打包了，路径错乱，所以 404。</p>
+<p>找到了原因就很简单了，解决这个动态路径图片 404 的方案其实 vue-cli3 官网就有写过：<a href="https://cli.vuejs.org/zh/guide/html-and-static-assets.html#%E5%A4%84%E7%90%86%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90">vue-cli3 的官方解决方案</a></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
+<p>Sidebar.vue</p>
 </blockquote>
-<p>虽然我自己没碰到过，但保不齐其他公司不爱问，所以还是放在这儿：</p>
-<ul>
-<li><a href="https://evestorm.github.io/posts/47462/">如何使用 webpack4</a></li>
-<li><a href="https://evestorm.github.io/posts/6706/">Webpack 面试题</a></li>
-</ul>
-<h3 id="6-性能优化"><a href="#6-性能优化" class="headerlink" title="6 性能优化"></a>6 性能优化</h3><p>性能优化现在应该是必考题了，我去几家公司面就有几家会问到，常考的知识点有「首屏优化」「重排重绘优化」以及「css3 动画优化」等。不太了解这部分的童鞋可以看下面链接：</p>
-<ul>
-<li><a href="https://evestorm.github.io/posts/41624/">网站性能优化</a></li>
-<li><a href="https://evestorm.github.io/posts/47143/">web 性能优化-实践</a></li>
-</ul>
-<h3 id="7-算法"><a href="#7-算法" class="headerlink" title="7 算法"></a>7 算法</h3><p>这部分目前是我薄弱项，暂时不能给到大家更多帮助。不过对于面一般普通前端来说，也就顶多问一下常见的排序算法了。</p>
-<p>这是我之前整理的常见排序算法：可以 <a href="https://evestorm.github.io/posts/59937/">点击此处</a> 查看。</p>
-<p>其他算法面试题会在后续更新…</p>
-<h2 id="简历模板"><a href="#简历模板" class="headerlink" title="简历模板"></a>简历模板</h2><p>网上的简历模板一搜一大堆，不过大都既不实用也不好看。所以最后我再分享几个觉得不错的模板给大家参考：</p>
-<h3 id="纸质模板"><a href="#纸质模板" class="headerlink" title="纸质模板"></a>纸质模板</h3><ul>
-<li><a href="https://www.resumeviking.com/wp-content/uploads/2018/01/Dwight-Kavanagh-Resume-IT-QA-Analyst-11.pdf">https://www.resumeviking.com/wp-content/uploads/2018/01/Dwight-Kavanagh-Resume-IT-QA-Analyst-11.pdf</a><img src="/posts/46036/resume0.png" class="" title="resume0"></li>
-<li><a href="https://www.resumeviking.com/wp-content/uploads/2019/04/Emily_Carter_-_Resume_-_English_Teacher-9.pdf">https://www.resumeviking.com/wp-content/uploads/2019/04/Emily_Carter_-_Resume_-_English_Teacher-9.pdf</a><img src="/posts/46036/resume1.png" class="" title="resume1"></li>
-<li><a href="https://www.resumeviking.com/wp-content/uploads/2018/09/Karen_Philips_-_Resume_-_Web_Designer-4.pdf">https://www.resumeviking.com/wp-content/uploads/2018/09/Karen_Philips_-_Resume_-_Web_Designer-4.pdf</a><img src="/posts/46036/resume2.png" class="" title="resume2">
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      customIcon: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      baseUrl: process.env.BASE_URL <span class="comment">// 项目根目录路径前缀</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<p>上面两份模板都来自 <a href="https://www.resumeviking.com/templates/">此网站</a> ，想寻找更满意的版本可以进去逛逛。</p>
-<h3 id="在线模板"><a href="#在线模板" class="headerlink" title="在线模板"></a>在线模板</h3><ul>
-<li><a href="http://zhangwenli.com/cv/">http://zhangwenli.com/cv/</a><ul>
-<li>下载地址：<a href="https://github.com/Ovilia/cv">https://github.com/Ovilia/cv</a></li>
-</ul>
-</li>
-<li><a href="https://html5up.net/read-only">https://html5up.net/read-only</a><ul>
-<li>下载地址：上方链接右上角 Download</li>
-</ul>
-</li>
-</ul>
-<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>本项目整合了大量下方资源的面试题内容，但毕竟是按照我自己技术栈整合的，所以如果你还想查缺补漏（例如 react 相关面试题等），可以点击下方链接了解更多：</p>
-<ul>
-<li><a href="https://github.com/markyun/My-blog/tree/master/Front-end-Developer-Questions/Questions-and-Answers">前端开发面试题</a></li>
-<li><a href="https://juejin.im/post/5aae076d6fb9a028cc6100a9">前端面试考点多？看这些文章就够了</a></li>
-<li><a href="https://github.com/KieSun/Front-end-knowledge">KieSun/Front-end-knowledge</a></li>
-</ul>
+<p>把你所用的动态图片 img 放到 public 目录下:</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── favicon.ico</span><br><span class="line">├── index.html</span><br><span class="line">└── sidebar-icon</span><br><span class="line">    ├── hc-control.png</span><br><span class="line">    ├── hc-list.png</span><br><span class="line">    ├── home.png</span><br><span class="line">    ├── material.png</span><br><span class="line">    ├── package.png</span><br><span class="line">    ├── repo.png</span><br><span class="line">    ├── secure.png</span><br><span class="line">    ├── sys-arg.png</span><br><span class="line">    └── sys-manage.png</span><br></pre></td></tr></table></figure>
+
+<p>修改你的动态路径图片地址:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;<span class="built_in">this</span>.baseUrl&#125;</span>sidebar-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;img :src=<span class="string">&quot;fullURL&quot;</span> /&gt;</span><br></pre></td></tr></table></figure>
 ]]></content>
-      <categories>
-        <category>前端</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>面试</tag>
-      </tags>
   </entry>
   <entry>
     <title>在VueCli3项目中使用Bootstrap</title>
@@ -6927,31 +6952,6 @@ callee</code></pre>
         <tag>Vue</tag>
         <tag>Bootstrap</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>在vue-cli3项目中解决动态引入图片img404的问题</title>
-    <url>/posts/39457/</url>
-    <content><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>最新需要在项目中动态显示侧边栏菜单的图标。</p>
-<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>按照一般的开发模式，静态图片路径是相对路径还是绝对路径都可以，因为图片路径是静态的是死的，所以 webpack 去找这个图片路径的时候是能找到的。</p>
-<p>但是我的这个路径是动态的，我在 <code>computed</code> 给出一个拼接了变量的路径，项目启动在浏览器下死活出不了这个图片，死活都是 404。</p>
-<a id="more"></a>
-
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`../assets/icc-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述这样的路径是不行的，一直是 404，原因也讲了点，vue-cli3 中内置的 webpack 会把图片当做一个模块引用，然后打包等等，路径就不对了，我们的静态资源是不需要打包等等的，。</p>
-<p>静态资源是直接被 webpack copy 到对应的静态资源文件夹下，所以根本原因就在于，用了动态路径的图片，webpack 将它认作为一个模块打包了，路径错乱，所以 404。</p>
-<p>找到了原因就很简单了，解决这个动态路径图片 404 的方案其实 vue-cli3 官网就有写过：<a href="https://cli.vuejs.org/zh/guide/html-and-static-assets.html#%E5%A4%84%E7%90%86%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90">vue-cli3 的官方解决方案</a></p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
-<p>Sidebar.vue</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      customIcon: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      baseUrl: process.env.BASE_URL <span class="comment">// 项目根目录路径前缀</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>把你所用的动态图片 img 放到 public 目录下:</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── favicon.ico</span><br><span class="line">├── index.html</span><br><span class="line">└── sidebar-icon</span><br><span class="line">    ├── hc-control.png</span><br><span class="line">    ├── hc-list.png</span><br><span class="line">    ├── home.png</span><br><span class="line">    ├── material.png</span><br><span class="line">    ├── package.png</span><br><span class="line">    ├── repo.png</span><br><span class="line">    ├── secure.png</span><br><span class="line">    ├── sys-arg.png</span><br><span class="line">    └── sys-manage.png</span><br></pre></td></tr></table></figure>
-
-<p>修改你的动态路径图片地址:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  <span class="function"><span class="title">fullURL</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;<span class="built_in">this</span>.baseUrl&#125;</span>sidebar-icon/<span class="subst">$&#123;<span class="built_in">this</span>.customIcon&#125;</span>.png`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;img :src=<span class="string">&quot;fullURL&quot;</span> /&gt;</span><br></pre></td></tr></table></figure>
-]]></content>
   </entry>
   <entry>
     <title>垂直居中方案汇总</title>
@@ -7252,39 +7252,6 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
-    <title>如何实现一个简单的骨架屏效果</title>
-    <url>/posts/11567/</url>
-    <content><![CDATA[<p>之前博客提到了如何在 Vue 中使用插件实现骨架屏效果，而且骨架屏 UI 素材使用的是图片。一旦我们没有设计师帮助提供图片或者插件失效就没辙了。所以这次记录下如何在不使用插件的前提下，使用 HTML+CSS 实现一个自定义骨架屏。</p>
-<h3 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h3><img src="/posts/11567/skeleton.png" class="" title="最终效果">
-
-<a id="more"></a>
-
-<h3 id="代码文件"><a href="#代码文件" class="headerlink" title="代码文件"></a>代码文件</h3><h4 id="封装组件"><a href="#封装组件" class="headerlink" title="封装组件"></a>封装组件</h4><blockquote>
-<p>yyt-st-skeleton.vue</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 预定selectTable的骨架屏 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-skeleton&quot;</span> <span class="attr">:style</span>=<span class="string">&quot;&#123; top: top + &#x27;rpx&#x27; &#125;&quot;</span> <span class="attr">v-if</span>=<span class="string">&quot;show&quot;</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 区域名称 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-area-name&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 桌台列表 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-table-list-wrapper&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">view</span> <span class="attr">v-else</span>&gt;</span><span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    name: <span class="string">&#x27;yyt-st-skeleton&#x27;</span>,</span></span><br><span class="line">    props: &#123;</span><br><span class="line">      top: &#123;</span><br><span class="line"><span class="javascript">        type: <span class="built_in">Number</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="number">100</span>,</span></span><br><span class="line"><span class="javascript">        <span class="built_in">require</span>: <span class="literal">false</span></span></span><br><span class="line">      &#125;,</span><br><span class="line">      show: &#123;</span><br><span class="line"><span class="javascript">        type: <span class="built_in">Boolean</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">        <span class="built_in">require</span>: <span class="literal">true</span></span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    components: &#123;&#125;,</span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> &#123;&#125;;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;&#125;</span><br><span class="line">  &#125;;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;less&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="keyword">@import</span> url(<span class="string">&#x27;yyt-st-skeleton.less&#x27;</span>);</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>yyt-st-skeleton.less</p>
-</blockquote>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.bgImg</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">linear-gradient</span>(</span><br><span class="line">    <span class="number">90deg</span>,</span><br><span class="line">    rgba(#fff, <span class="number">0</span>),</span><br><span class="line">    <span class="built_in">rgba</span>(#fff, <span class="number">0.5</span>),</span><br><span class="line">    <span class="built_in">rgba</span>(#fff, <span class="number">0</span>)</span><br><span class="line">  );</span><br><span class="line">  background-size: 40px 100%; // width of the shine</span><br><span class="line">  <span class="selector-tag">background-repeat</span>: <span class="selector-tag">no-repeat</span>; // <span class="selector-tag">No</span> <span class="selector-tag">need</span> <span class="selector-tag">to</span> <span class="selector-tag">repeat</span> <span class="selector-tag">the</span> <span class="selector-tag">shine</span> <span class="selector-tag">effect</span></span><br><span class="line">  <span class="selector-tag">background-position</span>: <span class="selector-tag">left</span> <span class="selector-tag">-40px</span> <span class="selector-tag">top</span> 0; // <span class="selector-tag">Place</span> <span class="selector-tag">shine</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">left</span> <span class="selector-tag">side</span>, <span class="selector-tag">with</span> <span class="selector-tag">offset</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">left</span> <span class="selector-tag">based</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">width</span> <span class="selector-tag">of</span> <span class="selector-tag">the</span> <span class="selector-tag">shine</span> <span class="selector-tag">-</span> <span class="selector-tag">see</span> <span class="selector-tag">background-size</span></span><br><span class="line">  animation: shine 1s ease infinite; // increase animation time to see effect in &#x27;slow-mo&#x27;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@bg: #e6e6e6;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.yyt-st-skeleton</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100vw</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">10</span>rpx <span class="number">20</span>rpx;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-direction</span>: column;</span><br><span class="line">  <span class="attribute">align-items</span>: flex-start;</span><br><span class="line"></span><br><span class="line">  .yyt-st-area-name &#123;</span><br><span class="line">    <span class="selector-tag">width</span>: <span class="selector-tag">calc</span>(100% / 3 <span class="selector-tag">-</span> 20<span class="selector-tag">rpx</span>);</span><br><span class="line">    <span class="selector-tag">height</span>: 40<span class="selector-tag">rpx</span>;</span><br><span class="line">    <span class="selector-tag">background-color</span>: <span class="keyword">@bg</span>;</span><br><span class="line">    <span class="selector-tag">margin-bottom</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line">    <span class="selector-tag">margin-left</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line"></span><br><span class="line">    <span class="selector-class">.bgImg</span>();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="selector-class">.yyt-st-table-list-wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">    <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">10</span>rpx;</span><br><span class="line">    <span class="attribute">text-align</span>: center;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span> auto;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="built_in">repeat</span>(auto-fill, calc(<span class="number">100vw</span> / <span class="number">3</span> - <span class="number">2</span> * <span class="number">10</span>rpx));</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="built_in">repeat</span>(auto-fill, calc(<span class="number">100%</span> / <span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    &amp; &gt; div &#123;</span><br><span class="line">      <span class="selector-tag">background-color</span>: <span class="keyword">@bg</span>;</span><br><span class="line">      <span class="selector-tag">background-clip</span>: <span class="selector-tag">content-box</span>;</span><br><span class="line">      <span class="selector-tag">margin</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line"></span><br><span class="line">      <span class="selector-class">.bgImg</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@keyframes</span> shine &#123;</span><br><span class="line">  // <span class="selector-tag">to</span> &#123;</span><br><span class="line">  // 	// Move shine from left to right, with offset on the right based on the width of the shine - see background-size</span><br><span class="line">  // 	<span class="selector-tag">background-position</span>: <span class="selector-tag">right</span> <span class="selector-tag">-40px</span> <span class="selector-tag">top</span> 0;</span><br><span class="line">  // &#125;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  50% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">0.6</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用组件"><a href="#使用组件" class="headerlink" title="使用组件"></a>使用组件</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">yyt-st-skeleton</span> <span class="attr">:show</span>=<span class="string">&quot;!ready&quot;</span> <span class="attr">:top</span>=<span class="string">&quot;100&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 数据加载成功后被骨架屏替换掉的页面元素 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">yyt-st-skeleton</span>&gt;</span></span><br><span class="line"></span><br><span class="line">export default &#123; data() &#123; return &#123; ready: false, //</span><br><span class="line">页面加载成功为true，默认为false &#125; &#125;, methods: &#123; requestData() &#123;</span><br><span class="line"><span class="comment">&lt;!-- 模拟数据加载 --&gt;</span></span><br><span class="line">setTimeout(() =&gt; &#123; this.ready = true; &#125;, 2000); &#125; &#125; &#125;</span><br></pre></td></tr></table></figure>
-
-<p>骨架屏原理其实很简单，它其实就是个占位组件，用简单的 HTML 和 CSS 就能实现，当页面请求时显示，请求完毕后隐藏，与此同时显示加载数据成功后的界面。</p>
-<p>如果需要在等待期间骨架屏有动画效果，使用 CSS3 的 animation + @keyframes 就能完成。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>用户体验</tag>
-        <tag>骨架屏</tag>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何清除浮动</title>
     <url>/posts/12906/</url>
     <content><![CDATA[<h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
@@ -7343,27 +7310,36 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>如何解决0.1+0.2不等于0.3的问题</title>
-    <url>/posts/21245/</url>
-    <content><![CDATA[<h2 id="为何会出现此问题？"><a href="#为何会出现此问题？" class="headerlink" title="为何会出现此问题？"></a>为何会出现此问题？</h2><p>总结一句话：这是因为二进制模拟十进制进行运算时的精度问题。</p>
-<p>具体可查看 <a href="https://juejin.im/post/5b90e00e6fb9a05cf9080dff">0.1 + 0.2 不等于 0.3？为什么 JavaScript 有这种“骚”操作？</a> 这篇掘金文章。</p>
+    <title>如何实现一个简单的骨架屏效果</title>
+    <url>/posts/11567/</url>
+    <content><![CDATA[<p>之前博客提到了如何在 Vue 中使用插件实现骨架屏效果，而且骨架屏 UI 素材使用的是图片。一旦我们没有设计师帮助提供图片或者插件失效就没辙了。所以这次记录下如何在不使用插件的前提下，使用 HTML+CSS 实现一个自定义骨架屏。</p>
+<h3 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h3><img src="/posts/11567/skeleton.png" class="" title="最终效果">
+
 <a id="more"></a>
 
-<h2 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h2><h3 id="Number-EPSILON"><a href="#Number-EPSILON" class="headerlink" title="Number.EPSILON"></a>Number.EPSILON</h3><p>第一种方法是利用 <code>Number.EPSILON</code> ，这个值无限接近于 0。0.1+0.2 的精度误差在这个值的范围内：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">numbersEqual</span>(<span class="params">a,b</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.abs(a-b)&lt;<span class="built_in">Number</span>.EPSILON;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a=<span class="number">0.1</span>+<span class="number">0.2</span>， b=<span class="number">0.3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(numbersEqual(a,b));    <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+<h3 id="代码文件"><a href="#代码文件" class="headerlink" title="代码文件"></a>代码文件</h3><h4 id="封装组件"><a href="#封装组件" class="headerlink" title="封装组件"></a>封装组件</h4><blockquote>
+<p>yyt-st-skeleton.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 预定selectTable的骨架屏 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-skeleton&quot;</span> <span class="attr">:style</span>=<span class="string">&quot;&#123; top: top + &#x27;rpx&#x27; &#125;&quot;</span> <span class="attr">v-if</span>=<span class="string">&quot;show&quot;</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 区域名称 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-area-name&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 桌台列表 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;yyt-st-table-list-wrapper&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">view</span> <span class="attr">v-else</span>&gt;</span><span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    name: <span class="string">&#x27;yyt-st-skeleton&#x27;</span>,</span></span><br><span class="line">    props: &#123;</span><br><span class="line">      top: &#123;</span><br><span class="line"><span class="javascript">        type: <span class="built_in">Number</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="number">100</span>,</span></span><br><span class="line"><span class="javascript">        <span class="built_in">require</span>: <span class="literal">false</span></span></span><br><span class="line">      &#125;,</span><br><span class="line">      show: &#123;</span><br><span class="line"><span class="javascript">        type: <span class="built_in">Boolean</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">        <span class="built_in">require</span>: <span class="literal">true</span></span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    components: &#123;&#125;,</span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> &#123;&#125;;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;&#125;</span><br><span class="line">  &#125;;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;less&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="keyword">@import</span> url(<span class="string">&#x27;yyt-st-skeleton.less&#x27;</span>);</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="内置函数-toFixed"><a href="#内置函数-toFixed" class="headerlink" title="内置函数 toFixed"></a>内置函数 toFixed</h3><p>利用 <code>parseFloat</code> + 内置函数 toFixed：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatNum</span>(<span class="params">num, fixed = <span class="number">10</span></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// a.toFixed(fixed) 先转为小数点10位的字符串 &quot;0.3000000000&quot;</span></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">parseFloat</span>(a.toFixed(fixed)); <span class="comment">// 然后通过parseFloat转为浮点数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">0.1</span> + <span class="number">0.2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(formatNum(a)); <span class="comment">//0.3</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>yyt-st-skeleton.less</p>
+</blockquote>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.bgImg</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">linear-gradient</span>(</span><br><span class="line">    <span class="number">90deg</span>,</span><br><span class="line">    rgba(#fff, <span class="number">0</span>),</span><br><span class="line">    <span class="built_in">rgba</span>(#fff, <span class="number">0.5</span>),</span><br><span class="line">    <span class="built_in">rgba</span>(#fff, <span class="number">0</span>)</span><br><span class="line">  );</span><br><span class="line">  background-size: 40px 100%; // width of the shine</span><br><span class="line">  <span class="selector-tag">background-repeat</span>: <span class="selector-tag">no-repeat</span>; // <span class="selector-tag">No</span> <span class="selector-tag">need</span> <span class="selector-tag">to</span> <span class="selector-tag">repeat</span> <span class="selector-tag">the</span> <span class="selector-tag">shine</span> <span class="selector-tag">effect</span></span><br><span class="line">  <span class="selector-tag">background-position</span>: <span class="selector-tag">left</span> <span class="selector-tag">-40px</span> <span class="selector-tag">top</span> 0; // <span class="selector-tag">Place</span> <span class="selector-tag">shine</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">left</span> <span class="selector-tag">side</span>, <span class="selector-tag">with</span> <span class="selector-tag">offset</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">left</span> <span class="selector-tag">based</span> <span class="selector-tag">on</span> <span class="selector-tag">the</span> <span class="selector-tag">width</span> <span class="selector-tag">of</span> <span class="selector-tag">the</span> <span class="selector-tag">shine</span> <span class="selector-tag">-</span> <span class="selector-tag">see</span> <span class="selector-tag">background-size</span></span><br><span class="line">  animation: shine 1s ease infinite; // increase animation time to see effect in &#x27;slow-mo&#x27;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@bg: #e6e6e6;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.yyt-st-skeleton</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100vw</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">10</span>rpx <span class="number">20</span>rpx;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-direction</span>: column;</span><br><span class="line">  <span class="attribute">align-items</span>: flex-start;</span><br><span class="line"></span><br><span class="line">  .yyt-st-area-name &#123;</span><br><span class="line">    <span class="selector-tag">width</span>: <span class="selector-tag">calc</span>(100% / 3 <span class="selector-tag">-</span> 20<span class="selector-tag">rpx</span>);</span><br><span class="line">    <span class="selector-tag">height</span>: 40<span class="selector-tag">rpx</span>;</span><br><span class="line">    <span class="selector-tag">background-color</span>: <span class="keyword">@bg</span>;</span><br><span class="line">    <span class="selector-tag">margin-bottom</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line">    <span class="selector-tag">margin-left</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line"></span><br><span class="line">    <span class="selector-class">.bgImg</span>();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="selector-class">.yyt-st-table-list-wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">    <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">10</span>rpx;</span><br><span class="line">    <span class="attribute">text-align</span>: center;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span> auto;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="built_in">repeat</span>(auto-fill, calc(<span class="number">100vw</span> / <span class="number">3</span> - <span class="number">2</span> * <span class="number">10</span>rpx));</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="built_in">repeat</span>(auto-fill, calc(<span class="number">100%</span> / <span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    &amp; &gt; div &#123;</span><br><span class="line">      <span class="selector-tag">background-color</span>: <span class="keyword">@bg</span>;</span><br><span class="line">      <span class="selector-tag">background-clip</span>: <span class="selector-tag">content-box</span>;</span><br><span class="line">      <span class="selector-tag">margin</span>: 10<span class="selector-tag">rpx</span>;</span><br><span class="line"></span><br><span class="line">      <span class="selector-class">.bgImg</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@keyframes</span> shine &#123;</span><br><span class="line">  // <span class="selector-tag">to</span> &#123;</span><br><span class="line">  // 	// Move shine from left to right, with offset on the right based on the width of the shine - see background-size</span><br><span class="line">  // 	<span class="selector-tag">background-position</span>: <span class="selector-tag">right</span> <span class="selector-tag">-40px</span> <span class="selector-tag">top</span> 0;</span><br><span class="line">  // &#125;</span><br><span class="line">  0% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  50% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">0.6</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  100% &#123;</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="内置函数-toPrecision"><a href="#内置函数-toPrecision" class="headerlink" title="内置函数 toPrecision"></a>内置函数 toPrecision</h3><p>我平常用此函数来计算精度，具体可参考 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/toPrecision">Number.prototype.toPrecision() | MDN</a>：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数toPrecision(中文：精确，精度)</span></span><br><span class="line"><span class="comment">// 参数是精度.比如5.1234，传2返回5.1，传1返回5；0.2+0.1传2返回0.30</span></span><br><span class="line">(<span class="number">0.1</span> + <span class="number">0.2</span>).toPrecision(<span class="number">10</span>) == <span class="number">0.3</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用组件"><a href="#使用组件" class="headerlink" title="使用组件"></a>使用组件</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">yyt-st-skeleton</span> <span class="attr">:show</span>=<span class="string">&quot;!ready&quot;</span> <span class="attr">:top</span>=<span class="string">&quot;100&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 数据加载成功后被骨架屏替换掉的页面元素 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">yyt-st-skeleton</span>&gt;</span></span><br><span class="line"></span><br><span class="line">export default &#123; data() &#123; return &#123; ready: false, //</span><br><span class="line">页面加载成功为true，默认为false &#125; &#125;, methods: &#123; requestData() &#123;</span><br><span class="line"><span class="comment">&lt;!-- 模拟数据加载 --&gt;</span></span><br><span class="line">setTimeout(() =&gt; &#123; this.ready = true; &#125;, 2000); &#125; &#125; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>骨架屏原理其实很简单，它其实就是个占位组件，用简单的 HTML 和 CSS 就能实现，当页面请求时显示，请求完毕后隐藏，与此同时显示加载数据成功后的界面。</p>
+<p>如果需要在等待期间骨架屏有动画效果，使用 CSS3 的 animation + @keyframes 就能完成。</p>
 ]]></content>
       <categories>
         <category>前端</category>
-        <category>JS</category>
+        <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
+        <tag>用户体验</tag>
+        <tag>骨架屏</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -7394,6 +7370,30 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>字体侵权</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决0.1+0.2不等于0.3的问题</title>
+    <url>/posts/21245/</url>
+    <content><![CDATA[<h2 id="为何会出现此问题？"><a href="#为何会出现此问题？" class="headerlink" title="为何会出现此问题？"></a>为何会出现此问题？</h2><p>总结一句话：这是因为二进制模拟十进制进行运算时的精度问题。</p>
+<p>具体可查看 <a href="https://juejin.im/post/5b90e00e6fb9a05cf9080dff">0.1 + 0.2 不等于 0.3？为什么 JavaScript 有这种“骚”操作？</a> 这篇掘金文章。</p>
+<a id="more"></a>
+
+<h2 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h2><h3 id="Number-EPSILON"><a href="#Number-EPSILON" class="headerlink" title="Number.EPSILON"></a>Number.EPSILON</h3><p>第一种方法是利用 <code>Number.EPSILON</code> ，这个值无限接近于 0。0.1+0.2 的精度误差在这个值的范围内：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">numbersEqual</span>(<span class="params">a,b</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.abs(a-b)&lt;<span class="built_in">Number</span>.EPSILON;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a=<span class="number">0.1</span>+<span class="number">0.2</span>， b=<span class="number">0.3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(numbersEqual(a,b));    <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="内置函数-toFixed"><a href="#内置函数-toFixed" class="headerlink" title="内置函数 toFixed"></a>内置函数 toFixed</h3><p>利用 <code>parseFloat</code> + 内置函数 toFixed：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatNum</span>(<span class="params">num, fixed = <span class="number">10</span></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// a.toFixed(fixed) 先转为小数点10位的字符串 &quot;0.3000000000&quot;</span></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">parseFloat</span>(a.toFixed(fixed)); <span class="comment">// 然后通过parseFloat转为浮点数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">0.1</span> + <span class="number">0.2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(formatNum(a)); <span class="comment">//0.3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="内置函数-toPrecision"><a href="#内置函数-toPrecision" class="headerlink" title="内置函数 toPrecision"></a>内置函数 toPrecision</h3><p>我平常用此函数来计算精度，具体可参考 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/toPrecision">Number.prototype.toPrecision() | MDN</a>：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数toPrecision(中文：精确，精度)</span></span><br><span class="line"><span class="comment">// 参数是精度.比如5.1234，传2返回5.1，传1返回5；0.2+0.1传2返回0.30</span></span><br><span class="line">(<span class="number">0.1</span> + <span class="number">0.2</span>).toPrecision(<span class="number">10</span>) == <span class="number">0.3</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -8032,30 +8032,6 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
-    <title>用JS实现翻转二叉树</title>
-    <url>/posts/50491/</url>
-    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
-<p>输入</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>输出</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>后端</category>
-        <category>算法</category>
-      </categories>
-  </entry>
-  <entry>
     <title>理解Vue中的computed用法以及和methods、watch的区别(摘录)</title>
     <url>/posts/42683/</url>
     <content><![CDATA[<p>摘录来源：<a href="https://www.cnblogs.com/tugenhua0707/p/11760466.html">https://www.cnblogs.com/tugenhua0707/p/11760466.html</a></p>
@@ -8140,6 +8116,30 @@ callee</code></pre>
         <tag>笔记</tag>
         <tag>Vue</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>用JS实现翻转二叉树</title>
+    <url>/posts/50491/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
+<p>输入</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>输出</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>算法</category>
+      </categories>
   </entry>
   <entry>
     <title>监听某个元素的宽度变化-ResizeObserver</title>
@@ -8257,8 +8257,15 @@ callee</code></pre>
 <li>如果 Star 项目有变动可点击左上同步按钮同步</li>
 </ul>
 <p>效果：</p>
-<img src="/posts/undefined/astral.png" class="" title="astral">
+<img src="/posts/45568/astral.png" class="" title="astral">
 ]]></content>
+      <categories>
+        <category>效率</category>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>GitHub</tag>
+      </tags>
   </entry>
   <entry>
     <title>苹果app如何在其他人电脑上发版</title>
