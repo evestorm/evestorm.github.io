@@ -37,13 +37,13 @@ date: 2019-11-20 16:07:34
 
 右键单击 `Elements` 面板中的目标元素节点并选择「force state」。或者在 `Styles` 子窗格中单击「:hov」图标。可以触发元素上的伪类来研究元素在悬停时的效果和样式：
 
-[![触发伪类](chrome调试技巧-汇总/chromehover.gif)](https://gitee.com/evestorm/various_resources/raw/master/tools/chromehover.gif)
+{% asset_img chromehover.gif 触发伪类 %}
 
 ## ALT+单击可以展开所有子节点
 
 在 Elements 面板中,使用 Alt+单击可以展开该 Dom 节点下的所有 Dom 子节点：
 
-[![alt+单击展开所有子节点](chrome调试技巧-汇总/2019082016164342.gif)](https://img-blog.csdnimg.cn/2019082016164342.gif)
+{% asset_img 2019082016164342.gif alt+单击展开所有子节点 %}
 
 ## copy
 
@@ -51,13 +51,13 @@ date: 2019-11-20 16:07:34
 
 你可以通过全局的方法 `copy()` 在 `console` 里 `copy` 任何你能拿到的资源，例如：
 
-[![copy 资源](chrome调试技巧-汇总/copy_resource.gif)](https://gitee.com/evestorm/various_resources/raw/master/tools/copy_resource.gif)
+{% asset_img copy_resource.gif copy资源 %}
 
 ### 拷贝 HTML (最快的方式)
 
 可能你知道右击或者点击在 `html` 元素边上的省略号(…)就能将它 `copy` 到操作系统剪贴板中 但你同样可以用非常古老的 `[ctrl] + [c]` + `[ctrl] + [v]` 大法来实现同样的效果！
 
-[![copy html](chrome调试技巧-汇总/copy_html.gif)](https://gitee.com/evestorm/various_resources/raw/master/tools/copy_html.gif)
+{% asset_img copy_html.gif copy_html %}
 
 ## snippet 代码块
 
@@ -70,21 +70,21 @@ date: 2019-11-20 16:07:34
 
 我们常常需要在控制台中调试代码。比如你想知道如何在 JavaScript 中反转字符串，然后你在网络上搜索相关信息并找到以下代可行代码。
 
-```
-copy'abcde'.split('').reverse().join('')
+```js
+'abcde'.split('').reverse().join('');
 ```
 
-[![split](chrome调试技巧-汇总/split.jpg)split](https://evestorm.github.io/posts/63676/split.jpg)
+{% asset_img split.jpg split %}
 
 没问题，上面的代码确实对字符串进行了翻转。但你还想了解 split()、reverse()、join() 这些方法的作用以及运行他们的中间步骤的结果。因此，现在你想逐步执行上述代码，可能会编写如下内容：
 
-[![chrome-split](chrome调试技巧-汇总/chrome-split.jpg)chrome-split](https://evestorm.github.io/posts/63676/chrome-split.jpg)
+{% asset_img chrome-split.jpg chrome-split %}
 
 好了，经过上面这些操作，我们确实知道了每个方法运行的返回值，也就了解了各个方法的作用。
 
 但是，这给人的感觉有点多此一举。上面的做法既容易出错，又难以理解。实际上，在控制台中，我们可以使用魔术变量$\_引用上一次操作的结果。
 
-[![chrome-full](chrome调试技巧-汇总/chrome-full.jpg)chrome-full](https://evestorm.github.io/posts/63676/chrome-full.jpg)
+{% asset_img chrome-full.jpg chrome-full %}
 
 $\_是一个特殊变量，它的值始终等于控制台中上一次操作的执行结果。它可以让你更加优雅地调试代码。
 
@@ -94,7 +94,7 @@ XHR，即 XMLHttpRequest，是一种创建 AJAX 请求的 JavaScript API 。
 在我们的前端项目中，我们经常需要使用 XHR 向后端发出请求来获取数据。如果你想重新发送 XHR 请求，那么该怎么办呢？
 对于新手来说，可能会选择刷新页面，但这可能比较麻烦。实际上，我们可以直接在“网络”面板中进行调试。
 
-[![xhr](chrome调试技巧-汇总/xhr.jpg)xhr](https://evestorm.github.io/posts/63676/xhr.jpg)
+{% asset_img xhr.jpg xhr %}
 
 ## 将复制图像为 Data URI
 
@@ -106,7 +106,13 @@ XHR，即 XMLHttpRequest，是一种创建 AJAX 请求的 JavaScript API 。
 
 所以在 Chrome 浏览器中，我们该如何将图像转换为 Data URL 呢？可以参考下面的 gif 图像：
 
-[![datauri](chrome调试技巧-汇总/datauri.jpg)datauri](https://evestorm.github.io/posts/63676/datauri.jpg)
+{% asset_img datauri.jpg datauri %}
+
+## 改变颜色格式
+
+在颜色预览中使用`Shift + Click` ，可以在`rgba`, `hsl` 和 `hexadecimal` 这三种格式中改变。
+
+{% asset_img color-picker.gif color-picker %}
 
 ## 参考来源
 
