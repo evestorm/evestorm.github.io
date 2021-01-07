@@ -19,6 +19,8 @@ CSS 中存在一个神秘的变量，少有人知自然也不怎么为人所用�
 
 它是何物？具有怎样的功效？它从哪里来？带着这些疑问我们继续。
 
+<!-- more -->
+
 下面是来自[MDN 的解释](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentColor_keyword)：
 
 > `currentColor`代表了当前元素被应用上的`color`颜色值。 使用它可以将当前这个颜色值应用到其他属性上，或者嵌套元素的其他属性上。
