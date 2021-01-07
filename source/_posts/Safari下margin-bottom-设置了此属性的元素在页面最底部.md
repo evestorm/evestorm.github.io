@@ -1,7 +1,7 @@
 ---
 title: Safari下margin-bottom(设置了此属性的元素在页面最底部)
 tags:
-  - css
+  - CSS
   - Safari
 categories:
   - 前端

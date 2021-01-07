@@ -2,7 +2,7 @@
 title: position/fixed在Safari下出现随屏幕一起滚动情况
 tags:
   - iOS
-  - css
+  - CSS
   - 移动端
 categories:
   - 前端
