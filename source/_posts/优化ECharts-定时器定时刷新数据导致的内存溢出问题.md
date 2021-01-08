@@ -220,3 +220,9 @@ date: 2021-01-08 15:16:06
   };
 </script>
 ```
+
+## 参考
+
+- [ECharts 折现更新卡顿](https://github.com/apache/incubator-echarts/issues/12449)
+- [定时器+echarts 运行时间太长导致内存溢出页面崩溃](https://blog.csdn.net/weixin_47711357/article/details/110945362)
+- [chrome 内存泄露分析](https://juejin.cn/post/6844904082918899720)
