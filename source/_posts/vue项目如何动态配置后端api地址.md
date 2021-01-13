@@ -1,7 +1,8 @@
 ---
 title: vue项目如何动态配置后端api地址
 tags:
-  - vue-cli
+  - vue-cli3
+  - Vue
 categories:
   - 前端
   - 框架
