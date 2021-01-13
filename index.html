@@ -410,10 +410,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2021-01-12 16:28:54 / 修改时间：17:02:58" itemprop="dateCreated datePublished" datetime="2021-01-12T16:28:54+08:00">2021-01-12</time>
+      <time title="创建时间：2021-01-12 16:28:54" itemprop="dateCreated datePublished" datetime="2021-01-12T16:28:54+08:00">2021-01-12</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-01-13 11:18:23" itemprop="dateModified" datetime="2021-01-13T11:18:23+08:00">2021-01-13</time>
+      </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
@@ -470,32 +476,14 @@
 <img src="/posts/19569/page-ui.png" class="" title="page-ui">
 
 <p>现在想要把「前往」改成「前往第」。然而 element-ui 文档中并没有给出跳转页面文字部分的配置。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在 github 上搜了下相关 issue 后找到了一种方案：使用 element-ui 提供的国际化部分进行文字替换。地址为：<a target="_blank" rel="noopener" href="https://github.com/ElemeFE/element/issues/16030">https://github.com/ElemeFE/element/issues/16030</a></p>
-<p>具体在 Vue 项目中如何做呢？</p>
-<h3 id="在-assets-文件夹中新增-locale-cn-js-文件。"><a href="#在-assets-文件夹中新增-locale-cn-js-文件。" class="headerlink" title="在 assets 文件夹中新增 /locale/cn.js 文件。"></a>在 assets 文件夹中新增 <code>/locale/cn.js</code> 文件。</h3><blockquote>
-<p>locale/cn.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  el: &#123;</span><br><span class="line">    pagination: &#123;</span><br><span class="line">      goto: <span class="string">&#x27;前往第&#x27;</span>,</span><br><span class="line">      pagesize: <span class="string">&#x27;条/页&#x27;</span>,</span><br><span class="line">      total: <span class="string">`共 &#123;total&#125; 条`</span>,</span><br><span class="line">      pageClassifier: <span class="string">&#x27;页&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<img src="/posts/19569/cn.png" class="" title="cn">
-
-<h3 id="main-js-中配置国际化"><a href="#main-js-中配置国际化" class="headerlink" title="main.js 中配置国际化"></a>main.js 中配置国际化</h3><blockquote>
-<p>main.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> Element <span class="keyword">from</span> <span class="string">&#x27;element-ui&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./styles/element-variables.scss&#x27;</span>; <span class="comment">// 覆盖一些element-ui样式风格</span></span><br><span class="line"><span class="keyword">import</span> locale <span class="keyword">from</span> <span class="string">&#x27;./assets/locale/cn&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 引入 ECharts</span></span><br><span class="line"><span class="keyword">import</span> echarts <span class="keyword">from</span> <span class="string">&#x27;echarts&#x27;</span>;</span><br><span class="line"></span><br><span class="line">Vue.use(Element, &#123;</span><br><span class="line">  locale</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><p>上述步骤做完后确实能改分页组件的文字部分了，但发现了个新问题。el-table 组件在没有数据时，「暂无数据」这样的默认提示文字消失了。</p>
-<p>所以我们还需要把 el-table 这部分缺失文字覆盖补全：</p>
-<blockquote>
-<p>locale/cn.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  el: &#123;</span><br><span class="line">    table: &#123;</span><br><span class="line">      emptyText: <span class="string">&#x27;暂无数据&#x27;</span>,</span><br><span class="line">      confirmFilter: <span class="string">&#x27;筛选&#x27;</span>,</span><br><span class="line">      resetFilter: <span class="string">&#x27;重置&#x27;</span>,</span><br><span class="line">      clearFilter: <span class="string">&#x27;全部&#x27;</span>,</span><br><span class="line">      sumText: <span class="string">&#x27;合计&#x27;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    pagination: &#123;</span><br><span class="line">      goto: <span class="string">&#x27;前往第&#x27;</span>,</span><br><span class="line">      pagesize: <span class="string">&#x27;条/页&#x27;</span>,</span><br><span class="line">      total: <span class="string">`共 &#123;total&#125; 条`</span>,</span><br><span class="line">      pageClassifier: <span class="string">&#x27;页&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>main.js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> Element <span class="keyword">from</span> <span class="string">&#x27;element-ui&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./styles/element-variables.scss&#x27;</span>; <span class="comment">// 覆盖一些element-ui样式风格</span></span><br><span class="line"><span class="keyword">import</span> zhLang <span class="keyword">from</span> <span class="string">&#x27;element-ui/lib/locale/lang/zh-CN&#x27;</span>; <span class="comment">// 引入官方的中文国际化</span></span><br><span class="line"><span class="keyword">import</span> locale <span class="keyword">from</span> <span class="string">&#x27;./assets/locale/cn&#x27;</span>; <span class="comment">// 引入自己的</span></span><br><span class="line"></span><br><span class="line">Vue.use(Element, &#123;</span><br><span class="line">  locale: &#123; ...zhLang, ...locale &#125;, <span class="comment">// 使用本地的 locale 去覆盖官方的 zhLang</span></span><br><span class="line">&#125;);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/19569/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

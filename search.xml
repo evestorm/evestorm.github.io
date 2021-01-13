@@ -152,83 +152,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CORS详解（转载）</title>
-    <url>/posts/28096/</url>
-    <content><![CDATA[<h2 id="转载文章"><a href="#转载文章" class="headerlink" title="转载文章"></a>转载文章</h2><p>博客源：<a href="https://github.com/hstarorg/HstarDoc/blob/master/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/CORS%E8%AF%A6%E8%A7%A3.md">CORS 详解</a></p>
-<h2 id="关于-CORS"><a href="#关于-CORS" class="headerlink" title="关于 CORS"></a>关于 CORS</h2><p>说到 CORS，就不得不先了解跨站 HTTP 请求（Cross-site HTTP request）。</p>
-<p>跨域 HTTP 请求是指发起请求的资源所在域不同于该请求所指向资源所在的域的 HTTP 请求。</p>
-<p>正如大家所知，出于安全考虑，浏览器会限制脚本中发起的跨站请求。使用 XMLHttpRequest 发起 HTTP 请求必须遵守同源策略。 具体而言，Web 应用程序能且只能使用 XMLHttpRequest 对象向其加载的源域名发起 HTTP 请求，而不能向任何其它域名发起请求。</p>
-<p>由于 Web 应用技术越来越丰富，我们非常渴望在不丢失安全的前提下，能够实现跨站请求。特别是现在的 Web 程序结构，一般是 HTML+REST API。在之前的实现中，我们一般采用 jsonp 来发起跨站请求，这其实是利用了 html 标签的特点。</p>
-<p>W3C 的 Web 应用工作组推荐了一种新的机制，即跨域资源共享（Cross-Origin Resource Sharing），也就是当前我们提到的 CORS。</p>
-<p>CORS 的核心，就是让服务器来确定是否允许跨域访问。</p>
-<a id="more"></a>
-
-<h2 id="1、典型场景"><a href="#1、典型场景" class="headerlink" title="1、典型场景"></a>1、典型场景</h2><h3 id="1-1、简单请求"><a href="#1-1、简单请求" class="headerlink" title="1.1、简单请求"></a>1.1、简单请求</h3><p>什么是简单请求？全部满足以下条件的请求可以称之为简单请求：</p>
-<ol>
-<li>只使用 GET、HEAD 或者 POST 请求方法。如果是 POST，则数据类型（Content-Type）只能是<code>application/x-www-form-urlencodeed</code>、<code>multipart/form-data</code>、<code>text/plain</code>中的一种。</li>
-<li>没有使用自定义的请求头（如 x-token）</li>
-</ol>
-<p>按照这个规则，那我们的能实现跨域请求的情况如下：</p>
-<p>Server 代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//之后设置了Access-Control-Allow-Origin，才会允许跨域</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>Client 代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景一：GET请求，不需要Header，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景二： POST请求，需要设置为指定Header（不设置content-type也可），允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line"><span class="comment">//此处value必须是text/plain或者application/x-www-form-urlencoded或者multipart/form-data。</span></span><br><span class="line"><span class="comment">//此处也可以不设置</span></span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景三：DELETE请求（不允许跨域）</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景四：POST请求，有自定义Header（不允许跨域）</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2、预请求"><a href="#1-2、预请求" class="headerlink" title="1.2、预请求"></a>1.2、预请求</h3><p>不同于简单请求，预请求要求必须先发送一个 OPTIONS 请求给站点，来查明该站点是否允许跨域请求，这样做的原因是为了避免跨站请求可能对目的站点的数据造成的损坏。</p>
-<p>如果请求满足以下任一条件，则会产生预请求：</p>
-<ol>
-<li>请求以 GET、HEAD、POST 之外的方法发起。或者，使用 POST，但数据类型为<code>application/x-www-form-urlencoded</code>, <code>multipart/form-data</code> 或者 <code>text/plain</code> 以外的数据类型。（注：之前的版本只有 text/plain 可以不用发起预请求）。</li>
-<li>使用了自定义请求头。</li>
-</ol>
-<p>按照如上规则，我们来列举几个应用场景：</p>
-<p>Server 端代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//之后设置了Access-Control-Allow-Origin，才会允许跨域</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Methods&#x27;</span>, <span class="string">&#x27;POST, DELETE, GET&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Headers&#x27;</span>, <span class="string">&#x27;x-token&#x27;</span>);</span><br><span class="line">  <span class="comment">//设置预请求缓存1天，1天内再次请求，可以跳过预请求</span></span><br><span class="line">  <span class="comment">//此功能需要客户端缓存支持，如果客户端禁用缓存，那么每次都会预请求</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Max-Age&#x27;</span>, <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>Client 端代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景一：DELETE请求，发送OPTIONS，匹配，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景二：PUT请求，发送OPTIONS，不匹配，不允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;PUT&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景三：DELETE请求匹配，使用自定义Header不匹配，不允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token1&#x27;</span>, <span class="string">&#x27;aa&#x27;</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景四：POST请求，匹配的自定义Header，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-3、带凭证的请求"><a href="#1-3、带凭证的请求" class="headerlink" title="1.3、带凭证的请求"></a>1.3、带凭证的请求</h3><p>一般来说，对于跨站请求，浏览器是不会发送凭证（HTTP Cookies 和验证信息）的。如果要发送带凭证的信息，只需要给 XMLHttpRequest 设置一个特殊的属性<code>withCredentials = true</code>，通过这种方式，浏览器就允许发送凭证信息。</p>
-<p>带凭证的请求可能是简单请求，也可以是会有预请求。是否允许跨域，会先判断简单请求和预请求的规则，然后还会带上带凭证的请求自己的规则。</p>
-<p>在带凭证的请求中，后端的响应必须包含 Header<code>Access-Control-Allow-Credentials=true</code>，同时 Header <code>Access-Control-Allow-Origin</code>，不能再使用*号这种匹配符。</p>
-<p>具体示例如下：</p>
-<p>服务端代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//要处理带凭证的请求，此Header不能使用*。</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;http://10.16.85.170:8000&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Methods&#x27;</span>, <span class="string">&#x27;POST, DELETE, GET&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Headers&#x27;</span>, <span class="string">&#x27;x-token&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Max-Age&#x27;</span>, <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>);</span><br><span class="line">  <span class="comment">//只有设置了该Header，才允许带凭证的请求。</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Credentials&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>客户端代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//优先满足预请求，然后满足凭证请求，允许跨域。</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.withCredentials = <span class="literal">true</span>;</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
-
-<h2 id="2、HTTP-响应头"><a href="#2、HTTP-响应头" class="headerlink" title="2、HTTP 响应头"></a>2、HTTP 响应头</h2><h3 id="2-1、-后端-HTTP-响应头"><a href="#2-1、-后端-HTTP-响应头" class="headerlink" title="2.1、 后端 HTTP 响应头"></a>2.1、 后端 HTTP 响应头</h3><p>此处列举后端有关 CORS 的响应头：</p>
-<ol>
-<li>Access-Control-Allow-Origin： | _允许的域名，只能有一个值。比如“_”或“abc.com”，”a.com,b.com”这种不允许</li>
-<li>Access-Control-Expose-Headers: 允许的白名单 Header，多个用逗号隔开</li>
-<li>Access-Control-Max-Age: 预请求缓存时间，单位秒，<strong>禁用缓存</strong>时无效哦！</li>
-<li>Access-Control-Allow-Credentials: true | false 是否允许带凭证的请求，如果为 true，则 Origin 只能是具体的值</li>
-<li>Access-Control-Allow-Methods: 允许的请求类型，多个用逗号隔开</li>
-<li>Access-Control-Allow-Headers: 在实际请求中，允许的自定义 header，多个用逗号隔开</li>
-</ol>
-<h3 id="2-2、-浏览器发出跨域请求的响应头"><a href="#2-2、-浏览器发出跨域请求的响应头" class="headerlink" title="2.2、 浏览器发出跨域请求的响应头"></a>2.2、 浏览器发出跨域请求的响应头</h3><p>此处列举出浏览器在发送跨域请求时，会带上的响应头：</p>
-<ol>
-<li>Origin: 告诉服务器，请求来自哪里，仅仅是服务器名，不包含路径。</li>
-<li>Access-Control-Request-Method: 预请求时，告诉服务器实际的请求方式</li>
-<li>Access-Control-Request-Headers: 预请求时，告诉服务器，实际请求所携带的自定义 Header</li>
-</ol>
-<h2 id="3、参考资料"><a href="#3、参考资料" class="headerlink" title="3、参考资料"></a>3、参考资料</h2><ol>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests">MDN HTTP access control (CORS)</a></li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN HTTP 访问控制(CORS)</a></li>
-</ol>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>浏览器</category>
-        <category>跨域</category>
-      </categories>
-      <tags>
-        <tag>跨域</tag>
-        <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CSS-currentColor变量的使用</title>
     <url>/posts/30008/</url>
     <content><![CDATA[<p>转载自：<a href="https://www.cnblogs.com/Wayou/p/css-currentColor.html">https://www.cnblogs.com/Wayou/p/css-currentColor.html</a></p>
@@ -320,8 +243,85 @@
       </categories>
       <tags>
         <tag>技巧</tag>
-        <tag>转载</tag>
         <tag>CSS</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CORS详解（转载）</title>
+    <url>/posts/28096/</url>
+    <content><![CDATA[<h2 id="转载文章"><a href="#转载文章" class="headerlink" title="转载文章"></a>转载文章</h2><p>博客源：<a href="https://github.com/hstarorg/HstarDoc/blob/master/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/CORS%E8%AF%A6%E8%A7%A3.md">CORS 详解</a></p>
+<h2 id="关于-CORS"><a href="#关于-CORS" class="headerlink" title="关于 CORS"></a>关于 CORS</h2><p>说到 CORS，就不得不先了解跨站 HTTP 请求（Cross-site HTTP request）。</p>
+<p>跨域 HTTP 请求是指发起请求的资源所在域不同于该请求所指向资源所在的域的 HTTP 请求。</p>
+<p>正如大家所知，出于安全考虑，浏览器会限制脚本中发起的跨站请求。使用 XMLHttpRequest 发起 HTTP 请求必须遵守同源策略。 具体而言，Web 应用程序能且只能使用 XMLHttpRequest 对象向其加载的源域名发起 HTTP 请求，而不能向任何其它域名发起请求。</p>
+<p>由于 Web 应用技术越来越丰富，我们非常渴望在不丢失安全的前提下，能够实现跨站请求。特别是现在的 Web 程序结构，一般是 HTML+REST API。在之前的实现中，我们一般采用 jsonp 来发起跨站请求，这其实是利用了 html 标签的特点。</p>
+<p>W3C 的 Web 应用工作组推荐了一种新的机制，即跨域资源共享（Cross-Origin Resource Sharing），也就是当前我们提到的 CORS。</p>
+<p>CORS 的核心，就是让服务器来确定是否允许跨域访问。</p>
+<a id="more"></a>
+
+<h2 id="1、典型场景"><a href="#1、典型场景" class="headerlink" title="1、典型场景"></a>1、典型场景</h2><h3 id="1-1、简单请求"><a href="#1-1、简单请求" class="headerlink" title="1.1、简单请求"></a>1.1、简单请求</h3><p>什么是简单请求？全部满足以下条件的请求可以称之为简单请求：</p>
+<ol>
+<li>只使用 GET、HEAD 或者 POST 请求方法。如果是 POST，则数据类型（Content-Type）只能是<code>application/x-www-form-urlencodeed</code>、<code>multipart/form-data</code>、<code>text/plain</code>中的一种。</li>
+<li>没有使用自定义的请求头（如 x-token）</li>
+</ol>
+<p>按照这个规则，那我们的能实现跨域请求的情况如下：</p>
+<p>Server 代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//之后设置了Access-Control-Allow-Origin，才会允许跨域</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Client 代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景一：GET请求，不需要Header，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景二： POST请求，需要设置为指定Header（不设置content-type也可），允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line"><span class="comment">//此处value必须是text/plain或者application/x-www-form-urlencoded或者multipart/form-data。</span></span><br><span class="line"><span class="comment">//此处也可以不设置</span></span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景三：DELETE请求（不允许跨域）</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景四：POST请求，有自定义Header（不允许跨域）</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2、预请求"><a href="#1-2、预请求" class="headerlink" title="1.2、预请求"></a>1.2、预请求</h3><p>不同于简单请求，预请求要求必须先发送一个 OPTIONS 请求给站点，来查明该站点是否允许跨域请求，这样做的原因是为了避免跨站请求可能对目的站点的数据造成的损坏。</p>
+<p>如果请求满足以下任一条件，则会产生预请求：</p>
+<ol>
+<li>请求以 GET、HEAD、POST 之外的方法发起。或者，使用 POST，但数据类型为<code>application/x-www-form-urlencoded</code>, <code>multipart/form-data</code> 或者 <code>text/plain</code> 以外的数据类型。（注：之前的版本只有 text/plain 可以不用发起预请求）。</li>
+<li>使用了自定义请求头。</li>
+</ol>
+<p>按照如上规则，我们来列举几个应用场景：</p>
+<p>Server 端代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//之后设置了Access-Control-Allow-Origin，才会允许跨域</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Methods&#x27;</span>, <span class="string">&#x27;POST, DELETE, GET&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Headers&#x27;</span>, <span class="string">&#x27;x-token&#x27;</span>);</span><br><span class="line">  <span class="comment">//设置预请求缓存1天，1天内再次请求，可以跳过预请求</span></span><br><span class="line">  <span class="comment">//此功能需要客户端缓存支持，如果客户端禁用缓存，那么每次都会预请求</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Max-Age&#x27;</span>, <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Client 端代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景一：DELETE请求，发送OPTIONS，匹配，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景二：PUT请求，发送OPTIONS，不匹配，不允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;PUT&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景三：DELETE请求匹配，使用自定义Header不匹配，不允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;DELETE&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token1&#x27;</span>, <span class="string">&#x27;aa&#x27;</span>);</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"><span class="comment">//场景四：POST请求，匹配的自定义Header，允许跨域</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3、带凭证的请求"><a href="#1-3、带凭证的请求" class="headerlink" title="1.3、带凭证的请求"></a>1.3、带凭证的请求</h3><p>一般来说，对于跨站请求，浏览器是不会发送凭证（HTTP Cookies 和验证信息）的。如果要发送带凭证的信息，只需要给 XMLHttpRequest 设置一个特殊的属性<code>withCredentials = true</code>，通过这种方式，浏览器就允许发送凭证信息。</p>
+<p>带凭证的请求可能是简单请求，也可以是会有预请求。是否允许跨域，会先判断简单请求和预请求的规则，然后还会带上带凭证的请求自己的规则。</p>
+<p>在带凭证的请求中，后端的响应必须包含 Header<code>Access-Control-Allow-Credentials=true</code>，同时 Header <code>Access-Control-Allow-Origin</code>，不能再使用*号这种匹配符。</p>
+<p>具体示例如下：</p>
+<p>服务端代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//要处理带凭证的请求，此Header不能使用*。</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="string">&#x27;http://10.16.85.170:8000&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Methods&#x27;</span>, <span class="string">&#x27;POST, DELETE, GET&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Headers&#x27;</span>, <span class="string">&#x27;x-token&#x27;</span>);</span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Max-Age&#x27;</span>, <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>);</span><br><span class="line">  <span class="comment">//只有设置了该Header，才允许带凭证的请求。</span></span><br><span class="line">  res.setHeader(<span class="string">&#x27;Access-Control-Allow-Credentials&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">  res.write(<span class="string">&#x27;abc&#x27;</span>);</span><br><span class="line">  res.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(<span class="number">10000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;started.&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>客户端代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (xhr.readyState === XMLHttpRequest.DONE) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Result：&#x27;</span>, xhr.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//优先满足预请求，然后满足凭证请求，允许跨域。</span></span><br><span class="line">xhr.open(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://localhost:10000/&#x27;</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.withCredentials = <span class="literal">true</span>;</span><br><span class="line">xhr.setRequestHeader(<span class="string">&#x27;x-token&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、HTTP-响应头"><a href="#2、HTTP-响应头" class="headerlink" title="2、HTTP 响应头"></a>2、HTTP 响应头</h2><h3 id="2-1、-后端-HTTP-响应头"><a href="#2-1、-后端-HTTP-响应头" class="headerlink" title="2.1、 后端 HTTP 响应头"></a>2.1、 后端 HTTP 响应头</h3><p>此处列举后端有关 CORS 的响应头：</p>
+<ol>
+<li>Access-Control-Allow-Origin： | _允许的域名，只能有一个值。比如“_”或“abc.com”，”a.com,b.com”这种不允许</li>
+<li>Access-Control-Expose-Headers: 允许的白名单 Header，多个用逗号隔开</li>
+<li>Access-Control-Max-Age: 预请求缓存时间，单位秒，<strong>禁用缓存</strong>时无效哦！</li>
+<li>Access-Control-Allow-Credentials: true | false 是否允许带凭证的请求，如果为 true，则 Origin 只能是具体的值</li>
+<li>Access-Control-Allow-Methods: 允许的请求类型，多个用逗号隔开</li>
+<li>Access-Control-Allow-Headers: 在实际请求中，允许的自定义 header，多个用逗号隔开</li>
+</ol>
+<h3 id="2-2、-浏览器发出跨域请求的响应头"><a href="#2-2、-浏览器发出跨域请求的响应头" class="headerlink" title="2.2、 浏览器发出跨域请求的响应头"></a>2.2、 浏览器发出跨域请求的响应头</h3><p>此处列举出浏览器在发送跨域请求时，会带上的响应头：</p>
+<ol>
+<li>Origin: 告诉服务器，请求来自哪里，仅仅是服务器名，不包含路径。</li>
+<li>Access-Control-Request-Method: 预请求时，告诉服务器实际的请求方式</li>
+<li>Access-Control-Request-Headers: 预请求时，告诉服务器，实际请求所携带的自定义 Header</li>
+</ol>
+<h2 id="3、参考资料"><a href="#3、参考资料" class="headerlink" title="3、参考资料"></a>3、参考资料</h2><ol>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests">MDN HTTP access control (CORS)</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN HTTP 访问控制(CORS)</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>浏览器</category>
+        <category>跨域</category>
+      </categories>
+      <tags>
+        <tag>跨域</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -1352,108 +1352,6 @@
       </categories>
   </entry>
   <entry>
-    <title>HTML知识点（面试系列）</title>
-    <url>/posts/55598/</url>
-    <content><![CDATA[<h2 id="你对语义化的理解"><a href="#你对语义化的理解" class="headerlink" title="你对语义化的理解"></a>你对语义化的理解</h2><p>用正确的标签做正确的事情</p>
-<ul>
-<li>利于开发：使代码<strong>结构清晰</strong>，<strong>可读性高</strong>，<strong>方便维护</strong></li>
-<li>利于 SEO：方便爬虫根据语义标签确定<strong>页面结构</strong>和<strong>关键字</strong>的权重</li>
-</ul>
-<a id="more"></a>
-
-<h3 id="你在平常工作中使用过哪些语义标签？"><a href="#你在平常工作中使用过哪些语义标签？" class="headerlink" title="你在平常工作中使用过哪些语义标签？"></a>你在平常工作中使用过哪些语义标签？</h3><p>header, nav, aside, main, section, article, footer, canvas, video, audio</p>
-<h3 id="你说你用过-canvas-video-audio，你是怎么用它们的？"><a href="#你说你用过-canvas-video-audio，你是怎么用它们的？" class="headerlink" title="你说你用过 canvas/video/audio，你是怎么用它们的？"></a>你说你用过 canvas/video/audio，你是怎么用它们的？</h3><ul>
-<li><p>画布：<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial">canvas</a></p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">canvas</span> <span class="attr">width</span>=<span class="string">&quot;500&quot;</span> <span class="attr">height</span>=<span class="string">&quot;500&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">canvas</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> canvas = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;canvas&#x27;</span>);</span></span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 获取上下文 --&gt;</span></span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> ctx = canvas.getContext(<span class="string">&#x27;2d&#x27;</span>);</span></span><br><span class="line">    ctx.beginPath();</span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 设置图形轮廓的颜色 --&gt;</span></span></span></span><br><span class="line"><span class="javascript">    ctx.strokeStyle = <span class="string">&#x27;red&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 绘制直线 --&gt;</span></span></span></span><br><span class="line">    ctx.moveTo(10, 20);</span><br><span class="line">    ctx.lineTo(100, 200);</span><br><span class="line">    ctx.stroke();</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>媒体元素：<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/video">video</a> 和 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/audio">audio</a></p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">src</span>=<span class="string">&quot;视频资源路径&quot;</span> <span class="attr">poster</span>=<span class="string">&quot;海报资源路径&quot;</span> <span class="attr">controls</span> <span class="attr">autoplay</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">audio</span> <span class="attr">src</span>=<span class="string">&quot;音频资源路径&quot;</span> <span class="attr">controls</span> <span class="attr">autoplay</span> <span class="attr">loop</span>&gt;</span><span class="tag">&lt;/<span class="name">audio</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="解释下移动端为什么要添加-meta-viewport-，怎么写？"><a href="#解释下移动端为什么要添加-meta-viewport-，怎么写？" class="headerlink" title="解释下移动端为什么要添加 meta viewport ，怎么写？"></a>解释下移动端为什么要添加 meta viewport ，怎么写？</h2><p>作用：</p>
-<p>防止页面在移动端可以缩放。</p>
-<p>写法：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&lt;meta</span><br><span class="line">  name=&quot;viewport&quot;</span><br><span class="line">  content=&quot;width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
-
-<p>解释：</p>
-<ul>
-<li><p>使用 <code>viewport</code> 来控制浏览器视口的宽度和缩放比例</p>
-</li>
-<li><p>添加 <code>width=device-width</code> 以便让视口的宽度与设备一致</p>
-</li>
-<li><p>添加 <code>initial-scale=1.0</code> 设置初始缩放比例为 1.0</p>
-</li>
-<li><p>添加</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">user-scalable&#x3D;no</span><br></pre></td></tr></table></figure>
-
-<p>使得用户不能放大或缩小网页</p>
-<ul>
-<li>添加 <code>minimum-scale=1.0, maximum-scale=1.0</code> 是为了兼容 iOS10 不支持 <code>user-scalable</code> 导致用户仍可缩放</li>
-</ul>
-</li>
-</ul>
-<p>参考阅读：</p>
-<ul>
-<li><strong><a href="https://developer.mozilla.org/zh-CN/docs/Mozilla/Mobile/Viewport_meta_tag">在移动浏览器中使用 viewport 元标签控制布局</a></strong></li>
-<li><strong><a href="https://developers.google.cn/web/tools/lighthouse/audits/has-viewport-meta-tag?hl=zh-cn">HTML 具有视口元标记</a></strong></li>
-<li><strong><a href="https://www.cnblogs.com/chunyangji/p/5795487.html">移动端 web 开发——视口</a></strong></li>
-</ul>
-<h2 id="关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？"><a href="#关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？" class="headerlink" title="关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？"></a>关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？</h2><table>
-<thead>
-<tr>
-<th align="left">格式</th>
-<th align="left">特点</th>
-<th align="left">使用场景</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">JPG/JPEG</td>
-<td align="left">有损压缩 体积小 不支持透明</td>
-<td align="left">1. 大的背景图； 2. 轮播图； 3. Banner 图</td>
-</tr>
-<tr>
-<td align="left">PNG</td>
-<td align="left">无损压缩 质量高 体积大 支持透明</td>
-<td align="left">1. 小 Logo； 2. 透明背景</td>
-</tr>
-<tr>
-<td align="left">GIF</td>
-<td align="left">支持动画</td>
-<td align="left">动态图片</td>
-</tr>
-<tr>
-<td align="left">SVG</td>
-<td align="left">文本文件 体积小 不失真 兼容性好</td>
-<td align="left">能适应不同设备且画质不能损坏的图片</td>
-</tr>
-<tr>
-<td align="left">Base64</td>
-<td align="left">文本文件 依赖编码 小图标解决方案</td>
-<td align="left">大小不超过 2KB，且更新率低的图片</td>
-</tr>
-<tr>
-<td align="left">webp</td>
-<td align="left">细节丰富 支持透明 支持动画 兼容性差</td>
-<td align="left">Chrome UC 等浏览器支持，局限性大，一般不考虑</td>
-</tr>
-<tr>
-<td align="left">雪碧图</td>
-<td align="left">一次加载多处使用</td>
-<td align="left">小图太多的时候，集中成一张图片减少 HTTP 请求</td>
-</tr>
-</tbody></table>
-<p>更多阅读：<a href="https://github.com/LiangJunrong/document-library/blob/master/other-library/interview/personal-experience/other-%E5%9B%BE%E7%89%87.md">面试知识点 - 图片</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>面试</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JS严格模式vs非严格模式</title>
     <url>/posts/15966/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以下为《JavaScript 高级程序设计（第 3 版）》中有关 <code>严格模式</code> 的笔记。</p>
@@ -1568,6 +1466,108 @@
       </categories>
       <tags>
         <tag>继承</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTML知识点（面试系列）</title>
+    <url>/posts/55598/</url>
+    <content><![CDATA[<h2 id="你对语义化的理解"><a href="#你对语义化的理解" class="headerlink" title="你对语义化的理解"></a>你对语义化的理解</h2><p>用正确的标签做正确的事情</p>
+<ul>
+<li>利于开发：使代码<strong>结构清晰</strong>，<strong>可读性高</strong>，<strong>方便维护</strong></li>
+<li>利于 SEO：方便爬虫根据语义标签确定<strong>页面结构</strong>和<strong>关键字</strong>的权重</li>
+</ul>
+<a id="more"></a>
+
+<h3 id="你在平常工作中使用过哪些语义标签？"><a href="#你在平常工作中使用过哪些语义标签？" class="headerlink" title="你在平常工作中使用过哪些语义标签？"></a>你在平常工作中使用过哪些语义标签？</h3><p>header, nav, aside, main, section, article, footer, canvas, video, audio</p>
+<h3 id="你说你用过-canvas-video-audio，你是怎么用它们的？"><a href="#你说你用过-canvas-video-audio，你是怎么用它们的？" class="headerlink" title="你说你用过 canvas/video/audio，你是怎么用它们的？"></a>你说你用过 canvas/video/audio，你是怎么用它们的？</h3><ul>
+<li><p>画布：<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial">canvas</a></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">canvas</span> <span class="attr">width</span>=<span class="string">&quot;500&quot;</span> <span class="attr">height</span>=<span class="string">&quot;500&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">canvas</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> canvas = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;canvas&#x27;</span>);</span></span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 获取上下文 --&gt;</span></span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> ctx = canvas.getContext(<span class="string">&#x27;2d&#x27;</span>);</span></span><br><span class="line">    ctx.beginPath();</span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 设置图形轮廓的颜色 --&gt;</span></span></span></span><br><span class="line"><span class="javascript">    ctx.strokeStyle = <span class="string">&#x27;red&#x27;</span>;</span></span><br><span class="line"><span class="handlebars"><span class="xml">    <span class="comment">&lt;!-- 绘制直线 --&gt;</span></span></span></span><br><span class="line">    ctx.moveTo(10, 20);</span><br><span class="line">    ctx.lineTo(100, 200);</span><br><span class="line">    ctx.stroke();</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>媒体元素：<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/video">video</a> 和 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/audio">audio</a></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">src</span>=<span class="string">&quot;视频资源路径&quot;</span> <span class="attr">poster</span>=<span class="string">&quot;海报资源路径&quot;</span> <span class="attr">controls</span> <span class="attr">autoplay</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">audio</span> <span class="attr">src</span>=<span class="string">&quot;音频资源路径&quot;</span> <span class="attr">controls</span> <span class="attr">autoplay</span> <span class="attr">loop</span>&gt;</span><span class="tag">&lt;/<span class="name">audio</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="解释下移动端为什么要添加-meta-viewport-，怎么写？"><a href="#解释下移动端为什么要添加-meta-viewport-，怎么写？" class="headerlink" title="解释下移动端为什么要添加 meta viewport ，怎么写？"></a>解释下移动端为什么要添加 meta viewport ，怎么写？</h2><p>作用：</p>
+<p>防止页面在移动端可以缩放。</p>
+<p>写法：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&lt;meta</span><br><span class="line">  name=&quot;viewport&quot;</span><br><span class="line">  content=&quot;width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li><p>使用 <code>viewport</code> 来控制浏览器视口的宽度和缩放比例</p>
+</li>
+<li><p>添加 <code>width=device-width</code> 以便让视口的宽度与设备一致</p>
+</li>
+<li><p>添加 <code>initial-scale=1.0</code> 设置初始缩放比例为 1.0</p>
+</li>
+<li><p>添加</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">user-scalable&#x3D;no</span><br></pre></td></tr></table></figure>
+
+<p>使得用户不能放大或缩小网页</p>
+<ul>
+<li>添加 <code>minimum-scale=1.0, maximum-scale=1.0</code> 是为了兼容 iOS10 不支持 <code>user-scalable</code> 导致用户仍可缩放</li>
+</ul>
+</li>
+</ul>
+<p>参考阅读：</p>
+<ul>
+<li><strong><a href="https://developer.mozilla.org/zh-CN/docs/Mozilla/Mobile/Viewport_meta_tag">在移动浏览器中使用 viewport 元标签控制布局</a></strong></li>
+<li><strong><a href="https://developers.google.cn/web/tools/lighthouse/audits/has-viewport-meta-tag?hl=zh-cn">HTML 具有视口元标记</a></strong></li>
+<li><strong><a href="https://www.cnblogs.com/chunyangji/p/5795487.html">移动端 web 开发——视口</a></strong></li>
+</ul>
+<h2 id="关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？"><a href="#关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？" class="headerlink" title="关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？"></a>关于图片，你了解哪些形式，你觉得哪种场合用哪种？它们优劣如何？然后这些图片的应用场景能说说不？</h2><table>
+<thead>
+<tr>
+<th align="left">格式</th>
+<th align="left">特点</th>
+<th align="left">使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">JPG/JPEG</td>
+<td align="left">有损压缩 体积小 不支持透明</td>
+<td align="left">1. 大的背景图； 2. 轮播图； 3. Banner 图</td>
+</tr>
+<tr>
+<td align="left">PNG</td>
+<td align="left">无损压缩 质量高 体积大 支持透明</td>
+<td align="left">1. 小 Logo； 2. 透明背景</td>
+</tr>
+<tr>
+<td align="left">GIF</td>
+<td align="left">支持动画</td>
+<td align="left">动态图片</td>
+</tr>
+<tr>
+<td align="left">SVG</td>
+<td align="left">文本文件 体积小 不失真 兼容性好</td>
+<td align="left">能适应不同设备且画质不能损坏的图片</td>
+</tr>
+<tr>
+<td align="left">Base64</td>
+<td align="left">文本文件 依赖编码 小图标解决方案</td>
+<td align="left">大小不超过 2KB，且更新率低的图片</td>
+</tr>
+<tr>
+<td align="left">webp</td>
+<td align="left">细节丰富 支持透明 支持动画 兼容性差</td>
+<td align="left">Chrome UC 等浏览器支持，局限性大，一般不考虑</td>
+</tr>
+<tr>
+<td align="left">雪碧图</td>
+<td align="left">一次加载多处使用</td>
+<td align="left">小图太多的时候，集中成一张图片减少 HTTP 请求</td>
+</tr>
+</tbody></table>
+<p>更多阅读：<a href="https://github.com/LiangJunrong/document-library/blob/master/other-library/interview/personal-experience/other-%E5%9B%BE%E7%89%87.md">面试知识点 - 图片</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>面试</tag>
       </tags>
   </entry>
   <entry>
@@ -2525,31 +2525,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VSCode配置TypeScript自动编译报错</title>
-    <url>/posts/15303/</url>
-    <content><![CDATA[<p>2020.10.02 更新：</p>
-<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
-<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
-<hr>
-<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
-
-<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
-
-<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
-<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
-        <tag>TypeScript</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vue+Koa实现cookie传输</title>
     <url>/posts/26486/</url>
     <content><![CDATA[<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>登录接口设置 cookie：</p>
@@ -2591,6 +2566,31 @@
       <tags>
         <tag>Koa</tag>
         <tag>Cookie</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode配置TypeScript自动编译报错</title>
+    <url>/posts/15303/</url>
+    <content><![CDATA[<p>2020.10.02 更新：</p>
+<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
+<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
+<hr>
+<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
+
+<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
+
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
+<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
+        <tag>TypeScript</tag>
       </tags>
   </entry>
   <entry>
@@ -4238,41 +4238,6 @@
       </tags>
   </entry>
   <entry>
-    <title>jsonp解决跨域问题的原理</title>
-    <url>/posts/40160/</url>
-    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
-<p>Jsonp(JSON with Padding) 是 json 的一种”使用模式”，可以让网页从别的域名（网站）那获取资料，即跨域读取数据。</p>
-</blockquote>
-<p>———— <a href="https://www.runoob.com/json/json-jsonp.html">菜鸟教程-jsonp</a></p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>script 标签的 src 不受同源策略影响，允许跨域。但需要借助服务端的配合。</p>
-<a id="more"></a>
-
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
-<p>前端 index.html</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>天气查询<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">id</span>=<span class="string">&quot;city&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请输入城市名称&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">id</span>=<span class="string">&quot;btn&quot;</span> <span class="attr">value</span>=<span class="string">&quot;查询&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 创建方法用来获取跨域数据（名称随意）</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">window</span>[<span class="string">&quot;foo&quot;</span>] = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">             <span class="comment">// 打印获取的数据</span></span></span><br><span class="line"><span class="javascript">             <span class="built_in">console</span>.log(data);</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        <span class="keyword">const</span> btn = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#btn&quot;</span>);</span></span><br><span class="line"><span class="javascript">        btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 获取用户输入城市名</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> = city = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#city&quot;</span>).value;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 动态创建script标签</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> script = <span class="built_in">document</span>.createElement(<span class="string">&quot;script&quot;</span>);</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 把回调函数foo的名称 以及 城市名 传递给后端</span></span></span><br><span class="line"><span class="javascript">            script.src = <span class="string">`http://127.0.0.1:8084/weather.php?callback=foo&amp;city=<span class="subst">$&#123;city&#125;</span>`</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> body = <span class="built_in">document</span>.querySelector(<span class="string">&quot;body&quot;</span>);</span></span><br><span class="line">            body.appendChild(script);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>后端 weather.php</p>
-</blockquote>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">   <span class="comment">// 获取前端回调函数名和城市名</span></span><br><span class="line">   <span class="variable">$cb</span> = <span class="variable">$_GET</span>[<span class="string">&quot;callback&quot;</span>];</span><br><span class="line">   <span class="variable">$city</span> = <span class="variable">$_GET</span>[<span class="string">&quot;city&quot;</span>];</span><br><span class="line">   <span class="keyword">if</span> (<span class="variable">$city</span> == <span class="string">&quot;shanghai&quot;</span>) &#123;</span><br><span class="line">       <span class="comment">// 调用前端已经定义的函数，把数据当做参数传递给 foo</span></span><br><span class="line">       <span class="keyword">echo</span> <span class="variable">$cb</span>.<span class="string">&quot;(&#x27;上海晴，无风&#x27;)&quot;</span>;</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="keyword">echo</span> <span class="variable">$cb</span>.<span class="string">&quot;(&#x27;没有查询到你所在城市天气&#x27;)&quot;</span>;</span><br><span class="line">   &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>这样一来当前端请求 <code>http://127.0.0.1:8084/weather.php?callback=foo&amp;city=$&#123;city&#125;</code> 后，后端返回的内容就应该类似这种格式：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">foo(<span class="string">&#x27;上海晴，无风&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>本质就是在调用前端已经定义好的 <code>foo</code> 方法，这样就能够获取到后端返回给我们的数据了。</p>
-<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>由于 jsonp 解决跨域问题本质上是后端返回一个方法调用。所以不是任何接口都支持 jsonp 来获取到数据的，一旦接口不支持，返回的不是方法调用格式（foo(data)）而是 json 格式（{“msg”: “success”, “data”: {…}}）的话，就说明我们无法通过 jsonp 获取到数据。</p>
-<h3 id="第三方接口跨域数据获取"><a href="#第三方接口跨域数据获取" class="headerlink" title="第三方接口跨域数据获取"></a>第三方接口跨域数据获取</h3><p>一旦第三方接口返回的是 json 格式的字符串，我们就无法通过 ajax 或者 jsonp 的方式获取跨域数据。这种情况下我们只能通过自己的服务器当做中转站帮我们前端获取三方接口数据了，因为服务端之间是不存在跨域问题的，所以出现这种情况后，你可以让公司的后端帮帮忙，写一个接口去获取三方接口数据，并暴露一个接口让你能够获取到数据~</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>跨域</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>let和const和var的区别</title>
     <url>/posts/37021/</url>
     <content><![CDATA[<h2 id="const-和-let-异同"><a href="#const-和-let-异同" class="headerlink" title="const 和 let 异同"></a>const 和 let 异同</h2><h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><ul>
@@ -5638,7 +5603,7 @@
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#103;&#105;&#116;&#x40;&#103;&#105;&#116;&#104;&#x75;&#x62;&#46;&#99;&#x6f;&#x6d;">&#103;&#105;&#116;&#x40;&#103;&#105;&#116;&#104;&#x75;&#x62;&#46;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#117;&#98;&#46;&#x63;&#111;&#109;">&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#117;&#98;&#46;&#x63;&#111;&#109;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -5664,7 +5629,7 @@
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#105;&#x74;&#64;&#103;&#x69;&#116;&#104;&#117;&#x62;&#x2e;&#99;&#x6f;&#109;">&#x67;&#105;&#x74;&#64;&#103;&#x69;&#116;&#104;&#117;&#x62;&#x2e;&#99;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#x62;&#46;&#x63;&#x6f;&#x6d;">&#x67;&#x69;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#x62;&#46;&#x63;&#x6f;&#x6d;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -5684,6 +5649,41 @@
       </categories>
       <tags>
         <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>jsonp解决跨域问题的原理</title>
+    <url>/posts/40160/</url>
+    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><blockquote>
+<p>Jsonp(JSON with Padding) 是 json 的一种”使用模式”，可以让网页从别的域名（网站）那获取资料，即跨域读取数据。</p>
+</blockquote>
+<p>———— <a href="https://www.runoob.com/json/json-jsonp.html">菜鸟教程-jsonp</a></p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>script 标签的 src 不受同源策略影响，允许跨域。但需要借助服务端的配合。</p>
+<a id="more"></a>
+
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
+<p>前端 index.html</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>天气查询<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">id</span>=<span class="string">&quot;city&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请输入城市名称&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">id</span>=<span class="string">&quot;btn&quot;</span> <span class="attr">value</span>=<span class="string">&quot;查询&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 创建方法用来获取跨域数据（名称随意）</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">window</span>[<span class="string">&quot;foo&quot;</span>] = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">             <span class="comment">// 打印获取的数据</span></span></span><br><span class="line"><span class="javascript">             <span class="built_in">console</span>.log(data);</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        <span class="keyword">const</span> btn = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#btn&quot;</span>);</span></span><br><span class="line"><span class="javascript">        btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 获取用户输入城市名</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> = city = <span class="built_in">document</span>.querySelector(<span class="string">&quot;#city&quot;</span>).value;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 动态创建script标签</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> script = <span class="built_in">document</span>.createElement(<span class="string">&quot;script&quot;</span>);</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 把回调函数foo的名称 以及 城市名 传递给后端</span></span></span><br><span class="line"><span class="javascript">            script.src = <span class="string">`http://127.0.0.1:8084/weather.php?callback=foo&amp;city=<span class="subst">$&#123;city&#125;</span>`</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> body = <span class="built_in">document</span>.querySelector(<span class="string">&quot;body&quot;</span>);</span></span><br><span class="line">            body.appendChild(script);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>后端 weather.php</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">   <span class="comment">// 获取前端回调函数名和城市名</span></span><br><span class="line">   <span class="variable">$cb</span> = <span class="variable">$_GET</span>[<span class="string">&quot;callback&quot;</span>];</span><br><span class="line">   <span class="variable">$city</span> = <span class="variable">$_GET</span>[<span class="string">&quot;city&quot;</span>];</span><br><span class="line">   <span class="keyword">if</span> (<span class="variable">$city</span> == <span class="string">&quot;shanghai&quot;</span>) &#123;</span><br><span class="line">       <span class="comment">// 调用前端已经定义的函数，把数据当做参数传递给 foo</span></span><br><span class="line">       <span class="keyword">echo</span> <span class="variable">$cb</span>.<span class="string">&quot;(&#x27;上海晴，无风&#x27;)&quot;</span>;</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="keyword">echo</span> <span class="variable">$cb</span>.<span class="string">&quot;(&#x27;没有查询到你所在城市天气&#x27;)&quot;</span>;</span><br><span class="line">   &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样一来当前端请求 <code>http://127.0.0.1:8084/weather.php?callback=foo&amp;city=$&#123;city&#125;</code> 后，后端返回的内容就应该类似这种格式：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">foo(<span class="string">&#x27;上海晴，无风&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>本质就是在调用前端已经定义好的 <code>foo</code> 方法，这样就能够获取到后端返回给我们的数据了。</p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>由于 jsonp 解决跨域问题本质上是后端返回一个方法调用。所以不是任何接口都支持 jsonp 来获取到数据的，一旦接口不支持，返回的不是方法调用格式（foo(data)）而是 json 格式（{“msg”: “success”, “data”: {…}}）的话，就说明我们无法通过 jsonp 获取到数据。</p>
+<h3 id="第三方接口跨域数据获取"><a href="#第三方接口跨域数据获取" class="headerlink" title="第三方接口跨域数据获取"></a>第三方接口跨域数据获取</h3><p>一旦第三方接口返回的是 json 格式的字符串，我们就无法通过 ajax 或者 jsonp 的方式获取跨域数据。这种情况下我们只能通过自己的服务器当做中转站帮我们前端获取三方接口数据了，因为服务端之间是不存在跨域问题的，所以出现这种情况后，你可以让公司的后端帮帮忙，写一个接口去获取三方接口数据，并暴露一个接口让你能够获取到数据~</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>跨域</tag>
       </tags>
   </entry>
   <entry>
@@ -6604,6 +6604,32 @@
       </tags>
   </entry>
   <entry>
+    <title>使用lorem在HTML中生成随机文本</title>
+    <url>/posts/22606/</url>
+    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
+<p>使用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/22606/lorem.gif" class="" title="lorem">
+
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
+<blockquote>
+<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
+</blockquote>
+<ul>
+<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用hexo搭建个人博客</title>
     <url>/posts/43303/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>利用 <a href="https://hexo.io/zh-cn/">Hexo</a> 在 <a href="https://baike.baidu.com/item/github/10145341?fr=aladdin">GitHub</a> 上搭建个人博客。</p>
@@ -6766,32 +6792,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用lorem在HTML中生成随机文本</title>
-    <url>/posts/22606/</url>
-    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
-<p>使用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
-
-<img src="/posts/22606/lorem.gif" class="" title="lorem">
-
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
-<blockquote>
-<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
-</blockquote>
-<ul>
-<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
-</ul>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -7830,52 +7830,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>小程序formId获取</title>
-    <url>/posts/35316/</url>
-    <content><![CDATA[<img src="/posts/35316/pushmessage.jpeg" class="" title="效果截图">
-
-<h2 id="1-什么是-formId"><a href="#1-什么是-formId" class="headerlink" title="1. 什么是 formId"></a>1. 什么是 formId</h2><p><code>formId</code> 是小程序可以向用户发送模板消息的通行证，简单而言，你只有获取到 <code>formId</code>，把它交给后台，后台同学才能向用户发送通知消息，而这个通行证的有效期只有七天。这是微信为了防止小程序滥用通知消息骚扰用户而提出的一种策略。</p>
-<h2 id="2-formId-的获取"><a href="#2-formId-的获取" class="headerlink" title="2. formId 的获取"></a>2. formId 的获取</h2><p>小程序的 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html">模板消息文档</a> 中说，获取 <code>formId</code> 有以下两种途径：</p>
-<ul>
-<li>支付</li>
-<li>提交表单</li>
-</ul>
-<p>用户支付一次，能获取 3 个 <code>formId</code>，用户提交表单一次可得到一个 <code>formId</code> 。如果小程序中没有支付行为，但又有需要向用户发送消息的需求，这个时候就只能依靠提交表单了。</p>
-<h3 id="2-1-下发条件说明"><a href="#2-1-下发条件说明" class="headerlink" title="2. 1 下发条件说明"></a>2. 1 下发条件说明</h3><p>以下摘自 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html#%E4%B8%8B%E5%8F%91%E6%9D%A1%E4%BB%B6%E8%AF%B4%E6%98%8E">模板消息文档 - 下发条件说明</a></p>
-<h4 id="2-1-1-支付"><a href="#2-1-1-支付" class="headerlink" title="2.1.1 支付"></a>2.1.1 支付</h4><p>当用户在小程序内完成过支付行为，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次支付可下发 3 条，多次支付下发条数独立，互相不影响）</p>
-<h4 id="2-1-2-提交表单"><a href="#2-1-2-提交表单" class="headerlink" title="2.1.2 提交表单"></a>2.1.2 提交表单</h4><p>当用户在小程序内发生过提交表单行为且该表单声明为要发模板消息的，开发者需要向用户提供服务时，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次提交表单可下发 1 条，多次提交下发条数独立，相互不影响）</p>
-<h3 id="2-2-代码示例"><a href="#2-2-代码示例" class="headerlink" title="2.2 代码示例"></a>2.2 代码示例</h3><p>获取 <code>formId</code> 必须使用小程序/uni-app 的 <code>form</code> 组件，它本身有个属性叫 <code>report-submit</code> ，当在标签中加入这个属性时，一旦表单提交，<code>submit</code> 回调中就可以拿到 <code>formId</code> 了。</p>
-<blockquote>
-<p>html</p>
-</blockquote>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 微信小程序代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">bindsubmit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">formType</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>Submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- uni-app 代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">:report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">form-type</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>提交表单<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  // formSubmit 为提交事件触发的自定义方法</span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>js</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">formSubmit: <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获取表单id</span></span><br><span class="line">  <span class="keyword">const</span> formId = e.detail.formId;</span><br><span class="line">  <span class="comment">// 非真机运行时 formId 应该为 &#x27;the formId is a mock one&#x27;</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;表单id:&#x27;</span>, formId);</span><br><span class="line">  <span class="comment">// 获取后可通过异步请求将 formId 传递给后端</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>重要：</strong></p>
-<p>在微信开发者工具中运行获取的 <code>formId</code> 为 <code>the formId is a mock one</code> ，要获得真实有效的 <code>formId</code> 需要在真机上运行。</p>
-<h3 id="2-3-获取尽可能多的-formId"><a href="#2-3-获取尽可能多的-formId" class="headerlink" title="2.3 获取尽可能多的 formId"></a>2.3 获取尽可能多的 formId</h3><p>从运营的角度而言，<code>formId</code> 肯定是越多越好。所以每一个页面上用户的每一次点击我们都巴不得触发一次表单提交。哪怕从界面上讲，这次点击可能是跳转，弹窗的功能，跟表单完全无关，都要把 <code>button</code> 放在一个 <code>form</code> 中。但是这样无疑增加了前端的工作量，因为需要为每个页面的 <code>submit</code> 事件绑定一个上传 <code>formId</code> 的方法。一个可行的方法是借助 <code>vue</code> 的 <code>mixin</code>，为每一个页面实例混入一个上传 <code>formId</code> 的方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// app.js</span></span><br><span class="line">Vue.mixin(&#123;</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">uploadFormId</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.req(&#123;</span><br><span class="line">        url: <span class="string">&#x27;/api/v1/formid?formId=&#x27;</span> + e.target.formId</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>另外一个方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_collectWeChatFormId</span>(<span class="params">formId</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> token = wx.getStorageSync(<span class="string">&#x27;token_/cookies&#x27;</span>),</span><br><span class="line">    openId = wx.getStorageSync(<span class="string">&#x27;openid_cookies&#x27;</span>),</span><br><span class="line">    orign = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;formId&#x27;</span>, formId);</span><br><span class="line">  <span class="keyword">if</span> (formId == <span class="string">&#x27;the formId is a mock one&#x27;</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`模拟器中运行！`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (formId.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`formId不能为空`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> site = <span class="string">&#x27;你的收集接口&#x27;</span>,</span><br><span class="line">    dates = &#123;</span><br><span class="line">      token: token,</span><br><span class="line">      openId: openId,</span><br><span class="line">      formId: formId,</span><br><span class="line">      orign: orign</span><br><span class="line">    &#125;,</span><br><span class="line">    md =</span><br><span class="line">      <span class="string">&#x27;token=&#x27;</span> +</span><br><span class="line">      token +</span><br><span class="line">      <span class="string">&#x27;&amp;openId=&#x27;</span> +</span><br><span class="line">      openId +</span><br><span class="line">      <span class="string">&#x27;&amp;formId=&#x27;</span> +</span><br><span class="line">      formId +</span><br><span class="line">      <span class="string">&#x27;&amp;orign=&#x27;</span> +</span><br><span class="line">      orign;</span><br><span class="line">  requestHttp(site, dates, md, <span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">    <span class="built_in">console</span>.log(res.data);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-小程序模板消息接口更新"><a href="#3-小程序模板消息接口更新" class="headerlink" title="3. 小程序模板消息接口更新"></a>3. 小程序模板消息接口更新</h2><p>请注意，小程序模板消息接口将于 2020 年 1 月 10 日下线，开发者可使用<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html">订阅消息功能</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>移动端</category>
-        <category>小程序</category>
-      </categories>
-      <tags>
-        <tag>uniapp</tag>
-        <tag>小程序</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>常见Shell命令</title>
     <url>/posts/54337/</url>
     <content><![CDATA[<h2 id="常见终端命令"><a href="#常见终端命令" class="headerlink" title="常见终端命令"></a>常见终端命令</h2><ul>
@@ -8134,25 +8088,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>微信web开发者工具input，button按钮偏移</title>
-    <url>/posts/40884/</url>
-    <content><![CDATA[<p>使用微信 web 开发者工具开发时有时会发现如图，明明 input 框和 button 框在下面，但只有点击箭头位置时才能有效果</p>
-<img src="/posts/40884/huanghelou.png" class="" title="huanghelou">
-
-<p>解决方法：</p>
-<p>在排除样式上的错误的情况下：这是因为高分屏 win10 的显示设置默认是 125%，只需调整为 100%即可：</p>
-<img src="/posts/40884/win10%E5%88%86%E8%BE%A8%E7%8E%87%E8%B0%83%E6%95%B4.png" class="" title="分辨率调整">
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>移动端</category>
-        <category>微信开发</category>
-      </categories>
-      <tags>
-        <tag>微信开发</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>微信小程序Image图片实现宽度100%，高度自适应</title>
     <url>/posts/1126/</url>
     <content><![CDATA[<p>做法如下：</p>
@@ -8170,6 +8105,25 @@ callee</code></pre>
       <tags>
         <tag>uniapp</tag>
         <tag>小程序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>微信web开发者工具input，button按钮偏移</title>
+    <url>/posts/40884/</url>
+    <content><![CDATA[<p>使用微信 web 开发者工具开发时有时会发现如图，明明 input 框和 button 框在下面，但只有点击箭头位置时才能有效果</p>
+<img src="/posts/40884/huanghelou.png" class="" title="huanghelou">
+
+<p>解决方法：</p>
+<p>在排除样式上的错误的情况下：这是因为高分屏 win10 的显示设置默认是 125%，只需调整为 100%即可：</p>
+<img src="/posts/40884/win10%E5%88%86%E8%BE%A8%E7%8E%87%E8%B0%83%E6%95%B4.png" class="" title="分辨率调整">
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+        <category>微信开发</category>
+      </categories>
+      <tags>
+        <tag>微信开发</tag>
       </tags>
   </entry>
   <entry>
@@ -8217,73 +8171,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>数组的遍历方法</title>
-    <url>/posts/64478/</url>
-    <content><![CDATA[<p>下面是总结的数组遍历的常见方法</p>
-<h2 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h2><ul>
-<li>标准for循环</li>
-<li>forEach((当前值, 当前索引, 当前数组) =&gt; {…}, [, 绑定的this])`<ul>
-<li>无法中途退出循环，只能用 return 退出本次回调，进行下一次回调</li>
-<li>它总是返回 undefined 值，即使你 return 了一个值</li>
-</ul>
-</li>
-<li>for…in（不推荐）会把继承链的对象属性都会遍历一遍，而且数组遍历不一定按次序<ul>
-<li>for-in 循环返回的是所有能通过对象访问的、可枚举的属性</li>
-</ul>
-</li>
-<li>for (variable of iterable)（ES6）可迭代Array，Map，Set，String等（迭代的是值value）<ul>
-<li>在 for..of 中如果遍历中途要退出，可以使用 break 退出循环</li>
-</ul>
-</li>
-</ul>
-<a id="more"></a>
-
-<h2 id="ES5"><a href="#ES5" class="headerlink" title="ES5"></a>ES5</h2><ul>
-<li><p>map (不改变原数组) 会给原数组中的每个元素都按顺序调用一次 callback 函数</p>
-</li>
-<li><p>reduce (不改变原数组) 数组中的前项和后项做某种计算,并累计最终值。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法：</span></span><br><span class="line"><span class="comment">// arr.reduce(function(total, currentValue, currentIndex, arr), initialValue)</span></span><br><span class="line"><span class="comment">// callback 参数</span></span><br><span class="line"><span class="comment">// (累积器, 当前元素, 当前元素索引, 当前数组)</span></span><br><span class="line"><span class="comment">// initialValue:指定第一次回调 的第一个参数</span></span><br><span class="line"><span class="keyword">var</span> wallets = [<span class="number">4</span>, <span class="number">7.8</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">var</span> totalMoney = wallets.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">countedMoney, curMoney</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> countedMoney + curMoney;</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>filter (不改变原数组)</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line"><span class="keyword">var</span> morearr = arr.filter(<span class="function"><span class="keyword">function</span> (<span class="params">number</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> number &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// [4,5,6]</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>every (不改变原数组) 测试数组的所有元素是否都通过了指定函数的测试</p>
-<ul>
-<li>如果数组中检测到有一个元素不满足，则整个表达式返回 false ，且剩余的元素不会再进行检测</li>
-<li>如果所有元素都满足条件，则返回 true</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.every(<span class="function"><span class="keyword">function</span> (<span class="params">item, index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">2</span></span><br><span class="line">&#125;) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>some (不改变原数组) 测试是否至少有一个元素通过 callback 中的条件。对于放在空数组上的任何条件，此方法返回 false</p>
-<ul>
-<li>如果有一个元素满足条件，则表达式返回true, 剩余的元素不会再执行检测</li>
-<li>如果没有满足条件的元素，则返回false</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// some(callback, thisArg)</span></span><br><span class="line"><span class="comment">// callback:</span></span><br><span class="line"><span class="comment">//    (当前元素, 当前索引, 调用some的数组)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.some(<span class="function"><span class="keyword">function</span> (<span class="params">item,index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h2><ul>
-<li><p>find() &amp; findIndex() 根据条件找到数组成员</p>
-<ul>
-<li>find 定义：用于找出第一个符合条件的数组成员，并返回该成员，如果没有符合条件的成员，则返回 undefined</li>
-<li>findIndex 定义：返回第一个符合条件的数组成员的位置，如果所有成员都不符合条件，则返回-1</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line"><span class="keyword">let</span> new_array = arr.find(<span class="function"><span class="keyword">function</span>(<span class="params">currentValue, index, arr</span>), <span class="title">thisArg</span>)</span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">new_array</span> = <span class="title">arr</span>.<span class="title">findIndex</span>(<span class="params"><span class="keyword">function</span>(currentValue, index, arr), thisArg</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// 这两个方法都可以识别<span class="title">NaN</span>,弥补了<span class="title">indexOf</span>的不足</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">find</span></span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">a</span> = [1, 4, -5, 10].<span class="title">find</span>(<span class="params">(n) =&gt; n &lt; <span class="number">0</span></span>)</span>; <span class="comment">// 返回元素-5</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].find(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回元素NaN</span></span><br><span class="line"><span class="comment">// findIndex</span></span><br><span class="line"><span class="keyword">let</span> a = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> n &lt; <span class="number">0</span>); <span class="comment">// 返回索引2</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回索引4</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>keys() &amp; values() &amp; entries() 遍历键名、遍历键值、遍历键名+键值</p>
-<ul>
-<li>三个方法都返回一个新的 Array Iterator 对象，对象根据方法不同包含不同的值</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line">array.keys()   array.values()   array.entries()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].keys()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> elem <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].values()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// &#x27;a&#x27;</span></span><br><span class="line"><span class="comment">// &#x27;b&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> [index, elem] <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].entries()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index, elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0 &quot;a&quot;</span></span><br><span class="line"><span class="comment">// 1 &quot;b&quot;</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>更改element-ui分页组件的文字部分</title>
     <url>/posts/19569/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>UI 设计稿中，分页部分的文字和 element-ui 中的有点偏差。</p>
@@ -8298,6 +8185,8 @@ callee</code></pre>
 <img src="/posts/19569/page-ui.png" class="" title="page-ui">
 
 <p>现在想要把「前往」改成「前往第」。然而 element-ui 文档中并没有给出跳转页面文字部分的配置。</p>
+<a id="more"></a>
+
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在 github 上搜了下相关 issue 后找到了一种方案：使用 element-ui 提供的国际化部分进行文字替换。地址为：<a href="https://github.com/ElemeFE/element/issues/16030">https://github.com/ElemeFE/element/issues/16030</a></p>
 <p>具体在 Vue 项目中如何做呢？</p>
 <h3 id="在-assets-文件夹中新增-locale-cn-js-文件。"><a href="#在-assets-文件夹中新增-locale-cn-js-文件。" class="headerlink" title="在 assets 文件夹中新增 /locale/cn.js 文件。"></a>在 assets 文件夹中新增 <code>/locale/cn.js</code> 文件。</h3><blockquote>
@@ -8353,6 +8242,30 @@ callee</code></pre>
 <p>递归实现</p>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">4</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">15</span>, <span class="number">33</span>, <span class="number">46</span>, <span class="number">49</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">101</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binary_search</span>(<span class="params">arr, min, max, target</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (min &gt; max) &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> mid = <span class="built_in">parseInt</span>((min + max) / <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (target === arr[mid]) &#123;</span><br><span class="line">        <span class="keyword">return</span> mid;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (target &gt; arr[mid]) &#123;</span><br><span class="line">        min = mid + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        max = mid - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> binary_search(arr, min, max, target);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(binary_search(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>, <span class="number">33</span>));</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>算法</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>用JS实现翻转二叉树</title>
+    <url>/posts/50491/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
+<p>输入</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>输出</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>后端</category>
@@ -8446,27 +8359,70 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>用JS实现翻转二叉树</title>
-    <url>/posts/50491/</url>
-    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>翻转二叉树就是把二叉树每一层的左右顺序颠倒过来。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><blockquote>
-<p>输入</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">2</span>     <span class="number">7</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">1</span>   <span class="number">3</span> <span class="number">6</span>   <span class="number">9</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>输出</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">     <span class="number">4</span></span><br><span class="line">   /   \</span><br><span class="line">  <span class="number">7</span>     <span class="number">2</span></span><br><span class="line"> / \   / \</span><br><span class="line"><span class="number">9</span>   <span class="number">6</span> <span class="number">3</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
+    <title>数组的遍历方法</title>
+    <url>/posts/64478/</url>
+    <content><![CDATA[<p>下面是总结的数组遍历的常见方法</p>
+<h2 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h2><ul>
+<li>标准for循环</li>
+<li>forEach((当前值, 当前索引, 当前数组) =&gt; {…}, [, 绑定的this])`<ul>
+<li>无法中途退出循环，只能用 return 退出本次回调，进行下一次回调</li>
+<li>它总是返回 undefined 值，即使你 return 了一个值</li>
+</ul>
+</li>
+<li>for…in（不推荐）会把继承链的对象属性都会遍历一遍，而且数组遍历不一定按次序<ul>
+<li>for-in 循环返回的是所有能通过对象访问的、可枚举的属性</li>
+</ul>
+</li>
+<li>for (variable of iterable)（ES6）可迭代Array，Map，Set，String等（迭代的是值value）<ul>
+<li>在 for..of 中如果遍历中途要退出，可以使用 break 退出循环</li>
+</ul>
+</li>
+</ul>
 <a id="more"></a>
 
-<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>如果根节点不为空，那么将左右子结点交换，然后将左右子结点进行递归调用。</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> invertTree = <span class="function"><span class="keyword">function</span>(<span class="params">root</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> temp = root.left;</span><br><span class="line">    root.left = root.right;</span><br><span class="line">    root.right = temp;</span><br><span class="line">    invertTree(root.left);</span><br><span class="line">    invertTree(root.right);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="ES5"><a href="#ES5" class="headerlink" title="ES5"></a>ES5</h2><ul>
+<li><p>map (不改变原数组) 会给原数组中的每个元素都按顺序调用一次 callback 函数</p>
+</li>
+<li><p>reduce (不改变原数组) 数组中的前项和后项做某种计算,并累计最终值。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法：</span></span><br><span class="line"><span class="comment">// arr.reduce(function(total, currentValue, currentIndex, arr), initialValue)</span></span><br><span class="line"><span class="comment">// callback 参数</span></span><br><span class="line"><span class="comment">// (累积器, 当前元素, 当前元素索引, 当前数组)</span></span><br><span class="line"><span class="comment">// initialValue:指定第一次回调 的第一个参数</span></span><br><span class="line"><span class="keyword">var</span> wallets = [<span class="number">4</span>, <span class="number">7.8</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">var</span> totalMoney = wallets.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">countedMoney, curMoney</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> countedMoney + curMoney;</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>filter (不改变原数组)</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line"><span class="keyword">var</span> morearr = arr.filter(<span class="function"><span class="keyword">function</span> (<span class="params">number</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> number &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// [4,5,6]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>every (不改变原数组) 测试数组的所有元素是否都通过了指定函数的测试</p>
+<ul>
+<li>如果数组中检测到有一个元素不满足，则整个表达式返回 false ，且剩余的元素不会再进行检测</li>
+<li>如果所有元素都满足条件，则返回 true</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.every(<span class="function"><span class="keyword">function</span> (<span class="params">item, index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">2</span></span><br><span class="line">&#125;) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>some (不改变原数组) 测试是否至少有一个元素通过 callback 中的条件。对于放在空数组上的任何条件，此方法返回 false</p>
+<ul>
+<li>如果有一个元素满足条件，则表达式返回true, 剩余的元素不会再执行检测</li>
+<li>如果没有满足条件的元素，则返回false</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// some(callback, thisArg)</span></span><br><span class="line"><span class="comment">// callback:</span></span><br><span class="line"><span class="comment">//    (当前元素, 当前索引, 调用some的数组)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="keyword">var</span> result = arr.some(<span class="function"><span class="keyword">function</span> (<span class="params">item,index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> item &gt; <span class="number">3</span></span><br><span class="line">&#125;) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h2><ul>
+<li><p>find() &amp; findIndex() 根据条件找到数组成员</p>
+<ul>
+<li>find 定义：用于找出第一个符合条件的数组成员，并返回该成员，如果没有符合条件的成员，则返回 undefined</li>
+<li>findIndex 定义：返回第一个符合条件的数组成员的位置，如果所有成员都不符合条件，则返回-1</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line"><span class="keyword">let</span> new_array = arr.find(<span class="function"><span class="keyword">function</span>(<span class="params">currentValue, index, arr</span>), <span class="title">thisArg</span>)</span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">new_array</span> = <span class="title">arr</span>.<span class="title">findIndex</span>(<span class="params"><span class="keyword">function</span>(currentValue, index, arr), thisArg</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// 这两个方法都可以识别<span class="title">NaN</span>,弥补了<span class="title">indexOf</span>的不足</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">find</span></span></span><br><span class="line"><span class="function"><span class="title">let</span> <span class="title">a</span> = [1, 4, -5, 10].<span class="title">find</span>(<span class="params">(n) =&gt; n &lt; <span class="number">0</span></span>)</span>; <span class="comment">// 返回元素-5</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].find(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回元素NaN</span></span><br><span class="line"><span class="comment">// findIndex</span></span><br><span class="line"><span class="keyword">let</span> a = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> n &lt; <span class="number">0</span>); <span class="comment">// 返回索引2</span></span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>,<span class="literal">NaN</span>].findIndex(<span class="function">(<span class="params">n</span>) =&gt;</span> <span class="built_in">Object</span>.is(<span class="literal">NaN</span>, n));  <span class="comment">// 返回索引4</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>keys() &amp; values() &amp; entries() 遍历键名、遍历键值、遍历键名+键值</p>
+<ul>
+<li>三个方法都返回一个新的 Array Iterator 对象，对象根据方法不同包含不同的值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line">array.keys()   array.values()   array.entries()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].keys()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> elem <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].values()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// &#x27;a&#x27;</span></span><br><span class="line"><span class="comment">// &#x27;b&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> [index, elem] <span class="keyword">of</span> [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>].entries()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(index, elem);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 0 &quot;a&quot;</span></span><br><span class="line"><span class="comment">// 1 &quot;b&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
 ]]></content>
       <categories>
-        <category>后端</category>
-        <category>算法</category>
+        <category>前端</category>
+        <category>JS</category>
       </categories>
   </entry>
   <entry>
@@ -8517,21 +8473,26 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>禁止uniapp&quot;v-longpress&quot;事件在滚动屏幕时也会触发</title>
-    <url>/posts/27545/</url>
-    <content><![CDATA[<img src="/posts/27545/lock-table.png" class="" title="锁台">
-
-<p>选中某个桌台滑动屏幕也会触发解锁弹窗。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>监听 <code>@touchstart</code> 和 <code>@touchmove</code> 事件</p>
-<p>在 <code>@touchstart</code> 触发时保存当前选中的桌台，<code>@touchmove</code> 触发时移除 <code>@touchstart</code> 中保存的桌台，最后在 <code>v-longpress</code> 事件触发时，判断桌台是否存在，存在则弹出 modal，否则忽略。</p>
+    <title>管理github上的star</title>
+    <url>/posts/45568/</url>
+    <content><![CDATA[<p>随着 github 上 star 的项目越来越多，找起来也越来越不方便。</p>
+<p>Google 了一下发现个不错的网站能帮我们管理 star：<a href="https://link.zhihu.com/?target=https://astralapp.com/">https://astralapp.com/</a></p>
+<p>特性：</p>
+<ul>
+<li>GitHub 授权之后自动同步所有 Star 项目</li>
+<li>可以使用标签分组（支持一个项目多个标签）</li>
+<li>可以给每个 repo 添加自己的笔记</li>
+<li>如果 Star 项目有变动可点击左上同步按钮同步</li>
+</ul>
+<p>效果：</p>
+<img src="/posts/45568/astral.png" class="" title="astral">
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>uniapp</category>
+        <category>效率</category>
+        <category>工具</category>
       </categories>
       <tags>
-        <tag>uniapp</tag>
+        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -8573,26 +8534,21 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>管理github上的star</title>
-    <url>/posts/45568/</url>
-    <content><![CDATA[<p>随着 github 上 star 的项目越来越多，找起来也越来越不方便。</p>
-<p>Google 了一下发现个不错的网站能帮我们管理 star：<a href="https://link.zhihu.com/?target=https://astralapp.com/">https://astralapp.com/</a></p>
-<p>特性：</p>
-<ul>
-<li>GitHub 授权之后自动同步所有 Star 项目</li>
-<li>可以使用标签分组（支持一个项目多个标签）</li>
-<li>可以给每个 repo 添加自己的笔记</li>
-<li>如果 Star 项目有变动可点击左上同步按钮同步</li>
-</ul>
-<p>效果：</p>
-<img src="/posts/45568/astral.png" class="" title="astral">
+    <title>禁止uniapp&quot;v-longpress&quot;事件在滚动屏幕时也会触发</title>
+    <url>/posts/27545/</url>
+    <content><![CDATA[<img src="/posts/27545/lock-table.png" class="" title="锁台">
+
+<p>选中某个桌台滑动屏幕也会触发解锁弹窗。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>监听 <code>@touchstart</code> 和 <code>@touchmove</code> 事件</p>
+<p>在 <code>@touchstart</code> 触发时保存当前选中的桌台，<code>@touchmove</code> 触发时移除 <code>@touchstart</code> 中保存的桌台，最后在 <code>v-longpress</code> 事件触发时，判断桌台是否存在，存在则弹出 modal，否则忽略。</p>
 ]]></content>
       <categories>
-        <category>效率</category>
-        <category>工具</category>
+        <category>前端</category>
+        <category>框架</category>
+        <category>uniapp</category>
       </categories>
       <tags>
-        <tag>GitHub</tag>
+        <tag>uniapp</tag>
       </tags>
   </entry>
   <entry>
@@ -8679,24 +8635,6 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>转载-CSS3不规则投影（filter/drop-shadow）滤镜</title>
-    <url>/posts/48484/</url>
-    <content><![CDATA[<p>转载地址：</p>
-<p><a href="https://www.jianshu.com/p/5cbab78f02b3">https://www.jianshu.com/p/5cbab78f02b3</a></p>
-<p>codepen 地址：</p>
-<p><a href="https://codepen.io/JingW/pen/OJMWgOP">https://codepen.io/JingW/pen/OJMWgOP</a></p>
-<iframe height="692" scrolling="no" title="filter(drop-shadow)" src="https://codepen.io/JingW/embed/OJMWgOP?height=692&amp;theme-id=light&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>CSS3</tag>
       </tags>
   </entry>
   <entry>
@@ -9041,6 +8979,24 @@ callee</code></pre>
       <tags>
         <tag>转载</tag>
         <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>转载-CSS3不规则投影（filter/drop-shadow）滤镜</title>
+    <url>/posts/48484/</url>
+    <content><![CDATA[<p>转载地址：</p>
+<p><a href="https://www.jianshu.com/p/5cbab78f02b3">https://www.jianshu.com/p/5cbab78f02b3</a></p>
+<p>codepen 地址：</p>
+<p><a href="https://codepen.io/JingW/pen/OJMWgOP">https://codepen.io/JingW/pen/OJMWgOP</a></p>
+<iframe height="692" scrolling="no" title="filter(drop-shadow)" src="https://codepen.io/JingW/embed/OJMWgOP?height=692&amp;theme-id=light&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>CSS3</tag>
       </tags>
   </entry>
   <entry>
@@ -10230,6 +10186,52 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>小程序formId获取</title>
+    <url>/posts/35316/</url>
+    <content><![CDATA[<img src="/posts/35316/pushmessage.jpeg" class="" title="效果截图">
+
+<h2 id="1-什么是-formId"><a href="#1-什么是-formId" class="headerlink" title="1. 什么是 formId"></a>1. 什么是 formId</h2><p><code>formId</code> 是小程序可以向用户发送模板消息的通行证，简单而言，你只有获取到 <code>formId</code>，把它交给后台，后台同学才能向用户发送通知消息，而这个通行证的有效期只有七天。这是微信为了防止小程序滥用通知消息骚扰用户而提出的一种策略。</p>
+<h2 id="2-formId-的获取"><a href="#2-formId-的获取" class="headerlink" title="2. formId 的获取"></a>2. formId 的获取</h2><p>小程序的 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html">模板消息文档</a> 中说，获取 <code>formId</code> 有以下两种途径：</p>
+<ul>
+<li>支付</li>
+<li>提交表单</li>
+</ul>
+<p>用户支付一次，能获取 3 个 <code>formId</code>，用户提交表单一次可得到一个 <code>formId</code> 。如果小程序中没有支付行为，但又有需要向用户发送消息的需求，这个时候就只能依靠提交表单了。</p>
+<h3 id="2-1-下发条件说明"><a href="#2-1-下发条件说明" class="headerlink" title="2. 1 下发条件说明"></a>2. 1 下发条件说明</h3><p>以下摘自 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/template-message.html#%E4%B8%8B%E5%8F%91%E6%9D%A1%E4%BB%B6%E8%AF%B4%E6%98%8E">模板消息文档 - 下发条件说明</a></p>
+<h4 id="2-1-1-支付"><a href="#2-1-1-支付" class="headerlink" title="2.1.1 支付"></a>2.1.1 支付</h4><p>当用户在小程序内完成过支付行为，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次支付可下发 3 条，多次支付下发条数独立，互相不影响）</p>
+<h4 id="2-1-2-提交表单"><a href="#2-1-2-提交表单" class="headerlink" title="2.1.2 提交表单"></a>2.1.2 提交表单</h4><p>当用户在小程序内发生过提交表单行为且该表单声明为要发模板消息的，开发者需要向用户提供服务时，可允许开发者向用户在 7 天内推送有限条数的模板消息（1 次提交表单可下发 1 条，多次提交下发条数独立，相互不影响）</p>
+<h3 id="2-2-代码示例"><a href="#2-2-代码示例" class="headerlink" title="2.2 代码示例"></a>2.2 代码示例</h3><p>获取 <code>formId</code> 必须使用小程序/uni-app 的 <code>form</code> 组件，它本身有个属性叫 <code>report-submit</code> ，当在标签中加入这个属性时，一旦表单提交，<code>submit</code> 回调中就可以拿到 <code>formId</code> 了。</p>
+<blockquote>
+<p>html</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 微信小程序代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">bindsubmit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">formType</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>Submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- uni-app 代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit</span>=<span class="string">&quot;formSubmit&quot;</span> <span class="attr">:report-submit</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">form-type</span>=<span class="string">&quot;submit&quot;</span>&gt;</span>提交表单<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  // formSubmit 为提交事件触发的自定义方法</span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">formSubmit: <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获取表单id</span></span><br><span class="line">  <span class="keyword">const</span> formId = e.detail.formId;</span><br><span class="line">  <span class="comment">// 非真机运行时 formId 应该为 &#x27;the formId is a mock one&#x27;</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;表单id:&#x27;</span>, formId);</span><br><span class="line">  <span class="comment">// 获取后可通过异步请求将 formId 传递给后端</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重要：</strong></p>
+<p>在微信开发者工具中运行获取的 <code>formId</code> 为 <code>the formId is a mock one</code> ，要获得真实有效的 <code>formId</code> 需要在真机上运行。</p>
+<h3 id="2-3-获取尽可能多的-formId"><a href="#2-3-获取尽可能多的-formId" class="headerlink" title="2.3 获取尽可能多的 formId"></a>2.3 获取尽可能多的 formId</h3><p>从运营的角度而言，<code>formId</code> 肯定是越多越好。所以每一个页面上用户的每一次点击我们都巴不得触发一次表单提交。哪怕从界面上讲，这次点击可能是跳转，弹窗的功能，跟表单完全无关，都要把 <code>button</code> 放在一个 <code>form</code> 中。但是这样无疑增加了前端的工作量，因为需要为每个页面的 <code>submit</code> 事件绑定一个上传 <code>formId</code> 的方法。一个可行的方法是借助 <code>vue</code> 的 <code>mixin</code>，为每一个页面实例混入一个上传 <code>formId</code> 的方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// app.js</span></span><br><span class="line">Vue.mixin(&#123;</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">uploadFormId</span>(<span class="params">e</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.req(&#123;</span><br><span class="line">        url: <span class="string">&#x27;/api/v1/formid?formId=&#x27;</span> + e.target.formId</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>另外一个方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_collectWeChatFormId</span>(<span class="params">formId</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> token = wx.getStorageSync(<span class="string">&#x27;token_/cookies&#x27;</span>),</span><br><span class="line">    openId = wx.getStorageSync(<span class="string">&#x27;openid_cookies&#x27;</span>),</span><br><span class="line">    orign = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;formId&#x27;</span>, formId);</span><br><span class="line">  <span class="keyword">if</span> (formId == <span class="string">&#x27;the formId is a mock one&#x27;</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`模拟器中运行！`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (formId.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`formId不能为空`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> site = <span class="string">&#x27;你的收集接口&#x27;</span>,</span><br><span class="line">    dates = &#123;</span><br><span class="line">      token: token,</span><br><span class="line">      openId: openId,</span><br><span class="line">      formId: formId,</span><br><span class="line">      orign: orign</span><br><span class="line">    &#125;,</span><br><span class="line">    md =</span><br><span class="line">      <span class="string">&#x27;token=&#x27;</span> +</span><br><span class="line">      token +</span><br><span class="line">      <span class="string">&#x27;&amp;openId=&#x27;</span> +</span><br><span class="line">      openId +</span><br><span class="line">      <span class="string">&#x27;&amp;formId=&#x27;</span> +</span><br><span class="line">      formId +</span><br><span class="line">      <span class="string">&#x27;&amp;orign=&#x27;</span> +</span><br><span class="line">      orign;</span><br><span class="line">  requestHttp(site, dates, md, <span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">    <span class="built_in">console</span>.log(res.data);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-小程序模板消息接口更新"><a href="#3-小程序模板消息接口更新" class="headerlink" title="3. 小程序模板消息接口更新"></a>3. 小程序模板消息接口更新</h2><p>请注意，小程序模板消息接口将于 2020 年 1 月 10 日下线，开发者可使用<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html">订阅消息功能</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+        <category>小程序</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
+        <tag>小程序</tag>
       </tags>
   </entry>
   <entry>
