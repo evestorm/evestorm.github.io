@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="在 Vue 中，我们通过 Vue.component(&#39;MyComponentName&#39;, &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;) 的方式来进行全局组件注册，但如果需要全局注册的组件很多，这时代码就会变得比较臃肿，例如： 123456789101112&#x2F;&#x2F; 注册 5 个全局组件import ExampleComponent1 from &amp;#x27;.&#x2F;components">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue全局组件自动注册(转载)">
+<meta property="og:url" content="https://evestorm.github.io/posts/64138/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="在 Vue 中，我们通过 Vue.component(&#39;MyComponentName&#39;, &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;) 的方式来进行全局组件注册，但如果需要全局注册的组件很多，这时代码就会变得比较臃肿，例如： 123456789101112&#x2F;&#x2F; 注册 5 个全局组件import ExampleComponent1 from &amp;#x27;.&#x2F;components">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-01-13T03:10:53.000Z">
+<meta property="article:modified_time" content="2021-01-13T03:13:53.284Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="vue-cli3">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/64138/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Vue全局组件自动注册(转载) | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E6%B3%A8%E5%86%8C"><span class="nav-number">1.</span> <span class="nav-text">循环注册</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%86%8C"><span class="nav-number">2.</span> <span class="nav-text">自动注册</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95"><span class="nav-number">3.</span> <span class="nav-text">扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/64138/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue全局组件自动注册(转载)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-01-13 11:10:53 / 修改时间：11:13:53" itemprop="dateCreated datePublished" datetime="2021-01-13T11:10:53+08:00">2021-01-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/64138/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/64138/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>在 Vue 中，我们通过 <code>Vue.component(&#39;MyComponentName&#39;, &#123; /* ... */ &#125;)</code> 的方式来进行全局组件注册，但如果需要全局注册的组件很多，这时代码就会变得比较臃肿，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册 5 个全局组件</span></span><br><span class="line"><span class="keyword">import</span> ExampleComponent1 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent1/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent2 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent2/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent3 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent3/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent4 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent4/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent5 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent5/index&#x27;</span>;</span><br><span class="line"></span><br><span class="line">Vue.component(<span class="string">&#x27;ExampleComponent1&#x27;</span>, ExampleComponent1);</span><br><span class="line">Vue.component(<span class="string">&#x27;ExampleComponent2&#x27;</span>, ExampleComponent2);</span><br><span class="line">Vue.component(<span class="string">&#x27;ExampleComponent3&#x27;</span>, ExampleComponent3);</span><br><span class="line">Vue.component(<span class="string">&#x27;ExampleComponent4&#x27;</span>, ExampleComponent4);</span><br><span class="line">Vue.component(<span class="string">&#x27;ExampleComponent5&#x27;</span>, ExampleComponent5);</span><br></pre></td></tr></table></figure>
+
+<p>下面我们就针对这块痛点，做些优化。</p>
+<h2 id="循环注册"><a href="#循环注册" class="headerlink" title="循环注册"></a>循环注册</h2><p>回看上面的演示代码，最先能想到的优化方式，就是能不能做到批量注册，但查了 Vue 的手册，并没有看到组件批量注册的 API。</p>
+<p>没办法，只能改变下思路，既然不能批量注册，那能不能做一层循环，在循环体内依次注册我们的组件呢？</p>
+<p>答案当然是可以的，来看下我的实现代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ExampleComponent1 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent1/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent2 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent2/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent3 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent3/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent4 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent4/index&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ExampleComponent5 <span class="keyword">from</span> <span class="string">&#x27;./components/exampleComponent5/index&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> components = &#123;</span><br><span class="line">  ExampleComponent1,</span><br><span class="line">  ExampleComponent2,</span><br><span class="line">  ExampleComponent3,</span><br><span class="line">  ExampleComponent4,</span><br><span class="line">  ExampleComponent5</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">Object</span>.keys(components).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">  Vue.component(key, components[key]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>首先组件还是要手动引入，引入之后我定义了一个 <code>components</code> 的对象，将引入组件的变量名存放在 <code>components</code> 对象里，最后通过 <code>Object.keys()</code> 方法循环对象并注册组件。</p>
+<p>这个方法虽然减轻了一部分工作，但实际使用中，依旧还是比较麻烦，于是我又开始思考能否做到全自动注册。</p>
+<h2 id="自动注册"><a href="#自动注册" class="headerlink" title="自动注册"></a>自动注册</h2><p>之前在阅读 <a target="_blank" rel="noopener" href="https://github.com/PanJiaChen/vue-admin-template">vue-admin-template</a> 的时候，学习到了一个语法 <code>require.context()</code> ，这是 Webpack 的一个 API ，它能做到遍历文件夹中的指定文件并自动引入。</p>
+<p>既然能遍历指定文件，还能自动引入，这就已经解决了主要问题了，而我要做无非就是在遍历指定文件的同时，将其注册就可以了。</p>
+<p>下面来看下实现代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> componentsContext = <span class="built_in">require</span>.context(<span class="string">&#x27;./components&#x27;</span>, <span class="literal">true</span>, <span class="regexp">/index.vue$/</span>);</span><br><span class="line">componentsContext.keys().forEach(<span class="function"><span class="params">component</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 获取文件中的 default 模块</span></span><br><span class="line">  <span class="keyword">const</span> componentConfig = componentsContext(component).default;</span><br><span class="line">  Vue.component(componentConfig.name, componentConfig);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>首先通过 <code>require.context()</code> 获取 ./components 目录下所有文件夹里的 index.vue 文件，然后循环依次读取文件中的 default 模块，并使用组件的 <code>name</code> 做为组件名进行组件注册。</p>
+<blockquote>
+<p>需要注意的是，组件必须设置 <code>name</code> 值，因为注册的组件名就是 <code>name</code> 值，所以还要确保不能重名。</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  name: <span class="string">&#x27;ExampleComponent1&#x27;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>到此为止，我们已经实现组件的全局自动注册功能了，只需按照规范写好组件，放到 ./components 目录下即可，程序就会自动遍历并注册，无需我再手动操作。</p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>组件有另一种调用方式，也就是通过 js 调用，例如 ElementUI 里的 <a target="_blank" rel="noopener" href="https://element.eleme.cn/#/zh-CN/component/notification">Notification</a> 组件，它的调用就是通过 <code>this.$notify()</code> 的方式调用，而 <code>$notify</code> 方法是 ElementUI 挂载到 Vue 原型链上的一个全局方法。</p>
+<p>针对这种通过 js 调用的组件，我们需要在原有组件同目录下增加一个 js 文件，里面的代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> component = <span class="built_in">require</span>(<span class="string">&#x27;./main.vue&#x27;</span>).default;</span><br><span class="line"><span class="keyword">const</span> <span class="title">constructor</span> = <span class="title">Vue</span>.<span class="title">extend</span>(<span class="params">component</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> exampleComponent1 = <span class="function"><span class="params">options</span> =&gt;</span> &#123;</span><br><span class="line">  options = options || &#123;&#125;;</span><br><span class="line">  <span class="keyword">let</span> instance = <span class="keyword">new</span> <span class="title">constructor</span>(<span class="params">&#123;</span></span><br><span class="line"><span class="params">    data: options</span></span><br><span class="line"><span class="params">  &#125;</span>);</span><br><span class="line">  instance.vm = instance.$mount();</span><br><span class="line">  instance.dom = instance.vm.$el;</span><br><span class="line">  <span class="built_in">document</span>.body.appendChild(instance.dom);</span><br><span class="line">  <span class="keyword">return</span> instance.vm;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  install: <span class="function"><span class="params">Vue</span> =&gt;</span> &#123;</span><br><span class="line">    Vue.prototype[<span class="string">`$<span class="subst">$&#123;component.name&#125;</span>`</span>] = exampleComponent1;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这时候，我们还需要修改一下自动注册的代码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> componentsContext = <span class="built_in">require</span>.context(</span><br><span class="line">  <span class="string">&#x27;./components&#x27;</span>,</span><br><span class="line">  <span class="literal">true</span>,</span><br><span class="line">  /index.(vue|js)$/</span><br><span class="line">);</span><br><span class="line">componentsContext.keys().forEach(<span class="function"><span class="params">component</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 组件配置信息</span></span><br><span class="line">  <span class="keyword">const</span> componentConfig = componentsContext(component).default;</span><br><span class="line">  <span class="keyword">if</span> (<span class="regexp">/.vue$/</span>.test(component)) &#123;</span><br><span class="line">    Vue.component(componentConfig.name, componentConfig);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    Vue.use(componentConfig);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在循环依次读取文件中的 default 模块的时候，判断一下文件是 vue 文件还是 js 文件，如果是 vue 文件，则进行组件注册，如果是 js 文件，则将组件挂载到 Vue 原型链上。</p>
+<p>上面这个 Demo，在实际使用中，就可以通过 <code>this.$ExampleComponent1()</code> 的方式调用组件了。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>全局组件自动注册的功能也加入到 <a target="_blank" rel="noopener" href="https://gitee.com/eoner/vue-automation/">vue-autumation</a> 中，这是一个基于 Vue CLI 3 制作的 Vue 脚手架，能方便快速进行业务开发，欢迎大家关注。</p>
+<p>作者：Hooray<br>链接：<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903893244051463">https://juejin.cn/post/6844903893244051463</a><br>来源：掘金<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
+              <a href="/tags/vue-cli3/" rel="tag"><i class="fa fa-tag"></i> vue-cli3</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/19569/" rel="prev" title="更改element-ui分页组件的文字部分">
+                  <i class="fa fa-chevron-left"></i> 更改element-ui分页组件的文字部分
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
