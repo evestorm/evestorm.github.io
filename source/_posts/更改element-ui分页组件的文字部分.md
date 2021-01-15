@@ -25,6 +25,8 @@ UI 设计稿中，分页部分的文字和 element-ui 中的有点偏差。
 
 现在想要把「前往」改成「前往第」。然而 element-ui 文档中并没有给出跳转页面文字部分的配置。
 
+<!-- more -->
+
 ## 解决方案
 
 在 github 上搜了下相关 issue 后找到了一种方案：使用 element-ui 提供的国际化部分进行文字替换。地址为：https://github.com/ElemeFE/element/issues/16030

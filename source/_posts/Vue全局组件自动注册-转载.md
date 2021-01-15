@@ -30,6 +30,8 @@ Vue.component('ExampleComponent5', ExampleComponent5);
 
 下面我们就针对这块痛点，做些优化。
 
+<!-- more -->
+
 ## 循环注册
 
 回看上面的演示代码，最先能想到的优化方式，就是能不能做到批量注册，但查了 Vue 的手册，并没有看到组件批量注册的 API。
