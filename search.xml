@@ -229,6 +229,33 @@
       </tags>
   </entry>
   <entry>
+    <title>CSS3伪元素实现自定义复选框</title>
+    <url>/posts/3583/</url>
+    <content><![CDATA[<p>我们都知道原生的复选框控件样式极难自定义，这对于工程师实现设计稿的难度加大了一大截。css3 的出现，增加了:checked 选择器，因此我们可以利用:checked 和 label 来实现各式各样的表单选择控件，接下来让我们来看看如何实现吧！</p>
+<a id="more"></a>
+
+<p>我们来看看如何实现上述自定义的复选框：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:focus</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">box-shadow</span>: 0 0 0.6<span class="selector-tag">em</span> <span class="selector-id">#06c</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\a0&#x27;; /* 不换行空格 */</span><br><span class="line">    display: inline-block;</span><br><span class="line">    margin-right: 0.3em;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    background: gray;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\2713&#x27;; /* 对勾 */</span><br><span class="line">    background: black;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里为了隐藏原生的 checkbox 控件，我们用了 clip: rect(0,0,0,0)进行截取，然后使用 checkbox 的伪类:checked 来实现交互。</p>
+<p>接下来扩展一下，我们来实现自定义开关：</p>
+
+
+<p>这里原理是一样的，只不过样式做了改动，直接上代码：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    margin-bottom: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    width: 6em;</span><br><span class="line">    height: 3em;</span><br><span class="line">    padding: 0.3em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    border: 1px solid rgba(0, 0, 0, 0.2);</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    box-shadow: 0 1px white inset;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#ccc</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background-image</span>: <span class="selector-tag">linear-gradient</span>(<span class="selector-id">#ddd</span>, <span class="selector-id">#bbb</span>);</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    box-shadow: 0.05em 0.1em 0.2em rgba(0, 0, 0, 0.6) inset;</span><br><span class="line">    border-color: rgba(0, 0, 0, 0.3);</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#bbb</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    position: relative;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    width: 5em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 1em;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#06c</span>;</span></span><br><span class="line">    text-align: left;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    position: absolute;</span><br><span class="line">    left: 0;</span><br><span class="line">    border-radius: 100%;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;OFF&#x27;;</span><br><span class="line">    margin-left: 2.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">    left: 3em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;NO&#x27;;</span><br><span class="line">    margin-left: 0.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch-an&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-an-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-an-1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>CSS3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CSS-currentColor变量的使用</title>
     <url>/posts/30008/</url>
     <content><![CDATA[<p>转载自：<a href="https://www.cnblogs.com/Wayou/p/css-currentColor.html">https://www.cnblogs.com/Wayou/p/css-currentColor.html</a></p>
@@ -325,33 +352,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CSS3伪元素实现自定义复选框</title>
-    <url>/posts/3583/</url>
-    <content><![CDATA[<p>我们都知道原生的复选框控件样式极难自定义，这对于工程师实现设计稿的难度加大了一大截。css3 的出现，增加了:checked 选择器，因此我们可以利用:checked 和 label 来实现各式各样的表单选择控件，接下来让我们来看看如何实现吧！</p>
-<a id="more"></a>
-
-<p>我们来看看如何实现上述自定义的复选框：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:focus</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">box-shadow</span>: 0 0 0.6<span class="selector-tag">em</span> <span class="selector-id">#06c</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\a0&#x27;; /* 不换行空格 */</span><br><span class="line">    display: inline-block;</span><br><span class="line">    margin-right: 0.3em;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    background: gray;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.checkbox</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;\2713&#x27;; /* 对勾 */</span><br><span class="line">    background: black;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">id</span>=<span class="string">&quot;check-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;check-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<p>这里为了隐藏原生的 checkbox 控件，我们用了 clip: rect(0,0,0,0)进行截取，然后使用 checkbox 的伪类:checked 来实现交互。</p>
-<p>接下来扩展一下，我们来实现自定义开关：</p>
-
-
-<p>这里原理是一样的，只不过样式做了改动，直接上代码：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.check-wrap</span> &#123;</span></span><br><span class="line">    margin-bottom: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    width: 6em;</span><br><span class="line">    height: 3em;</span><br><span class="line">    padding: 0.3em;</span><br><span class="line">    border-radius: 0.3em;</span><br><span class="line">    border: 1px solid rgba(0, 0, 0, 0.2);</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">line-height</span>: 2<span class="selector-tag">em</span>; <span class="comment">/* 关键 */</span></span></span><br><span class="line">    font-size: 20px;</span><br><span class="line">    text-align: center;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    box-shadow: 0 1px white inset;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#ccc</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background-image</span>: <span class="selector-tag">linear-gradient</span>(<span class="selector-id">#ddd</span>, <span class="selector-id">#bbb</span>);</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    box-shadow: 0.05em 0.1em 0.2em rgba(0, 0, 0, 0.6) inset;</span><br><span class="line">    border-color: rgba(0, 0, 0, 0.3);</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#bbb</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  label &#123;</span><br><span class="line">    margin-right: 40px;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span> &#123;</span></span><br><span class="line">    position: absolute;</span><br><span class="line">    clip: rect(0, 0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span> &#123;</span></span><br><span class="line">    position: relative;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    width: 5em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    border-radius: 1em;</span><br><span class="line"><span class="css">    <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#06c</span>;</span></span><br><span class="line">    text-align: left;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    width: 2em;</span><br><span class="line">    height: 2em;</span><br><span class="line">    position: absolute;</span><br><span class="line">    left: 0;</span><br><span class="line">    border-radius: 100%;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line"><span class="css">    <span class="selector-tag">background-color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;OFF&#x27;;</span><br><span class="line">    margin-left: 2.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::before</span> &#123;</span></span><br><span class="line">    transition: left 0.3s;</span><br><span class="line">    left: 3em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.switch-an</span><span class="selector-attr">[type=<span class="string">&#x27;checkbox&#x27;</span>]</span><span class="selector-pseudo">:checked</span> + <span class="selector-tag">label</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;NO&#x27;;</span><br><span class="line">    margin-left: 0.6em;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-1&quot;</span>&gt;</span>生男孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-2&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-2&quot;</span>&gt;</span>生女孩<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;check-wrap&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;checkbox&quot;</span> <span class="attr">class</span>=<span class="string">&quot;switch-an&quot;</span> <span class="attr">id</span>=<span class="string">&quot;switch-an-1&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;switch-an-1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>转载</tag>
-        <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CSS使用技巧汇总</title>
     <url>/posts/61575/</url>
     <content><![CDATA[<h2 id="CSS-样式"><a href="#CSS-样式" class="headerlink" title="CSS 样式"></a>CSS 样式</h2><h3 id="css-设置文字无法选中"><a href="#css-设置文字无法选中" class="headerlink" title="css 设置文字无法选中"></a>css 设置文字无法选中</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">-webkit-user-select</span>: <span class="selector-tag">none</span>;</span><br><span class="line"><span class="selector-tag">-moz-user-select</span>: <span class="selector-tag">none</span>;</span><br><span class="line"><span class="selector-tag">-ms-user-select</span>: <span class="selector-tag">none</span>;</span><br><span class="line"><span class="selector-tag">user-select</span>: <span class="selector-tag">none</span>;</span><br></pre></td></tr></table></figure>
@@ -413,33 +413,6 @@
         <category>CSS</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CSS百分比实现高度自适应</title>
-    <url>/posts/40550/</url>
-    <content><![CDATA[<h2 id="基本知识点"><a href="#基本知识点" class="headerlink" title="基本知识点"></a>基本知识点</h2><p>当 <code>padding/margin</code> 取形式为百分比的值时，无论是 <code>left/right</code>，还是 <code>top/bottom</code> ，都是以父元素的 <code>width</code> 为参照物。</p>
-<img src="/posts/40550/margin-top.png" class="" title="margin-top">
-
-<a id="more"></a>
-
-<h2 id="1-给容器设置-padding-top-bottom"><a href="#1-给容器设置-padding-top-bottom" class="headerlink" title="1. 给容器设置 padding-top/bottom"></a>1. 给容器设置 padding-top/bottom</h2><p><code>padding-top/bottom</code> 的百分比值，是依赖父容器宽度的，所以给子元素设置一个与父元素高度相同百分值的 <code>padding-top</code> 即可实现。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid red;</span><br><span class="line">  <span class="attribute">background</span>: green;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">50%</span>; <span class="comment">/*父元素宽度一半*/</span></span><br><span class="line">  <span class="attribute">padding-top</span>: <span class="number">50%</span>; <span class="comment">/*与width一样，为父元素宽度一半*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>此方案浏览器兼容性很不错，唯一的缺陷是无法给容器设置 <code>max-height</code> 属性了，因为 <code>max-height</code> 只能限制内容高度，而不能限制 <code>padding</code> ，为了解决这个问题我们可以选择下面这个办法。</p>
-<h2 id="2-给子元素-伪元素设置-margin-padding-撑开容器"><a href="#2-给子元素-伪元素设置-margin-padding-撑开容器" class="headerlink" title="2. 给子元素/伪元素设置 margin/padding 撑开容器"></a>2. 给子元素/伪元素设置 margin/padding 撑开容器</h2><p>从上面的方案的盒模型看出 max-height 失效的原因是容器的高度本来就是 padding 撑的，而内容高度为 0，max-height 无法起作用。那想要优化这一点，唯一的方法就是利用内容高度来撑开而非 padding，这个方案跟消除浮动所用的方案非常相似：给容器添加一个子元素/伪元素，并把子元素/伪元素的 pading/margin 设为 100%，使其实际高度相当于容器的宽度，如此一来，便能把容器的高度撑至与宽度达成我们预想的宽高比(1:1)了。由于添加子元素与 HTML 语义化相悖，因此更推荐使用伪元素:after 来实现此方案。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid red;</span><br><span class="line">  <span class="attribute">background</span>: green;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">50%</span>; <span class="comment">/*父元素宽度一半*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">div</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="attribute">display</span>: block;</span><br><span class="line">  <span class="attribute">margin-top</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用该方法可能需考虑 <code>margin</code> 折叠的问题，可在父元素上加 <code>overflow:hidden</code> 触发 BFC 解决。</p>
-<p>转载自：<a href="https://www.jianshu.com/p/25e7d0793bf0">https://www.jianshu.com/p/25e7d0793bf0</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>布局</tag>
         <tag>技巧</tag>
       </tags>
   </entry>
@@ -509,6 +482,33 @@
         <tag>布局</tag>
         <tag>技巧</tag>
         <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CSS百分比实现高度自适应</title>
+    <url>/posts/40550/</url>
+    <content><![CDATA[<h2 id="基本知识点"><a href="#基本知识点" class="headerlink" title="基本知识点"></a>基本知识点</h2><p>当 <code>padding/margin</code> 取形式为百分比的值时，无论是 <code>left/right</code>，还是 <code>top/bottom</code> ，都是以父元素的 <code>width</code> 为参照物。</p>
+<img src="/posts/40550/margin-top.png" class="" title="margin-top">
+
+<a id="more"></a>
+
+<h2 id="1-给容器设置-padding-top-bottom"><a href="#1-给容器设置-padding-top-bottom" class="headerlink" title="1. 给容器设置 padding-top/bottom"></a>1. 给容器设置 padding-top/bottom</h2><p><code>padding-top/bottom</code> 的百分比值，是依赖父容器宽度的，所以给子元素设置一个与父元素高度相同百分值的 <code>padding-top</code> 即可实现。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid red;</span><br><span class="line">  <span class="attribute">background</span>: green;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">50%</span>; <span class="comment">/*父元素宽度一半*/</span></span><br><span class="line">  <span class="attribute">padding-top</span>: <span class="number">50%</span>; <span class="comment">/*与width一样，为父元素宽度一半*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此方案浏览器兼容性很不错，唯一的缺陷是无法给容器设置 <code>max-height</code> 属性了，因为 <code>max-height</code> 只能限制内容高度，而不能限制 <code>padding</code> ，为了解决这个问题我们可以选择下面这个办法。</p>
+<h2 id="2-给子元素-伪元素设置-margin-padding-撑开容器"><a href="#2-给子元素-伪元素设置-margin-padding-撑开容器" class="headerlink" title="2. 给子元素/伪元素设置 margin/padding 撑开容器"></a>2. 给子元素/伪元素设置 margin/padding 撑开容器</h2><p>从上面的方案的盒模型看出 max-height 失效的原因是容器的高度本来就是 padding 撑的，而内容高度为 0，max-height 无法起作用。那想要优化这一点，唯一的方法就是利用内容高度来撑开而非 padding，这个方案跟消除浮动所用的方案非常相似：给容器添加一个子元素/伪元素，并把子元素/伪元素的 pading/margin 设为 100%，使其实际高度相当于容器的宽度，如此一来，便能把容器的高度撑至与宽度达成我们预想的宽高比(1:1)了。由于添加子元素与 HTML 语义化相悖，因此更推荐使用伪元素:after 来实现此方案。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid red;</span><br><span class="line">  <span class="attribute">background</span>: green;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">50%</span>; <span class="comment">/*父元素宽度一半*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">div</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="attribute">display</span>: block;</span><br><span class="line">  <span class="attribute">margin-top</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用该方法可能需考虑 <code>margin</code> 折叠的问题，可在父元素上加 <code>overflow:hidden</code> 触发 BFC 解决。</p>
+<p>转载自：<a href="https://www.jianshu.com/p/25e7d0793bf0">https://www.jianshu.com/p/25e7d0793bf0</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>布局</tag>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -1548,29 +1548,6 @@
       </categories>
   </entry>
   <entry>
-    <title>JS中如何实现继承</title>
-    <url>/posts/2751/</url>
-    <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="寄生组合继承（组合继承升级版）"><a href="#寄生组合继承（组合继承升级版）" class="headerlink" title="寄生组合继承（组合继承升级版）"></a>寄生组合继承（组合继承升级版）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  F.prototype = o;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prototype = object(superType.prototype); <span class="comment">// 创建了父类原型的浅复制</span></span><br><span class="line">    prototype.constructor = subType;             <span class="comment">// 修正原型的构造函数</span></span><br><span class="line">    subType.prototype = prototype;               <span class="comment">// 将子类的原型替换为这个原型</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.colors = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;green&quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>, name);</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费</span></span><br><span class="line">inheritPrototype(SubType, SuperType);</span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ES6继承写法"><a href="#ES6继承写法" class="headerlink" title="ES6继承写法"></a>ES6继承写法</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age</span>)</span> &#123;<span class="built_in">this</span>.name=name;<span class="built_in">this</span>.age=age&#125;</span><br><span class="line">  <span class="function"><span class="title">sayHi</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age, weight</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(name, age); <span class="built_in">this</span>.weight = weight;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">run</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？"><a href="#在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？" class="headerlink" title="在原型链继承时，为什么不直接 Student.prototype = Person.prototype ？"></a>在原型链继承时，为什么不直接 <code>Student.prototype = Person.prototype</code> ？</h2><p>因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。</p>
-<h2 id="组合继承的缺点"><a href="#组合继承的缺点" class="headerlink" title="组合继承的缺点"></a>组合继承的缺点</h2><p>缺点就是调用了两次父类的构造函数。<br>第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = <span class="string">&#x27;parent&#x27;</span>;</span><br><span class="line">    <span class="built_in">this</span>.arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;this is parent&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>) <span class="comment">// 第二次调用SuperType</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用SuperType</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>继承</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JS中的连等赋值操作</title>
     <url>/posts/24177/</url>
     <content><![CDATA[<p>金三银四正是面试的好时候，有不少学员面试后在前端群里分享 JS 面试题，我正巧没事儿翻到一题做做看，发现答案与我自己的预期大相径庭，当时我就震惊了，在 chrome 控制台打印了下结果，还真是我错了。没错，就是下面这道连等赋值题：</p>
@@ -1594,6 +1571,29 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>JS中如何实现继承</title>
+    <url>/posts/2751/</url>
+    <content><![CDATA[<h2 id="组合继承（原型链-借用构造函数）"><a href="#组合继承（原型链-借用构造函数）" class="headerlink" title="组合继承（原型链 + 借用构造函数）"></a>组合继承（原型链 + 借用构造函数）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 组合继承:原型继承+借用（调用）构造函数继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, sex</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.sex = sex;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;Hello world&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, sex, score</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 借用构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>,name,age,sex);</span><br><span class="line">  <span class="built_in">this</span>.score = score;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 改变原型指向----继承</span></span><br><span class="line"><span class="comment">// 我们让 Student.prototype 指向一个Person的实例对象</span></span><br><span class="line"><span class="comment">// 这个对象的__proto__指向的是Person.prototype</span></span><br><span class="line"><span class="comment">// 所以我们就可以借助这个实例对象拿到sayHi方法，实现继承</span></span><br><span class="line">Student.prototype=<span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.eat = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">20</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;100分&quot;</span>);</span><br><span class="line">stu.sayHi();</span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;Jerry&quot;</span>, <span class="number">19</span>, <span class="string">&quot;男&quot;</span>, <span class="string">&quot;101分&quot;</span>);</span><br><span class="line">stu2.eat();</span><br><span class="line"></span><br><span class="line"><span class="comment">//属性和方法都被继承了</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="寄生组合继承（组合继承升级版）"><a href="#寄生组合继承（组合继承升级版）" class="headerlink" title="寄生组合继承（组合继承升级版）"></a>寄生组合继承（组合继承升级版）</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  F.prototype = o;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prototype = object(superType.prototype); <span class="comment">// 创建了父类原型的浅复制</span></span><br><span class="line">    prototype.constructor = subType;             <span class="comment">// 修正原型的构造函数</span></span><br><span class="line">    subType.prototype = prototype;               <span class="comment">// 将子类的原型替换为这个原型</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.colors = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;green&quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>, name);</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费</span></span><br><span class="line">inheritPrototype(SubType, SuperType);</span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="built_in">this</span>.age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ES6继承写法"><a href="#ES6继承写法" class="headerlink" title="ES6继承写法"></a>ES6继承写法</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age</span>)</span> &#123;<span class="built_in">this</span>.name=name;<span class="built_in">this</span>.age=age&#125;</span><br><span class="line">  <span class="function"><span class="title">sayHi</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name, age, weight</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(name, age); <span class="built_in">this</span>.weight = weight;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">run</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？"><a href="#在原型链继承时，为什么不直接-Student-prototype-Person-prototype-？" class="headerlink" title="在原型链继承时，为什么不直接 Student.prototype = Person.prototype ？"></a>在原型链继承时，为什么不直接 <code>Student.prototype = Person.prototype</code> ？</h2><p>因为对象的赋值只是引用的赋值, 上面两者都指向同一个内存地址，只要随便通过1个途径就能修改该内存地址的对象，这样子类就无法单独扩展方法，而且会影响父类。</p>
+<h2 id="组合继承的缺点"><a href="#组合继承的缺点" class="headerlink" title="组合继承的缺点"></a>组合继承的缺点</h2><p>缺点就是调用了两次父类的构造函数。<br>第一次给子类的原型添加了父类构造函数中的属性方法；第二次又给子类的构造函数添加了父类的构造函数的属性方法，从而覆盖了子类原型中的同名参数。这种被覆盖的情况造成了性能上的浪费：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = <span class="string">&#x27;parent&#x27;</span>;</span><br><span class="line">    <span class="built_in">this</span>.arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SuperType.prototype.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;this is parent&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    SuperType.call(<span class="built_in">this</span>) <span class="comment">// 第二次调用SuperType</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用SuperType</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>继承</tag>
+      </tags>
   </entry>
   <entry>
     <title>JS垃圾回收机制</title>
@@ -1901,30 +1901,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Photoshop如何生成多页PDF</title>
-    <url>/posts/13252/</url>
-    <content><![CDATA[<p>来源：<a href="http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html">http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html</a></p>
-<ol>
-<li>要把分页的内容分别在 ps 中建立不同的文档</li>
-</ol>
-<img src="/posts/13252/pdf1.png" class="" title="pdf1">
-
-<img src="/posts/13252/pdf2.png" class="" title="pdf2">
-
-<ol>
-<li>然后点击文件——自动——pdf 演示文稿，选择添加打开的文件，选择多页面文档，点击存储即可</li>
-</ol>
-<img src="/posts/13252/pdf3.png" class="" title="pdf3">
-]]></content>
-      <categories>
-        <category>教程</category>
-        <category>PS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【翻译】Minification 压缩与 Gzip 压缩的区别</title>
     <url>/posts/8214/</url>
     <content><![CDATA[<blockquote>
@@ -1968,6 +1944,30 @@
       </categories>
       <tags>
         <tag>翻译</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Photoshop如何生成多页PDF</title>
+    <url>/posts/13252/</url>
+    <content><![CDATA[<p>来源：<a href="http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html">http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html</a></p>
+<ol>
+<li>要把分页的内容分别在 ps 中建立不同的文档</li>
+</ol>
+<img src="/posts/13252/pdf1.png" class="" title="pdf1">
+
+<img src="/posts/13252/pdf2.png" class="" title="pdf2">
+
+<ol>
+<li>然后点击文件——自动——pdf 演示文稿，选择添加打开的文件，选择多页面文档，点击存储即可</li>
+</ol>
+<img src="/posts/13252/pdf3.png" class="" title="pdf3">
+]]></content>
+      <categories>
+        <category>教程</category>
+        <category>PS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -2201,23 +2201,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Swift记录通话时间</title>
-    <url>/posts/32380/</url>
-    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
-<a id="more"></a>
-
-<p>代码如下：</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Tree-Shaking性能优化实践(笔记)</title>
     <url>/posts/64509/</url>
     <content><![CDATA[<h2 id="何为-Tree-Shaking"><a href="#何为-Tree-Shaking" class="headerlink" title="何为 Tree-Shaking"></a>何为 Tree-Shaking</h2><blockquote>
@@ -2239,6 +2222,23 @@
       <tags>
         <tag>转载</tag>
         <tag>Webpack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Swift记录通话时间</title>
+    <url>/posts/32380/</url>
+    <content><![CDATA[<p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
+<a id="more"></a>
+
+<p>代码如下：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2466,6 +2466,31 @@
       </tags>
   </entry>
   <entry>
+    <title>VSCode配置TypeScript自动编译报错</title>
+    <url>/posts/15303/</url>
+    <content><![CDATA[<p>2020.10.02 更新：</p>
+<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
+<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
+<hr>
+<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
+
+<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
+
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
+<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>VSCode</tag>
+        <tag>TypeScript</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VSCode插件Sync-Settings同步失败-token失效</title>
     <url>/posts/50280/</url>
     <content><![CDATA[<p>VSCode 有款插件叫做 <a href="https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync">Settings Sync</a>，它能将我们在 VSCode 中配置的所有插件上传到 github 的 gist 中去，这样不管我们是换电脑还是重装系统后，都能重新从云端下载一份之前配置好的插件库到电脑中去。</p>
@@ -2522,31 +2547,6 @@
       </categories>
       <tags>
         <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode配置TypeScript自动编译报错</title>
-    <url>/posts/15303/</url>
-    <content><![CDATA[<p>2020.10.02 更新：</p>
-<p>em… 我在 github 上提问有了回复，链接在此：<a href="https://github.com/microsoft/vscode/issues/107895">https://github.com/microsoft/vscode/issues/107895</a></p>
-<p>具体解决方案就是，打开 <code>settings.json</code> ，设置 <code>&quot;terminal.integrated.inheritEnv&quot;</code> 为 true 。</p>
-<hr>
-<p>之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> Executing task: tsc -p <span class="string">&#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27;</span> --watch &lt;</span></span><br><span class="line"></span><br><span class="line">env: node: No such file or directory</span><br><span class="line">The terminal process &quot;/bin/bash &#x27;-c&#x27;, &#x27;tsc -p &#x27;/Users/macbook/Documents/01ts-intro/tsconfig.json&#x27; --watch&#x27;&quot; failed to launch (exit code: 127).</span><br><span class="line"></span><br><span class="line">Terminal will be reused by tasks, press any key to close it.</span><br></pre></td></tr></table></figure>
-
-<p>尝试了各种办法仍然没有解决，后来在终端直接执行命令反而好了，这里记录一下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tsc -p &#x27;tsconfig.json&#x27; --watch</span><br></pre></td></tr></table></figure>
-
-<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>想要知道如何自动编译 TS？</p>
-<p>可以看下掘金的这篇文章：<a href="https://juejin.im/post/6844903829163474952">Visual Studio Code 中配置 TypeScript 自动编译</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>VSCode</tag>
-        <tag>TypeScript</tag>
       </tags>
   </entry>
   <entry>
@@ -2870,26 +2870,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Vue深度作用选择器</title>
-    <url>/posts/5691/</url>
-    <content><![CDATA[<p>之前写 uni-app 在修改三方深层样式时，会使用 <code>/deep/</code> ，例如：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>但在我的 Vue 项目中却报错，使用 <code>::v-deep</code> 则可以：</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-pseudo">::v-deep</span> <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p><a href="https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors">Deep Selectors</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>scss</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vue数据响应式的简单实现</title>
     <url>/posts/12491/</url>
     <content><![CDATA[<p>今天来实现一个简单的 Vue 数据响应式，最终达到两个基本效果：</p>
@@ -2939,6 +2919,26 @@
       </categories>
       <tags>
         <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue深度作用选择器</title>
+    <url>/posts/5691/</url>
+    <content><![CDATA[<p>之前写 uni-app 在修改三方深层样式时，会使用 <code>/deep/</code> ，例如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但在我的 Vue 项目中却报错，使用 <code>::v-deep</code> 则可以：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-pseudo">::v-deep</span> <span class="selector-class">.el-input__inner</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p><a href="https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors">Deep Selectors</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>scss</tag>
       </tags>
   </entry>
   <entry>
@@ -3829,22 +3829,6 @@
       </tags>
   </entry>
   <entry>
-    <title>cnchar.js获取汉字的拼音</title>
-    <url>/posts/38408/</url>
-    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
-<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
-<p>几种常用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>解决方案</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>cookie与session区别</title>
     <url>/posts/63891/</url>
     <content><![CDATA[<h2 id="保存状态"><a href="#保存状态" class="headerlink" title="保存状态"></a>保存状态</h2><p>cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：</p>
@@ -3884,6 +3868,22 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>cnchar.js获取汉字的拼音</title>
+    <url>/posts/38408/</url>
+    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
+<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
+<p>几种常用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
   </entry>
   <entry>
     <title>css扩大元素点击区域</title>
@@ -5431,6 +5431,39 @@
       </tags>
   </entry>
   <entry>
+    <title>vue项目如何动态配置后端api地址</title>
+    <url>/posts/47242/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
+<a id="more"></a>
+
+<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+        <tag>vue-cli3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue骨架屏</title>
     <url>/posts/7260/</url>
     <content><![CDATA[<h2 id="什么是骨架屏"><a href="#什么是骨架屏" class="headerlink" title="什么是骨架屏"></a>什么是骨架屏</h2><p>骨架屏就是在页面尚未加载之前先给用户展示出页面的大致结构，直到页面请求数据后渲染页面。<br>骨架屏和 loading 相比较还是骨架屏用户体验感更好。<br>原理其实非常简单，就是在页面还没加载完成时展示一张图片（一般是 Base64 编码），类似下方效果：</p>
@@ -5478,36 +5511,105 @@
       </tags>
   </entry>
   <entry>
-    <title>vue项目如何动态配置后端api地址</title>
-    <url>/posts/47242/</url>
-    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>后端希望前端能动态配置 API 地址，但前端往往在 <code>npm run build</code> 生成 <code>dist</code> 后，配置就无法更改了。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>利用 <code>generate-asset-webpack-plugin</code> 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。</p>
+    <title>【转载】git配置ssh服务</title>
+    <url>/posts/1071/</url>
+    <content><![CDATA[<p>原文：<a href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在管理 Git 项目上，很多时候都是直接使用<code>https url</code>克隆到本地，当然也有有些人使用<code>SSH url</code>克隆到本地。</p>
+<p>这两种方式的主要区别在于：</p>
+<ul>
+<li>使用<code>https url</code>克隆对初学者来说会比较方便，复制<code>https url</code>然后到 git Bash 里面直接用 clone 命令克隆到本地就好了，但是每次 fetch 和 push 代码都需要输入账号和密码，这也是 https 方式的麻烦之处。</li>
+<li>而使用<code>SSH url</code>克隆却需要在克隆之前先配置和添加好<code>SSH key</code>，因此，如果你想要使用<code>SSH url</code>克隆的话，你必须是这个项目的拥有者。否则你是无法添加<code>SSH key</code>的，另外 ssh 默认是每次 fetch 和 push 代码都不需要输入账号和密码，如果你想要每次都输入账号密码才能进行 fetch 和 push 也可以另外进行设置。</li>
+</ul>
+<p>下面主要是讲述如何配置使用 ssh 方式来提交和克隆代码。</p>
 <a id="more"></a>
 
-<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h3 id="安装并引入-generate-asset-webpack-plugin"><a href="#安装并引入-generate-asset-webpack-plugin" class="headerlink" title="安装并引入 generate-asset-webpack-plugin"></a>安装并引入 generate-asset-webpack-plugin</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install generate-asset-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="配置本机-ssh"><a href="#配置本机-ssh" class="headerlink" title="配置本机 ssh"></a>配置本机 ssh</h2><h3 id="一、确定的是你的电脑上是安装过-Git"><a href="#一、确定的是你的电脑上是安装过-Git" class="headerlink" title="一、确定的是你的电脑上是安装过 Git"></a>一、确定的是你的电脑上是安装过 Git</h3><p>打开<code>cmd</code>，查看 git 版本：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git --version</span><br><span class="line">显示：git version 2.20.1.windows.1</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
 
+<p>如果显示类似<code>git version 2.20.1.windows.1</code>的 Git 版本，说明你的电脑是安装过 Git 的；否则请左转<a href="https://juejin.im/post/6844903749631098893#heading-4">打开 Git 的正确姿势</a>，把 Git 安装完了再来，不送。</p>
+<h3 id="二、查看是否配置了-git-用户名和邮箱"><a href="#二、查看是否配置了-git-用户名和邮箱" class="headerlink" title="二、查看是否配置了 git 用户名和邮箱"></a>二、查看是否配置了 git 用户名和邮箱</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config user.name</span><br><span class="line">显示：用户名</span><br><span class="line">输入：git config user.email</span><br><span class="line">显示用户邮箱</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果没有配置，那么需要配置用户名和邮箱：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config --global user.name &quot;xxx&quot;</span><br><span class="line"></span><br><span class="line">输入：git config --global user.email &quot;xxx&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、查看是否配置过-SSH-Key-密钥"><a href="#三、查看是否配置过-SSH-Key-密钥" class="headerlink" title="三、查看是否配置过 SSH Key(密钥)"></a>三、查看是否配置过 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cd ~/.ssh</span><br><span class="line">输入：ls，</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>查看该文件下的文件，看是否存在 <code>id_isa</code> 和 <code>id_isa.pub</code> 文件（也可以是别的文件名，只要 <code>yourName</code> 和 <code>yourName.pub</code> 成对存在就可以），如果存在的话，证明已经存在 ssh key 了，可以直接跳过<code>4、生成SSH Key</code>这一步骤，</p>
+<h3 id="四、生成-SSH-Key-密钥"><a href="#四、生成-SSH-Key-密钥" class="headerlink" title="四、生成 SSH Key(密钥)"></a>四、生成 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入: ssh-keygen -t rsa -C &quot;你的邮箱&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>此处会提示<code>Enter file in which to save the key (/Users/shutong/.ssh/id_rsa):</code>这样一段内容,让我们输入文件名，如果第 3 步的文件存在的话最好在这里修改一下文件名以防覆盖之前的内容；如果第 3 步的文件不存在的话则直接按<code>enter</code>键就好了。</p>
+<p>之后会有提示你是否需要设置密码，如果设置了每次使用 Git 都会用到密码，一般都是直接不写为空，直接<code>enter</code>就好了。</p>
+<p>上述操作执行完毕后，在<code>~/.ssh/</code>目录会生成<code>XXX-rsa</code>(私钥)和<code>XXX-rsa.pub</code>(公钥)，它们默认的存储路径是：</p>
 <blockquote>
-<p>vue.config.js</p>
+<p>C:\Users\Administrator.ssh</p>
 </blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> GenerateAssetPlugin = <span class="built_in">require</span>(<span class="string">&#x27;generate-asset-webpack-plugin&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="定义需要生成的配置内容"><a href="#定义需要生成的配置内容" class="headerlink" title="定义需要生成的配置内容"></a>定义需要生成的配置内容</h3><blockquote>
-<p>vue.config.js</p>
+<p><strong>注意</strong></p>
+<blockquote>
+<p>个人建议生成的 rsa 最好单独命名不要使用默认名称，因为有可能 sshkey 可能会用在多个地方，一不小心就可能被覆盖然后导致 git 功能异常</p>
 </blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> createConfig = <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> cfgJson = &#123;</span><br><span class="line">    server_url: <span class="string">&#x27;http://127.0.0.1&#x27;</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(cfgJson);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="五、添加公钥到你的远程仓库（github）"><a href="#五、添加公钥到你的远程仓库（github）" class="headerlink" title="五、添加公钥到你的远程仓库（github）"></a>五、添加公钥到你的远程仓库（github）</h3><h4 id="1-、查看你生成的公钥："><a href="#1-、查看你生成的公钥：" class="headerlink" title="1 、查看你生成的公钥："></a>1 、查看你生成的公钥：</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
 
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> GenerateAssetPlugin(&#123;</span><br><span class="line">        filename: <span class="string">&#x27;dynamicConfig.json&#x27;</span>,</span><br><span class="line">        fn: (compilation, cb)&#123;</span><br><span class="line">          cb(<span class="literal">null</span>, createConfig(compilation))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里会把公钥显示出来，我们把这段内容复制出来。</p>
+<h4 id="2、添加公钥到远程仓库"><a href="#2、添加公钥到远程仓库" class="headerlink" title="2、添加公钥到远程仓库:"></a>2、添加公钥到远程仓库:</h4><p>登陆你的 github 帐户 -&gt; 点击你的头像，然后点击 <code>Settings</code> -&gt; 左栏点击 <code>SSH and GPG keys</code> -&gt; 点击 <code>New SSH key</code></p>
+<p>然后将复制的公钥内容，粘贴进<code>Key</code>文本域内。 <code>title</code>域，自己随便起个名字。</p>
+<p>点击 <code>Add SSH key</code>。</p>
+<h4 id="2、查看-ssh-文件是否配置成功"><a href="#2、查看-ssh-文件是否配置成功" class="headerlink" title="2、查看 ssh 文件是否配置成功"></a>2、查看 ssh 文件是否配置成功</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： ssh -T git@github.com</span><br><span class="line">输出： Hi danygitgit! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
 
-<p>编译后 dist 根目录下就会生成 <code>dynamicConfig.json</code> 文件。</p>
+<p>恭喜你，你的设置已经成功了。</p>
+<h3 id="六、修改-git-的-remote-url"><a href="#六、修改-git-的-remote-url" class="headerlink" title="六、修改 git 的 remote url"></a>六、修改 git 的 remote url</h3><p>如果之前添加的是<code>HTTPS</code>协议的 github 仓库地址，那么每次 push 或者 pull 仍然需要密码，所以，我们需要将其修改为<code>ssh</code>协议的，这样，就不需要这么麻烦了。</p>
+<p>那么我们应该怎么办呢？</p>
+<h4 id="1、查看当前的-remote-url"><a href="#1、查看当前的-remote-url" class="headerlink" title="1、查看当前的 remote url"></a>1、查看当前的 remote url</h4><p>首先进入本地仓库，右键 -&gt; <code>Git Bash Here</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： git remote -v</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (fetch)</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (push)</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
+<h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
+<blockquote>
+<p><a href="mailto:&#x67;&#x69;&#116;&#64;&#103;&#105;&#116;&#104;&#117;&#98;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#x69;&#116;&#64;&#103;&#105;&#116;&#104;&#117;&#98;&#x2e;&#99;&#x6f;&#x6d;</a>:danygitgit/document-library.git</p>
+</blockquote>
+<p>复制此 ssh 链接。</p>
+<h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
+<ol>
+<li>修改命令</li>
+</ol>
+<blockquote>
+<p>git remote origin set-url [url]</p>
+</blockquote>
+<ol>
+<li>先删后加</li>
+</ol>
+<blockquote>
+<p>git remote rm origin git remote add origin [url]</p>
+</blockquote>
+<ol>
+<li>直接修改<code>config</code>文件</li>
+</ol>
+<p>找到仓库下 <code>.git</code> 文件夹下的<code>config</code>文件，打开，可以看到以下内容</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url =<a href="https://github.com/danygitgit/document-library.git">https://github.com/danygitgit/document-library.git</a> fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
+<p>修改后的文件如下</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#99;&#111;&#109;">&#x67;&#x69;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
+<h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
+<p>关于<code>SourceTree</code>的安装及配置就不赘述了，具体请参考</p>
+<ul>
+<li><a href="https://blog.csdn.net/wangjiangrong/article/details/80287041">Git SourceTree 免登陆安装及配置 生成 ssh</a></li>
+<li><a href="https://www.cnblogs.com/liuxin-673855200/p/11151835.html">SOURCETREE 3.1.3 版本跳过 BITBUCKET 注册方法（亲测好用） | 淡忘&amp;天涯</a></li>
+<li><a href="https://jingyan.baidu.com/article/9faa7231cdec65473d28cb11.html">Sourcetree 配置 ssh 密钥</a></li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>磨刀不误砍柴工。勇于尝试，善于总结。开启你的 Git 踩坑之旅吧！</p>
+<p>路漫漫其修远兮，希望 Git 可以帮我们记录每一个脚印，每一步成长。与诸君共勉。</p>
+<p>祝大家 2020 更上一层楼！</p>
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
+        <category>工具</category>
+        <category>版本控制</category>
       </categories>
       <tags>
-        <tag>Vue</tag>
-        <tag>vue-cli3</tag>
+        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -5653,108 +5755,6 @@
       <tags>
         <tag>技巧</tag>
         <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【转载】git配置ssh服务</title>
-    <url>/posts/1071/</url>
-    <content><![CDATA[<p>原文：<a href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在管理 Git 项目上，很多时候都是直接使用<code>https url</code>克隆到本地，当然也有有些人使用<code>SSH url</code>克隆到本地。</p>
-<p>这两种方式的主要区别在于：</p>
-<ul>
-<li>使用<code>https url</code>克隆对初学者来说会比较方便，复制<code>https url</code>然后到 git Bash 里面直接用 clone 命令克隆到本地就好了，但是每次 fetch 和 push 代码都需要输入账号和密码，这也是 https 方式的麻烦之处。</li>
-<li>而使用<code>SSH url</code>克隆却需要在克隆之前先配置和添加好<code>SSH key</code>，因此，如果你想要使用<code>SSH url</code>克隆的话，你必须是这个项目的拥有者。否则你是无法添加<code>SSH key</code>的，另外 ssh 默认是每次 fetch 和 push 代码都不需要输入账号和密码，如果你想要每次都输入账号密码才能进行 fetch 和 push 也可以另外进行设置。</li>
-</ul>
-<p>下面主要是讲述如何配置使用 ssh 方式来提交和克隆代码。</p>
-<a id="more"></a>
-
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="配置本机-ssh"><a href="#配置本机-ssh" class="headerlink" title="配置本机 ssh"></a>配置本机 ssh</h2><h3 id="一、确定的是你的电脑上是安装过-Git"><a href="#一、确定的是你的电脑上是安装过-Git" class="headerlink" title="一、确定的是你的电脑上是安装过 Git"></a>一、确定的是你的电脑上是安装过 Git</h3><p>打开<code>cmd</code>，查看 git 版本：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git --version</span><br><span class="line">显示：git version 2.20.1.windows.1</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果显示类似<code>git version 2.20.1.windows.1</code>的 Git 版本，说明你的电脑是安装过 Git 的；否则请左转<a href="https://juejin.im/post/6844903749631098893#heading-4">打开 Git 的正确姿势</a>，把 Git 安装完了再来，不送。</p>
-<h3 id="二、查看是否配置了-git-用户名和邮箱"><a href="#二、查看是否配置了-git-用户名和邮箱" class="headerlink" title="二、查看是否配置了 git 用户名和邮箱"></a>二、查看是否配置了 git 用户名和邮箱</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config user.name</span><br><span class="line">显示：用户名</span><br><span class="line">输入：git config user.email</span><br><span class="line">显示用户邮箱</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果没有配置，那么需要配置用户名和邮箱：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：git config --global user.name &quot;xxx&quot;</span><br><span class="line"></span><br><span class="line">输入：git config --global user.email &quot;xxx&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<h3 id="三、查看是否配置过-SSH-Key-密钥"><a href="#三、查看是否配置过-SSH-Key-密钥" class="headerlink" title="三、查看是否配置过 SSH Key(密钥)"></a>三、查看是否配置过 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cd ~/.ssh</span><br><span class="line">输入：ls，</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>查看该文件下的文件，看是否存在 <code>id_isa</code> 和 <code>id_isa.pub</code> 文件（也可以是别的文件名，只要 <code>yourName</code> 和 <code>yourName.pub</code> 成对存在就可以），如果存在的话，证明已经存在 ssh key 了，可以直接跳过<code>4、生成SSH Key</code>这一步骤，</p>
-<h3 id="四、生成-SSH-Key-密钥"><a href="#四、生成-SSH-Key-密钥" class="headerlink" title="四、生成 SSH Key(密钥)"></a>四、生成 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入: ssh-keygen -t rsa -C &quot;你的邮箱&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>此处会提示<code>Enter file in which to save the key (/Users/shutong/.ssh/id_rsa):</code>这样一段内容,让我们输入文件名，如果第 3 步的文件存在的话最好在这里修改一下文件名以防覆盖之前的内容；如果第 3 步的文件不存在的话则直接按<code>enter</code>键就好了。</p>
-<p>之后会有提示你是否需要设置密码，如果设置了每次使用 Git 都会用到密码，一般都是直接不写为空，直接<code>enter</code>就好了。</p>
-<p>上述操作执行完毕后，在<code>~/.ssh/</code>目录会生成<code>XXX-rsa</code>(私钥)和<code>XXX-rsa.pub</code>(公钥)，它们默认的存储路径是：</p>
-<blockquote>
-<p>C:\Users\Administrator.ssh</p>
-</blockquote>
-<p><strong>注意</strong></p>
-<blockquote>
-<p>个人建议生成的 rsa 最好单独命名不要使用默认名称，因为有可能 sshkey 可能会用在多个地方，一不小心就可能被覆盖然后导致 git 功能异常</p>
-</blockquote>
-<h3 id="五、添加公钥到你的远程仓库（github）"><a href="#五、添加公钥到你的远程仓库（github）" class="headerlink" title="五、添加公钥到你的远程仓库（github）"></a>五、添加公钥到你的远程仓库（github）</h3><h4 id="1-、查看你生成的公钥："><a href="#1-、查看你生成的公钥：" class="headerlink" title="1 、查看你生成的公钥："></a>1 、查看你生成的公钥：</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入：cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>这里会把公钥显示出来，我们把这段内容复制出来。</p>
-<h4 id="2、添加公钥到远程仓库"><a href="#2、添加公钥到远程仓库" class="headerlink" title="2、添加公钥到远程仓库:"></a>2、添加公钥到远程仓库:</h4><p>登陆你的 github 帐户 -&gt; 点击你的头像，然后点击 <code>Settings</code> -&gt; 左栏点击 <code>SSH and GPG keys</code> -&gt; 点击 <code>New SSH key</code></p>
-<p>然后将复制的公钥内容，粘贴进<code>Key</code>文本域内。 <code>title</code>域，自己随便起个名字。</p>
-<p>点击 <code>Add SSH key</code>。</p>
-<h4 id="2、查看-ssh-文件是否配置成功"><a href="#2、查看-ssh-文件是否配置成功" class="headerlink" title="2、查看 ssh 文件是否配置成功"></a>2、查看 ssh 文件是否配置成功</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： ssh -T git@github.com</span><br><span class="line">输出： Hi danygitgit! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>恭喜你，你的设置已经成功了。</p>
-<h3 id="六、修改-git-的-remote-url"><a href="#六、修改-git-的-remote-url" class="headerlink" title="六、修改 git 的 remote url"></a>六、修改 git 的 remote url</h3><p>如果之前添加的是<code>HTTPS</code>协议的 github 仓库地址，那么每次 push 或者 pull 仍然需要密码，所以，我们需要将其修改为<code>ssh</code>协议的，这样，就不需要这么麻烦了。</p>
-<p>那么我们应该怎么办呢？</p>
-<h4 id="1、查看当前的-remote-url"><a href="#1、查看当前的-remote-url" class="headerlink" title="1、查看当前的 remote url"></a>1、查看当前的 remote url</h4><p>首先进入本地仓库，右键 -&gt; <code>Git Bash Here</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">输入： git remote -v</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (fetch)</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (push)</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
-<h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
-<blockquote>
-<p><a href="mailto:&#103;&#x69;&#116;&#64;&#x67;&#x69;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;">&#103;&#x69;&#116;&#64;&#x67;&#x69;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git</p>
-</blockquote>
-<p>复制此 ssh 链接。</p>
-<h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
-<ol>
-<li>修改命令</li>
-</ol>
-<blockquote>
-<p>git remote origin set-url [url]</p>
-</blockquote>
-<ol>
-<li>先删后加</li>
-</ol>
-<blockquote>
-<p>git remote rm origin git remote add origin [url]</p>
-</blockquote>
-<ol>
-<li>直接修改<code>config</code>文件</li>
-</ol>
-<p>找到仓库下 <code>.git</code> 文件夹下的<code>config</code>文件，打开，可以看到以下内容</p>
-<blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url =<a href="https://github.com/danygitgit/document-library.git">https://github.com/danygitgit/document-library.git</a> fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
-</blockquote>
-<p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
-<p>修改后的文件如下</p>
-<blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#x69;&#116;&#x40;&#103;&#x69;&#x74;&#104;&#117;&#98;&#x2e;&#99;&#111;&#109;">&#103;&#x69;&#116;&#x40;&#103;&#x69;&#x74;&#104;&#117;&#98;&#x2e;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
-</blockquote>
-<p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
-<h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
-<p>关于<code>SourceTree</code>的安装及配置就不赘述了，具体请参考</p>
-<ul>
-<li><a href="https://blog.csdn.net/wangjiangrong/article/details/80287041">Git SourceTree 免登陆安装及配置 生成 ssh</a></li>
-<li><a href="https://www.cnblogs.com/liuxin-673855200/p/11151835.html">SOURCETREE 3.1.3 版本跳过 BITBUCKET 注册方法（亲测好用） | 淡忘&amp;天涯</a></li>
-<li><a href="https://jingyan.baidu.com/article/9faa7231cdec65473d28cb11.html">Sourcetree 配置 ssh 密钥</a></li>
-</ul>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>磨刀不误砍柴工。勇于尝试，善于总结。开启你的 Git 踩坑之旅吧！</p>
-<p>路漫漫其修远兮，希望 Git 可以帮我们记录每一个脚印，每一步成长。与诸君共勉。</p>
-<p>祝大家 2020 更上一层楼！</p>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>版本控制</category>
-      </categories>
-      <tags>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -6675,6 +6675,32 @@
       </tags>
   </entry>
   <entry>
+    <title>使用lorem在HTML中生成随机文本</title>
+    <url>/posts/22606/</url>
+    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
+<p>使用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/22606/lorem.gif" class="" title="lorem">
+
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
+<blockquote>
+<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
+</blockquote>
+<ul>
+<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用hexo搭建个人博客</title>
     <url>/posts/43303/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>利用 <a href="https://hexo.io/zh-cn/">Hexo</a> 在 <a href="https://baike.baidu.com/item/github/10145341?fr=aladdin">GitHub</a> 上搭建个人博客。</p>
@@ -6837,32 +6863,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用lorem在HTML中生成随机文本</title>
-    <url>/posts/22606/</url>
-    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
-<p>使用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
-
-<img src="/posts/22606/lorem.gif" class="" title="lorem">
-
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
-<blockquote>
-<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
-</blockquote>
-<ul>
-<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
-</ul>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -7799,37 +7799,6 @@ callee</code></pre>
       </categories>
   </entry>
   <entry>
-    <title>对HTML语义化的理解</title>
-    <url>/posts/2906/</url>
-    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
-<ol>
-<li>利与开发：方便代码的阅读和维护</li>
-<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
-</ol>
-<a id="more"></a>
-
-<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
-<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
-
-
-<p>元素细节：</p>
-<ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
-</ul>
-<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>HTML</category>
-      </categories>
-  </entry>
-  <entry>
     <title>对this指向的判定</title>
     <url>/posts/33207/</url>
     <content><![CDATA[<h2 id="对-this-的理解"><a href="#对-this-的理解" class="headerlink" title="对 this 的理解"></a>对 this 的理解</h2><p>对于this指向的判定，时刻记住下面两点就好：</p>
@@ -8284,6 +8253,37 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>对HTML语义化的理解</title>
+    <url>/posts/2906/</url>
+    <content><![CDATA[<h2 id="对HTML语义化的理解"><a href="#对HTML语义化的理解" class="headerlink" title="对HTML语义化的理解"></a>对HTML语义化的理解</h2><p>核心：用正确的标签做正确的事情</p>
+<ol>
+<li>利与开发：方便代码的阅读和维护</li>
+<li>利于SEO：方便爬虫根据 语义标签 确定 页面结构 和 关键字 的权重</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="常见语义化标签"><a href="#常见语义化标签" class="headerlink" title="常见语义化标签"></a>常见语义化标签</h2><p>一图胜千言：</p>
+<img src="/posts/2906/f8442d9e-e30d-11e6-85aa-3e3fb75f9695.jpg" class="" title="语义化demo">
+
+
+<p>元素细节：</p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/main">main</a> 存放每个页面独有的内容。每个页面上只能用一次 <code>&lt;main&gt;</code>，且直位于 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">``</a>中。最好不要把它嵌套进其它元素。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 包围的内容即一篇文章，与页面其它部分无关（比如一篇博文）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 与 <code>&lt;article&gt;</code> 类似，但 <code>&lt;section&gt;</code> 更适用于组织页面使其按功能（比如迷你地图、一组文章标题和摘要）分块。一般的最佳用法是：以 <a href="https://developer.mozilla.org/en-US/Learn/HTML/Howto/Set_up_a_proper_title_hierarchy">标题</a> 作为开头；也可以把一篇 <code>&lt;article&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;section&gt;</code> 中，也可以把一个区段 <code>&lt;section&gt;</code> 分成若干部分并分别置于不同的 <code>&lt;article&gt;</code> 中，取决于上下文。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/aside">aside</a> 包含一些间接信息（术语条目、作者简介、相关链接，等等）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/header">header</a> 是简介形式的内容。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/body">body</a> 的子元素，那么就是网站的全局页眉。如果它是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/article">article</a> 或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/section">section</a> 的子元素，那么它是这些部分特有的页眉（此 <code>&lt;header&gt;</code> 非彼 <a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%A0%87%E9%A2%98">标题</a>）。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/nav">nav</a> 包含页面主导航功能。其中不应包含二级链接等内容。</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/footer">footer</a> 包含了页面的页脚部分。</li>
+</ul>
+<p>来源：<a href="https://developer.mozilla.org/zh-CN/docs/learn/HTML/Introduction_to_HTML/%E6%96%87%E4%BB%B6%E5%92%8C%E7%BD%91%E7%AB%99%E7%BB%93%E6%9E%84">文档与网站架构</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>HTML</category>
+      </categories>
+  </entry>
+  <entry>
     <title>微信小程序热更新</title>
     <url>/posts/15012/</url>
     <content><![CDATA[<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 及时更新微信小程序</span></span><br><span class="line"><span class="function"><span class="title">updateWxApp</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> updateManager = uni.getUpdateManager();</span><br><span class="line">  updateManager.onCheckForUpdate(<span class="function">(<span class="params">res</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 请求完新版本信息的回调</span></span><br><span class="line">    <span class="keyword">if</span> (res.hasUpdate) &#123;</span><br><span class="line">      updateManager.onUpdateReady(<span class="function"><span class="keyword">function</span>(<span class="params">res2</span>) </span>&#123;</span><br><span class="line">        uni.showModal(&#123;</span><br><span class="line">          title: <span class="string">&#x27;更新提示&#x27;</span>,</span><br><span class="line">          content: <span class="string">&#x27;发现新版本，是否重启应用?&#x27;</span>,</span><br><span class="line">          cancelColor: <span class="string">&#x27;#eeeeee&#x27;</span>,</span><br><span class="line">          confirmColor: <span class="string">&#x27;#FF0000&#x27;</span>,</span><br><span class="line">          <span class="function"><span class="title">success</span>(<span class="params">res2</span>)</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (res2.confirm) &#123;</span><br><span class="line">              <span class="comment">// 新的版本已经下载好，调用 applyUpdate 应用新版本并重启</span></span><br><span class="line">              updateManager.applyUpdate();</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  updateManager.onUpdateFailed(<span class="function">(<span class="params">res</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 新的版本下载失败</span></span><br><span class="line">    uni.showModal(&#123;</span><br><span class="line">      title: <span class="string">&#x27;提示&#x27;</span>,</span><br><span class="line">      content: <span class="string">&#x27;检查到有新版本，但下载失败，请检查网络设置&#x27;</span>,</span><br><span class="line">      <span class="function"><span class="title">success</span>(<span class="params">res</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (res.confirm) &#123;</span><br><span class="line">          <span class="comment">// 新的版本已经下载好，调用 applyUpdate 应用新版本并重启</span></span><br><span class="line">          updateManager.applyUpdate();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -8699,6 +8699,32 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>解决浮点数运算误差</title>
+    <url>/posts/46988/</url>
+    <content><![CDATA[<h3 id="解决什么问题"><a href="#解决什么问题" class="headerlink" title="解决什么问题"></a>解决什么问题</h3><p>前端计算产生的精度误差</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">0.14</span> * <span class="number">100</span>);</span><br><span class="line"><span class="comment">// log 14.000000000000002</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="不推荐-toFixed"><a href="#不推荐-toFixed" class="headerlink" title="不推荐 toFixed()"></a>不推荐 toFixed()</h4><a id="more"></a>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">100.</span>toFixed(<span class="number">2</span>)); <span class="comment">// 100.00</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="number">0.105</span>).toFixed(<span class="number">2</span>)); <span class="comment">// 0.10 与预期不符</span></span><br></pre></td></tr></table></figure>
+
+<p>这种方法大部分场合都适用，但是存在尾数是 5 的时候会不进位的问题。</p>
+<h4 id="不推荐-Math-round"><a href="#不推荐-Math-round" class="headerlink" title="不推荐 Math.round()"></a>不推荐 Math.round()</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100.0</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100.01</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100.01</span></span><br></pre></td></tr></table></figure>
+
+<p>这种方法存在当数字是整数或者小数点后数字为 0，或者原数字长度比我们要保留的长度短时，保留有问题的情况。</p>
+<h4 id="推荐-自己封装"><a href="#推荐-自己封装" class="headerlink" title="推荐 自己封装"></a>推荐 自己封装</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description </span>四舍五入保留指定小数</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;Number&#125;</span> </span>n 数字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;Number&#125;</span> </span>r 保留位数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">preciseRound</span>(<span class="params">n, r = <span class="number">2</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> int = <span class="built_in">Math</span>.floor(n).toString();</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n !== <span class="string">&#x27;number&#x27;</span> || <span class="keyword">typeof</span> r !== <span class="string">&#x27;number&#x27;</span>) <span class="keyword">return</span> <span class="string">&#x27;Not a Number&#x27;</span>;</span><br><span class="line">  <span class="keyword">if</span> (int[<span class="number">0</span>] == <span class="string">&#x27;-&#x27;</span> || int[<span class="number">0</span>] == <span class="string">&#x27;+&#x27;</span>) int = int.slice(int[<span class="number">1</span>], int.length);</span><br><span class="line">  <span class="keyword">return</span> n.toPrecision(int.length + r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="四舍五入格式化金额"><a href="#四舍五入格式化金额" class="headerlink" title="四舍五入格式化金额"></a>四舍五入格式化金额</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 将数值四舍五入(保留2位小数)后格式化成金额形式</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param </span>num 数值(Number或者String)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return </span>金额格式的字符串,如&#x27;1,234,567.45&#x27;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type <span class="variable">String</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatCurrency</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">  num = num.toString().replace(<span class="regexp">/\$|\,/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">isNaN</span>(num)) num = <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">  <span class="keyword">const</span> sign = num == (num = <span class="built_in">Math</span>.abs(num));</span><br><span class="line">  num = <span class="built_in">Math</span>.floor(num * <span class="number">100</span> + <span class="number">0.50000000001</span>);</span><br><span class="line">  <span class="keyword">let</span> cents = num % <span class="number">100</span>;</span><br><span class="line">  num = <span class="built_in">Math</span>.floor(num / <span class="number">100</span>).toString();</span><br><span class="line">  <span class="keyword">if</span> (cents &lt; <span class="number">10</span>) cents = <span class="string">&#x27;0&#x27;</span> + cents;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="built_in">Math</span>.floor((num.length - (<span class="number">1</span> + i)) / <span class="number">3</span>); i++)</span><br><span class="line">    num =</span><br><span class="line">      num.substring(<span class="number">0</span>, num.length - (<span class="number">4</span> * i + <span class="number">3</span>)) +</span><br><span class="line">      <span class="string">&#x27;,&#x27;</span> +</span><br><span class="line">      num.substring(num.length - (<span class="number">4</span> * i + <span class="number">3</span>));</span><br><span class="line">  <span class="keyword">return</span> (sign ? <span class="string">&#x27;&#x27;</span> : <span class="string">&#x27;-&#x27;</span>) + num + <span class="string">&#x27;.&#x27;</span> + cents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>解决canvas转image/jpeg透明背景变黑问题</title>
     <url>/posts/46911/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>png 图片转 jpeg 时，透明区域被填充成黑色</p>
@@ -8760,32 +8786,6 @@ callee</code></pre>
       <tags>
         <tag>技巧</tag>
         <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>解决浮点数运算误差</title>
-    <url>/posts/46988/</url>
-    <content><![CDATA[<h3 id="解决什么问题"><a href="#解决什么问题" class="headerlink" title="解决什么问题"></a>解决什么问题</h3><p>前端计算产生的精度误差</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">0.14</span> * <span class="number">100</span>);</span><br><span class="line"><span class="comment">// log 14.000000000000002</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="不推荐-toFixed"><a href="#不推荐-toFixed" class="headerlink" title="不推荐 toFixed()"></a>不推荐 toFixed()</h4><a id="more"></a>
-
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">100.</span>toFixed(<span class="number">2</span>)); <span class="comment">// 100.00</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="number">0.105</span>).toFixed(<span class="number">2</span>)); <span class="comment">// 0.10 与预期不符</span></span><br></pre></td></tr></table></figure>
-
-<p>这种方法大部分场合都适用，但是存在尾数是 5 的时候会不进位的问题。</p>
-<h4 id="不推荐-Math-round"><a href="#不推荐-Math-round" class="headerlink" title="不推荐 Math.round()"></a>不推荐 Math.round()</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100.0</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.round(<span class="number">100.01</span> * <span class="number">100</span>) / <span class="number">100</span>); <span class="comment">//100.01</span></span><br></pre></td></tr></table></figure>
-
-<p>这种方法存在当数字是整数或者小数点后数字为 0，或者原数字长度比我们要保留的长度短时，保留有问题的情况。</p>
-<h4 id="推荐-自己封装"><a href="#推荐-自己封装" class="headerlink" title="推荐 自己封装"></a>推荐 自己封装</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description </span>四舍五入保留指定小数</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;Number&#125;</span> </span>n 数字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;Number&#125;</span> </span>r 保留位数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">preciseRound</span>(<span class="params">n, r = <span class="number">2</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> int = <span class="built_in">Math</span>.floor(n).toString();</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n !== <span class="string">&#x27;number&#x27;</span> || <span class="keyword">typeof</span> r !== <span class="string">&#x27;number&#x27;</span>) <span class="keyword">return</span> <span class="string">&#x27;Not a Number&#x27;</span>;</span><br><span class="line">  <span class="keyword">if</span> (int[<span class="number">0</span>] == <span class="string">&#x27;-&#x27;</span> || int[<span class="number">0</span>] == <span class="string">&#x27;+&#x27;</span>) int = int.slice(int[<span class="number">1</span>], int.length);</span><br><span class="line">  <span class="keyword">return</span> n.toPrecision(int.length + r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="四舍五入格式化金额"><a href="#四舍五入格式化金额" class="headerlink" title="四舍五入格式化金额"></a>四舍五入格式化金额</h4><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 将数值四舍五入(保留2位小数)后格式化成金额形式</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param </span>num 数值(Number或者String)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return </span>金额格式的字符串,如&#x27;1,234,567.45&#x27;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type <span class="variable">String</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatCurrency</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">  num = num.toString().replace(<span class="regexp">/\$|\,/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">isNaN</span>(num)) num = <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">  <span class="keyword">const</span> sign = num == (num = <span class="built_in">Math</span>.abs(num));</span><br><span class="line">  num = <span class="built_in">Math</span>.floor(num * <span class="number">100</span> + <span class="number">0.50000000001</span>);</span><br><span class="line">  <span class="keyword">let</span> cents = num % <span class="number">100</span>;</span><br><span class="line">  num = <span class="built_in">Math</span>.floor(num / <span class="number">100</span>).toString();</span><br><span class="line">  <span class="keyword">if</span> (cents &lt; <span class="number">10</span>) cents = <span class="string">&#x27;0&#x27;</span> + cents;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="built_in">Math</span>.floor((num.length - (<span class="number">1</span> + i)) / <span class="number">3</span>); i++)</span><br><span class="line">    num =</span><br><span class="line">      num.substring(<span class="number">0</span>, num.length - (<span class="number">4</span> * i + <span class="number">3</span>)) +</span><br><span class="line">      <span class="string">&#x27;,&#x27;</span> +</span><br><span class="line">      num.substring(num.length - (<span class="number">4</span> * i + <span class="number">3</span>));</span><br><span class="line">  <span class="keyword">return</span> (sign ? <span class="string">&#x27;&#x27;</span> : <span class="string">&#x27;-&#x27;</span>) + num + <span class="string">&#x27;.&#x27;</span> + cents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -9133,6 +9133,33 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>阻止安卓物理返回键事件</title>
+    <url>/posts/32404/</url>
+    <content><![CDATA[<h2 id="uni-app-app-非-h5-嵌套-app"><a href="#uni-app-app-非-h5-嵌套-app" class="headerlink" title="uni-app app(非 h5 嵌套 app)"></a>uni-app app(非 h5 嵌套 app)</h2><p><strong>生命周期函数：onBackPress</strong></p>
+<p><a href="https://ask.dcloud.net.cn/article/35120">https://ask.dcloud.net.cn/article/35120</a></p>
+<p>注意：<strong>H5 平台，顶部导航栏返回按钮支持 <code>onBackPress()</code>，浏览器默认返回按键及 Android 手机实体返回键不支持 <code>onBackPress()</code></strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">onBackPress</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="H5-浏览器端"><a href="#H5-浏览器端" class="headerlink" title="H5 浏览器端"></a>H5 浏览器端</h2><p><strong>利用 Web api: popstate</strong></p>
+<p><a href="https://www.cnblogs.com/linx/p/7018697.html">https://www.cnblogs.com/linx/p/7018697.html</a></p>
+<p>仅能阻止一次，按两次或多次依然返回</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">history.pushState(<span class="literal">null</span>, <span class="literal">null</span>, <span class="built_in">window</span>.location.href);</span><br><span class="line"><span class="built_in">window</span>.onpopstate = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">  history.go(<span class="number">1</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="uni-app-h5-嵌套-app-用于单页应用退出登陆-点击实体按钮返回会返回之前页面闪一下又跳转回登录页"><a href="#uni-app-h5-嵌套-app-用于单页应用退出登陆-点击实体按钮返回会返回之前页面闪一下又跳转回登录页" class="headerlink" title="uni-app h5 嵌套 app(用于单页应用退出登陆,点击实体按钮返回会返回之前页面闪一下又跳转回登录页)"></a>uni-app h5 嵌套 app(用于单页应用退出登陆,点击实体按钮返回会返回之前页面闪一下又跳转回登录页)</h2><p>（销毁掉之前的浏览记录页面 ）更改退出登录跳转方式为：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uni.reLaunch(&#123;</span><br><span class="line">  url: <span class="string">&#x27;/pages/homePageSub/login/login&#x27;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>转载-怎样在Mac上删除iPhone和iPad备份</title>
     <url>/posts/21365/</url>
     <content><![CDATA[<p>本地 iPhone 和 iPad 备份可能会占用大量空间。以下是查看正在使用多少空间并释放空间的方法。这些技巧适用于 macOS Catalina，macOS Mojave 和其他最新版本的 macOS。</p>
@@ -9188,33 +9215,6 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>阻止安卓物理返回键事件</title>
-    <url>/posts/32404/</url>
-    <content><![CDATA[<h2 id="uni-app-app-非-h5-嵌套-app"><a href="#uni-app-app-非-h5-嵌套-app" class="headerlink" title="uni-app app(非 h5 嵌套 app)"></a>uni-app app(非 h5 嵌套 app)</h2><p><strong>生命周期函数：onBackPress</strong></p>
-<p><a href="https://ask.dcloud.net.cn/article/35120">https://ask.dcloud.net.cn/article/35120</a></p>
-<p>注意：<strong>H5 平台，顶部导航栏返回按钮支持 <code>onBackPress()</code>，浏览器默认返回按键及 Android 手机实体返回键不支持 <code>onBackPress()</code></strong></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">onBackPress</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="H5-浏览器端"><a href="#H5-浏览器端" class="headerlink" title="H5 浏览器端"></a>H5 浏览器端</h2><p><strong>利用 Web api: popstate</strong></p>
-<p><a href="https://www.cnblogs.com/linx/p/7018697.html">https://www.cnblogs.com/linx/p/7018697.html</a></p>
-<p>仅能阻止一次，按两次或多次依然返回</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">history.pushState(<span class="literal">null</span>, <span class="literal">null</span>, <span class="built_in">window</span>.location.href);</span><br><span class="line"><span class="built_in">window</span>.onpopstate = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">  history.go(<span class="number">1</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="uni-app-h5-嵌套-app-用于单页应用退出登陆-点击实体按钮返回会返回之前页面闪一下又跳转回登录页"><a href="#uni-app-h5-嵌套-app-用于单页应用退出登陆-点击实体按钮返回会返回之前页面闪一下又跳转回登录页" class="headerlink" title="uni-app h5 嵌套 app(用于单页应用退出登陆,点击实体按钮返回会返回之前页面闪一下又跳转回登录页)"></a>uni-app h5 嵌套 app(用于单页应用退出登陆,点击实体按钮返回会返回之前页面闪一下又跳转回登录页)</h2><p>（销毁掉之前的浏览记录页面 ）更改退出登录跳转方式为：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uni.reLaunch(&#123;</span><br><span class="line">  url: <span class="string">&#x27;/pages/homePageSub/login/login&#x27;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>移动端</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>uniapp</tag>
       </tags>
   </entry>
   <entry>
@@ -10178,6 +10178,267 @@ callee</code></pre>
       </categories>
       <tags>
         <tag>Sequelize</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Sass/SCSS:让CSS书写更高效</title>
+    <url>/posts/47379/</url>
+    <content><![CDATA[<p>转载自：<a href="https://blog.csdn.net/qq_41694291/article/details/105529166">https://blog.csdn.net/qq_41694291/article/details/105529166</a></p>
+<h1 id="一、Sass-SCSS-使用简介"><a href="#一、Sass-SCSS-使用简介" class="headerlink" title="一、Sass/SCSS 使用简介"></a>一、Sass/SCSS 使用简介</h1><h2 id="1-Sass-和-SCSS-的关系"><a href="#1-Sass-和-SCSS-的关系" class="headerlink" title="1. Sass 和 SCSS 的关系"></a>1. Sass 和 SCSS 的关系</h2><p>没有用过 Sass 的人很可能会有这样一个疑惑，Sass 和 SCSS 是一个东西吗？</p>
+<p>其实本文的标题已经给出了暗示，它们本质上是一个东西。具体来说，SCSS 是 Sass 版本 3 使用的语法。Sass 1.xx 和 Sass 2.xx 采用的是基于缩进的语法，如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">body</span><br><span class="line">  color: red;</span><br><span class="line">  font-size: 12px;</span><br></pre></td></tr></table></figure>
+
+<p>显然，这与 CSS 的写法有很大出入，原生 CSS 是下面这种基于大括号的语法：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">12px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这也就意味着早期版本的 Sass 是不能直接兼容原生 CSS 的（即 CSS 代码直接粘贴进 Sass 文件无法编译）。很多前端开发者认为这种语法带来了使用上的不便，为此还催生了兼容原生 CSS 语法的 Less，并且抢占了 Sass 相当多的市场份额。</p>
+<p>后来到了版本 3，Sass 团队决定改变之前的缩进风格，改为完全兼容 CSS3 语法的风格，同时把之前的文件后缀<code>.sass</code>改成<code>.scss</code>，以表明该版本已经完全兼容了 CSS3 语法。所以 SCSS 指代的是 Sass 从版本 3 之后开始使用的语法规范，本质上仍然是 Sass 框架。</p>
+<p>鉴于 Sass 的版本 3 已经成为其主流版本，因此本文所介绍的内容都将基于 SCSS 语法，除了对一些早期项目维护的需求外，已经没有必要学习早期的 Sass 语法。</p>
+<h2 id="2-Sass-简介"><a href="#2-Sass-简介" class="headerlink" title="2. Sass 简介"></a>2. Sass 简介</h2><p>从概念上来说，Sass 是一个 CSS 的预处理器，用于辅助进行 CSS 开发。</p>
+<p>Sass 为 CSS 开发引入了变量、嵌套、运算、混入、继承、指令控制等一系列接近常规编程语言的语法特性，使得 CSS 开发变得更加简洁和高效。经过编译，Sass 代码可以被转化为原生的 CSS 代码。比如下面是一个符合 scss 语法的文件：<br>style.scss</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-class">.main-body</span> &#123;</span><br><span class="line">  div &#123;</span><br><span class="line">    <span class="selector-tag">color</span>: <span class="selector-tag">black</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="selector-tag">p</span> &#123;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">14px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里<code>div</code>和<code>p</code>位于<code>.container .main-body</code>内表示它们是该选择器的子选择器，它会被编译为以下的 css 文件：<br>style.css</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.container</span> <span class="selector-class">.main-body</span> <span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: black;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.container</span> <span class="selector-class">.main-body</span> <span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">14px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种嵌套的写法不仅可以减少代码量，还可以清晰地表明它们的包含关系，使得代码的逻辑性更强，非常有利于提升 css 的开发效率。</p>
+<p>Sass 是用 Ruby 语言开发的，因此想要编译<code>.scss</code>文件，一般来说应该首先安装 Ruby。不过 Nodejs 社区提供了一个非常好用的模块：node-sass，同样可以直接编译<code>.scss</code>文件。node-sass 之所以不依赖 Ruby 环境，是因为它将 Nodejs 绑定到了 C 语言版本的 Sass 库：LibSass，而 C 语言环境几乎是各大操作系统的标配。比如：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">// 安装node-sass，对于单独的项目也可以局部安装</span><br><span class="line">npm install node-sass -g</span><br><span class="line"></span><br><span class="line">// 切换到style.scss所在路径</span><br><span class="line">// 输入以下命令，将style.scss编译为css文件</span><br><span class="line">node-sass style.scss style.css</span><br></pre></td></tr></table></figure>
+
+<p>如果你使用的编辑器是 vs code，官方还推荐了一个非常好用的实时编译插件：Live Sass Compiler。通过对<code>.scss</code>文件进行监视，它可以在每次保存时自动将其编译为 css 文件。</p>
+<p>关于 scss 语法，第二部分会有详细的介绍，因此这里暂不深入讲解。</p>
+<h2 id="3-在项目中编译-Sass"><a href="#3-在项目中编译-Sass" class="headerlink" title="3. 在项目中编译 Sass"></a>3. 在项目中编译 Sass</h2><p>前端项目中编译 Sass 文件，本质上还是借助 node-sass 模块，它可以看做是 Sass 代码的解析引擎。我们这里简单介绍一下 webpack 是如何调用 node-sass 模块进行代码编译的。</p>
+<p>我们知道，webpack 运行于 Nodejs 环境下，因此它只能直接解析 JavaScript 代码。对于其他类型的文件，webpack 无法读取和识别，于是就需要借助对应的 loader 来加载这些文件。webpack 提供了<code>sass-loader</code>来读取和编译 sass 文件，这个 loader 在读取到<code>.scss</code>文件的内容后，会调用 node-sass 对这些代码进行编译，生成对应的 css 代码。</p>
+<p>生成了 css 代码后，本质上 scss 代码的解析任务就完成了。不过现在你只是得到了普通的 css 代码，为了使 webpack 能识别这些 css 代码，你仍然需要使用解析样式时需要的两个 loader：css-loader 和 style-loader。css-loader 可以把 css 代码解析为 js 模块，这样就可以用 import 直接导入到其他模块中。style-loader 的作用是将 css 代码添加到 style 标签内，内嵌到页面中。因此 webpack.config.js 中应该是下面的写法：<br>webpack.config.js</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.scss$/</span>,</span><br><span class="line">          use:[<span class="string">&#x27;style-loader&#x27;</span>, <span class="string">&#x27;css-loader&#x27;</span>, <span class="string">&#x27;sass-loader&#x27;</span>]</span><br><span class="line">       &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>webpack 将先调用 sass-loader 将 scss 代码编译为 css 代码（sass-loader 完成该过程依赖的是 node-sass 模块）；然后调用 css-loader 将 css 代码封装成合法的 js 模块（这样才可以通过 require 或者 import 导入）；最后使用 style-loader 将样式内嵌到页面的 style 标签内。</p>
+<h2 id="4-Sass-SCSS、Less-还是-stylus？"><a href="#4-Sass-SCSS、Less-还是-stylus？" class="headerlink" title="4. Sass/SCSS、Less 还是 stylus？"></a>4. Sass/SCSS、Less 还是 stylus？</h2><p>相比于 Less 和 stylus，Sass 的历史最为悠久。由于早期的 Sass 语法没有得到广泛接受，社区诞生了更为轻量，兼容原生 css 语法的 Less，并因此被 Twitter 的著名前端框架 Bootstrap 所采用。一时间，Less 名声大噪，甚至有取代 Sass 的趋势。</p>
+<p>不过后来，Sass 在其版本 3 中推出了兼容原生 css 语法的 SCSS，Less 最重要的优势已不复存在。另外，Sass 的功能相对 Less 来说更加强大，也更成熟。因此在 Bootstrap 4 中，依赖的框架已经从 Less 切换为 Sass，这几乎标志着 Sass 与 Less 的竞争已经以 Sass 的胜利告终（另外，即将发布&lt;截止到 2020/4/16&gt;的 Bootstrap 5 已经确定将完全移除对 jQuery 的依赖，转而使用原生的 JavaScript，这一举动也基本预示着 jQuery 的退场）。</p>
+<p>相比于 Sass 和 Less，stylus 诞生时间相对较短，暂时没有足够的影响力，不过据说其功能已经可以媲美 Sass，所以关于 Sass 和 stylus 孰优孰劣，本文暂不给出评价。不过如果你希望使用一款更加成熟的预处理器，那么推荐 Sass（SCSS 语法）。</p>
+<h1 id="二、Sass（基于-SCSS-语法）详解"><a href="#二、Sass（基于-SCSS-语法）详解" class="headerlink" title="二、Sass（基于 SCSS 语法）详解"></a>二、Sass（基于 SCSS 语法）详解</h1><h2 id="1-CSS-功能拓展"><a href="#1-CSS-功能拓展" class="headerlink" title="1. CSS 功能拓展"></a>1. CSS 功能拓展</h2><h3 id="1-嵌套规则"><a href="#1-嵌套规则" class="headerlink" title="(1). 嵌套规则"></a>(1). 嵌套规则</h3><p>这可能是最典型，也最常见的可以体现 sass 是如何提高 css 开发效率的特性之一了。</p>
+<p>嵌套规则可以允许你像数学中提取公因式一样，把多个选择器相同的父选择器提取到外部，从而有效地减少选择器的书写量。比如在编写 css 时，我们可能会写出下面的样式：<br>index.css:</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> &#123;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">h1</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">  <span class="attribute">cursor</span>: pointer;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-class">.content</span> <span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#333</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-class">.content</span> <span class="selector-tag">span</span> &#123;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">14px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，为了定义<code>.head</code>选择器下面的 h1、a、p、span 等元素，我们需要把<code>.head</code>书写四遍，而且你并不能非常直观地看出这四个元素都是<code>.head</code>的子元素（这需要一定的归纳）。</p>
+<p>但是使用 SCSS 语法，你可以写成下面的格式：<br>index.scss</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> &#123;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  h1 &#123;</span><br><span class="line">    <span class="selector-tag">color</span>: <span class="selector-tag">red</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="selector-tag">a</span> &#123;</span><br><span class="line">    <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">    <span class="attribute">cursor</span>: pointer;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="selector-class">.content</span> &#123;</span><br><span class="line">    p &#123;</span><br><span class="line">      <span class="selector-tag">color</span>: <span class="selector-id">#333</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-tag">span</span> &#123;</span><br><span class="line">      <span class="attribute">font-size</span>: <span class="number">14px</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它经过编译之后，就是之前的 css 代码。但显然，用 scss 语法，你可以避免书写大量重复的父选择器。它的另一个优势是，你可以非常直观地看出各个选择的嵌套关系，这可以有效提高修改样式的效率。所以，嵌套语法不可谓不优雅！</p>
+<h3 id="2-父选择器-amp"><a href="#2-父选择器-amp" class="headerlink" title="(2). 父选择器&amp;"></a>(2). 父选择器&amp;</h3><p>在使用嵌套语法的时候可能会遇到这样一个问题，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span><span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你可能会想到下面的写法，但它与上述 css 是不等价的：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">  :hover &#123;</span><br><span class="line">    <span class="selector-tag">color</span>: <span class="selector-tag">red</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 它会被编译成</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> <span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>显然，这时<code>:hover</code>不再是选择器<code>a</code>的伪类了，它会导致 a 标签下的所有元素在鼠标悬停时都变成红色。</p>
+<p>因此你只能采用下面的写法：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> &#123;</span><br><span class="line">  a &#123;</span><br><span class="line">    <span class="selector-tag">color</span>: <span class="selector-id">#555</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="selector-tag">a</span><span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">    <span class="attribute">color</span>: red;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们认为这看起来并不优雅，因为这并没有达到最大程度的复用，而父选择器则为我们解决了这个问题：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">  &amp;:hover &#123;</span><br><span class="line">    <span class="selector-tag">color</span>: <span class="selector-tag">red</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>&amp;</code>我们称为父选择器，在这里它指代的就是外部选择器<code>.head a</code>。sass 引擎在解析这个代码时，会直接用外部选择器替换这个字符，这样你就得到了<code>.head a:hover</code>这样的选择器。</p>
+<p>值得注意的是，sass 引擎是基于字符串来处理 scss 文件的，在解析过程中，只是简单地把<code>&amp;</code>替换成其父选择器对应的字符串。所以你完全可以把&amp;看做普通的占位字符与其他字符串拼接，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.main</span> &#123;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">  &amp;-content &#123;</span><br><span class="line">    <span class="selector-tag">padding</span>: 0;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.main</span> &#123;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.main-content</span> &#123;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，引擎是直接把<code>&amp;</code>替换成了字符串<code>.main</code>，因此得到了选择器<code>.main-content</code>。</p>
+<p>另外，存在更深层次的嵌套时，&amp;指代的是所有的外部选择器，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.head</span> &#123;</span><br><span class="line">  a &#123;</span><br><span class="line">    &amp;<span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>&amp;</code>指代<code>.head a</code>。</p>
+<p>需要注意的是，<code>&amp;</code>必须作为第一个字符，而不能被拼接到其他字符后面，如<code>.main-&amp;</code>，这样会报错。</p>
+<h3 id="3-属性嵌套"><a href="#3-属性嵌套" class="headerlink" title="(3). 属性嵌套"></a>(3). 属性嵌套</h3><p>这是嵌套语法的变体。我们上面介绍的嵌套语法指的是选择器的嵌套，除此之外，sass 还支持有相同前缀的属性的嵌套，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="attribute">font</span>: &#123;</span><br><span class="line">    family: fantasy;</span><br><span class="line">    <span class="attribute">size</span>: <span class="number">16px</span>;</span><br><span class="line">    <span class="attribute">weight</span>: bold;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>等价于：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: fantasy;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">16px</span>;</span><br><span class="line">  <span class="attribute">font-weight</span>: bold;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，前缀属性也可以有自己的值，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">button</span> &#123;</span><br><span class="line">  // 会在上述css代码中额外生成font: 20px/24px</span><br><span class="line">  <span class="selector-tag">font</span>: 20<span class="selector-tag">px</span>/24<span class="selector-tag">px</span> &#123;</span><br><span class="line">    <span class="attribute">family</span>: fantasy;</span><br><span class="line">    <span class="attribute">size</span>: <span class="number">16px</span>;</span><br><span class="line">    <span class="attribute">weight</span>: bold;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-占位选择器-foo"><a href="#4-占位选择器-foo" class="headerlink" title="(4). 占位选择器%foo"></a>(4). 占位选择器%foo</h3><p>占位选择器是 sass 提供的一种特殊选择器，以<code>%</code>开头。带有占位选择器的选择器只能被<code>@extend</code>语句（这是 sass 的继承机制，第三节 SassScript 中会讲到）引用，单独使用时不会被编译为原生 css。如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.btn</span>%<span class="selector-tag">extreme</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: blue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直接编译 scss 文件时，上述样式会被忽略，因为<code>%extreme</code>表明这个样式只能被继承。当使用下面的<code>@extend</code>语句时，这个样式就会被继承下来：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.primary-btn</span> &#123;</span><br><span class="line">  @extend %extreme;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在<code>.primary-btn</code>的文字颜色会被置为蓝色。关于继承的语法，SassScript 部分会有进一步介绍。</p>
+<h3 id="5-注释"><a href="#5-注释" class="headerlink" title="(5). 注释"></a>(5). 注释</h3><p>除了原生 css 所支持的多行注释<code>/* */</code>，sass 还支持类似于 js 的单行语法<code>//</code>，但是多行注释会被输出到生成的 css 文件中，而单行注释在编译的过程中会被去除。因此单行注释应该只用于解释 sass 语句，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 这是符合css的注释，</span></span><br><span class="line"><span class="comment"> * 它会被保留 */</span></span><br><span class="line">// 这行代码会被去除</span><br><span class="line"><span class="selector-class">.head</span> &#123;</span><br><span class="line">  <span class="attribute">a</span>: &#123;</span><br><span class="line">    color: <span class="number">#555</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译后：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 这是符合css的注释，</span></span><br><span class="line"><span class="comment"> * 它会被保留 */</span></span><br><span class="line"><span class="selector-class">.head</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#555</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，压缩模式下会去掉所有注释，但如果多行注释的第一个字符是<code>!</code>，那么即使在压缩模式下它也会被保留，如<code>/*! version: 1.0 */</code>，常用于添加版权信息。</p>
+<p>另外，注释中允许插入变量（SassScript 部分会讲到变量）：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">$version: &#x27;1.0&#x27;;</span><br><span class="line"><span class="comment">/* 当前版本为：#&#123;$version&#125; */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-SassScript"><a href="#2-SassScript" class="headerlink" title="2. SassScript"></a>2. SassScript</h2><p>直译为 sass 脚本。</p>
+<p>css 的全写是 Cascading Style Sheets（层叠样式表），它只是用声明的方式去定义一组规则，不支持像变量、函数、数据结构定义等编程语法，因此我们一般不把 css 当成一门变成语言看待。</p>
+<p>而 SassScript 的设计目的就是将 css 脚本化，使开发者可以像写 js 脚本一样去写样式，从而使 css 代码的编写更加高效和科学。为了使 css 脚本化，sass 提供了以下语法支持：</p>
+<h3 id="1-变量"><a href="#1-变量" class="headerlink" title="(1). 变量"></a>(1). 变量</h3><p>变量可谓是编程语言最基础的语法特性之一了。sass 为 css 也引入了变量。</p>
+<p>sass 中的变量是以<code>$</code>开头的，如：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">$primary-color: #0066ff;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>$primary-color</code>就被 sass 视为一个变量，它的值是<code>#0066ff</code>，现在你可以像下面一样引用这个变量：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">$primary-color: #0066ff;</span><br><span class="line"><span class="selector-class">.btn</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: $primary-color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.btn</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#0066ff</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果你把 sass 引擎看做一个字符串处理函数，那它其实就是把<code>$primary-color</code>替换成<code>#0066ff</code>而已。</p>
+<p>此外，变量还可以参与构成其他变量，如：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">$primary-color: #0066ff;</span><br><span class="line">$primary-border: 1px solid $primary-color;</span><br></pre></td></tr></table></figure>
+
+<p>使用变量的好处是，当某个值在多个地方用到时，一旦需要修改这个值，你只需要修改对应变量的值就可以了。如果你编写的是原生 css，那么你需要挨个找到这些值去修改，不仅费时，还容易发生遗漏。</p>
+<p>另外，变量还可以用于运算和函数传值，因此它是 css 脚本化的一个很重要的基石。</p>
+<h3 id="2-数据类型"><a href="#2-数据类型" class="headerlink" title="(2). 数据类型"></a>(2). 数据类型</h3><p>原生 css 没有数据类型的概念，你可以把所有的值都仅视为字符串。为了将 css 脚本化，sass 为 css 引入了数据类型的概念，包括以下 7 种数据类型：</p>
+<ol>
+<li><strong>数字</strong>：1，10，5px 等</li>
+<li><strong>字符串</strong>：有引号与无引号字符串，如”foo”、‘bar’、solid 等</li>
+<li><strong>颜色</strong>：red、#0066ff、rgba(0, 0, 0, 0.5)等</li>
+<li><strong>布尔值</strong>：true 和 false</li>
+<li><strong>空值</strong>：null</li>
+<li><strong>数组</strong>：用空格或逗号隔开的一组数据，如<code>1px 5px</code>、<code>Helvetica, Arial, sans-serif</code>等</li>
+<li><strong>maps</strong>：可以理解为 js 的对象，格式为<code>(key1: value1, key2: value2)</code></li>
+</ol>
+<p>需要特别注意的是，在 sass 中，<code>5px</code>这样的值被视为数字，因此可以直接参与运算，sass 会在必要时对单位进行类型转换。</p>
+<p>数据类型是为其他语法服务的，我们后面会讲到这些数据类型的使用。</p>
+<h3 id="3-运算"><a href="#3-运算" class="headerlink" title="(3). 运算"></a>(3). 运算</h3><p>sass 支持数字运算、颜色值运算、字符串运算、布尔运算等。</p>
+<h4 id="数字运算"><a href="#数字运算" class="headerlink" title="数字运算"></a>数字运算</h4><p>包括加减乘除和取模（<code>+、-、*、/、%</code>）五种，必要时会进行单位转换。如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">1in</span> + <span class="number">8pt</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">1.111in</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关系运算符中<code>&lt;、&gt;、&lt;=、&gt;=</code>可以用于数值之间，而<code>==、!=</code>可以用于任何数据类型。</p>
+<p>其中除法运算比较特殊，因为它同样是原生 css 支持的标识符，所以在遇到<code>/</code>时，sass 引擎必须区分它是 css 标识符，还是除法运算。当遇到以下情况，sass 引擎会将其视为除法运算：</p>
+<ol>
+<li>运算符两侧的值包含变量或函数返回值</li>
+<li>整个值被一个圆括号包裹</li>
+<li>值是某个算术表达式的一部分</li>
+</ol>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  font: 10px/8px; // 不符合上述三种情况，是原生css</span><br><span class="line"></span><br><span class="line">  $width: 1000px;</span><br><span class="line">  width: $width/2; // 运算符两侧包含变量</span><br><span class="line">  <span class="selector-tag">width</span>: <span class="selector-tag">round</span>(1.5) / 2; // 包含函数返回值</span><br><span class="line">  <span class="selector-tag">height</span>: (500<span class="selector-tag">px</span>/2); // 值被圆括号包裹</span><br><span class="line">  <span class="selector-tag">margin-left</span>: 5<span class="selector-tag">px</span> + 8<span class="selector-tag">px</span>/2<span class="selector-tag">px</span>; // 是某个表达式的一部分</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">font</span>: <span class="number">10px</span>/<span class="number">8px</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">500px</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">250px</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: <span class="number">9px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果表达式中包含变量，但希望将<code>/</code>当做原生 css 标识符，可以用<code>#&#123;&#125;</code>插值，如：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">font: #&#123;$font-size&#125;/#&#123;$line-height&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="颜色值运算"><a href="#颜色值运算" class="headerlink" title="颜色值运算"></a>颜色值运算</h4><p>颜色值分 red（红）、green（绿）、blue（蓝）三种颜色，在进行颜色运算时，也是对三个颜色分别运算得到最后结果。比如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">color</span>: <span class="selector-tag">rgb</span>(100, 100, 100) + <span class="selector-tag">rgb</span>(100, 100, 100)</span><br><span class="line">=&gt; rgb(200, 200, 200)</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">color</span>: <span class="selector-id">#222222</span> + <span class="selector-id">#333333</span>;</span><br><span class="line">=&gt; #555555;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">color</span>: <span class="selector-tag">rgb</span>(100, 100, 100) + <span class="selector-id">#111111</span>;</span><br><span class="line">=&gt; rgb(117, 117, 117);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，红、绿、蓝三种颜色的值都是 0-255，分别进行运算即可。假如颜色中包含透明度参数，则只有在透明度相同的情况下才可以直接运算。不同透明度的颜色值需要经过 <code>opacify</code>或 <code>transparentize</code>这两个函数转化才能参与运算。</p>
+<p>颜色值的运算还可以使用 sass 提供的<a href="https://sass-lang.com/documentation/modules">颜色函数</a>。</p>
+<h4 id="字符串运算"><a href="#字符串运算" class="headerlink" title="字符串运算"></a>字符串运算</h4><p>与 JavaScript 一样，字符串也可以用加号拼接。不过拼接结果是否带引号，取决于等号左边的值是否带引号。如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;Foo &#x27;</span> + Bar;</span><br><span class="line">  <span class="attribute">font-family</span>: sans- + <span class="string">&#x27;serif&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;Foo Bar&#x27;</span>;</span><br><span class="line">  <span class="attribute">font-family</span>: sans-serif;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="布尔运算"><a href="#布尔运算" class="headerlink" title="布尔运算"></a>布尔运算</h4><p>SassScript 支持<code>and</code>、<code>or</code>和<code>not</code>等布尔运算。布尔运算主要用于流程控制中，与 JavaScript 中的写法是一致的。</p>
+<p>不过值得注意的是，在 sass 中没有真正意义上的布尔值。在早期的 sass 语法中，1 表示 true，0 表示 false。而在后来的 SCSS 语法中新增了关键字<code>True</code>和<code>False</code>，不过可以看到，它们被划为数值类，也就是说，它们的值本质上还是 1 和 0，只是有了更明显的语义。</p>
+<h3 id="4-函数"><a href="#4-函数" class="headerlink" title="(4). 函数"></a>(4). 函数</h3><p>函数当是大多数编程语言最基本的概念之一了（在函数式编程中，函数是一等公民），sass 为 css 也引入了函数。</p>
+<p>首先，sass 内置了相当多的函数，用于各种运算和转换，请参考这份函数列表：<a href="https://sass-lang.com/documentation/modules">Sass::Script::Functions </a>。使用内置函数时，需要首先用<code>@use</code>导入函数对象，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@use</span> <span class="string">&quot;sass:color&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.button</span> &#123;</span><br><span class="line">  $primary-color: #6b717f;</span><br><span class="line">  color: $primary-color;</span><br><span class="line">  border: 1px solid color.scale($primary-color, $lightness: 20%);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>sass 也允许自定义函数，这需要<code>@function</code>和<code>@return</code>这两个特殊指令，格式如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@function</span> column-width($col, $total) &#123;</span><br><span class="line">  <span class="keyword">@return</span> percentage($col/$total);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在你可以像调用普通函数一样调用这个函数。</p>
+<h3 id="5-插值"><a href="#5-插值" class="headerlink" title="(5). 插值 #{ }"></a>(5). 插值 #{ }</h3><p>为了解决字符串与变量拼接带来的不变，sass 引入了模板引擎，使用<code>#&#123;&#125;</code>作为插值语法。</p>
+<p>选择器、属性名、属性值等都可以使用插值，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">$name: foo;</span><br><span class="line">$attr: border;</span><br><span class="line">$content: world;</span><br><span class="line">p.#&#123;$name&#125; &#123;</span><br><span class="line">  #&#123;$attr&#125;-color: blue;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">p</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&#x27;hello #&#123;$content&#125;&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-导入-import"><a href="#6-导入-import" class="headerlink" title="(6). 导入@import"></a>(6). 导入@import</h3><p>css 中允许使用<code>@import</code>从其他 css 文件中导入样式。但是这个功能在 css 中使用并不多，因为 css 的<code>@import</code>是同步的，也就是说只有在解析到这个语句时，浏览器才会去下载对应的 css 文件。这种同步的方式会影响到前端的使用体验。</p>
+<p>而 sass 对@import 语句进行了扩展，在引入 sass/scss 文件时，不再使用同步的方式去下载对应的文件，而是使用异步的方式，也就是会进行静态分析，提前下载和编译好对应的文件：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;foo.scss&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对于下面四种情况，sass 会将其视为原生的 css，不会进行编译：</p>
+<ol>
+<li>文件拓展名是 .css；</li>
+<li>文件名以 http:// 开头；</li>
+<li>文件名是 url()；</li>
+<li>@import 包含 media queries。</li>
+</ol>
+<p>如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;foo.css&#x27;</span>;</span><br><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;foo&#x27;</span> screen;</span><br><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;http://foo.com/bar&#x27;</span>;</span><br><span class="line"><span class="keyword">@import</span> url(foo);</span><br></pre></td></tr></table></figure>
+
+<p>它们会被原样输出到 css 代码中。</p>
+<p>如果导入的文件与当前文件存在同名变量，一般来说当前文件的变量优先级更高（因为一般导入语句会写在最前面，所以当前文件的变量会将其覆盖）。但是如果你希望优先使用引入文件的变量，但不确定该变量是否存在时，可以使用<code>!default</code>定义变量：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;foo.scss&#x27;</span>;</span><br><span class="line">$width: 100px !default;</span><br></pre></td></tr></table></figure>
+
+<p>这时如果<code>foo.scss</code>定义了<code>$width</code>，则以它优先，如果没有，才使用这里的<code>100px</code>默认值。</p>
+<p>另外，sass 的<code>@import</code>是有作用域概念的，也就是说如果你是在某个作用域内导入的 scss 文件，那么它的代码将被插入到这个作用域内。</p>
+<p>如果某个 scss 文件不需要单独编译成 css，只需要通过其他 scss 作为公共文件导入，可以在命名前加下划线：<code>_color.scss</code>。这样这个文件就不会被编译了，而你可以在其他 scss 文件中将其导入，注意，导入的时候不需要带下划线：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">&#x27;color.scss&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-控制指令"><a href="#7-控制指令" class="headerlink" title="(7). 控制指令"></a>(7). 控制指令</h3><p>包括<code>@if</code>(<code>@else if</code>，<code>@else</code>)，<code>@for</code>，<code>@each</code>，<code>@while</code>等。</p>
+<p><code>@if</code>与 JavaScript 的<code>if</code>用法类似：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  @if 1 + 1 == 2 &#123;</span><br><span class="line">    <span class="selector-tag">border</span>: 1<span class="selector-tag">px</span> <span class="selector-tag">solid</span>;</span><br><span class="line">  &#125; <span class="keyword">@else</span> if <span class="number">5</span> &lt; <span class="number">3</span> &#123;</span><br><span class="line">    <span class="selector-tag">border</span>: 2<span class="selector-tag">px</span> <span class="selector-tag">dotted</span>;</span><br><span class="line">  &#125; <span class="keyword">@else</span> &#123;</span><br><span class="line">    <span class="selector-tag">border</span>: 3<span class="selector-tag">px</span> <span class="selector-tag">double</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@for</code>包括两种语法格式：<code>@for $var from &lt;start&gt; through &lt;end&gt;</code>和<code>@for $var from &lt;start&gt; to &lt;end&gt;</code>。这里的变量$var 是任意的，只是作为临时变量使用，start 和 end 都必须是整数。两种语法的差异在于，前者的取值区域是<code>start ~ end</code>，而后者的取值区域是<code>start ~ end-1</code>，即<code>to</code>语法不包含<code>end</code>的值。</p>
+<p><code>@each</code>用于遍历数组或对象。遍历数组的语法是：<code>@each $var in &lt;list&gt;</code>，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@each</span> $animal in puma, sea-slug, egret &#123;</span><br><span class="line">  .#&#123;$animal&#125;-icon &#123;</span><br><span class="line">    background-image: url(&#x27;/images/#&#123;$animal&#125;.png&#x27;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.puma-icon</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;/images/puma.png&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.sea-slug-icon</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;/images/sea-slug.png&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.egret-icon</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;/images/egret.png&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>遍历对象的语法为：<code>@each $var1, $var2, ... in &lt;maps&gt;</code>，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@each</span> $animal, $color, $cursor in (puma, black, default), (sea-slug, blue, pointer)</span><br><span class="line">&#123;</span><br><span class="line">  .#&#123;$animal&#125;-icon &#123;</span><br><span class="line">    background-image: url(&#x27;/images/#&#123;$animal&#125;.png&#x27;);</span><br><span class="line">    border: 2px solid $color;</span><br><span class="line">    cursor: $cursor;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.puma-icon</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;/images/puma.png&#x27;</span>);</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">2px</span> solid black;</span><br><span class="line">  <span class="attribute">cursor</span>: default;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.sea-slug-icon</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;/images/sea-slug.png&#x27;</span>);</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">2px</span> solid blue;</span><br><span class="line">  <span class="attribute">cursor</span>: pointer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@while</code>也是很常见的循环指令，当条件为假时退出循环，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">$i: 6;</span><br><span class="line"><span class="keyword">@while</span> $i &gt; <span class="number">0</span> &#123;</span><br><span class="line">  .item-#&#123;$i&#125; &#123;</span><br><span class="line">    width: 2em * $i;</span><br><span class="line">  &#125;</span><br><span class="line">  $i: $i - 2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-混入-mixin"><a href="#8-混入-mixin" class="headerlink" title="(8). 混入@mixin"></a>(8). 混入@mixin</h3><p>混入的本意是将一组常使用的样式提取出来，然后在使用的时候直接使用<code>@mixin</code>语句导入即可，这样可以避免重复书写这些样式。它最简单的用法如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@mixin</span> large-text &#123;</span><br><span class="line">  <span class="selector-tag">font</span>: &#123;</span><br><span class="line">    <span class="attribute">size</span>: <span class="number">20px</span>;</span><br><span class="line">    <span class="attribute">weight</span>: bold;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="selector-tag">color</span>: <span class="selector-id">#ff0000</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里定义了一组样式，包括<code>font-size</code>，<code>font-weight</code>和<code>color</code>，我们将这样一组样式命名为<code>large-text</code>。现在当我们想在某个元素上应用大文本样式时，就可以导入这段样式：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  @include large-text;</span><br><span class="line">  <span class="selector-tag">display</span>: <span class="selector-tag">inline-block</span>;</span><br><span class="line">  ...;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式可以不用为元素定义大量的类名来应用不同的样式，而是从编程的角度来提取公共样式，从而提升开发效率。</p>
+<p>类似于函数，mixin 也可以传入参数，也可以给参数设置默认值，如：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@mixin</span> sexy-border($color, $<span class="attribute">width:</span> <span class="number">1in</span>) &#123;</span><br><span class="line">  <span class="selector-tag">border</span>: &#123;</span><br><span class="line">    <span class="attribute">color</span>: $color;</span><br><span class="line">    <span class="attribute">width</span>: $width;</span><br><span class="line">    <span class="attribute">style</span>: dashed;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  @include sexy-border(blue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译为：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">border-color</span>: blue;</span><br><span class="line">  <span class="attribute">border-width</span>: <span class="number">1in</span>;</span><br><span class="line">  <span class="attribute">border-style</span>: dashed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传参时可以指定参数名，这样就不需要严格按照参数顺序了：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">h1</span> &#123;</span><br><span class="line">  @include special-border($color: blue, $width: 2in);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当传入的参数数量不确定时，可以使用省略号语法来接收：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@mixin</span> box-shadow($shadows...) &#123;</span><br><span class="line">  -moz-box-shadow: $shadows;</span><br><span class="line">  -webkit-box-shadow: $shadows;</span><br><span class="line">  box-shadow: $shadows;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.shadows</span> &#123;</span><br><span class="line">  @include box-shadow(0px 4px 5px #666, 2px 6px 10px #999);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传参的时候同样可以使用省略号语法：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@mixin</span> colors($text, $background, $border) &#123;</span><br><span class="line">  ...;</span><br><span class="line">&#125;</span><br><span class="line">$values: #ff0000, #00ff00, #0000ff;</span><br><span class="line"><span class="selector-class">.primary</span> &#123;</span><br><span class="line">  @include colors($values...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-继承-extend"><a href="#9-继承-extend" class="headerlink" title="(9). 继承 @extend"></a>(9). 继承 @extend</h3><p>基于<code>Nicole Sullivan</code>面向对象的 css 的理念，选择器继承是说一个选择器可以继承为另一个选择器定义的所有样式。比如 bootstrap 中的<code>btn-primary</code>就可以认为是继承自<code>btn</code>。语法如下：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line">//通过选择器继承继承样式</span><br><span class="line"><span class="selector-class">.error</span> &#123;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid red;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#fdd</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.seriousError</span> &#123;</span><br><span class="line">  @extend .error;</span><br><span class="line">  <span class="selector-tag">border-width</span>: 3<span class="selector-tag">px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不同于混入，<code>@extend</code>并不是直接把<code>.error</code>的样式直接复制过来，而是给所有添加了<code>seriousError</code>的标签同时加上<code>error</code>类。这样，所有与<code>error</code>类相关的选择器，现在都与<code>seriousError</code>有关。也就是说，此时 sass 相当于进行了下面的转化：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">&quot;seriousError&quot;</span>&gt;</span>error<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">&quot;error seriousError&quot;</span>&gt;</span>error<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>因此，像<code>.error a</code>这样的选择器，现在对<code>seriousError</code>内的<code>a</code>元素也是有效的。</p>
+<p>关于继承，在实际使用中有很多的细节需要注意，这里暂不详述，有需要的可以参考<a href="https://www.sass.hk/guide/">sass 中文网</a>。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文涉及了大部分 sass 的基本用法，但仍然不够全面，如果在使用中遇到了其他问题，建议参考<a href="https://www.sass.hk/guide/">sass 中文网</a>。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+        <category>SCSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>转载</tag>
+        <tag>scss</tag>
       </tags>
   </entry>
   <entry>
