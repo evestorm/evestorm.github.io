@@ -1,7 +1,7 @@
 ---
 title: macOS下使用nvm管理node版本
 tags:
-  - node
+  - Node
   - nvm
 categories:
   - 后端
