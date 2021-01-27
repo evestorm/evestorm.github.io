@@ -1,5 +1,5 @@
 ---
-title: macOS下使用nvm管理node版本
+title: 使用nvm管理node版本
 tags:
   - Node
   - nvm
@@ -9,6 +9,8 @@ categories:
 abbrlink: 48432
 date: 2020-10-21 23:58:09
 ---
+
+# macOS
 
 ## 卸载之前安装的 node
 
@@ -90,7 +92,39 @@ export NVM_DIR="$HOME/.nvm"
 
 重启终端再次执行 nvm ，发现能够使用。
 
-## nvm 常见命令
+# Window 10 64bit
+
+摘自：[Windows nvm 的安装使用(及排坑)](https://zhuanlan.zhihu.com/p/81801605)
+
+## 卸载系统上现有 node（如果有）
+
+> 此处基于[windows 下 nvm 安装 node 之后 npm 命令找不到问题解决办法](https://link.zhihu.com/?target=https%3A//www.bbsmax.com/A/1O5EPPR3J7/)，在此基础上简化和完善。
+
+- 在卸载程序中卸载 node
+- 在环境变量中删除所有与 node 相关的路径(无论是 user 级，还是 system 级)
+- 删除以下路径的文件(可能只有部分文件才有) C:\Program Files (x86)\nodejs
+
+> C:\Program Files\nodejs
+> C:\Users{User}\AppData\Roaming\npm
+> C:\Users{User}\AppData\Roaming\npm-cache
+> C:\Users{User}\node_modules (在我电脑上的路径)
+
+## 下载 nvm
+
+下载最新版 nvm 并安装[nvm-setup.zip](https://link.zhihu.com/?target=https%3A//github.com/coreybutler/nvm-windows/releases)
+
+## 更换镜像源
+
+在 `路径 C:\Users\{User}\AppData\Roaming\nvm\settings.txt` 下添加以下两条
+
+```js
+node_mirror: https://npm.taobao.org/mirrors/node/
+npm_mirror: https://npm.taobao.org/mirrors/npm/
+```
+
+此时如果你还仔细观察，会发现`C:\Program Files`下的 nodejs 问家家其实是一个快捷方式，指向的是 nvm 的安装路径`C:\Users\i353667\AppData\Roaming\nvm`下对应的 node 版本。
+
+# nvm 常见命令
 
 - nvm ls 列出安装 node 的所有版本
 - nvm current 显示当前使用的版本
@@ -100,3 +134,4 @@ export NVM_DIR="$HOME/.nvm"
 - nvm alias default v12.18.4 设置默认 node 版本
 - nvm deactivate 解除当前版本绑定
 - nvm ls-remote 获取远程可用版本
+- nvm list available 获取可用的 node 版本列表
