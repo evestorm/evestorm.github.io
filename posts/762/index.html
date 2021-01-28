@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="起因物流项目中需要在 web 端接入港口的视频监控，摄像头是海康威视的，数据协议是 rtsp，后端表示希望前端直接解码，而不通过将 rtsp 转为 rtmp 的方式与前端交互。 寻找方案找前端的解决方案就找了一下午，各种 google 几乎所有文章都说没法单靠浏览器完成对 rtsp 视频流的渲染。这里列几个我觉得对 rtsp 相关知识有帮助的文章吧：  7 ways to stream RTSP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue项目中使用海康威视web插件">
+<meta property="og:url" content="https://evestorm.github.io/posts/762/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="起因物流项目中需要在 web 端接入港口的视频监控，摄像头是海康威视的，数据协议是 rtsp，后端表示希望前端直接解码，而不通过将 rtsp 转为 rtmp 的方式与前端交互。 寻找方案找前端的解决方案就找了一下午，各种 google 几乎所有文章都说没法单靠浏览器完成对 rtsp 视频流的渲染。这里列几个我觉得对 rtsp 相关知识有帮助的文章吧：  7 ways to stream RTSP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/web-plugin.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/demo.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/params.png">
+<meta property="article:published_time" content="2021-01-28T11:18:17.000Z">
+<meta property="article:modified_time" content="2021-01-28T14:38:28.829Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="海康威视">
+<meta property="article:tag" content="视频监控">
+<meta property="article:tag" content="RTSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/web-plugin.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/762/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Vue项目中使用海康威视web插件 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">寻找方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue-%E4%B8%AD%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">Vue 中使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%BF%87%E7%9A%84%E7%9B%B8%E5%85%B3%E8%B5%84%E6%BA%90"><span class="nav-number">5.</span> <span class="nav-text">查询过的相关资源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/762/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue项目中使用海康威视web插件
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-01-28 19:18:17 / 修改时间：22:38:28" itemprop="dateCreated datePublished" datetime="2021-01-28T19:18:17+08:00">2021-01-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/762/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/762/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>物流项目中需要在 web 端接入港口的视频监控，摄像头是海康威视的，数据协议是 rtsp，后端表示希望前端直接解码，而不通过将 rtsp 转为 rtmp 的方式与前端交互。</p>
+<h2 id="寻找方案"><a href="#寻找方案" class="headerlink" title="寻找方案"></a>寻找方案</h2><p>找前端的解决方案就找了一下午，各种 google 几乎所有文章都说没法单靠浏览器完成对 rtsp 视频流的渲染。这里列几个我觉得对 rtsp 相关知识有帮助的文章吧：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://flashphoner.com/7-ways-to-stream-rtsp-on-the-page/">7 ways to stream RTSP on the page</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dreamsqin/p/12557070.html">前端视频直播技术总结及 video.js 在 h5 页面中的应用</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/337712456">在 Chrome、Firefox 等高版本浏览器中实现低延迟播放海康、大华 RTSP</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/243466">谷歌浏览器 Chrome 播放 rtsp 视频流解决方案</a></li>
+</ul>
+<p>其中最后一个用 vlc 插件播放 rtsp 我离成功就差一步。视频能放了，但是播一段时间后画面就不动了，再过一会浏览器就卡死不动了… 尝试了各种办法，wiki 文档看了也无济于事，最后放弃了这个方案。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>最终，查看了海康威视的官网接口文档，找到了 web 端能够使用的<a target="_blank" rel="noopener" href="https://open.hikvision.com/download/5c67f1e2f05948198c909700?type=10">视频插件</a>:</p>
+<img src="/posts/undefined/web-plugin.png" class="" title="web-plugin">
+
+<p>提供了文档和程序包下载。</p>
+<p>通过阅读文档和运行 demo，实现了 web 端播放 rtsp 实时监控，demo 我运行的下图中红框圈出的 html 文件：</p>
+<img src="/posts/undefined/demo.png" class="" title="demo">
+
+<p>示例项目中需要填写的参数是：</p>
+<img src="/posts/undefined/params.png" class="" width="22">
+
+<p>这些参数需要后端提供。</p>
+<h2 id="Vue-中使用"><a href="#Vue-中使用" class="headerlink" title="Vue 中使用"></a>Vue 中使用</h2><p>这里直接贴代码吧，我写了个组件封装了下：</p>
+<blockquote>
+<p>components/common/hikvisionGrid/index.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  &lt;div</span><br><span class="line">    id=&quot;hikvision-grid&quot;</span><br><span class="line">    class=&quot;wrapper&quot;</span><br><span class="line">    ref=&quot;wrapper&quot;</span><br><span class="line">    :style=&quot;&#123; width: &#x27;100%&#x27;, height: &#x27;100%&#x27; &#125;&quot;</span><br><span class="line">  &gt;</span><br><span class="line">    &lt;div</span><br><span class="line">      v-show=&quot;oWebControl&quot;</span><br><span class="line">      :id=&quot;setting.id&quot;</span><br><span class="line">      :class=&quot;[oWebControl === null ? &#x27;videoNull&#x27; : &#x27;&#x27;]&quot;</span><br><span class="line">    &gt;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-show</span>=<span class="string">&quot;!oWebControl&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-html</span>=<span class="string">&quot;playText&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-show</span>=<span class="string">&quot;playText.includes(&#x27;插件启动失败&#x27;)&quot;</span>&gt;</span></span><br><span class="line">        下载完成？</span><br><span class="line">        <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">type</span>=<span class="string">&quot;primary&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;destroyedAndCreate&quot;</span>&gt;</span></span><br><span class="line">          点击此处</span><br><span class="line">        <span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">        启动插件</span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 从父组件传递过来的</span></span></span><br><span class="line">    props: &#123;</span><br><span class="line">      setting: &#123;</span><br><span class="line"><span class="javascript">        <span class="comment">// 设置项，带id</span></span></span><br><span class="line"><span class="javascript">        type: <span class="built_in">Object</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="function">() =&gt;</span> (&#123;</span></span><br><span class="line">          id: 1</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;,</span><br><span class="line">      sysParams: &#123;</span><br><span class="line"><span class="javascript">        <span class="comment">// 系统参数</span></span></span><br><span class="line"><span class="javascript">        type: <span class="built_in">Object</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="function">() =&gt;</span> (&#123;</span></span><br><span class="line"><span class="javascript">          appkey: <span class="string">&#x27;29228660&#x27;</span>,</span></span><br><span class="line"><span class="javascript">          secret: <span class="string">&#x27;eDSkiRPcZ9VTSGt8zT7p&#x27;</span>,</span></span><br><span class="line"><span class="javascript">          ip: <span class="string">&#x27;57.215.7.52&#x27;</span>,</span></span><br><span class="line">          port: 443</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;,</span><br><span class="line">      list: &#123;</span><br><span class="line"><span class="javascript">        <span class="comment">// cameraCode列表</span></span></span><br><span class="line"><span class="javascript">        type: <span class="built_in">Array</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="function">() =&gt;</span> []</span></span><br><span class="line">      &#125;,</span><br><span class="line">      layout: &#123;</span><br><span class="line"><span class="javascript">        <span class="comment">// 布局</span></span></span><br><span class="line"><span class="javascript">        type: <span class="built_in">String</span>,</span></span><br><span class="line"><span class="javascript">        <span class="keyword">default</span>: <span class="string">&#x27;2x2&#x27;</span></span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> &#123;</span></span><br><span class="line">        videoWidth: 0,</span><br><span class="line">        videoHeight: 0,</span><br><span class="line"><span class="javascript">        left: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        top: <span class="string">&#x27;&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        initCount: <span class="number">0</span>, <span class="comment">// 启动次数</span></span></span><br><span class="line"><span class="javascript">        playMode: <span class="number">0</span>, <span class="comment">// 0 预览 1回放</span></span></span><br><span class="line"><span class="javascript">        playText: <span class="string">&#x27;加载中...&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        cameraIndexCode: <span class="string">&#x27;&#x27;</span>, <span class="comment">// 监控点编号</span></span></span><br><span class="line"><span class="javascript">        oWebControl: <span class="literal">null</span>,</span></span><br><span class="line"><span class="javascript">        href: <span class="string">&#x27;hikvision/VideoWebPlugin.exe&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        selfEle: <span class="literal">null</span> <span class="comment">// 自身原始</span></span></span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="comment">// 当前组件</span></span></span><br><span class="line"><span class="javascript">      <span class="built_in">this</span>.selfEle = <span class="built_in">this</span>.$refs.wrapper;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">this</span>.observeWrapper();</span></span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line"><span class="javascript">      <span class="comment">// 监听自身容器大小变化</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">observeWrapper</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 监听 自身容器 元素宽度的变化</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">const</span> ro = <span class="keyword">new</span> ResizeObserver(<span class="function"><span class="params">entries</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="keyword">for</span> (<span class="keyword">const</span> entry <span class="keyword">of</span> entries) &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> cr = entry.contentRect;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoWidth = cr.width;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoHeight = cr.height;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.oWebControl &amp;&amp;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.oWebControl.JS_Resize(<span class="built_in">this</span>.videoWidth, <span class="built_in">this</span>.videoHeight);</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.oWebControl &amp;&amp; <span class="built_in">this</span>.setWndCover();</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"><span class="javascript">        ro.observe(<span class="built_in">document</span>.querySelector(<span class="string">&#x27;#hikvision-grid&#x27;</span>));</span></span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 初始化+预览</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">createdVideo</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.playText = <span class="string">&#x27;启动中...&#x27;</span>;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.initPlugin(<span class="built_in">this</span>.setting.id, <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.multiPreviewVideo();</span></span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 销毁插件</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">destroyWnd</span>(<span class="params">cb</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (<span class="built_in">this</span>.oWebControl) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_HideWnd();</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl</span></span><br><span class="line">            .JS_DestroyWnd(&#123;</span><br><span class="line"><span class="javascript">              funcName: <span class="string">&#x27;destroyeWnd&#x27;</span></span></span><br><span class="line">            &#125;)</span><br><span class="line"><span class="javascript">            .then(<span class="function"><span class="keyword">function</span> (<span class="params">oData</span>) </span>&#123;&#125;);</span></span><br><span class="line"><span class="javascript">        &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">console</span>.log(<span class="string">&#x27;没有实例&#x27;</span>);</span></span><br><span class="line">        &#125;</span><br><span class="line">        cb &amp;&amp; cb();</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 销毁并重启</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">destroyedAndCreate</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.destroyWnd(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.createdVideo();</span></span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 初始化</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">init</span>(<span class="params">callback</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.getPubKey(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="comment">////////////////////////////////// 请自行修改以下变量值   ////////////////////////////////////</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> appkey = <span class="built_in">this</span>.sysParams.appkey; <span class="comment">//综合安防管理平台提供的appkey，必填</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> secret = <span class="built_in">this</span>.setEncrypt(<span class="built_in">this</span>.sysParams.secret); <span class="comment">//综合安防管理平台提供的secret，必填</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> ip = <span class="built_in">this</span>.sysParams.ip; <span class="comment">//综合安防管理平台IP地址，必填</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> playMode = <span class="built_in">this</span>.playMode; <span class="comment">//初始播放模式：0-预览，1-回放</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> port = <span class="built_in">this</span>.sysParams.port; <span class="comment">//综合安防管理平台端口，若启用HTTPS协议，默认443</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> snapDir = <span class="string">&#x27;D:\\SnapDir&#x27;</span>; <span class="comment">//抓图存储路径</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> videoDir = <span class="string">&#x27;D:\\VideoDir&#x27;</span>; <span class="comment">//紧急录像或录像剪辑存储路径</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> layout = <span class="built_in">this</span>.layout; <span class="comment">//playMode指定模式的布局</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> enableHTTPS = <span class="number">1</span>; <span class="comment">//是否启用HTTPS协议与综合安防管理平台交互，是为1，否为0</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> encryptedFields = <span class="string">&#x27;secret&#x27;</span>; <span class="comment">//加密字段，默认加密领域为secret</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> showToolbar = <span class="number">0</span>; <span class="comment">//是否显示工具栏，0-不显示，非0-显示</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> showSmart = <span class="number">0</span>; <span class="comment">//是否显示智能信息（如配置移动侦测后画面上的线框），0-不显示，非0-显示</span></span></span><br><span class="line"><span class="javascript">          <span class="keyword">let</span> buttonIDs =</span></span><br><span class="line"><span class="javascript">            <span class="string">&#x27;0,16,256,257,258,259,260,512,513,514,515,516,517,768,769&#x27;</span>; <span class="comment">//自定义工具条按钮</span></span></span><br><span class="line"><span class="javascript">          <span class="comment">////////////////////////////////// 请自行修改以上变量值   ////////////////////////////////////</span></span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl</span></span><br><span class="line">            .JS_RequestInterface(&#123;</span><br><span class="line"><span class="javascript">              funcName: <span class="string">&#x27;init&#x27;</span>,</span></span><br><span class="line"><span class="javascript">              argument: <span class="built_in">JSON</span>.stringify(&#123;</span></span><br><span class="line"><span class="javascript">                appkey: appkey, <span class="comment">//API网关提供的appkey</span></span></span><br><span class="line"><span class="javascript">                secret: secret, <span class="comment">//API网关提供的secret</span></span></span><br><span class="line"><span class="javascript">                ip: ip, <span class="comment">//API网关IP地址</span></span></span><br><span class="line"><span class="javascript">                playMode: playMode, <span class="comment">//播放模式（决定显示预览还是回放界面）</span></span></span><br><span class="line"><span class="javascript">                port: port, <span class="comment">//端口</span></span></span><br><span class="line"><span class="javascript">                snapDir: snapDir, <span class="comment">//抓图存储路径</span></span></span><br><span class="line"><span class="javascript">                videoDir: videoDir, <span class="comment">//紧急录像或录像剪辑存储路径</span></span></span><br><span class="line"><span class="javascript">                layout: layout, <span class="comment">//布局</span></span></span><br><span class="line"><span class="javascript">                enableHTTPS: enableHTTPS, <span class="comment">//是否启用HTTPS协议</span></span></span><br><span class="line"><span class="javascript">                encryptedFields: encryptedFields, <span class="comment">//加密字段</span></span></span><br><span class="line"><span class="javascript">                showToolbar: showToolbar, <span class="comment">//是否显示工具栏</span></span></span><br><span class="line"><span class="javascript">                showSmart: showSmart, <span class="comment">//是否显示智能信息</span></span></span><br><span class="line"><span class="javascript">                buttonIDs: buttonIDs <span class="comment">//自定义工具条按钮</span></span></span><br><span class="line">              &#125;)</span><br><span class="line">            &#125;)</span><br><span class="line"><span class="javascript">            .then(<span class="function"><span class="params">oData</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">              <span class="comment">// 初始化后resize一次，规避firefox下首次显示窗口后插件窗口未与DIV窗口重合问题</span></span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.oWebControl.JS_Resize(<span class="built_in">this</span>.videoWidth, <span class="built_in">this</span>.videoHeight);</span></span><br><span class="line">              callback &amp;&amp; callback();</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 创建播放实例</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">initPlugin</span>(<span class="params">id, callback</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> that = <span class="built_in">this</span>;</span></span><br><span class="line"><span class="javascript">        that.oWebControl = <span class="keyword">new</span> WebControl(&#123;</span></span><br><span class="line"><span class="javascript">          szPluginContainer: id, <span class="comment">// 指定容器id</span></span></span><br><span class="line"><span class="javascript">          iServicePortStart: <span class="number">15900</span>, <span class="comment">// 指定起止端口号，建议使用该值</span></span></span><br><span class="line">          iServicePortEnd: 15909,</span><br><span class="line"><span class="javascript">          szClassId: <span class="string">&#x27;23BF3B0A-2C56-4D97-9C03-0CB103AA8F11&#x27;</span>, <span class="comment">// 用于IE10使用ActiveX的clsid</span></span></span><br><span class="line"><span class="javascript">          cbConnectSuccess: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 创建WebControl实例成功</span></span></span><br><span class="line">            that.oWebControl</span><br><span class="line"><span class="javascript">              .JS_StartService(<span class="string">&#x27;window&#x27;</span>, &#123;</span></span><br><span class="line"><span class="javascript">                <span class="comment">// WebControl实例创建成功后需要启动服务</span></span></span><br><span class="line"><span class="javascript">                dllPath: <span class="string">&#x27;./VideoPluginConnect.dll&#x27;</span> <span class="comment">// 值&quot;./VideoPluginConnect.dll&quot;写死</span></span></span><br><span class="line">              &#125;)</span><br><span class="line">              .then(</span><br><span class="line"><span class="javascript">                <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                  <span class="comment">// 启动插件服务成功</span></span></span><br><span class="line">                  that.oWebControl.JS_SetWindowControlCallback(&#123;</span><br><span class="line"><span class="javascript">                    <span class="comment">// 设置消息回调</span></span></span><br><span class="line">                    cbIntegrationCallBack: that.cbIntegrationCallBack</span><br><span class="line">                  &#125;);</span><br><span class="line"></span><br><span class="line">                  that.oWebControl</span><br><span class="line">                    .JS_CreateWnd(id, that.videoWidth, that.videoHeight)</span><br><span class="line"><span class="javascript">                    .then(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">                      <span class="comment">//JS_CreateWnd创建视频播放窗口，宽高可设定</span></span></span><br><span class="line"><span class="javascript">                      that.init(callback); <span class="comment">// 创建播放实例成功后初始化</span></span></span><br><span class="line">                    &#125;);</span><br><span class="line">                &#125;,</span><br><span class="line"><span class="javascript">                <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                  <span class="comment">// 启动插件服务失败</span></span></span><br><span class="line">                &#125;</span><br><span class="line">              );</span><br><span class="line">          &#125;,</span><br><span class="line"><span class="javascript">          cbConnectError: <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 创建WebControl实例失败</span></span></span><br><span class="line"><span class="javascript">            that.oWebControl = <span class="literal">null</span>;</span></span><br><span class="line"><span class="javascript">            that.playText = <span class="string">&#x27;插件未启动，正在尝试启动，请稍候...&#x27;</span>;</span></span><br><span class="line"><span class="javascript">            WebControl.JS_WakeUp(<span class="string">&#x27;VideoWebPlugin://&#x27;</span>); <span class="comment">// 程序未启动时执行error函数，采用wakeup来启动程序</span></span></span><br><span class="line">            that.initCount++;</span><br><span class="line"><span class="javascript">            <span class="keyword">if</span> (that.initCount &lt; <span class="number">3</span>) &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line">                that.initPlugin();</span><br><span class="line">              &#125;, 3000);</span><br><span class="line"><span class="javascript">            &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="handlebars"><span class="xml">              that.playText = `插件启动失败，请检查插件是否安装！<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">$&#123;this.href&#125;</span> <span class="attr">type</span>=<span class="string">&quot;primary&quot;</span> <span class="attr">download</span>=<span class="string">&quot;VideoWebPlugin.exe&quot;</span> <span class="attr">style</span>=<span class="string">&#x27;color:#4194fc&#x27;</span>&gt;</span>下载地址<span class="tag">&lt;/<span class="name">a</span>&gt;</span>`;</span></span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line"><span class="javascript">          cbConnectClose: <span class="function"><span class="params">bNormalClose</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 异常断开：bNormalClose = false</span></span></span><br><span class="line"><span class="javascript">            <span class="comment">// JS_Disconnect正常断开：bNormalClose = true</span></span></span><br><span class="line"><span class="javascript">            that.oWebControl = <span class="literal">null</span>;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 关闭</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">handleClose</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (<span class="built_in">this</span>.oWebControl) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_RequestInterface(&#123;</span></span><br><span class="line"><span class="javascript">            funcName: <span class="string">&#x27;stopAllPreview&#x27;</span></span></span><br><span class="line">          &#125;);</span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_HideWnd(); <span class="comment">// 先让窗口隐藏，规避可能的插件窗口滞后于浏览器消失问题</span></span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_Disconnect().then(</span></span><br><span class="line">            () =&gt; &#123;</span><br><span class="line"><span class="javascript">              <span class="comment">// 断开与插件服务连接成功</span></span></span><br><span class="line">            &#125;,</span><br><span class="line">            () =&gt; &#123;</span><br><span class="line"><span class="javascript">              <span class="comment">// 断开与插件服务连接失败</span></span></span><br><span class="line">            &#125;</span><br><span class="line">          );</span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl = <span class="literal">null</span>;</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 消息回调</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">cbIntegrationCallBack</span>(<span class="params">oData</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// console.log(oData);</span></span></span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 预览</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">previewVideo</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> cameraIndexCode = <span class="built_in">this</span>.cameraIndexCode; <span class="comment">// 获取输入的监控点编号值，必填</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> streamMode = <span class="number">1</span>; <span class="comment">// 主子码流标识：0-主码流，1-子码流</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> transMode = <span class="number">1</span>; <span class="comment">// 传输协议：0-UDP，1-TCP</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> gpuMode = <span class="number">0</span>; <span class="comment">// 是否启用GPU硬解，0-不启用，1-启用</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> wndId = -<span class="number">1</span>; <span class="comment">// 播放窗口序号（在2x2以上布局下可指定播放窗口）</span></span></span><br><span class="line"></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.oWebControl.JS_RequestInterface(&#123;</span></span><br><span class="line"><span class="javascript">          funcName: <span class="string">&#x27;startPreview&#x27;</span>,</span></span><br><span class="line"><span class="javascript">          argument: <span class="built_in">JSON</span>.stringify(&#123;</span></span><br><span class="line"><span class="javascript">            cameraIndexCode: cameraIndexCode.trim(), <span class="comment">// 监控点编号</span></span></span><br><span class="line"><span class="javascript">            streamMode: streamMode, <span class="comment">// 主子码流标识</span></span></span><br><span class="line"><span class="javascript">            transMode: transMode, <span class="comment">// 传输协议</span></span></span><br><span class="line"><span class="javascript">            gpuMode: gpuMode, <span class="comment">// 是否开启GPU硬解</span></span></span><br><span class="line"><span class="javascript">            wndId: wndId <span class="comment">// 可指定播放窗口</span></span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 批量预览</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">multiPreviewVideo</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> streamMode = <span class="number">1</span>; <span class="comment">// 主子码流标识：0-主码流，1-子码流</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> transMode = <span class="number">1</span>; <span class="comment">// 传输协议：0-UDP，1-TCP</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> gpuMode = <span class="number">0</span>; <span class="comment">// 是否启用GPU硬解，0-不启用，1-启用</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.oWebControl</span></span><br><span class="line">          .JS_RequestInterface(&#123;</span><br><span class="line"><span class="javascript">            funcName: <span class="string">&#x27;startMultiPreviewByCameraIndexCode&#x27;</span>,</span></span><br><span class="line"><span class="javascript">            argument: <span class="built_in">JSON</span>.stringify(&#123;</span></span><br><span class="line"><span class="javascript">              list: <span class="built_in">this</span>.list.map(<span class="function">(<span class="params">camera, idx</span>) =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="javascript">                  cameraIndexCode: camera, <span class="comment">//监控点编号</span></span></span><br><span class="line"><span class="javascript">                  streamMode, <span class="comment">//主子码流标识</span></span></span><br><span class="line"><span class="javascript">                  transMode, <span class="comment">//传输协议</span></span></span><br><span class="line"><span class="javascript">                  gpuMode, <span class="comment">//是否开启GPU硬解</span></span></span><br><span class="line"><span class="javascript">                  wndId: idx + <span class="number">1</span> <span class="comment">// 播放窗口序号（在2x2以上布局下可指定播放窗口）</span></span></span><br><span class="line">                &#125;;</span><br><span class="line"><span class="javascript">              &#125;) <span class="comment">// 监控点编号集合</span></span></span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line"><span class="javascript">          .then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">if</span> (res.errorCode === <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">console</span>.log(<span class="string">&#x27;预览成功&#x27;</span>);</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">//获取公钥</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">getPubKey</span>(<span class="params">callback</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.oWebControl</span></span><br><span class="line">          .JS_RequestInterface(&#123;</span><br><span class="line"><span class="javascript">            funcName: <span class="string">&#x27;getRSAPubKey&#x27;</span>,</span></span><br><span class="line"><span class="javascript">            argument: <span class="built_in">JSON</span>.stringify(&#123;</span></span><br><span class="line">              keyLength: 1024</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line"><span class="javascript">          .then(<span class="function"><span class="params">oData</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">if</span> (oData.responseMsg.data) &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.pubKey = oData.responseMsg.data;</span></span><br><span class="line">              callback();</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">//RSA加密</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">setEncrypt</span>(<span class="params">value</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> encrypt = <span class="keyword">new</span> JSEncrypt();</span></span><br><span class="line"><span class="javascript">        encrypt.setPublicKey(<span class="built_in">this</span>.pubKey);</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> encrypt.encrypt(value);</span></span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      <span class="comment">// 设置窗口裁剪，当因滚动条滚动导致窗口需要被遮住的情况下需要JS_CuttingPartWindow部分窗口</span></span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="title">setWndCover</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iWidth = $(<span class="built_in">window</span>).width(); <span class="comment">// 获取浏览器宽度 不含滚动条</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iHeight = $(<span class="built_in">window</span>).height();</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> oDivRect = $(<span class="string">&#x27;#&#x27;</span> + <span class="built_in">this</span>.setting.id)</span></span><br><span class="line">          .get(0)</span><br><span class="line">          .getBoundingClientRect();</span><br><span class="line"></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iCoverLeft = oDivRect.left &lt; <span class="number">0</span> ? <span class="built_in">Math</span>.abs(oDivRect.left) : <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iCoverTop = oDivRect.top &lt; <span class="number">0</span> ? <span class="built_in">Math</span>.abs(oDivRect.top) : <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iCoverRight =</span></span><br><span class="line"><span class="javascript">          oDivRect.right - iWidth &gt; <span class="number">0</span> ? <span class="built_in">Math</span>.round(oDivRect.right - iWidth) : <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> iCoverBottom =</span></span><br><span class="line">          oDivRect.bottom - iHeight &gt; 0</span><br><span class="line"><span class="javascript">            ? <span class="built_in">Math</span>.round(oDivRect.bottom - iHeight)</span></span><br><span class="line">            : 0;</span><br><span class="line"></span><br><span class="line">        iCoverLeft =</span><br><span class="line"><span class="javascript">          iCoverLeft &gt; <span class="built_in">this</span>.videoWidth ? <span class="built_in">this</span>.videoWidth : iCoverLeft;</span></span><br><span class="line"><span class="javascript">        iCoverTop = iCoverTop &gt; <span class="built_in">this</span>.videoHeight ? <span class="built_in">this</span>.videoHeight : iCoverTop;</span></span><br><span class="line">        iCoverRight =</span><br><span class="line"><span class="javascript">          iCoverRight &gt; <span class="built_in">this</span>.videoWidth ? <span class="built_in">this</span>.videoWidth : iCoverRight;</span></span><br><span class="line">        iCoverBottom =</span><br><span class="line"><span class="javascript">          iCoverBottom &gt; <span class="built_in">this</span>.videoHeight ? <span class="built_in">this</span>.videoHeight : iCoverBottom;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">        <span class="comment">// 多1个像素点防止还原后边界缺失一个像素条</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.oWebControl.JS_RepairPartWindow(</span></span><br><span class="line">          0,</span><br><span class="line">          0,</span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.videoWidth + <span class="number">1</span>,</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.videoHeight</span></span><br><span class="line">        );</span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (iCoverLeft != <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_CuttingPartWindow(</span></span><br><span class="line">            0,</span><br><span class="line">            0,</span><br><span class="line">            iCoverLeft,</span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoHeight</span></span><br><span class="line">          );</span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (iCoverTop != <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="comment">// 多剪掉一个像素条，防止出现剪掉一部分窗口后出现一个像素条</span></span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_CuttingPartWindow(</span></span><br><span class="line">            0,</span><br><span class="line">            0,</span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoWidth + <span class="number">1</span>,</span></span><br><span class="line">            iCoverTop</span><br><span class="line">          );</span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (iCoverRight != <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_CuttingPartWindow(</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoWidth - iCoverRight,</span></span><br><span class="line">            0,</span><br><span class="line">            iCoverRight,</span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoHeight</span></span><br><span class="line">          );</span><br><span class="line">        &#125;</span><br><span class="line"><span class="javascript">        <span class="keyword">if</span> (iCoverBottom != <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.oWebControl.JS_CuttingPartWindow(</span></span><br><span class="line">            0,</span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoHeight - iCoverBottom,</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.videoWidth,</span></span><br><span class="line">            iCoverBottom</span><br><span class="line">          );</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">destroyed</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">this</span>.destroyWnd();</span></span><br><span class="line">    &#125;,</span><br><span class="line">    watch: &#123;</span><br><span class="line">      list: &#123;</span><br><span class="line"><span class="javascript">        immediate: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">        deep: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">handler</span>(<span class="params">value</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">          <span class="keyword">if</span> (value.length &gt; <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">console</span>.log(<span class="string">&#x27;watch海康威视组件的列表list:&#x27;</span>, value);</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.destroyedAndCreate();</span></span><br><span class="line"><span class="javascript">          &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.destroyWnd(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">              <span class="built_in">this</span>.oWebControl = <span class="literal">null</span>;</span></span><br><span class="line">            &#125;);</span><br><span class="line"><span class="javascript">            <span class="built_in">this</span>.playText = <span class="string">&#x27;请选择要播放的监控&#x27;</span>;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;scss&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.playWnd</span> &#123;</span></span><br><span class="line">    // margin: 30px 0 0 400px;</span><br><span class="line"><span class="css">    <span class="selector-tag">width</span>: 1000<span class="selector-tag">px</span>; <span class="comment">/*播放容器的宽和高设定*/</span></span></span><br><span class="line">    height: 600px;</span><br><span class="line">    border: 1px solid red;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.operate</span> &#123;</span></span><br><span class="line">    margin-top: 24px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.operate</span><span class="selector-pseudo">::after</span> &#123;</span></span><br><span class="line">    content: &#x27;&#x27;;</span><br><span class="line">    display: block;</span><br><span class="line">    clear: both;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.module</span> &#123;</span></span><br><span class="line">    float: left;</span><br><span class="line">    width: 340px;</span><br><span class="line"><span class="css">    <span class="comment">/*min-height: 320px;*/</span></span></span><br><span class="line">    margin-left: 16px;</span><br><span class="line">    padding: 16px 8px;</span><br><span class="line">    box-sizing: border-box;</span><br><span class="line"><span class="css">    <span class="selector-tag">border</span>: 1<span class="selector-tag">px</span> <span class="selector-tag">solid</span> <span class="selector-id">#e5e5e5</span>;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.module</span> <span class="selector-class">.item</span> &#123;</span></span><br><span class="line">    margin-bottom: 4px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.module</span> <span class="selector-tag">input</span><span class="selector-attr">[type=<span class="string">&#x27;text&#x27;</span>]</span> &#123;</span></span><br><span class="line">    box-sizing: border-box;</span><br><span class="line">    display: inline-block;</span><br><span class="line">    vertical-align: middle;</span><br><span class="line">    margin-left: 0;</span><br><span class="line">    width: 150px;</span><br><span class="line">    min-height: 20px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.module</span> <span class="selector-class">.btn</span> &#123;</span></span><br><span class="line">    min-width: 80px;</span><br><span class="line">    min-height: 24px;</span><br><span class="line">    margin-top: 100px;</span><br><span class="line">    margin-left: 80px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>parent.vue</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;monitor-port d-flex flex-column&quot;</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">&lt;!-- 监控组件 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">hikvision-grid</span> <span class="attr">:list</span>=<span class="string">&quot;curShowList&quot;</span> <span class="attr">:layout</span>=<span class="string">&quot;layout&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">hikvision-grid</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="comment">// 组件</span></span></span><br><span class="line"><span class="javascript">  <span class="keyword">import</span> HikvisionGrid <span class="keyword">from</span> <span class="string">&#x27;@/components/common/hikvisionGrid&#x27;</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="javascript">        curShowList: [] <span class="comment">// 当前能显示的摄像头</span></span></span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">    components: &#123;</span><br><span class="line">      HikvisionGrid</span><br><span class="line">    &#125;,</span><br><span class="line"><span class="javascript">    <span class="keyword">async</span> <span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">this</span>.curShowList = [</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;88b1264462b24d47b71d34b042dda16f&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;922c23133fb54cef8810f0b418906bcd&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;674d5788aba44969b63ffef24848d82d&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;2ead926168614d33aa2cbcae5946e621&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;a6dbe5c74a884405903c19ee32d1ea1a&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;c509cdb1a6e6437a9b96a90dcc121369&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;18e892d96fd7498c8f899c9a4d6ee591&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;5be592372de947c696ec2e3aaa5bf020&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;e5a02704013e4a408a3d75fd1e2302fd&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;6f2ba113a09341fd8e92374c85e96071&#x27;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="string">&#x27;a80494c0509d4992baebf76ca537c9bc&#x27;</span></span></span><br><span class="line">      ];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;scss&quot;</span> <span class="attr">scoped</span>&gt;</span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="查询过的相关资源"><a href="#查询过的相关资源" class="headerlink" title="查询过的相关资源"></a>查询过的相关资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/94440420">使用 flv.js 快速搭建 html5 网页直播</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000023949105">无插件 web 直播解决方案(不使用 Flash) ，flv.js+ffmpeg+nginx-http-flv-module</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_34239851/article/details/107078336">使用 java+ffmpeg+nginx-http-flv 将海康 rtsp 视频流转 http-flv，使 Web 可以无插件播放</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_22633333/article/details/96288603">记录 RTSP 通过 FFmpeg+nginx 发布成 rtmp 和 http-flv</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/kawhileonardfans/p/13044468.html">Java + Nginx-http-flv-module + FFmpeg + Flv.js 推 Rtsp 流 H5 播放</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Bilibili/flv.js/">flv.js</a></li>
+<li><a target="_blank" rel="noopener" href="https://wiki.videolan.org/Documentation:WebPlugin/">VLC Documentation:WebPlugin</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B5%B7%E5%BA%B7%E5%A8%81%E8%A7%86/" rel="tag"><i class="fa fa-tag"></i> 海康威视</a>
+              <a href="/tags/%E8%A7%86%E9%A2%91%E7%9B%91%E6%8E%A7/" rel="tag"><i class="fa fa-tag"></i> 视频监控</a>
+              <a href="/tags/RTSP/" rel="tag"><i class="fa fa-tag"></i> RTSP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/55714/" rel="prev" title="编写高质量可维护的代码：优雅命名">
+                  <i class="fa fa-chevron-left"></i> 编写高质量可维护的代码：优雅命名
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
