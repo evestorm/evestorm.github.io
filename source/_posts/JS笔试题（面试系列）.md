@@ -13,7 +13,7 @@ date: 2019-06-09 23:41:10
 
 ### typeof 没定义的变量会报错吗？typeof let 定义了的呢？
 
-- 未声明的变量使用 typeof 返回字符串 “undefined”
+- 未声明的变量使用 typeof 返回字符串 "undefined"
 - typeof 一个 let 定义的变量会因为暂时性死区报错 [ReferenceError](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError)（前提：let/const 未声明之前赋值或使用）
 
 ```js
@@ -29,8 +29,6 @@ let tmp;
 let tmp;
 console.log(typeof tmp); // undefined 不会报错
 ```
-
-<!-- more -->
 
 ### typeof 的值有哪些
 
@@ -63,8 +61,8 @@ function checkPalindrom(str) {
 
 给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
 
-- **输入:** “A man, a plan, a canal: Panama” **输出:** true
-- **输入:** “race a car” **输出:** false
+- **输入:** "A man, a plan, a canal: Panama" **输出:** true
+- **输入:** "race a car" **输出:** false
 
 ```js
 var str = 'A man, a plan, a canal: Panama';
@@ -109,8 +107,8 @@ function findMaxDuplicateChar(str) {
 
 给定一个字符串，找到它的第一个不重复的字符，并返回它的索引。如果不存在，则返回 -1。
 
-- s = “leetcode” 返回 0.
-- s = “loveleetcode” 返回 2.
+- s = "leetcode" 返回 0.
+- s = "loveleetcode" 返回 2.
 
 ```js
 var str = 'leetcode';
@@ -130,8 +128,8 @@ console.log(firstUniqChar(str));
 
 即判断字符串中是否只有字符的位置不同，也就是判断两个字符串中包含的字符以及这些字符出现的次数是否相同
 
-- **输入:** _s_ = “anagram”, _t_ = “nagaram” **输出:** true
-- **输入:** _s_ = “rat”, _t_ = “car” **输出:** false
+- **输入:** _s_ = "anagram", _t_ = "nagaram" **输出:** true
+- **输入:** _s_ = "rat", _t_ = "car" **输出:** false
 
 ```js
 var s = 'anagram',
@@ -147,9 +145,9 @@ console.log(isAnagram(s, t));
 
 ### 判断一个给定的字符串是否是同构的
 
-> 输入: s = “egg”, t = “add”
+> 输入: s = "egg", t = "add"
 > 输出: true
-> 输入: s = “foo”, t = “bar”
+> 输入: s = "foo", t = "bar"
 > 输出: false
 
 ```js
@@ -169,7 +167,7 @@ var isIsomorphic = function (s, t) {
 
 报数序列是一个整数序列，按照其中的整数的顺序进行报数，得到下一个数。其前五项如下：
 
-```js
+```shell
 1.     1
 2.     11
 3.     21
@@ -181,7 +179,7 @@ var isIsomorphic = function (s, t) {
 
 `11` 被读作 `"two 1s"` (`"两个一"`）, 即 `21`。
 
-`21` 被读作 `"one 2"`, “`one 1"` （`"一个二"` , `"一个一"`) , 即 `1211`。
+`21` 被读作 `"one 2"`, "`one 1"` （`"一个二"` , `"一个一"`) , 即 `1211`。
 
 ```js
 var countAndSay = function (n) {
@@ -215,8 +213,8 @@ var countAndSay = function (n) {
 
 编写一个函数来查找字符串数组中的最长公共前缀。如果不存在公共前缀，返回空字符串 `""`。
 
-- **输入:** [“flower”,”flow”,”flight”] **输出:** “fl”
-- **输入:** [“dog”,”racecar”,”car”] **输出:** “”
+- **输入:** ["flower","flow","flight"] **输出:** "fl"
+- **输入:** ["dog","racecar","car"] **输出:** ""
 
 ```js
 var arr = ['flower', 'flow', 'flight'];
@@ -250,7 +248,7 @@ function getRandomStr(len) {
 }
 ```
 
-### 如何把一个字符串的大小写取反（大写变小写小写变大写），例如 ’AbC’ 变成 ‘aBc’
+### 如何把一个字符串的大小写取反（大写变小写小写变大写），例如 ’AbC' 变成 'aBc'
 
 ```js
 // 方法一：常规
@@ -784,7 +782,7 @@ console.log(singleNumber(arr));
 
 **示例 1:**
 
-```js
+```shell
 输入: [1,2,3]
 输出: [1,2,4]
 解释: 输入数组表示数字 123。
@@ -792,32 +790,35 @@ console.log(singleNumber(arr));
 
 **示例 2:**
 
-```js
+```shell
 输入: [4,3,2,1]
 输出: [4,3,2,2]
 解释: 输入数组表示数字 4321。
-var arr = [9, 9, 9] // 预期：[1, 0, 0, 0]
+```
+
+```js
+var arr = [9, 9, 9]; // 预期：[1, 0, 0, 0]
 function plusOne(arr) {
-    var count = arr.length - 1
-    // 从末尾往前倒
-    while (count > -1) {
-        // 只要当前位+1大于9，就把当前位置为0，count--
-        if (arr[count] + 1 > 9) {
-            arr[count] = 0
-            count--
-        } else {
-            // 一旦当前位+1不大于9，就放心+1，且直接退出，不用再算更高位的了
-            arr[count]++
-            break;
-        }
+  var count = arr.length - 1;
+  // 从末尾往前倒
+  while (count > -1) {
+    // 只要当前位+1大于9，就把当前位置为0，count--
+    if (arr[count] + 1 > 9) {
+      arr[count] = 0;
+      count--;
+    } else {
+      // 一旦当前位+1不大于9，就放心+1，且直接退出，不用再算更高位的了
+      arr[count]++;
+      break;
     }
-    // 如果while后，第一位还是0，证明这个数组所有数字都为9.这个时候往数组最前面加个1就好
-    if (arr[0] === 0) {
-        arr.unshift(1)
-    }
-    return arr;
-};
-console.log(plusOne(arr))
+  }
+  // 如果while后，第一位还是0，证明这个数组所有数字都为9.这个时候往数组最前面加个1就好
+  if (arr[0] === 0) {
+    arr.unshift(1);
+  }
+  return arr;
+}
+console.log(plusOne(arr));
 ```
 
 ### 移动零
@@ -826,9 +827,12 @@ console.log(plusOne(arr))
 
 **示例:**
 
+```shell
+输入: [0,1,0,3,12]
+输出: [1,3,12,0,0]
+```
+
 ```js
-输入: [0, 1, 0, 3, 12];
-输出: [1, 3, 12, 0, 0];
 var arr = [0, 1, 0, 3, 12]; // 预期：[ 1, 3, 12, 0, 0 ]
 var moveZeroes = function (nums) {
   // 长度提取出来
@@ -880,24 +884,28 @@ console.log(result);
 
 **示例:**
 
-```js
+```shell
 给定 nums = [2, 7, 11, 15], target = 9
 
 因为 nums[0] + nums[1] = 2 + 7 = 9
 所以返回 [0, 1]
-var nums = [2, 7, 11, 15], target = 9
+```
+
+```js
+var nums = [2, 7, 11, 15],
+  target = 9;
 function twoSum(nums, target) {
   for (let i = 0; i < nums.length; i++) {
-    const num = nums[i]
+    const num = nums[i];
     // 第二个数索引
-    const targetIndex = nums.indexOf(target - num)
+    const targetIndex = nums.indexOf(target - num);
     // 确保存在第二个数，且不为当前遍历的数
     if (targetIndex > -1 && targetIndex !== i) {
-      return [i, targetIndex]
+      return [i, targetIndex];
     }
   }
 }
-console.log(twoSum(nums, target))
+console.log(twoSum(nums, target));
 ```
 
 ### 旋转图像
@@ -912,7 +920,7 @@ console.log(twoSum(nums, target))
 
 **示例 1:**
 
-```js
+```shell
 给定 matrix =
 [
   [1,2,3],
@@ -930,7 +938,7 @@ console.log(twoSum(nums, target))
 
 **示例 2:**
 
-```js
+```shell
 给定 matrix =
 [
   [ 5, 1, 9,11],
@@ -946,26 +954,29 @@ console.log(twoSum(nums, target))
   [12, 6, 8, 9],
   [16, 7,10,11]
 ]
+```
+
+```js
 var matrix = [
-    [5, 1, 9, 11],
-    [2, 4, 8, 10],
-    [13, 3, 6, 7],
-    [15, 14, 12, 16]
-]
+  [5, 1, 9, 11],
+  [2, 4, 8, 10],
+  [13, 3, 6, 7],
+  [15, 14, 12, 16]
+];
 
 function rotate(arr) {
-    for (var i = 0; i < arr.length; i++) {
-        for (var j = i + 1; j < arr.length; j++) {
-            var tempArr = arr[j][i]
-            arr[j][i] = arr[i][j]
-            arr[i][j] = tempArr
-        }
-        arr[i].reverse()
+  for (var i = 0; i < arr.length; i++) {
+    for (var j = i + 1; j < arr.length; j++) {
+      var tempArr = arr[j][i];
+      arr[j][i] = arr[i][j];
+      arr[i][j] = tempArr;
     }
-    return arr
+    arr[i].reverse();
+  }
+  return arr;
 }
 
-console.log(rotate(matrix))
+console.log(rotate(matrix));
 ```
 
 ### 如何将浮点数点左边的数每三位添加一个逗号，如 12000000.11 转化为『12,000,000.11』？
@@ -1140,7 +1151,7 @@ console.log(symmetry());
 
 以下数据结构中，id 代表部门编号，name 是部门名称，parentId 是父部门编号，为 0 代表一级部门，现在要求实现一个 convert 方法，把原始 list 转换成树形结构，parentId 为多少就挂载在该 id 的属性 children 数组下，结构如下：
 
-```js
+```javascript
 // 原始 list 如下
 let list = [
     {id:1,name:'部门A',parentId:0},
@@ -1312,6 +1323,30 @@ console.log(users);
 
 **题目来源：**[2019 前端面试 | “HTML + CSS + JS”专题](https://juejin.im/post/5ce4171ff265da1bd04eb4f3#heading-6) 「JavaScript 基础」部分编号 js_12
 
+### 取数组的最大值
+
+```js
+// ES5写法
+function max(arr) {
+  if (arr.length < 1) return undefined;
+  return Math.max.apply(null, arr);
+}
+// ES6写法
+function max(arr) {
+  if (arr.length < 1) return undefined;
+  return Math.max(...arr);
+}
+// or
+function max(arr) {
+  if (arr.length < 1) return undefined;
+  return arr.reduce((previous, current) => {
+    return previous > current ? previous : current;
+  });
+}
+
+console.log(max([1, 22, 3435, 321, 9990, 100001, 2133]));
+```
+
 ### 实现一个 reduce 函数
 
 解析：reduce 是归并方法，它并不对每一项执行目标函数，简单来说概括为如下步骤：
@@ -1348,6 +1383,80 @@ var sum = reduce(
   0
 );
 console.log(sum);
+```
+
+写法 2：
+
+```js
+function reduce(arr, reduceCallback, initialValue) {
+  // 首先，检查传递的参数是否正确。
+  if (!Array.isArray(arr) || !arr.length || typeof reduceCallback !== 'function')
+  {
+    return [];
+  } else {
+    // 如果没有将initialValue传递给该函数，我们将使用第一个数组项作为initialValue
+    let hasInitialValue = initialValue !== undefined;
+    let value = hasInitialValue ? initialValue : arr[0];
+   、
+
+    // 如果有传递 initialValue，则索引从 1 开始，否则从 0 开始
+    for (let i = hasInitialValue ? 0 : 1, len = arr.length; i < len; i++) {
+      value = reduceCallback(value, arr[i], i, arr);
+    }
+    return value;
+  }
+}
+```
+
+### 手动实现 Array.prototype.map 方法
+
+map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
+
+```js
+function map(arr, mapCallback) {
+  // 首先，检查传递的参数是否正确。
+  if (!Array.isArray(arr) || !arr.length || typeof mapCallback !== 'function') {
+    return [];
+  } else {
+    let result = [];
+    // 每次调用此函数时，我们都会创建一个 result 数组
+    // 因为我们不想改变原始数组。
+    for (let i = 0, len = arr.length; i < len; i++) {
+      result.push(mapCallback(arr[i], i, arr));
+      // 将 mapCallback 返回的结果 push 到 result 数组中
+    }
+    return result;
+  }
+}
+```
+
+### 手动实现 Array.prototype.filter 方法
+
+filter()方法创建一个新数组, 其包含通过所提供函数实现的测试的所有元素。
+
+```js
+function filter(arr, filterCallback) {
+  // 首先，检查传递的参数是否正确。
+  if (
+    !Array.isArray(arr) ||
+    !arr.length ||
+    typeof filterCallback !== 'function'
+  ) {
+    return [];
+  } else {
+    let result = [];
+    // 每次调用此函数时，我们都会创建一个 result 数组
+    // 因为我们不想改变原始数组。
+    for (let i = 0, len = arr.length; i < len; i++) {
+      // 检查 filterCallback 的返回值是否是真值
+      if (filterCallback(arr[i], i, arr)) {
+        // 如果条件为真，则将数组元素 push 到 result 中
+        result.push(arr[i]);
+      }
+    }
+    return result; // return the result array
+  }
+}
 ```
 
 ## 随机数 / 数字
@@ -1413,7 +1522,7 @@ function priceFormat(price) {
 }
 ```
 
-### 如何将字符串转化为数字，例如’12.3b’？
+### 如何将字符串转化为数字，例如'12.3b'？
 
 ```js
 parseFloat('12.3b');
@@ -1484,6 +1593,83 @@ function getRandColor() {
 var color = getRandColor();
 console.log(color);
 ```
+
+### 写一个函数，生成一个随机 IP 地址，一个合法的 IP 地址为 0.0.0.0 ~ 255.255.255.255。
+
+```js
+function getRandIP() {
+  return Array.from({ length: 4 }).reduce((ip, cur, idx) => {
+    const randomIdx = Math.floor(Math.random() * 256);
+    return idx === 3 ? ip + randomIdx : ip + randomIdx + '.';
+  }, '');
+}
+var ip = getRandIP();
+console.log(ip);
+
+// or
+function getRandIP() {
+  let ip = '';
+  for (let i = 0; i < 3; i++) {
+    ip = ip + Math.floor(Math.random() * 256) + '.';
+  }
+  return ip + Math.floor(Math.random() * 256);
+}
+var ip = getRandIP();
+console.log(ip);
+```
+
+题目来源：[2019 前端面试 | “HTML + CSS + JS”专题](https://juejin.im/post/5ce4171ff265da1bd04eb4f3#heading-6)「《JS 提供的对象：④ Math》[编号：js_19]」
+
+## 闭包
+
+### 如下代码输出多少？如果想输出 3，那如何改造代码？
+
+```js
+var fnArr = [];
+for (var i = 0; i < 10; i++) {
+  fnArr[i] = function () {
+    return i;
+  };
+}
+console.log(fnArr[3]());
+```
+
+答案：
+
+```js
+//方法一
+var fnArr = [];
+for (var i = 0; i < 10; i++) {
+  fnArr[i] = (function (j) {
+    return function () {
+      return j;
+    };
+  })(i);
+}
+console.log(fnArr[3]()); //-->3
+
+//方法二
+var fnArr = [];
+for (var i = 0; i < 10; i++) {
+  (function (i) {
+    fnArr[i] = function () {
+      return i;
+    };
+  })(i);
+}
+console.log(fnArr[3]()); //-->3
+
+//方法三
+var fnArr = [];
+for (let i = 0; i < 10; i++) {
+  fnArr[i] = function () {
+    return i;
+  };
+}
+console.log(fnArr[3]()); //-->3
+```
+
+**题目来源：** [2019 前端面试 | “HTML + CSS + JS”专题](https://juejin.im/post/5ce4171ff265da1bd04eb4f3#heading-5) 的 「JavaScript 基础」部分，编号[js_11]中第 5 题。
 
 ## 对象 & 原型 & 原型链
 
@@ -1629,18 +1815,54 @@ hasOwnProperty 返回一个布尔值，指出一个对象是否具有指定名�
 
 > 思路：只要右边变量的 prototype 在左边变量的原型链上即可。
 
+**思路**
+
+步骤 1：先取得当前类的原型，当前实例对象的原型链
+
+步骤 2：一直循环（执行原型链的查找机制）
+
+- 取得当前实例对象原型链的原型链（`proto = proto.____proto____`，沿着原型链一直向上查找）
+- 如果 当前实例的原型链`____proto__`上找到了当前类的原型`prototype`，则返回 `true`
+- 如果 一直找到`Object.prototype.____proto____ == null`，Object 的基类(null)上面都没找到，则返回 false
+
 ```js
-function myInstanceOf(leftValue, rightValue) {
-  let rightProto = rightValue.prototype; // 取右表达式的 prototype 值
-  leftValue = leftValue.__proto__; // 取左表达式的 __proto__ 值
+function _instanceof(instanceObject, classFunc) {
+  let classFunc = classFunc.prototype; // 取得当前类的原型
+  let proto = instanceObject.__proto__; // 取得当前实例对象的原型链
+
   while (true) {
-    if (leftValue === null) {
+    if (proto === null) {
+      // 找到了 Object的基类 Object.prototype.__proto__
       return false;
     }
-    if (leftValue === rightProto) {
+    if (proto === classFunc) {
+      // 在当前实例对象的原型链上，找到了当前类
       return true;
     }
-    leftValue = leftValue.__proto__;
+    proto = proto.__proto__; // 沿着原型链__ptoto__一层一层向上查找
+  }
+}
+```
+
+**优化版 (处理兼容问题)**
+
+> **Object.getPrototypeOf ( )：**用来获取某个实例对象的原型（内部**[[prototype]]**属性的值，包含**proto**属性）
+
+```js
+function _instanceof(instanceObject, classFunc) {
+  let classFunc = classFunc.prototype; // 取得当前类的原型
+  let proto = Object.getPrototypeOf(instanceObject); // 取得当前实例对象的原型链上的属性
+
+  while (true) {
+    if (proto === null) {
+      // 找到了 Object的基类 Object.prototype.__proto__
+      return false;
+    }
+    if (proto === classFunc) {
+      // 在当前实例对象的原型链上，找到了当前类
+      return true;
+    }
+    proto = Object.getPrototypeOf(proto); // 沿着原型链__ptoto__一层一层向上查找
   }
 }
 ```
@@ -1846,7 +2068,7 @@ Promise 的构造函数是同步执行的；then 中的方法是异步执行的�
 
 Promise 实现 then 处理：
 
-```js
+```javascript
 const PENDING = 'pending';
 const FULFILLED = 'fulfilled';
 const REJECTED = 'rejected';
@@ -1952,44 +2174,6 @@ Promise.prototype.then = function (onFulfilled, onRejected) {
 };
 ```
 
-首先，需要知道 Promise.all() 的功能：
-
-- 如果传入的参数是一个空的可迭代对象，那么此 promise 对象回调完成（resolve），只有此情况，是同步执行的，其它都是异步返回的。
-- 如果传入的参数不包含任何 promise，则返回一个异步完成。promises 中所有的 promise 都“完成”时或参数中不包含 promise 时回调完成。
-- 如果参数中有一个 promise 失败，那么 Promise.all 返回的 promise 对象失败。
-- 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组。
-
-```js
-Promise.all = function (promises) {
-  return new Promise((resolve, reject) => {
-    let index = 0;
-    let result = [];
-    if (promises.length === 0) {
-      resolve(result);
-    } else {
-      function processValue(i, data) {
-        result[i] = data;
-        if (++index === promises.length) {
-          esolve(result);
-        }
-      }
-      for (let i = 0; i < promises.length; i++) {
-        //promises[i] 可能是普通值
-        Promise.resolve(promises[i]).then(
-          data => {
-            processValue(i, data);
-          },
-          err => {
-            reject(err);
-            return;
-          }
-        );
-      }
-    }
-  });
-};
-```
-
 ### 实现一个基本的 Promise
 
 ```js
@@ -2035,11 +2219,51 @@ class Promise {
 }
 ```
 
+### 如何实现 Promise.all()
+
+首先，需要知道 Promise.all() 的功能：
+
+- 如果传入的参数是一个空的可迭代对象，那么此 promise 对象回调完成（resolve），只有此情况，是同步执行的，其它都是异步返回的。
+- 如果传入的参数不包含任何 promise，则返回一个异步完成。promises 中所有的 promise 都“完成”时或参数中不包含 promise 时回调完成。
+- 如果参数中有一个 promise 失败，那么 Promise.all 返回的 promise 对象失败。
+- 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组。
+
+```javascript
+Promise.all = function (promises) {
+  return new Promise((resolve, reject) => {
+    let index = 0;
+    let result = [];
+    if (promises.length === 0) {
+      resolve(result);
+    } else {
+      function processValue(i, data) {
+        result[i] = data;
+        if (++index === promises.length) {
+          esolve(result);
+        }
+      }
+      for (let i = 0; i < promises.length; i++) {
+        //promises[i] 可能是普通值
+        Promise.resolve(promises[i]).then(
+          data => {
+            processValue(i, data);
+          },
+          err => {
+            reject(err);
+            return;
+          }
+        );
+      }
+    }
+  });
+};
+```
+
 ### 如何实现 Promise.prototype.finally() ？
 
 不管成功还是失败，都会走到 finally 中,并且 finally 之后，还可以继续 then。并且会将值原封不动的传递给后面的 then。
 
-```js
+```javascript
 Promise.prototype.finally = function (callback) {
   return this.then(
     value => {
@@ -2062,7 +2286,7 @@ Promise.prototype.finally = function (callback) {
 
 ### setTimeout 的机制
 
-等到当前脚本的同步任务和 “任务队列” 中已有的事件，全部处理完以后，才会执行 setTimeout 指定的任务。
+等到当前脚本的同步任务和 "任务队列" 中已有的事件，全部处理完以后，才会执行 setTimeout 指定的任务。
 
 参考：[JavaScript 运行机制详解：再谈 Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
 
@@ -2135,9 +2359,9 @@ console.log('script end');
 
 ### 原生 JS 添加类
 
-- element.setAttribute(“class”, ‘Lance’)
-- element.className = “lance awesome”
-- 追加类：element.setAttribute(“class”, element.getAttribute(“class”) + “ “ + “lance”)
+- element.setAttribute("class", 'Lance')
+- element.className = "lance awesome"
+- 追加类：element.setAttribute("class", element.getAttribute("class") + " " + "lance")
 
 ### 编写一个可拖拽的 div
 
@@ -2263,7 +2487,7 @@ console.log(obj);
 
 结果：
 
-{% asset_img 55368589-3605a000-5525-11e9-8c20-c5aeea6b1880.png screenshots %}
+![screenshots](https://user-images.githubusercontent.com/26674103/55368589-3605a000-5525-11e9-8c20-c5aeea6b1880.png)
 
 解析参考：
 
@@ -2344,7 +2568,10 @@ a[c] = 'c';
 
 // 输出 c
 console.log(a[b]);
-copy; // example 2
+```
+
+```js
+// example 2
 var a = {},
   b = Symbol('123'),
   c = Symbol('123');
@@ -2357,7 +2584,10 @@ a[c] = 'c';
 
 // 输出 b
 console.log(a[b]);
-copy; // example 3
+```
+
+```js
+// example 3
 var a = {},
   b = { key: '123' },
   c = { key: '456' };
@@ -2469,13 +2699,13 @@ String('11') === new String('11');
 
 解析：
 
-- 1 + “1”
+- 1 + "1"
 
 加性操作符：如果只有一个操作数是字符串，则将另一个操作数转换为字符串，然后再将两个字符串拼接起来
 
 所以值为：“11”
 
-- 2 \* “2”
+- 2 \* "2"
 
 乘性操作符：如果有一个操作数不是数值，则在后台调用 Number()将其转换为数值
 
@@ -2483,13 +2713,13 @@ String('11') === new String('11');
 
 Javascript 中所有对象基本都是先调用`valueOf`方法，如果不是数值，再调用`toString`方法。
 
-所以两个数组对象的 toString 方法相加，值为：”1,22,1”
+所以两个数组对象的 toString 方法相加，值为："1,22,1"
 
-- “a” + + “b”
+- "a" + + "b"
 
 后边的“+”将作为一元操作符，如果操作数是字符串，将调用 Number 方法将该操作数转为数值，如果操作数无法转为数值，则为 NaN。
 
-所以值为：”aNaN”
+所以值为："aNaN"
 
 以上均参考：《Javascript 高级程序设计》
 
@@ -2528,6 +2758,103 @@ console.log(fn.length); // length 为多少？
 
 拓展阅读：[JS 中函数的 length 属性](https://www.cnblogs.com/go4it/p/9678028.html)
 
+### {} 和 [] 的 valueOf 和 toString 的结果是什么？
+
+```html
+{} 的 valueOf 结果为 {} ，toString 的结果为 "[object Object]" [] 的 valueOf
+结果为 [] ，toString 的结果为 ""
+```
+
+- toString 是把对象转换为字符串；
+- valueOf 是把对象转换 du 成一个基 zhi 本数据的值
+- valueOf 偏向 dao 于运算，toString 偏向于显示。
+
+1. 在进行对象转换时（例如:alert(a)）,将优先调用 toString 方法，如若没有重写 toString 将调用 valueOf 方法，如果两方法都没有重写，按 Object 的 toString 输出。
+2. 在进行强转字符串类型时将优先调用 toString 方法，强转为数字时优先调用 valueOf。
+3. 在有运算操作符的情况下，valueOf 的优先级高于 toString。
+
+### 预测下面的输出是什么
+
+```js
+function Person(firstName, lastName) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+}
+
+const member = new Person('Lydia', 'Hallie');
+Person.getFullName = function () {
+  return `${this.firstName} ${this.lastName}`;
+};
+
+console.log(member.getFullName());
+```
+
+- A: `TypeError`
+- B: `SyntaxError`
+- C: `Lydia Hallie`
+- D: `undefined` `undefined`
+
+解析：
+
+答案是 A
+
+1. getFullName 函数是赋值给 Person 的，没有赋值给 Person 的原型，所以 member 并没有 getFullName 这个函数，这样运行会报错
+2. 如果这里运行的是 Person.getFullName() 那么会得到两个 undefined
+3. 如果写了 Person.prototype.getFullName = .... 此时调用 member.getFullName 函数 会得到答案 C
+
+### 下面的输出是什么？
+
+```js
+class Chameleon {
+  static colorChange(newColor) {
+    this.newColor = newColor;
+    return this.newColor;
+  }
+
+  constructor({ newColor = 'green' } = {}) {
+    this.newColor = newColor;
+  }
+}
+
+const freddie = new Chameleon({ newColor: 'purple' });
+freddie.colorChange('orange');
+```
+
+- A: `orange`
+- B: `purple`
+- C: `green`
+- D: `TypeError`
+
+解析：
+
+colorChange 是静态方法不是实例方法，需要 Chameleon.colorChange 才能调用
+
+### 输出是什么？
+
+```js
+const shape = {
+  radius: 10,
+  diameter() {
+    return this.radius * 2;
+  },
+  perimeter: () => 2 * Math.PI * this.radius
+};
+
+shape.diameter();
+shape.perimeter();
+```
+
+- A: `20` and `62.83185307179586`
+- B: `20` and `NaN`
+- C: `20` and `63`
+- D: `NaN` and `63`
+
+解析：
+
+1. shape 定义所在环境，是 window 对象。
+2. diameter 方法中的 this 指向方法调用者，即 shape。
+3. perimeter 方法中的 this 指向方法调用者**所在的环境**，即 window 对象。
+
 ## 算法题
 
 我面的都不是什么大公司，所以很少被问到算法，不过对于前端来说，了解一些基本的算法还是很有必要的，起码最常见的排序算法得掌握，例如冒泡和快排。这部分内容可参考我的博客：
@@ -2555,8 +2882,7 @@ console.log(fn(100));
 
 ```js
 function isValidUsername(str) {
-  let reg = /^\w{6,20}$/;
-  return reg.test(str);
+  return /^\w{6,20}$/.test(str);
 }
 
 console.log(isValidUsername('swlance'));
@@ -2572,7 +2898,7 @@ function isPhoneNum(str) {
 console.log(isPhoneNum('13871455497'));
 ```
 
-### 写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. [xxx@gmail.com](mailto:xxx@gmail.com) 或者 [xxx@swlance.com.cn](mailto:xxx@swlance.com.cn)）
+### 写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. xxx@gmail.com 或者 xxx@swlance.com.cn）
 
 ```js
 function isEmail(str) {
@@ -2599,6 +2925,9 @@ console.log(trim('     xxxswlance.cn        '));
 ```js
 var s1 = 'get-element-by-id';
 // 转化为 getElementById
+```
+
+```js
 function fn(str) {
   return str.replace(/-\w/g, x => x.slice(1).toUpperCase());
 }
@@ -2626,9 +2955,9 @@ Eg. 商品设置了阶梯价，>=3KG，价格为 8 元/KG；应付款 24=8\*3 �
 
 2.1 用户有 500 积分，店铺积分可抵扣，抵扣规则为 100 积分可抵扣 0.5 元；店铺设置有满减活动，满 20 元减 3 元；商品设置阶梯价，》=3KG，价格为 8 元/KG，则用户应付款为\_\_\_\_元。（5.0 分）
 
-2.2 用户有 500 积分，店铺积分可抵扣，抵扣规则为 100 积分可抵 0.5 元；商品设置会员价 8 元/KG，使用会员价必须使用余额支付；店铺设置有满减活动，满 20 元减 3 元；用户若实用余额支付应付款为**\*\*元。若使用在线支付，则应付款为\*\***元；（8.0 元）
+2.2 用户有 500 积分，店铺积分可抵扣，抵扣规则为 100 积分可抵 0.5 元；商品设置会员价 8 元/KG，使用会员价必须使用余额支付；店铺设置有满减活动，满 20 元减 3 元；用户若实用余额支付应付款为\_**\_元。若使用在线支付，则应付款为\_\_**元；（8.0 元）
 
-2.3 用户有 500 积分，店铺积分不可抵扣，抵扣规则为 100 积分可抵 0.5 元；店铺有开启会员折扣，会员折扣为 8.5 折，使用会员折扣必须使用余额支付；店铺设置有满减活动，满 20 元减 3 元；用户若使用余额支付应付款为**\*\*元，若使用在线支付，则应付款为\*\***元;(8.0 分)
+2.3 用户有 500 积分，店铺积分不可抵扣，抵扣规则为 100 积分可抵 0.5 元；店铺有开启会员折扣，会员折扣为 8.5 折，使用会员折扣必须使用余额支付；店铺设置有满减活动，满 20 元减 3 元；用户若使用余额支付应付款为\_**\_元，若使用在线支付，则应付款为\_\_**元;(8.0 分)
 
 参考答案：
 
@@ -2645,11 +2974,11 @@ Eg. 商品设置了阶梯价，>=3KG，价格为 8 元/KG；应付款 24=8\*3 �
 
 ## 非常规题
 
-### [‘1’, ‘2’, ‘3’].map(parseInt)的结果
+### ['1', '2', '3'].map(parseInt)的结果
 
 正确答案：[1, NaN, NaN]
 
-答案解析：[[‘1’, ‘2’, ‘3’\].map(parseInt) what & why ?](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/4)
+答案解析：[['1', '2', '3'].map(parseInt) what & why ?](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/4)
 
 ## 其它
 
@@ -2702,3 +3031,60 @@ function print3(n) {
 ```
 
 题目来源：[Daily-Interview-Question 第 101 题](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/158)
+
+### 写一个通用的事件侦听器函数
+
+```js
+const EventUtils = {
+  // 视能力分别使用dom0||dom2||IE方式 来绑定事件
+  // 添加事件
+  addEvent: function (element, type, handler) {
+    if (element.addEventListener) {
+      element.addEventListener(type, handler, false);
+    } else if (element.attachEvent) {
+      element.attachEvent('on' + type, handler);
+    } else {
+      element['on' + type] = handler;
+    }
+  },
+
+  // 移除事件
+  removeEvent: function (element, type, handler) {
+    if (element.removeEventListener) {
+      element.removeEventListener(type, handler, false);
+    } else if (element.detachEvent) {
+      element.detachEvent('on' + type, handler);
+    } else {
+      element['on' + type] = null;
+    }
+  },
+
+  // 获取事件目标
+  getTarget: function (event) {
+    return event.target || event.srcElement;
+  },
+
+  // 获取 event 对象的引用，取到事件的所有信息，确保随时能使用 event
+  getEvent: function (event) {
+    return event || window.event;
+  },
+
+  // 阻止事件（主要是事件冒泡，因为 IE 不支持事件捕获）
+  stopPropagation: function (event) {
+    if (event.stopPropagation) {
+      event.stopPropagation();
+    } else {
+      event.cancelBubble = true;
+    }
+  },
+
+  // 取消事件的默认行为
+  preventDefault: function (event) {
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else {
+      event.returnValue = false;
+    }
+  }
+};
+```
