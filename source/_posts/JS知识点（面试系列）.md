@@ -11,7 +11,7 @@ date: 2019-06-09 23:15:17
 
 ## JS 类型
 
-string，number，boolean，undefined，null，symbol，object
+string，number，boolean，undefined，null，symbol（es6），BigInt（es10），object
 
 ### 值类型和引用类型的区别
 
@@ -240,6 +240,14 @@ console.log(Object.values(obj)); // ['bar', 42]
 // array like object
 var obj = { 0: 'a', 1: 'b', 2: 'c' };
 console.log(Object.values(obj)); // ['a', 'b', 'c']
+
+var obj = ['e', 's', '8']; // 等同于 { 0: 'e', 1: 's', 2: '8' };
+Object.values(obj); // ['e', 's', '8']
+
+//当把数字当做对象的键的时候，返回的数组以键的值升序排序
+var obj = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.values(obj); // ['yyy', 'zzz', 'xxx']
+Object.values('es8'); // ['e', 's', '8']
 ```
 
 ### Object.entries()
@@ -255,6 +263,10 @@ const obj = { a: 5, b: 7, c: 9 };
 for (const [key, value] of Object.entries(obj)) {
   console.log(`${key} ${value}`); // "a 5", "b 7", "c 9"
 }
+
+const obj2 = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.entries(obj2); // [['1', 'yyy'], ['3', 'zzz'], ['10', 'xxx']]
+Object.entries('es8'); // [['0', 'e'], ['1', 's'], ['2', '8']]
 ```
 
 ## 数组
@@ -262,34 +274,12 @@ for (const [key, value] of Object.entries(obj)) {
 ### 数组的遍历方法
 
 - 标准 for 循环
-
 - forEach((当前值, 当前索引,当前数组)=>{})
-
   - 无法中途退出循环，只能用 `return` 退出本次回调，进行下一次回调。
   - 它总是返回 undefined 值,即使你 return 了一个值。
-
 - for-in（不推荐）会把继承链的对象属性都会遍历一遍，而且数组遍历不一定按次序
-
   - for-in 循环返回的是所有能通过对象访问的、可枚举的属性。
-
-- for (variable of iterable)（ES6）可迭代
-
-  Array
-
-  ，
-
-  Map
-
-  ，
-
-  Set
-
-  ，
-
-  String
-
-  等（迭代的是值 value ）
-
+- for (variable of iterable)（ES6）可迭代 [Array](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Array) ，[Map](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Map)，[Set](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set)，[String](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/String) 等（迭代的是值 value ）
   - 在 `for-of` 中如果遍历中途要退出，可以使用 `break` 退出循环。
 
 #### ES5
@@ -833,6 +823,31 @@ console.log('swlance'.startsWith('l')); //-->false
 ```js
 console.log('swlance'.endsWith('e')); //-->true
 console.log('swlance'.endsWith('o')); //-->false
+```
+
+#### padStart/padEnd
+
+在 ES 8 中 String 新增了两个实例函数`String.prototype.padStart`和`String.prototype.padEnd`，允许将空字符串或其他字符串添加到原始字符串的开头或结尾。
+
+- `String.padStart(targetLength,[padString])`
+  *targetLength：*当前字符串需要填充到的目标长度。如果这个数值小于当前字符串的长度，则返回当前字符串本身。
+
+  _padString：_(可选)填充字符串。如果字符串太长，使填充后的字符串长度超过了目标长度，则只保留最左侧的部分，其他部分会被截断，此参数的缺省值为空格。
+
+- `String.padEnd(targetLength,padString])` 参数释义同上。
+
+```js
+'es8'.padStart(2); // 'es8'
+'es8'.padStart(5); // '  es8'
+'es8'.padStart(6, '1891'); // '189es8'
+'es8'.padStart(14, 'coffe'); // 'coffecoffeces8'
+'es8'.padStart(7, '0'); // '0000es8'
+
+'es8'.padEnd(2); // 'es8'
+'es8'.padEnd(5); // 'es8  '
+'es8'.padEnd(6, '1891'); // 'es8189'
+'es8'.padEnd(14, 'coffe'); // 'es8coffecoffec'
+'es8'.padEnd(7, '9'); // 'es89999'
 ```
 
 ## 什么是 JavaScript 作用链域？
@@ -1664,45 +1679,16 @@ var a = ()
 > MAP
 
 - 属性
-
   - `size` ：返回 Map 结构的成员总数。
-
 - 操作方法
 
   - `set(key, value)`: `set` 方法设置键名 `key` 对应的键值为 `value` ，然后返回整个 Map 结构。
-
   - `get(key)` ：`get` 方法读取 `key` 对应的键值，如果找不到 `key` ，返回 `undefined` 。
-
   - `has(key)`：`has` 方法返回一个布尔值，表示某个键是否在当前 Map 对象之中。
-
-  - ```
-    delete(key)
-    ```
-
-    ：
-
-    ```
-    delete
-    ```
-
-    方法删除某个键，返回
-
-    ```
-    true
-    ```
-
-    。如果删除失败，返回
-
-    ```
-    false
-    ```
-
-    。
-
-    - `clear()`：`clear`方法清除所有成员，没有返回值。
+  - `delete(key)`：`delete` 方法删除某个键，返回 `true` 。如果删除失败，返回 `false` 。
+  - `clear()`：`clear`方法清除所有成员，没有返回值。
 
 - 遍历方法
-
   - `keys()`：返回键名的遍历器。
   - `values()`：返回键值的遍历器。
   - `entries()`：返回所有成员的遍历器。
@@ -1927,6 +1913,10 @@ Promise new的时候会立即执行里面的代码 then是微任务 会在本次
 - async 用于声明一个异步的 function
 - await 用于等待一个异步方法执行完成
 
+Async/Await 是一种用于处理 JS 异步操作的语法糖，可以帮助我们摆脱回调地狱（callback hell），编写更加优雅的代码。
+
+通俗的理解，async 关键字的作用是告诉编译器对于标定的函数要区别对待。当编译器遇到标定的函数中的 await 关键字时，要暂时停止运行，等到 await 标定的函数处理完毕后，再进行相应操作。如果该函数 fulfiled 了，则返回值是 fulfillment value，否则得到的就是 reject value。
+
 #### Async
 
 async 函数会返回一个 Promise 对象，如果在函数中 `return` 一个直接量，async 会把这个直接量通过 `Promise.resolve()` 封装成 Promise 对象。
@@ -1994,6 +1984,89 @@ doIt();
 ```
 
 参考：[理解 JavaScript 的 async/await](https://segmentfault.com/a/1190000007535316)
+
+最后拿普通的 promise 写法来和 async/await 对比，便于理解：
+
+```js
+async function asyncFunc() {
+  const result = await otherAsyncFunc(); // otherAsyncFunc()返回一个Promise对象
+  console.log(result);
+}
+
+// 等同于:
+function asyncFunc() {
+  return otherAsyncFunc() // otherAsyncFunc()返回一个Promise对象
+    .then(result => {
+      console.log(result);
+    });
+}
+```
+
+按顺序处理多个异步函数的时候优势更为明显：
+
+```js
+async function asyncFunc() {
+  const result1 = await otherAsyncFunc1(); // otherAsyncFunc1()返回一个Promise对象
+  console.log(result1);
+  const result2 = await otherAsyncFunc2(); // otherAsyncFunc2()返回一个Promise对象
+  console.log(result2);
+}
+
+// 等同于:
+function asyncFunc() {
+  return otherAsyncFunc1() // otherAsyncFunc1()返回一个Promise对象
+    .then(result1 => {
+      console.log(result1);
+      return otherAsyncFunc2(); // otherAsyncFunc2()返回一个Promise对象
+    })
+    .then(result2 => {
+      console.log(result2);
+    });
+}
+```
+
+并行处理多个异步函数：
+
+```js
+async function asyncFunc() {
+    const [result1, result2] = await Promise.all([
+        otherAsyncFunc1(),// otherAsyncFunc1()返回一个Promise对象
+        otherAsyncFunc2() // otherAsyncFunc2()返回一个Promise对象
+    ]);
+    console.log(result1, result2);
+}
+
+// 等同于:
+function asyncFunc() {
+    return Promise.all([
+        otherAsyncFunc1(),// otherAsyncFunc1()返回一个Promise对象
+        otherAsyncFunc2() // otherAsyncFunc2()返回一个Promise对象
+    ])
+    .then([result1, result2] => {
+        console.log(result1, result2);
+    });
+}
+```
+
+处理错误：
+
+```js
+async function asyncFunc() {
+  try {
+    await otherAsyncFunc(); // otherAsyncFunc()返回一个Promise对象
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// 等同于:
+function asyncFunc() {
+  return otherAsyncFunc() // otherAsyncFunc()返回一个Promise对象
+    .catch(err => {
+      console.error(err);
+    });
+}
+```
 
 ### 解构赋值
 
@@ -2089,21 +2162,8 @@ console.log(arr); // [2, 4, 6]
 剩余参数和 `arguments` 对象之间的区别主要有三个：
 
 - 剩余参数只包含那些没有对应形参的实参，而 `arguments` 对象包含了传给函数的所有实参。
-
 - `arguments` 对象不是一个真正的数组，而剩余参数是真正的 `Array` 实例，也就是说你能够在它上面直接使用所有的数组方法，比如 `sort`，`map`，`forEach` 或 `pop` 。
-
-- ```
-  arguments
-  ```
-
-  对象还有一些附加的属性 （如
-
-  ```
-  callee
-  ```
-
-  属性）。
-
+- `arguments` 对象还有一些附加的属性 （如 `callee` 属性）。
   - arguments.callee 属性包含当前正在执行的函数。
 
 ### 模块化
