@@ -11,8 +11,6 @@ abbrlink: 32592
 date: 2020-09-20 21:46:45
 ---
 
-转载自：https://www.haorooms.com/post/vue_new_oldval
-
 ## 前言
 
 假如你用 vue 监听复杂对象的时候，新旧值通常是一样的，vue 官方也给出了解释：
@@ -82,3 +80,5 @@ watch: {
 ```
 
 此时监听打印的值就不一样了。
+
+转载自：https://www.haorooms.com/post/vue_new_oldval

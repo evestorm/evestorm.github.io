@@ -1,7 +1,6 @@
 ---
 title: Tree-Shaking性能优化实践(笔记)
 tags:
-  - 转载
   - Webpack
 categories:
   - 前端
