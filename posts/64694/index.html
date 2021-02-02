@@ -25,15 +25,16 @@
   </script>
 <meta name="description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。 webpack hashwebpack 内置了多种可使用 hash，官网解释分别如下：  hash：the hash of the">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Webpack4 如何优雅打包缓存文件（转载）">
+<meta property="og:title" content="转载-Webpack4 如何优雅打包缓存文件">
 <meta property="og:url" content="https://evestorm.github.io/posts/64694/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
 <meta property="og:description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。 webpack hashwebpack 内置了多种可使用 hash，官网解释分别如下：  hash：the hash of the">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-03-14T02:34:04.000Z">
-<meta property="article:modified_time" content="2020-11-22T02:40:10.767Z">
+<meta property="article:modified_time" content="2021-02-02T11:39:01.245Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="Webpack">
+<meta property="article:tag" content="转载">
 <meta name="twitter:card" content="summary">
 
 
@@ -49,7 +50,7 @@
     lang   : 'zh-CN'
   };
 </script>
-<title>Webpack4 如何优雅打包缓存文件（转载） | EVE | 暴风雨前夕</title>
+<title>转载-Webpack4 如何优雅打包缓存文件 | EVE | 暴风雨前夕</title>
   
 
 
@@ -296,7 +297,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Webpack4 如何优雅打包缓存文件（转载）
+          转载-Webpack4 如何优雅打包缓存文件
         </h1>
 
         <div class="post-meta-container">
@@ -314,7 +315,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2020-11-22 10:40:10" itemprop="dateModified" datetime="2020-11-22T10:40:10+08:00">2020-11-22</time>
+        <time title="修改时间：2021-02-02 19:39:01" itemprop="dateModified" datetime="2021-02-02T19:39:01+08:00">2021-02-02</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -375,8 +376,8 @@
 <p>那么问题来了，这么多种 hash 该如何选择呢？</p>
 <a id="more"></a>
 
-<h2 id="实战-hash"><a href="#实战-hash" class="headerlink" title="实战 hash"></a>实战 hash</h2><p>基础的配置文件如下（基于webpack 4，入口文件分别为 index 和 detail，其中每个文件中引入了一个图片）：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  mode: <span class="string">&#x27;none&#x27;</span>, <span class="comment">// 设置为 none，避免 development 或 production 默认设置的一些影响</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    index: <span class="string">&#x27;./src/index.js&#x27;</span>, </span><br><span class="line">    detail: <span class="string">&#x27;./src/detail.js&#x27;</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  output: &#123;</span><br><span class="line">    filename: <span class="string">&#x27;[name].[hash].js&#x27;</span>,</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">&#x27;dist&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="实战-hash"><a href="#实战-hash" class="headerlink" title="实战 hash"></a>实战 hash</h2><p>基础的配置文件如下（基于 webpack 4，入口文件分别为 index 和 detail，其中每个文件中引入了一个图片）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  mode: <span class="string">&#x27;none&#x27;</span>, <span class="comment">// 设置为 none，避免 development 或 production 默认设置的一些影响</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    index: <span class="string">&#x27;./src/index.js&#x27;</span>,</span><br><span class="line">    detail: <span class="string">&#x27;./src/detail.js&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  output: &#123;</span><br><span class="line">    filename: <span class="string">&#x27;[name].[hash].js&#x27;</span>,</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">&#x27;dist&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h3 id="hash（the-hash-of-the-module-identifier）"><a href="#hash（the-hash-of-the-module-identifier）" class="headerlink" title="hash（the hash of the module identifier）"></a>hash（the hash of the module identifier）</h3><p>首先，我们来解释下 the module identifier。webpack 默认为给各个模块分配一个 id 以作标识，用来处理模块之间的依赖关系。而默认的 id 命名规则是根据模块引入的顺序，赋予一个整数(1、2、3……)。如下图就是使用 hash 的打包，index 和 detail 作为 entry 的两个入口，可以看到其 hash 值是一样的，而另外两个图片的 hash 值是不同的。</p>
 
@@ -391,7 +392,7 @@
 <p>This is because webpack includes certain boilerplate, specifically the <a target="_blank" rel="noopener" href="https://webpack.js.org/concepts/manifest/">runtime and manifest</a>, in the entry chunk.</p>
 </blockquote>
 <p>为了解决这个不稳定的因素，webpack 4 提供了一个配置可以直接把 boilerplate 给单独抽离出来，配置如下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">optimization: &#123;</span><br><span class="line">    runtimeChunk: <span class="string">&#x27;single&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">optimization: &#123;</span><br><span class="line">  runtimeChunk: <span class="string">&#x27;single&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这样我们就能得到一个 runtime 的 js 文件，如下图：</p>
 
@@ -408,7 +409,7 @@
 <p>我们会发现 index 和 detail 文件的 chunkhash 都变了，这就奇怪了，按理来说 detail 文件我们根本没有改变啊，为什么它的 chunkhash 值变了呢？</p>
 <p>其实根本原因还是 module identifier，因为 index 新引入的模块改变了以后所有模块的 id 值，所以 detail 文件中引入的模块 id 值发生了改变，于是 detail 的 chunkhash 也随着发生改变。</p>
 <p>解决方案是将默认的数字 id 命名规则换成路径的方式。webpack 4 中当 mode 为 development 会默认启动</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">optimization: &#123;</span><br><span class="line">    namedModules: <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">optimization: &#123;</span><br><span class="line">  namedModules: <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>当然如果是生产环境的话，全路径是有点太长，所以我们可以换成使用<a target="_blank" rel="noopener" href="https://webpack.js.org/plugins/hashed-module-ids-plugin/">HashedModuleIdsPlugin</a> 插件来根据路径生成的 hash 作为 module identifier。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.HashedModuleIdsPlugin(),</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
@@ -443,6 +444,7 @@
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Webpack/" rel="tag"><i class="fa fa-tag"></i> Webpack</a>
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
           </div>
 
         
