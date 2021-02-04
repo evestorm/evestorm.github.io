@@ -10,6 +10,10 @@ abbrlink: 14487
 date: 2020-05-04 09:03:13
 ---
 
+## 账号种类说明
+
+{% asset_img account-info.png account-info %}
+
 ## 开发账号注册
 
 打开 https://developer.apple.com/cn/
