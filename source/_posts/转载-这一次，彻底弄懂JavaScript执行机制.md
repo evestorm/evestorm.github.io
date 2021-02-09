@@ -334,6 +334,9 @@ setTimeout(function () {
 
 在 node 环境下，process.nextTick 的优先级高于 Promise；在宏任务结束后会先执行微任务队列中的 nextTickQueue 部分，然后才会执行微任务中的 Promise 部分。
 
+> 从技术上来讲 process.nextTick() 并不是 event loop 的一部分。实际上，不管 event loop 当前处于哪个阶段，nextTick 队列都是在**当前阶段**后就被执行了。
+> ——> https://juejin.cn/post/6844903582538399752#comment
+
 ### 6.写在最后
 
 #### (1)js 的异步
