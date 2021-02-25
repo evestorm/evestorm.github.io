@@ -13,8 +13,6 @@ date: 2021-02-08 10:19:19
 
 转载自：https://mp.weixin.qq.com/s/57rsKjxtXcmpOLz61u4l2g
 
-## asd asd 阿萨德
-
 我相信你一定或多或少的接触或使用过 `JS` 中的扩展操作符（Spread Operator），在基本形式中，扩展操作符看起来像三个点，比如如下这样：
 
 ```js
