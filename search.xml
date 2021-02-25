@@ -1500,90 +1500,6 @@
       </categories>
   </entry>
   <entry>
-    <title>JS垃圾回收机制</title>
-    <url>/posts/20229/</url>
-    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
-<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
-<a id="more"></a>
-
-<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
-
-<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
-<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
-
-<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
-<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
-<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
-
-<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
-
-<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
-<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
-
-<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
-<blockquote>
-<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
-</blockquote>
-<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
-<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
-
-<p>接着我们执行下面操作：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
-
-<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
-<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
-
-<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
-
-<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
-<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
-
-<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
-<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
-<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
-
-<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
-<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
-<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
-<ul>
-<li>新一代（e.g. 一个函数中的临时变量）</li>
-<li>老一代（e.g. window 对象）</li>
-</ul>
-<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
-<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
-<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
-<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
-<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
-<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
-
-<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
-<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
-<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
-<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
-<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-  </entry>
-  <entry>
     <title>JS数组有哪些常用方法</title>
     <url>/posts/21501/</url>
     <content><![CDATA[<h2 id="改变原数组的方法"><a href="#改变原数组的方法" class="headerlink" title="改变原数组的方法"></a>改变原数组的方法</h2><h3 id="splice-添加-删除数组元素"><a href="#splice-添加-删除数组元素" class="headerlink" title="splice() 添加/删除数组元素"></a>splice() 添加/删除数组元素</h3><blockquote>
@@ -1715,6 +1631,90 @@
 </ol>
 </blockquote>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a=[<span class="string">&#x27;OB&#x27;</span>,<span class="string">&#x27;Koro1&#x27;</span>,<span class="number">1</span>,<span class="literal">NaN</span>];</span><br><span class="line"><span class="comment">// let b=a.includes(NaN); // true 识别NaN</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,100); // false 超过数组长度 不搜索</span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-3);  // true 从倒数第三个元素开始搜索 </span></span><br><span class="line"><span class="comment">// let b=a.includes(&#x27;Koro1&#x27;,-100);  // true 负值绝对值超过数组长度，搜索整个数组</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>JS垃圾回收机制</title>
+    <url>/posts/20229/</url>
+    <content><![CDATA[<p>一直以来我对 JS 垃圾回收机制的了解仅仅停留在两个词儿上：标记清除和引用计数。除此之外我就啥不知道了。最近空下来阅读了不少相关文章，算是对 JS 的垃圾回收机制有了点粗浅的认识。这篇博客算是一个笔记，也是一个总结。而我阅读的文章也会在最后的“资源”一节列出，想更加深入了解 JS 垃圾回收机制的小伙伴可以点击查看。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>要想理解 JS 的垃圾回收机制，首先得确定什么才是所谓的要被回收的<strong>垃圾</strong>。一般情况下，没有被引用的对象就是垃圾，是需要被清除的。下面是我总结的几大类型。</p>
+<a id="more"></a>
+
+<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>所有全局的变量都<strong>不是垃圾</strong>，因为浏览器会认为你在任何情况下都有可能使用到全局变量。例如下面这种情况：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处省略若干代码</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
+
+<p>在顶部定义了一个全局变量 str，你是完全有可能在 n 行代码以后打印这个变量的。</p>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>通常情况下，局部作用域变量在函数执行完毕后就是垃圾，再也用不到了：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;hello world&#x27;</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
+
+<p>当开始执行 fn 时，才产生 str ，它的作用域就在 fn 中，fn 执行结束后，str 就是垃圾，会被销毁。你可能会说，我完全有可能调用两次 fn 啊，但这里要注意的一点是，当你再次执行 fn 时，产生的是一个全新的 str ，和刚才的 str 完全没关系。</p>
+<h3 id="单引用"><a href="#单引用" class="headerlink" title="单引用"></a>单引用</h3><p>一个单引用对象，没有引用就是垃圾：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我在全局作用域下定义了变量 user ，指向一个对象，然而却在最后把变量 user 设置为 null。此时就没有谁在引用 {name: “John”} 这个对象了，所以它是垃圾，会被销毁。</p>
+<img src="/posts/20229/1557125754803-d30ae923-a32b-46b3-87e3-af75220e598a.png" class="" title="user">
+
+<img src="/posts/20229/1557125763671-1b38c9b5-f918-4147-82dc-3f993147edd5.png" class="" title="user&#x3D;&gt;null">
+
+<h3 id="多引用"><a href="#多引用" class="headerlink" title="多引用"></a>多引用</h3><p>如果一个对象有两个及以上的引用，它不一定会被回收：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> admin = user;</span><br><span class="line"></span><br><span class="line">user = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>即使我们删掉了其中一个引用，但 admin 仍然还引用着 object ，所以此 object 还不会被回收。</p>
+<img src="/posts/20229/1557125810603-13d0fcdd-56cc-41be-984f-7f2c0df69359.png" class="" title="user&amp;admin">
+
+<h3 id="环引用"><a href="#环引用" class="headerlink" title="环引用"></a>环引用</h3><p>还记得文章开头说的下面这段话吗？</p>
+<blockquote>
+<p>一般情况下，没有被引用的对象就是垃圾，是需要被清除的。</p>
+</blockquote>
+<p>环引用就是个例外，当几个对象相互引用，但没有被其它任何人引用时，它们仍然是垃圾，需要被回收，我们考虑下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">marry</span>(<span class="params">man, woman</span>) </span>&#123;</span><br><span class="line">  woman.husband = man;</span><br><span class="line">  man.wife = woman;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    father: man,</span><br><span class="line">    mother: woman</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> family = marry(</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;John&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: <span class="string">&#x27;Ann&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上述代码我们创建了一个家庭（family）对象，其中包含一个男人（man）对象和一个女人（woman）对象，并让女人的丈夫（husband）设为男人，男人的妻子（wife）设为女人。它们之间的关系可以用下图表示：</p>
+<img src="/posts/20229/1557125998918-51ef0e3c-76ce-45c8-9ef7-7054a89e3525.png" class="" title="family">
+
+<p>接着我们执行下面操作：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">delete</span> family.father;</span><br><span class="line"><span class="keyword">delete</span> family.mother.husband;</span><br></pre></td></tr></table></figure>
+
+<p>此刻删掉家庭对丈夫的引用，以及妻子对丈夫的引用，此时不再有任何人引用丈夫，所以此时丈夫是垃圾，需要被回收：</p>
+<img src="/posts/20229/1557126018898-be628eeb-4894-48b0-9070-56c118ded162.png" class="" title="father_death">
+
+<img src="/posts/20229/1557126115803-b0e225e0-880f-4e12-bf0c-a6caaaa0df4c.png" class="" title="father_death2">
+
+<p>让我们回到丈夫还没有被家庭和妻子去除引用的时刻。然后执行下面代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">family = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候，我们直接删掉了全局（外界）对家庭这个对象的引用，则家庭和丈夫以及妻子就都“死掉”了，需要被回收。你可能会说，它们之间不是存在相互引用关系吗？但此刻它们已经不被外界所引用，所以它们会被回收。</p>
+<img src="/posts/20229/1557126222885-361626fc-b4e4-43f5-84db-76461d05c381.png" class="" title="garbage">
+
+<h2 id="如何实现垃圾回收"><a href="#如何实现垃圾回收" class="headerlink" title="如何实现垃圾回收"></a>如何实现垃圾回收</h2><p>分析完什么是所谓的垃圾之后，我们就可以开始讨论如何实现垃圾回收了。也就是文章开头提到的「标记清除」和「引用计数」。</p>
+<h3 id="标记清除"><a href="#标记清除" class="headerlink" title="标记清除"></a>标记清除</h3><p>简单来理解，标记清除机制会从全局作用域开始，把所有它遇到的变量都标记一遍，如果这些被标记的变量还引用了其他变量，就再标记，一直标记到再也没有新的对象为止，这个标记过程就结束了。标记过程结束后就开始进行清除过程，把所有刚才没有被标记过的对象都删掉。这就是标记清除算法：</p>
+<img src="/posts/20229/garbage-collection-5.png" class="" title="标记清除">
+
+<p>听起来这种实现很美好不是吗？但是此方法有个缺点很伤，那就是在变量对象多了以后，造成遍历很慢的后果。而且我们会不定时对这些变量都要再标记一遍，然而我们知道 JS 是单线程的，标记期间 JS 代码的执行会被中断，而标记的时间又很久，就造成不好的影响，这就是它的缺点。</p>
+<p>所以针对这个缺点，我们会对标记清除做一些改进：</p>
+<h4 id="分代收集（Generational-collection）"><a href="#分代收集（Generational-collection）" class="headerlink" title="分代收集（Generational collection）"></a>分代收集（Generational collection）</h4><p>类比我们手机网络的 2G，3G 和 4G，这里的 G 就是 Generational 的意思，而我们的对象可以大致分为两种：</p>
+<ul>
+<li>新一代（e.g. 一个函数中的临时变量）</li>
+<li>老一代（e.g. window 对象）</li>
+</ul>
+<p>不同代的回收策略是不一样的，一般老一代的对象停留时间会很久，而这种停留时间越久的对象，后面用到它的时间也可能越久（这只是一种推测，不一定对，仅仅是一种策略）。所以可能在第一轮标记后，会隔一段时间才会去再看它，比如 3s 后。</p>
+<p>而新一代的对象，比如一个函数中的临时变量，函数执行完就可回收，不用从头开始遍历，这样的临时对象就会被马上标记然后立即马上删除，这样的对象就有可能隔 1 毫秒就看它一次，没被标记就删除了它。</p>
+<h4 id="增量收集（Incremental-collection）"><a href="#增量收集（Incremental-collection）" class="headerlink" title="增量收集（Incremental collection）"></a>增量收集（Incremental collection）</h4><p>举个例子，假如此刻有 10000 个需要遍历的对象，我不一次性遍历完，而是先遍历 1000 个，然后执行 JS，再遍历 1000 个，再执行 JS… 这样遍历 10 次就能遍历完，而且 JS 也不会有明显卡顿。</p>
+<h4 id="空闲收集（Idle-time-collection）"><a href="#空闲收集（Idle-time-collection）" class="headerlink" title="空闲收集（Idle-time collection）"></a>空闲收集（Idle-time collection）</h4><p>这个优化即字面意思，由于 JS 不是一直在执行的，所以我等到 JS 执行完后空闲下来再开始遍历。</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>每次对象被引用的时候就+1，再被引用时就再+1，有人不引用它时就-1，再不引用就又-1，当这个对象被减到 0 时就该被垃圾回收了。</p>
+<p>此算法的缺点也有不少，但被大家所熟知的一个缺点就是循环引用无法被回收。在早期的 IE 版本里（ie4-ie6），对宿主对象（也就是 Document 对象）采用是引用计数的垃圾回收机制，一旦你在 JS 中没有正确使用闭包，就会导致内存泄漏，这也就是此算法的一个缺陷。循环引用会导致没法回收，这个循环引用只限定于有宿主对象参与的循环引用，而 js 对象之间即使形成循环引用，也不会产生内存泄漏，因为对 js 对象的回收算法不是计数的方式。示例如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>); <span class="comment">//oDiv用完之后一直驻留在内存中</span></span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(oDiv.innerHTML); <span class="comment">//这里用oDiv导致内存泄露</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以上代码创建了一个作为 div 元素事件处理程序的闭包，而这个闭包则又创建了一个循环引用。</span></span><br><span class="line"><span class="comment">// 由于匿名函数保存了一个对closure()的活动对象的引用，因此就会导致无法减少div 的引用数。</span></span><br><span class="line"><span class="comment">// 只要匿名函数存在，element 的引用数至少也是1，因此它所占用的内存就永远不会被回收</span></span><br><span class="line"></span><br><span class="line">closure();</span><br><span class="line"><span class="comment">//最后应将oDiv解除引用来避免内存泄露</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oDiv = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;oDiv&#x27;</span>);</span><br><span class="line">  <span class="keyword">var</span> test = oDiv.innerHTML;</span><br><span class="line">  oDiv.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(test);</span><br><span class="line">  &#125;;</span><br><span class="line">  oDiv = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 解决办法: 把 oDiv.innerHTML 的一个副本保存在一个变量中，</span></span><br><span class="line"><span class="comment">// 从而消除闭包中该变量的循环引用,同时将 oDiv 变量设为null。</span></span><br></pre></td></tr></table></figure>
+
+<p>好了，有关 JS 的垃圾回收机制就写到这里，想要了解更多可以点击下面的资源链接~ 完。</p>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a href="https://javascript.info/garbage-collection">Garbage collection</a></li>
+<li><a href="https://www.jianshu.com/p/a8a04fd00c3c">几种垃圾回收算法</a></li>
+<li><a href="http://newhtml.net/v8-garbage-collection/">V8 之旅： 垃圾回收器</a></li>
+</ul>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -2929,55 +2929,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Vue组件通讯$attrs/$listeners</title>
-    <url>/posts/47247/</url>
-    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
-<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
-<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
-<a id="more"></a>
-
-<p>图解</p>
-<img src="/posts/47247/attrs1.png" class="" title="图解">
-
-<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
-<p>{ age: “20”, gender: “man” }</p>
-<img src="/posts/47247/attrs2.png" class="" title="attrs2">
-
-<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
-<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
-<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
-<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
-</blockquote>
-<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
-<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
-<img src="/posts/47247/listeners1.png" class="" title="listeners1">
-
-<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
-<p>{ customEvent: fn }</p>
-<img src="/posts/47247/listeners2.png" class="" title="listeners2">
-
-<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
-<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
-<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
-<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
-<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
-<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vue组件开发——无限菜单</title>
     <url>/posts/23904/</url>
     <content><![CDATA[<h2 id="vue-cli-service-global-插件介绍"><a href="#vue-cli-service-global-插件介绍" class="headerlink" title="@vue/cli-service-global 插件介绍"></a>@vue/cli-service-global 插件介绍</h2><p>该 npm 包可以让你在零配置情况下，直接使用 <code>vue serve</code> 和 <code>vue build</code> 命令跑 <code>*.vue</code> 文件，并且可以把它编译打包成一个 Vue 插件。</p>
@@ -3087,6 +3038,55 @@
         <category>Vue</category>
       </categories>
       <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vue组件通讯$attrs/$listeners</title>
+    <url>/posts/47247/</url>
+    <content><![CDATA[<h2 id="attrs"><a href="#attrs" class="headerlink" title="$attrs"></a>$attrs</h2><blockquote>
+<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (<code>class</code> 和 <code>style</code> 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (<code>class</code> 和 <code>style</code> 除外)，并且可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件——在创建高级别的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-attrs">Vue.js 官网 - vm.$attrs</a></p>
+<p>一句话总结：接收除了 <code>props</code> 声明外的所有绑定属性（class、style 除外）</p>
+<a id="more"></a>
+
+<p>图解</p>
+<img src="/posts/47247/attrs1.png" class="" title="图解">
+
+<p>由于 <code>child.vue</code> 在 props 中声明了 name 属性，<code>$attrs</code> 中只有 age、gender 两个属性，输出结果为：</p>
+<p>{ age: “20”, gender: “man” }</p>
+<img src="/posts/47247/attrs2.png" class="" title="attrs2">
+
+<p>另外可以在 <code>grandson.vue</code> 上通过 <code>v-bind=&quot;$attrs&quot;</code>， 可以将属性继续向下传递，让 <code>grandson.vue</code> 也能访问到父组件的属性，这在传递多个属性时会显得很便捷，而不用一条条的进行绑定。</p>
+<p>如果想要添加其他属性，可继续绑定属性。但要注意的是，继续绑定的属性和 <code>$attrs</code> 中的属性有重复时，继续绑定的属性优先级会更高。</p>
+<h2 id="listeners"><a href="#listeners" class="headerlink" title="$listeners"></a>$listeners</h2><blockquote>
+<p>包含了父作用域中的 (不含 <code>.native</code> 修饰器的) <code>v-on</code> 事件监听器。它可以通过 <code>v-on=&quot;$listeners&quot;</code> 传入内部组件——在创建更高层次的组件时非常有用。</p>
+</blockquote>
+<p>——&gt; <a href="https://cn.vuejs.org/v2/api/#vm-listeners">Vue.js 官网 - vm.$listeners</a></p>
+<p>一句话总结：接收除了带有 <code>.native</code> 事件修饰符的所有事件监听器</p>
+<img src="/posts/47247/listeners1.png" class="" title="listeners1">
+
+<p><code>App.vue</code> 中对 <code>child.vue</code> 绑定了两个事件，带有 <code>.native</code> 的 <code>click</code> 事件和一个自定义事件，所以在 <code>child.vue</code> 中，输出 <code>$listeners</code> 的结果为：</p>
+<p>{ customEvent: fn }</p>
+<img src="/posts/47247/listeners2.png" class="" title="listeners2">
+
+<p>同 <code>attrs</code> 属性一样，可以通过 <code>v-on=&quot;$listeners&quot;</code>，将事件监听器继续向下传递，让 <code>grandson.vue</code> 访问到事件，且可以使用 <code>$emit</code> 触发 <code>App.vue</code> 的函数。</p>
+<p>如果想要添加其他事件监听器，可继续绑定事件。但要注意的是，继续绑定的事件和 <code>$listeners</code> 中的事件有重复时，不会被覆盖。当 <code>grandson.vue</code> 触发 <code>customEvent</code> 时，<code>child.vue</code> 和 <code>parent.vue</code> 的事件都会被触发，触发顺序类似于冒泡，先到 <code>child.vue</code> 再到 <code>parent.vue</code>。</p>
+<h2 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h2><p><a href="https://codesandbox.io/s/eloquent-wood-b2zed">https://codesandbox.io/s/eloquent-wood-b2zed</a></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>当我们去二次封装别人组件时，可能别人组件上有很多属性，我们不想再次重写一遍</p>
+<p>这时候就可以使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 。这是 vue 2.4 版本提供</p>
+<p><code>vm.$attrs</code> 是一个属性，其包含了父作用域中不作为 <code>prop</code> 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 <code>v-bind=&quot;$attrs&quot;</code> 传入内部组件。未识别的事件可通过 v-on=”$listeners”传入。</p>
+<p>举个例子，比如我创建了我的按钮组件 <code>myButton</code>，封装了 <code>element-ui</code> 的 <code>el-button</code> 组件（其实什么事情都没做），在使用组件 <code>&lt;my-button /&gt;</code> 时，就可以直接在组件上使用 <code>el-button</code> 的属性,不被 <code>prop</code> 识别的属性会传入到 <code>el-button</code> 元素上去：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">v-bind</span>=<span class="string">&quot;$attrs&quot;</span>&gt;</span>确定<span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 父组件使用</span><br><span class="line"><span class="tag">&lt;<span class="name">my-button</span> <span class="attr">type</span>=<span class="string">&#x27;primary&#x27;</span> <span class="attr">size</span>=<span class="string">&#x27;mini&#x27;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
         <tag>Vue</tag>
       </tags>
   </entry>
@@ -3273,6 +3273,31 @@
       </tags>
   </entry>
   <entry>
+    <title>Xcode格式化代码</title>
+    <url>/posts/7987/</url>
+    <content><![CDATA[<p>最近因为业务需要重操旧业，玩起了 iOS。发现 Xcode 没有 VS Code 这种 IDE 自带的格式化代码工具。问了问万能 Will ，推荐了个插件叫 <a href="https://github.com/nicklockwood/SwiftFormat">SwiftFormat</a> 。感觉还不错。这里记录下如何用 CocoPods 安装。</p>
+<a id="more"></a>
+
+<h3 id="Pods-引入"><a href="#Pods-引入" class="headerlink" title="Pods 引入"></a>Pods 引入</h3><p>在 <code>Podfile</code> 中添加插件：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Pods <span class="keyword">for</span> YYT</span></span><br><span class="line">  ...</span><br><span class="line">  pod &#x27;SwiftFormat/CLI&#x27;</span><br><span class="line"></span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<h3 id="Pods-更新"><a href="#Pods-更新" class="headerlink" title="Pods 更新"></a>Pods 更新</h3><p>项目的根目录执行 Pods 更新：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">pod update --no-repo-update</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置脚本"><a href="#配置脚本" class="headerlink" title="配置脚本"></a>配置脚本</h3><p>然后添加运行脚本：</p>
+<img src="/posts/7987/image-20201119114158207.png" class="" title="image-20201119114158207">
+
+<p>添加好之后 <code>CMD + B</code> or <code>CMD + R</code> 编译运行时就能自动格式化代码了，赞！</p>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>Xcode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Xcode升级12编译报错The linked library is missing one or more architectures required by this target</title>
     <url>/posts/45158/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>升级 Xcode12 后编译报错，报错提示类似：</p>
@@ -3289,31 +3314,6 @@
 <img src="/posts/45158/comp.png" class="" title="target-build-settings">
 
 <p>保存后重新编译即可。</p>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>Xcode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Xcode格式化代码</title>
-    <url>/posts/7987/</url>
-    <content><![CDATA[<p>最近因为业务需要重操旧业，玩起了 iOS。发现 Xcode 没有 VS Code 这种 IDE 自带的格式化代码工具。问了问万能 Will ，推荐了个插件叫 <a href="https://github.com/nicklockwood/SwiftFormat">SwiftFormat</a> 。感觉还不错。这里记录下如何用 CocoPods 安装。</p>
-<a id="more"></a>
-
-<h3 id="Pods-引入"><a href="#Pods-引入" class="headerlink" title="Pods 引入"></a>Pods 引入</h3><p>在 <code>Podfile</code> 中添加插件：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Pods <span class="keyword">for</span> YYT</span></span><br><span class="line">  ...</span><br><span class="line">  pod &#x27;SwiftFormat/CLI&#x27;</span><br><span class="line"></span><br><span class="line">end</span><br></pre></td></tr></table></figure>
-
-<h3 id="Pods-更新"><a href="#Pods-更新" class="headerlink" title="Pods 更新"></a>Pods 更新</h3><p>项目的根目录执行 Pods 更新：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">pod update --no-repo-update</span><br></pre></td></tr></table></figure>
-
-<h3 id="配置脚本"><a href="#配置脚本" class="headerlink" title="配置脚本"></a>配置脚本</h3><p>然后添加运行脚本：</p>
-<img src="/posts/7987/image-20201119114158207.png" class="" title="image-20201119114158207">
-
-<p>添加好之后 <code>CMD + B</code> or <code>CMD + R</code> 编译运行时就能自动格式化代码了，赞！</p>
 ]]></content>
       <categories>
         <category>移动端</category>
@@ -3399,6 +3399,39 @@
       </tags>
   </entry>
   <entry>
+    <title>chrome修改滚动条样式</title>
+    <url>/posts/63768/</url>
+    <content><![CDATA[<h2 id="修改滚动条样式"><a href="#修改滚动条样式" class="headerlink" title="修改滚动条样式"></a>修改滚动条样式</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*css主要部分的样式*/</span></span><br><span class="line"><span class="comment">/*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/</span></span><br><span class="line"></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">20px</span>; <span class="comment">/*对垂直流动条有效*/</span></span><br><span class="line">  <span class="attribute">height</span>: <span class="number">40px</span>; <span class="comment">/*对水平流动条有效*/</span></span><br><span class="line">  <span class="attribute">display</span>: none; <span class="comment">/* 隐藏滚动条 */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义滚动条的轨道颜色、内阴影及圆角*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-track</span> &#123;</span><br><span class="line">  <span class="attribute">-webkit-box-shadow</span>: inset <span class="number">0</span> <span class="number">0</span> <span class="number">6px</span> <span class="built_in">rgba</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0.3</span>);</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgb</span>(<span class="number">246</span>, <span class="number">214</span>, <span class="number">214</span>);</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">3px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义滑块颜色、内阴影及圆角*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-thumb</span> &#123;</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">7px</span>;</span><br><span class="line">  <span class="attribute">-webkit-box-shadow</span>: inset <span class="number">0</span> <span class="number">0</span> <span class="number">6px</span> <span class="built_in">rgba</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0.3</span>);</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#f50e0e</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义两端按钮的样式 */</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-button</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgb</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义右下角汇合处的样式*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-corner</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="built_in">rgb</span>(<span class="number">252</span>, <span class="number">227</span>, <span class="number">7</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="隐藏滚动条"><a href="#隐藏滚动条" class="headerlink" title="隐藏滚动条"></a>隐藏滚动条</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-pseudo">::-webkit-scrollbar</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: none;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>CSS</tag>
+        <tag>chrome</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>cnchar.js获取汉字的拼音</title>
+    <url>/posts/38408/</url>
+    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
+<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
+<p>几种常用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>解决方案</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>animation动画（二）</title>
     <url>/posts/20298/</url>
     <content><![CDATA[<h2 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h2><ul>
@@ -3447,39 +3480,6 @@
       </categories>
       <tags>
         <tag>CSS3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>chrome修改滚动条样式</title>
-    <url>/posts/63768/</url>
-    <content><![CDATA[<h2 id="修改滚动条样式"><a href="#修改滚动条样式" class="headerlink" title="修改滚动条样式"></a>修改滚动条样式</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*css主要部分的样式*/</span></span><br><span class="line"><span class="comment">/*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/</span></span><br><span class="line"></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">20px</span>; <span class="comment">/*对垂直流动条有效*/</span></span><br><span class="line">  <span class="attribute">height</span>: <span class="number">40px</span>; <span class="comment">/*对水平流动条有效*/</span></span><br><span class="line">  <span class="attribute">display</span>: none; <span class="comment">/* 隐藏滚动条 */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义滚动条的轨道颜色、内阴影及圆角*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-track</span> &#123;</span><br><span class="line">  <span class="attribute">-webkit-box-shadow</span>: inset <span class="number">0</span> <span class="number">0</span> <span class="number">6px</span> <span class="built_in">rgba</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0.3</span>);</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgb</span>(<span class="number">246</span>, <span class="number">214</span>, <span class="number">214</span>);</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">3px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义滑块颜色、内阴影及圆角*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-thumb</span> &#123;</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">7px</span>;</span><br><span class="line">  <span class="attribute">-webkit-box-shadow</span>: inset <span class="number">0</span> <span class="number">0</span> <span class="number">6px</span> <span class="built_in">rgba</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0.3</span>);</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#f50e0e</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义两端按钮的样式 */</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-button</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgb</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义右下角汇合处的样式*/</span></span><br><span class="line"><span class="selector-pseudo">::-webkit-scrollbar-corner</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="built_in">rgb</span>(<span class="number">252</span>, <span class="number">227</span>, <span class="number">7</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="隐藏滚动条"><a href="#隐藏滚动条" class="headerlink" title="隐藏滚动条"></a>隐藏滚动条</h2><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-pseudo">::-webkit-scrollbar</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: none;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>CSS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>CSS</tag>
-        <tag>chrome</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>cnchar.js获取汉字的拼音</title>
-    <url>/posts/38408/</url>
-    <content><![CDATA[<p>分享一个获取汉字拼音的库：</p>
-<p><a href="https://github.com/theajack/cnchar">https://github.com/theajack/cnchar</a></p>
-<p>几种常用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">array:返回数组；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;array&quot;</span>) =&gt;[<span class="string">&#x27;Han&#x27;</span>,<span class="string">&#x27;Zi&#x27;</span>]</span><br><span class="line"></span><br><span class="line">first:返回首字母 ；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>) =&gt;<span class="string">&#x27;HZ&#x27;</span></span><br><span class="line"></span><br><span class="line">up:将结果全部大写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;up&quot;</span>) =&gt;<span class="string">&#x27;HANZI&#x27;</span></span><br><span class="line"></span><br><span class="line">low:将结果全部小写；<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;low&quot;</span>) =&gt;<span class="string">&#x27;hanzi&#x27;</span></span><br><span class="line"></span><br><span class="line">组合使用：<span class="string">&quot;汉字&quot;</span>.spell(<span class="string">&quot;first&quot;</span>,<span class="string">&quot;array&quot;</span>,<span class="string">&#x27;low&#x27;</span>) =&gt;[<span class="string">&#x27;h&#x27;</span>,<span class="string">&#x27;z&#x27;</span>]</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>解决方案</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -3652,6 +3652,25 @@
       </tags>
   </entry>
   <entry>
+    <title>iOS上input输入内容拦腰截断</title>
+    <url>/posts/40889/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 ios 上 input 输入框只显示一半高度的字:</p>
+<img src="/posts/40889/input-error.jpeg" class="" title="input输入内容只显示了一半">
+
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>固定 input 输入框的高度，把 input 输入框写死高度:</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* uniapp 写法，非 uniapp 项目给 input 添加固定高度即可 */</span></span><br><span class="line"><span class="selector-tag">uni-input</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.uni-input-form</span> &#123;</span><br><span class="line">  .uni-input-input &#123;</span><br><span class="line">    <span class="selector-tag">height</span>: 50<span class="selector-tag">rpx</span> !<span class="selector-tag">important</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/40889/input-suc.jpeg" class="" title="解决">
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>CSS</category>
+      </categories>
+      <tags>
+        <tag>uniapp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>iOS13.4+版本h5拍照图片旋转问题的解决方案</title>
     <url>/posts/13740/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>前几天刚解决完 Safari 上 h5 拍照会旋转 90 度的问题，今天更新完苹果系统后（13.4 ——&gt; 13.6），突然发现图片又旋转了。前几天不刚测完是好的么，怎么又出问题了。拿公司测试机 12.6 版本测试了下发现没毛病，就基本定位到问题所在了：iOS13.4+版本可能都存在此问题。</p>
@@ -3677,22 +3696,23 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS上input输入内容拦腰截断</title>
-    <url>/posts/40889/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 ios 上 input 输入框只显示一半高度的字:</p>
-<img src="/posts/40889/input-error.jpeg" class="" title="input输入内容只显示了一半">
+    <title>iOS启动页图片无法全屏显示</title>
+    <url>/posts/58404/</url>
+    <content><![CDATA[<p>在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满：</p>
+<img src="/posts/58404/safearea.png" class="" title="安全区域未填满">
 
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>固定 input 输入框的高度，把 input 输入框写死高度:</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* uniapp 写法，非 uniapp 项目给 input 添加固定高度即可 */</span></span><br><span class="line"><span class="selector-tag">uni-input</span> /<span class="selector-tag">deep</span>/ <span class="selector-class">.uni-input-form</span> &#123;</span><br><span class="line">  .uni-input-input &#123;</span><br><span class="line">    <span class="selector-tag">height</span>: 50<span class="selector-tag">rpx</span> !<span class="selector-tag">important</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>设置相应约束的 FirstItem ，改 <code>Safe Area</code> 为 <code>SuperView</code> ：</p>
+<img src="/posts/58404/safearea2superview.png" class="" title="安全区域未填满">
 
-<img src="/posts/40889/input-suc.jpeg" class="" title="解决">
+<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><img src="/posts/58404/superview.png" class="" title="安全区域未填满">
 ]]></content>
       <categories>
-        <category>前端</category>
-        <category>CSS</category>
+        <category>移动端</category>
+        <category>iOS</category>
       </categories>
       <tags>
-        <tag>uniapp</tag>
+        <tag>iOS</tag>
+        <tag>Xcode</tag>
       </tags>
   </entry>
   <entry>
@@ -3720,26 +3740,6 @@
       <tags>
         <tag>iOS</tag>
         <tag>解决方案</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>iOS启动页图片无法全屏显示</title>
-    <url>/posts/58404/</url>
-    <content><![CDATA[<p>在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满：</p>
-<img src="/posts/58404/safearea.png" class="" title="安全区域未填满">
-
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>设置相应约束的 FirstItem ，改 <code>Safe Area</code> 为 <code>SuperView</code> ：</p>
-<img src="/posts/58404/safearea2superview.png" class="" title="安全区域未填满">
-
-<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><img src="/posts/58404/superview.png" class="" title="安全区域未填满">
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-        <tag>Xcode</tag>
       </tags>
   </entry>
   <entry>
@@ -4035,27 +4035,6 @@
       </categories>
   </entry>
   <entry>
-    <title>npm-run-build遇到Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js 14.x</title>
-    <url>/posts/7710/</url>
-    <content><![CDATA[<p>今天 <code>npm run build-prod</code> 打包项目的时候遇到如下报错信息：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js</span><br></pre></td></tr></table></figure>
-
-<p>百度了一些解决方案都没法解决问题，后来在 Stack Overflow 上看到了一种解决方案，地址：<a href="https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns">https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns</a></p>
-<ol>
-<li>install / downgrade node.js to a stable version (LTS) like <a href="https://nodejs.org/en/download/">14.15.0</a></li>
-<li>install the compatible node-sass version via <code>npm install node-sass@4.14.0</code>; you can find the list <a href="https://www.npmjs.com/package/node-sass">here</a>, or even install <code>gulp-sass</code>with <code>npm i gulp-sass --save-dev</code>.</li>
-</ol>
-]]></content>
-      <categories>
-        <category>解决方案</category>
-        <category>Node</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-        <tag>解决方案</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>node14+版本下hexo部署失败</title>
     <url>/posts/430/</url>
     <content><![CDATA[<p>最近升级了 node14，发现在用 hexo 写博客部署时失败了，报错大致如下：</p>
@@ -4115,6 +4094,27 @@
         <category>前端</category>
         <category>JS</category>
       </categories>
+  </entry>
+  <entry>
+    <title>npm-run-build遇到Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js 14.x</title>
+    <url>/posts/7710/</url>
+    <content><![CDATA[<p>今天 <code>npm run build-prod</code> 打包项目的时候遇到如下报错信息：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Node Sass could not find a binding for your current environment: OS X 64-bit with Node.js</span><br></pre></td></tr></table></figure>
+
+<p>百度了一些解决方案都没法解决问题，后来在 Stack Overflow 上看到了一种解决方案，地址：<a href="https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns">https://stackoverflow.com/questions/64612707/node-sass-does-not-yet-support-your-current-environment-windows-64-bit-with-uns</a></p>
+<ol>
+<li>install / downgrade node.js to a stable version (LTS) like <a href="https://nodejs.org/en/download/">14.15.0</a></li>
+<li>install the compatible node-sass version via <code>npm install node-sass@4.14.0</code>; you can find the list <a href="https://www.npmjs.com/package/node-sass">here</a>, or even install <code>gulp-sass</code>with <code>npm i gulp-sass --save-dev</code>.</li>
+</ol>
+]]></content>
+      <categories>
+        <category>解决方案</category>
+        <category>Node</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+        <tag>解决方案</tag>
+      </tags>
   </entry>
   <entry>
     <title>position/fixed在Safari下出现随屏幕一起滚动情况</title>
@@ -4851,6 +4851,33 @@
       </tags>
   </entry>
   <entry>
+    <title>vue利用provide+inject实现页面重新渲染</title>
+    <url>/posts/57665/</url>
+    <content><![CDATA[<p>在 vue 中有时 vuex 或者 computed 的数据改变后数据并不会进行重新渲染，只有刷新后数据才会重新加载，</p>
+<p>但如果为了让页面重新加载而采用 window.reload()或者 router.go(0)进行刷新那加载慢闪烁白屏等问题会让客户体验及其不好</p>
+<a id="more"></a>
+
+<p>这时就可以进行局部刷新，原理是使用 provide+inject 的组合来控制 router-view 的显示消失完成</p>
+<p>provide+inject 这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效</p>
+<p>在 app.vue 中注册函数 reload 对属性 isRouterAlive 进行开关操作</p>
+<img src="/posts/57665/provide-reload.png" class="" title="provide-reload">
+
+<p>然后在需要使用的组件中注入方法直接 this.reload()使用即可</p>
+<img src="/posts/57665/inject-reload.png" class="" title="inject-reload">
+
+<p>补充：在 reload 中的 this.$nextTick()是将回调延迟到下次 DOM 更新循环之后执行，基本等价于 setTimeout(()=&gt;{},0)</p>
+<p>能够让一些数据完成接收替换后再进行调用，也是能解决加载问题的方法之一</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue-cli中sass全局变量配置</title>
     <url>/posts/36073/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>最近使用 <a href="https://github.com/PanJiaChen/vue-element-admin">vue-element-admin</a> 想添加全局变量 <code>src/styles/variables.scss</code> 中的值。然而发现不能直接在组件中使用。</p>
@@ -4904,33 +4931,6 @@
       <tags>
         <tag>Vue</tag>
         <tag>element-ui</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vue利用provide+inject实现页面重新渲染</title>
-    <url>/posts/57665/</url>
-    <content><![CDATA[<p>在 vue 中有时 vuex 或者 computed 的数据改变后数据并不会进行重新渲染，只有刷新后数据才会重新加载，</p>
-<p>但如果为了让页面重新加载而采用 window.reload()或者 router.go(0)进行刷新那加载慢闪烁白屏等问题会让客户体验及其不好</p>
-<a id="more"></a>
-
-<p>这时就可以进行局部刷新，原理是使用 provide+inject 的组合来控制 router-view 的显示消失完成</p>
-<p>provide+inject 这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效</p>
-<p>在 app.vue 中注册函数 reload 对属性 isRouterAlive 进行开关操作</p>
-<img src="/posts/57665/provide-reload.png" class="" title="provide-reload">
-
-<p>然后在需要使用的组件中注入方法直接 this.reload()使用即可</p>
-<img src="/posts/57665/inject-reload.png" class="" title="inject-reload">
-
-<p>补充：在 reload 中的 this.$nextTick()是将回调延迟到下次 DOM 更新循环之后执行，基本等价于 setTimeout(()=&gt;{},0)</p>
-<p>能够让一些数据完成接收替换后再进行调用，也是能解决加载问题的方法之一</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
@@ -5770,6 +5770,32 @@
       </tags>
   </entry>
   <entry>
+    <title>使用lorem在HTML中生成随机文本</title>
+    <url>/posts/22606/</url>
+    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
+<p>使用方法：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/22606/lorem.gif" class="" title="lorem">
+
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
+<blockquote>
+<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
+</blockquote>
+<ul>
+<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>IDE</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用nvm管理node版本</title>
     <url>/posts/48432/</url>
     <content><![CDATA[<h1 id="macOS"><a href="#macOS" class="headerlink" title="macOS"></a>macOS</h1><h2 id="卸载之前安装的-node"><a href="#卸载之前安装的-node" class="headerlink" title="卸载之前安装的 node"></a>卸载之前安装的 node</h2><p>如果安装 nvm 之前本地已全局安装过 node，请在终端执行下面脚本删除 node：</p>
@@ -5837,32 +5863,6 @@
       <tags>
         <tag>Node</tag>
         <tag>nvm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用lorem在HTML中生成随机文本</title>
-    <url>/posts/22606/</url>
-    <content><![CDATA[<p>看 b 站视频偶尔知道的这个功能，VSCode 可以自动生成随机文本。这样平常就不用在编写前端页面时重复 copy 文字用来占位了。</p>
-<p>使用方法：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">lorem + 单词数量;</span><br></pre></td></tr></table></figure>
-
-<img src="/posts/22606/lorem.gif" class="" title="lorem">
-
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p><strong>Lorem ipsum</strong></p>
-<blockquote>
-<p>Lorem ipsum，中文又称“乱数假文”， 是指一篇常用于排版设计领域的拉丁文文章，主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字</p>
-</blockquote>
-<ul>
-<li>[来自百度百科](<a href="https://baike.baidu.com/item/Lorem">https://baike.baidu.com/item/Lorem</a> ipsum/3684081?fr=aladdin)</li>
-</ul>
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>IDE</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -7304,23 +7304,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>指数函数的中缀表示法</title>
-    <url>/posts/15070/</url>
-    <content><![CDATA[<p>这个是与 <code>Math.pow</code> 有关的特性，还记得 <code>i++,x += x</code> 这种写法吗，指数函数的中缀表示法与之类似。与 python 语言一样，JavaScript 也采用两个星符号 <code>**</code> 来表示 Math.pow。好处有两个：<br>a. 中缀表示法比函数表示法更简洁，这使它更可取。<br>b. 方便数学、物理、机器人学等领域的计算。</p>
-<p>用法示例如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用法一：x ** y</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> squared = <span class="number">2</span> ** <span class="number">2</span>; <span class="comment">//等同于: 2 * 2</span></span><br><span class="line"><span class="keyword">let</span> cubed = <span class="number">2</span> ** <span class="number">3</span>; <span class="comment">//等同于: 2 * 2 * 2</span></span><br><span class="line"><span class="comment">//用法二：x **= y</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="number">2</span>;</span><br><span class="line">a **= <span class="number">2</span>; <span class="comment">//等同于: a = a * a;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> b = <span class="number">3</span>;</span><br><span class="line">b **= <span class="number">3</span>; <span class="comment">//等同于: b = b * b * b;</span></span><br></pre></td></tr></table></figure>
-
-<p>没错，是一块很甜的<strong>语法糖</strong>（指计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用）。</p>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-      </categories>
-      <tags>
-        <tag>技巧</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>扩展(spread)和剩余(rest)操作符</title>
     <url>/posts/56177/</url>
     <content><![CDATA[<p>转载自：<a href="https://github.com/coffe1891/frontend-hard-mode-interview/blob/master/1/1.2.12.md">https://github.com/coffe1891/frontend-hard-mode-interview/blob/master/1/1.2.12.md</a></p>
@@ -7378,6 +7361,23 @@ callee</code></pre>
       <tags>
         <tag>技巧</tag>
         <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>指数函数的中缀表示法</title>
+    <url>/posts/15070/</url>
+    <content><![CDATA[<p>这个是与 <code>Math.pow</code> 有关的特性，还记得 <code>i++,x += x</code> 这种写法吗，指数函数的中缀表示法与之类似。与 python 语言一样，JavaScript 也采用两个星符号 <code>**</code> 来表示 Math.pow。好处有两个：<br>a. 中缀表示法比函数表示法更简洁，这使它更可取。<br>b. 方便数学、物理、机器人学等领域的计算。</p>
+<p>用法示例如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">//用法一：x ** y</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> squared = <span class="number">2</span> ** <span class="number">2</span>; <span class="comment">//等同于: 2 * 2</span></span><br><span class="line"><span class="keyword">let</span> cubed = <span class="number">2</span> ** <span class="number">3</span>; <span class="comment">//等同于: 2 * 2 * 2</span></span><br><span class="line"><span class="comment">//用法二：x **= y</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="number">2</span>;</span><br><span class="line">a **= <span class="number">2</span>; <span class="comment">//等同于: a = a * a;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> b = <span class="number">3</span>;</span><br><span class="line">b **= <span class="number">3</span>; <span class="comment">//等同于: b = b * b * b;</span></span><br></pre></td></tr></table></figure>
+
+<p>没错，是一块很甜的<strong>语法糖</strong>（指计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用）。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>技巧</tag>
       </tags>
   </entry>
   <entry>
@@ -7874,6 +7874,20 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>苹果app如何在其他人电脑上发版</title>
+    <url>/posts/62601/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>之前只有我的电脑能发版，其他电脑上传不了；希望在其他电脑上也能发版。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在能发版的电脑上 Xcode -&gt; Preferences… -&gt; Accounts -&gt; 左下角齿轮 -&gt; Export Account 。然后会导出一个文件，把这个文件传给另一台机器，然后安装就好了。</p>
+]]></content>
+      <categories>
+        <category>移动端</category>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>Xcode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>解决&#39;node-pre-gyp WARN Using needle for node-pre-gyp https download&#39;问题</title>
     <url>/posts/36648/</url>
     <content><![CDATA[<p>华为云跑前端流水线发现进度一直卡在：</p>
@@ -7895,20 +7909,6 @@ callee</code></pre>
       <tags>
         <tag>Node</tag>
         <tag>npm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>苹果app如何在其他人电脑上发版</title>
-    <url>/posts/62601/</url>
-    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>之前只有我的电脑能发版，其他电脑上传不了；希望在其他电脑上也能发版。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在能发版的电脑上 Xcode -&gt; Preferences… -&gt; Accounts -&gt; 左下角齿轮 -&gt; Export Account 。然后会导出一个文件，把这个文件传给另一台机器，然后安装就好了。</p>
-]]></content>
-      <categories>
-        <category>移动端</category>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>Xcode</tag>
       </tags>
   </entry>
   <entry>
@@ -8769,6 +8769,74 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
+    <title>转载-axios发post请求-后端接收不到参数的解决方案</title>
+    <url>/posts/32468/</url>
+    <content><![CDATA[<p>转载自：<a href="https://blog.csdn.net/csdn_yudong/article/details/79668655">https://blog.csdn.net/csdn_yudong/article/details/79668655</a></p>
+<h2 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h2><p>下面一个正常的 axios post 请求，后端说没有接收到你的传参：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username,</span><br><span class="line">    pwd</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><h3 id="要点一"><a href="#要点一" class="headerlink" title="要点一"></a>要点一</h3><p>原因就是这次的接口使用 java spring mvc<br>并且在这个方法上使用了注解 @RequestParam</p>
+<p>那么这个是什么意思呢，这个是只能从请求的地址中取出参数，也就是只能从 username=admin&amp;password=admin 这种字符串中解析出参数。</p>
+<h3 id="要点二"><a href="#要点二" class="headerlink" title="要点二"></a>要点二</h3><p>我们还可以看到我们这次请求的 Content-Type：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">application/json;charset=UTF-8</span><br></pre></td></tr></table></figure>
+
+<p>axios 会帮我们 <strong>转换请求数据和响应数据</strong> 以及 <strong>自动转换 JSON 数据</strong></p>
+<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><ul>
+<li>Make <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequests</a> from the browser</li>
+<li>Make <a href="http://nodejs.org/api/http.html">http</a> requests from node.js</li>
+<li>Supports the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> API</li>
+<li>Intercept request and response</li>
+<li><mark>Transform request and response data</mark></li>
+<li>Cancel requests</li>
+<li>Automatic transforms for JSON data</li>
+<li>Client side support for protecting against <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">XSRF</a></li>
+</ul>
+<p>在 axios 源码中发现下面这段内容：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">transformRequest: [<span class="function"><span class="keyword">function</span> <span class="title">transformRequest</span>(<span class="params">data, headers</span>) </span>&#123;</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Accept&#x27;</span>);</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Content-Type&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (utils.isFormData(data) ||</span><br><span class="line">      utils.isArrayBuffer(data) ||</span><br><span class="line">      utils.isBuffer(data) ||</span><br><span class="line">      utils.isStream(data) ||</span><br><span class="line">      utils.isFile(data) ||</span><br><span class="line">      utils.isBlob(data)</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isArrayBufferView(data)) &#123;</span><br><span class="line">      <span class="keyword">return</span> data.buffer;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isURLSearchParams(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/x-www-form-urlencoded;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> data.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ========= 如果data是object，就会转 ========</span></span><br><span class="line">    <span class="keyword">if</span> (utils.isObject(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/json;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125;],</span><br></pre></td></tr></table></figure>
+
+<p>我们知道在做 post 请求的时候，我们的传参是 data: {…} 或者直接 {…} 的形式传递的，嗯，就是下面这两种形式：</p>
+<p>【第一种】</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios</span><br><span class="line">  .post(<span class="string">&#x27;/user&#x27;</span>, &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">() =&gt;</span> &#123;&#125;)</span><br><span class="line">  .catch(<span class="function">() =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>【第二种】</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/user/12345&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>非常的刺激，这两种形式无一例外都触发了 axios 源码中【很关键】的那一段代码</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>也就是说，我们的 <code>Content-Type</code> 变成了 <code>application/json;charset=utf-8</code><br>然后，因为我们的参数是 JSON 对象，axios 帮我们做了一个 stringify 的处理。<br>而且查阅 axios 文档可以知道：axios 使用 post 发送数据时，默认是直接把 json 放到请求体中提交到后端的。</p>
+<p>那么，这就与我们服务端要求的 <code>&#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;</code> 以及 <code>@RequestParam</code> 不符合。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>【用 URLSearchParams 传递参数】</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> param = <span class="keyword">new</span> URLSearchParams();</span><br><span class="line">param.append(<span class="string">&#x27;username&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">param.append(<span class="string">&#x27;pwd&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: param</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>需要注意的是： URLSearchParams 不支持所有的浏览器，但是总体的支持情况还是 OK 的，所以优先推荐这种简单直接的解决方案</p>
+</blockquote>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p><em>网上有很多方案说使用</em></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios.defaults.headers.post[<span class="string">&#x27;Content-Type&#x27;</span>] =</span><br><span class="line">  <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;headers&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/x-www-form-urlencoded&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>我试了一下，其实这样还是不行的</em></p>
+<p>【还需要额外的操作，（我们要将参数转换为 query 参数）】</p>
+<p>引入 qs ，这个库是 axios 里面包含的，不需要再下载了。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> data = &#123;</span><br><span class="line">  username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">  pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: Qs.stringify(data)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案三"><a href="#方案三" class="headerlink" title="方案三"></a>方案三</h3><p>在请求中添加 <code>transformRequest</code> :</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line">axios(&#123;</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  transformRequest: [</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 对 data 进行任意转换处理</span></span><br><span class="line">      <span class="keyword">return</span> Qs.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">    pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案四"><a href="#方案四" class="headerlink" title="方案四"></a>方案四</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios.post(<span class="string">&#x27;/api/lockServer/search&#x27;</span>, <span class="string">&quot;userName=&#x27;admin&#x27;&amp;pwd=&#x27;admin&#x27;&quot;</span>);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>框架</category>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>axios</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>转载-chrome调试技巧-汇总</title>
     <url>/posts/62808/</url>
     <content><![CDATA[<h2 id="打印"><a href="#打印" class="headerlink" title="打印"></a>打印</h2><h3 id="console-table"><a href="#console-table" class="headerlink" title="console.table"></a>console.table</h3><p>使用 <code>console.table()</code> 可以将传入的对象，或数组以表格形式输出。适合排列整齐的元素：</p>
@@ -8843,74 +8911,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>转载-axios发post请求-后端接收不到参数的解决方案</title>
-    <url>/posts/32468/</url>
-    <content><![CDATA[<p>转载自：<a href="https://blog.csdn.net/csdn_yudong/article/details/79668655">https://blog.csdn.net/csdn_yudong/article/details/79668655</a></p>
-<h2 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h2><p>下面一个正常的 axios post 请求，后端说没有接收到你的传参：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username,</span><br><span class="line">    pwd</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><h3 id="要点一"><a href="#要点一" class="headerlink" title="要点一"></a>要点一</h3><p>原因就是这次的接口使用 java spring mvc<br>并且在这个方法上使用了注解 @RequestParam</p>
-<p>那么这个是什么意思呢，这个是只能从请求的地址中取出参数，也就是只能从 username=admin&amp;password=admin 这种字符串中解析出参数。</p>
-<h3 id="要点二"><a href="#要点二" class="headerlink" title="要点二"></a>要点二</h3><p>我们还可以看到我们这次请求的 Content-Type：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">application/json;charset=UTF-8</span><br></pre></td></tr></table></figure>
-
-<p>axios 会帮我们 <strong>转换请求数据和响应数据</strong> 以及 <strong>自动转换 JSON 数据</strong></p>
-<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><ul>
-<li>Make <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequests</a> from the browser</li>
-<li>Make <a href="http://nodejs.org/api/http.html">http</a> requests from node.js</li>
-<li>Supports the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> API</li>
-<li>Intercept request and response</li>
-<li><mark>Transform request and response data</mark></li>
-<li>Cancel requests</li>
-<li>Automatic transforms for JSON data</li>
-<li>Client side support for protecting against <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">XSRF</a></li>
-</ul>
-<p>在 axios 源码中发现下面这段内容：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">transformRequest: [<span class="function"><span class="keyword">function</span> <span class="title">transformRequest</span>(<span class="params">data, headers</span>) </span>&#123;</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Accept&#x27;</span>);</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Content-Type&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (utils.isFormData(data) ||</span><br><span class="line">      utils.isArrayBuffer(data) ||</span><br><span class="line">      utils.isBuffer(data) ||</span><br><span class="line">      utils.isStream(data) ||</span><br><span class="line">      utils.isFile(data) ||</span><br><span class="line">      utils.isBlob(data)</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isArrayBufferView(data)) &#123;</span><br><span class="line">      <span class="keyword">return</span> data.buffer;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isURLSearchParams(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/x-www-form-urlencoded;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> data.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ========= 如果data是object，就会转 ========</span></span><br><span class="line">    <span class="keyword">if</span> (utils.isObject(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/json;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125;],</span><br></pre></td></tr></table></figure>
-
-<p>我们知道在做 post 请求的时候，我们的传参是 data: {…} 或者直接 {…} 的形式传递的，嗯，就是下面这两种形式：</p>
-<p>【第一种】</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios</span><br><span class="line">  .post(<span class="string">&#x27;/user&#x27;</span>, &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">() =&gt;</span> &#123;&#125;)</span><br><span class="line">  .catch(<span class="function">() =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>【第二种】</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/user/12345&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>非常的刺激，这两种形式无一例外都触发了 axios 源码中【很关键】的那一段代码</p>
-<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>也就是说，我们的 <code>Content-Type</code> 变成了 <code>application/json;charset=utf-8</code><br>然后，因为我们的参数是 JSON 对象，axios 帮我们做了一个 stringify 的处理。<br>而且查阅 axios 文档可以知道：axios 使用 post 发送数据时，默认是直接把 json 放到请求体中提交到后端的。</p>
-<p>那么，这就与我们服务端要求的 <code>&#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;</code> 以及 <code>@RequestParam</code> 不符合。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>【用 URLSearchParams 传递参数】</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> param = <span class="keyword">new</span> URLSearchParams();</span><br><span class="line">param.append(<span class="string">&#x27;username&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">param.append(<span class="string">&#x27;pwd&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: param</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>需要注意的是： URLSearchParams 不支持所有的浏览器，但是总体的支持情况还是 OK 的，所以优先推荐这种简单直接的解决方案</p>
-</blockquote>
-<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p><em>网上有很多方案说使用</em></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios.defaults.headers.post[<span class="string">&#x27;Content-Type&#x27;</span>] =</span><br><span class="line">  <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>或者</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;headers&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/x-www-form-urlencoded&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><em>我试了一下，其实这样还是不行的</em></p>
-<p>【还需要额外的操作，（我们要将参数转换为 query 参数）】</p>
-<p>引入 qs ，这个库是 axios 里面包含的，不需要再下载了。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> data = &#123;</span><br><span class="line">  username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">  pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: Qs.stringify(data)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="方案三"><a href="#方案三" class="headerlink" title="方案三"></a>方案三</h3><p>在请求中添加 <code>transformRequest</code> :</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line">axios(&#123;</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  transformRequest: [</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 对 data 进行任意转换处理</span></span><br><span class="line">      <span class="keyword">return</span> Qs.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">    pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="方案四"><a href="#方案四" class="headerlink" title="方案四"></a>方案四</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">axios.post(<span class="string">&#x27;/api/lockServer/search&#x27;</span>, <span class="string">&quot;userName=&#x27;admin&#x27;&amp;pwd=&#x27;admin&#x27;&quot;</span>);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>框架</category>
-        <category>Vue</category>
-      </categories>
-      <tags>
-        <tag>axios</tag>
-        <tag>转载</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>转载-git配置ssh服务</title>
     <url>/posts/1071/</url>
     <content><![CDATA[<p>原文：<a href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
@@ -8964,7 +8964,7 @@ callee</code></pre>
 <p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
 <h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
 <blockquote>
-<p><a href="mailto:&#103;&#105;&#x74;&#x40;&#103;&#105;&#116;&#x68;&#117;&#98;&#46;&#99;&#111;&#x6d;">&#103;&#105;&#x74;&#x40;&#103;&#105;&#116;&#x68;&#117;&#98;&#46;&#99;&#111;&#x6d;</a>:danygitgit/document-library.git</p>
+<p><a href="mailto:&#x67;&#x69;&#116;&#64;&#103;&#x69;&#x74;&#104;&#117;&#98;&#46;&#x63;&#x6f;&#109;">&#x67;&#x69;&#116;&#64;&#103;&#x69;&#x74;&#104;&#117;&#98;&#46;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git</p>
 </blockquote>
 <p>复制此 ssh 链接。</p>
 <h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
@@ -8990,7 +8990,7 @@ callee</code></pre>
 <p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
 <p>修改后的文件如下</p>
 <blockquote>
-<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#109;">&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#117;&#98;&#x2e;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#103;&#x69;&#116;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;">&#103;&#x69;&#116;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
 </blockquote>
 <p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
 <h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a href="https://www.sourcetreeapp.com/">官网链接</a></p>
@@ -9661,142 +9661,6 @@ callee</code></pre>
       </tags>
   </entry>
   <entry>
-    <title>转载-说说原型（prototype）、原型链和原型继承</title>
-    <url>/posts/12455/</url>
-    <content><![CDATA[<p>转载自：<a href="https://zhuanlan.zhihu.com/p/35790971">https://zhuanlan.zhihu.com/p/35790971</a></p>
-<h2 id="一、原型-prototype-和-proto"><a href="#一、原型-prototype-和-proto" class="headerlink" title="一、原型 prototype 和 __proto__"></a>一、原型 <code>prototype</code> 和 <code>__proto__</code></h2><ul>
-<li><p>每个对象都有一个<code>__proto__</code>属性，并且指向它的<code>prototype</code>原型对象</p>
-</li>
-<li><p>每个构造函数都有一个<code>prototype</code>原型对象</p>
-</li>
-<li><ul>
-<li><code>prototype</code>原型对象里的<code>constructor</code>指向构造函数本身</li>
-</ul>
-</li>
-</ul>
-<img src="/posts/12455/v2-e722d5325f7d4215169f1d04296e0f89_720w.png" class="" title="v2-e722d5325f7d4215169f1d04296e0f89_720w">
-
-<a id="more"></a>
-
-<p><strong>有的同学可能会问<code>prototype</code> 和 <code>__proto__</code>有什么用呢？</strong></p>
-<p>实例对象的<code>__proto__</code>指向构造函数的<code>prototype</code>，从而实现继承。</p>
-<p><code>prototype</code>对象相当于特定类型所有实例对象都可以访问的公共容器</p>
-<img src="/posts/12455/v2-1ae63b09f2f38aee29efc79f1400b8d3_720w.jpg" class="" title="v2-1ae63b09f2f38aee29efc79f1400b8d3_720w">
-
-<p><strong>看一下代码就清楚了</strong></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">nick, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.nick = nick;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.nick);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p1 = <span class="keyword">new</span> Person(<span class="string">&#x27;Byron&#x27;</span>, <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p2 = <span class="keyword">new</span> Person(<span class="string">&#x27;Casper&#x27;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line">p1.sayName(); <span class="comment">// Byron</span></span><br><span class="line"></span><br><span class="line">p2.sayName(); <span class="comment">// Casper</span></span><br><span class="line"></span><br><span class="line">p1.__proto__ === Person.prototype; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">p2.__proto__ === Person.prototype; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">p1.__proto__ === p2.__proto__; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">Person.prototype.constructor === Person; <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>注意<br>\1. 当<code>Object.prototype.__proto__</code> 已被大多数浏览器厂商所支持的今天，其存在和确切行为仅在 ECMAScript 2015 规范中被标准化为传统功能，以确保 Web 浏览器的兼容性。为了更好的支持，建议只使用 <code>Object.getPrototypeOf()</code>。<br>\2. Object.create(null) 新建的对象是没有<strong>proto</strong>属性的。</p>
-</blockquote>
-<h2 id="二、原型链"><a href="#二、原型链" class="headerlink" title="二、原型链"></a>二、原型链</h2><p>请看以下代码</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"></span><br><span class="line">arr.valueOf(); <span class="comment">//  [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
-
-<p>我们再来看一张图</p>
-<img src="/posts/12455/v2-baca413d5f93e3b7194c13a0b3c4621d_720w.jpg" class="" title="v2-baca413d5f93e3b7194c13a0b3c4621d_720w">
-
-<p>按照之前的理论，如果自身没有该方法，我们应该去<code>Array.prototype</code>对象里去找，但是你会发现<code>arr.__proto__</code>上压根就没有<code>valueOf</code>方法，那它是从哪里来的呢？</p>
-<p><strong>各位客官，请看这张图</strong></p>
-<img src="/posts/12455/v2-cd7629e47fcb399e5f009c7dbb5149d8_720w.jpg" class="" title="v2-cd7629e47fcb399e5f009c7dbb5149d8_720w">
-
-<p>很奇怪我们在<code>Array.prototype.__proto__</code>里找到了<code>valueOf</code>方法，为什么呢？</p>
-<h2 id="查找valueOf方法的过程"><a href="#查找valueOf方法的过程" class="headerlink" title="查找valueOf方法的过程"></a>查找<code>valueOf</code>方法的过程</h2><p>当试图访问一个对象的属性时，它不仅仅在该对象上搜寻，还会搜寻该对象的原型，以及该对象的原型的原型，依次层层向上搜索，直到找到一个名字匹配的属性或到达原型链的末尾。</p>
-<p>查找 valueOf 大致流程</p>
-<ol>
-<li>当前实例对象 obj，查找 obj 的属性或方法，找到后返回</li>
-<li>没有找到，通过<code>obj. __proto__</code>，找到 obj 构造函数的<code>prototype</code>并且查找上面的属性和方法，找到后返回</li>
-<li>没有找到，把<code>Array.prototype</code>当做 obj，重复以上步骤</li>
-</ol>
-<p>当然不会一直找下去，原型链是有终点的，最后查找到<code>Object.prototype</code>时<br><code>Object.prototype.__proto__ === null</code>，意味着查找结束</p>
-<img src="/posts/12455/v2-78c74eec6cda54f09e10092a5080f739_720w.jpg" class="" title="v2-78c74eec6cda54f09e10092a5080f739_720w">
-
-<p>我们来看看上图的关系</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">arr.__proto__ === <span class="built_in">Array</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line"><span class="built_in">Array</span>.prototype.__proto__ === <span class="built_in">Object</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line">arr.__proto__.__proto__ === <span class="built_in">Object</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 原型链的终点</span></span><br><span class="line"><span class="built_in">Object</span>.prototype.__proto__ === <span class="literal">null</span>;</span><br><span class="line"><span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>原型链如下：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">arr ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null</span><br></pre></td></tr></table></figure>
-
-<p><strong>这就是传说中的原型链，层层向上查找，最后还没有就返回 undefined</strong></p>
-<h2 id="三、JavaScript-中的继承"><a href="#三、JavaScript-中的继承" class="headerlink" title="三、JavaScript 中的继承"></a>三、JavaScript 中的继承</h2><h2 id="3-1-什么是继承？"><a href="#3-1-什么是继承？" class="headerlink" title="3.1 什么是继承？"></a>3.1 什么是继承？</h2><blockquote>
-<p>继承是指一个对象直接使用另外一个对象的属性和方法</p>
-</blockquote>
-<p>由此可见只要实现属性和方法的继承，就达到继承的效果</p>
-<ul>
-<li>得到一个对象的属性</li>
-<li>得到一个对象的方法</li>
-</ul>
-<h2 id="3-2-属性如何继承？"><a href="#3-2-属性如何继承？" class="headerlink" title="3.2 属性如何继承？"></a>3.2 属性如何继承？</h2><p>我们先创建一个<code>Person</code>类</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法定义在构造函数的原型上</span></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>此时我想创建一个<code>Teacher</code>类，我希望它可以继承<code>Person</code>所有的属性，并且额外添加属于自己特定的属性；</p>
-<ul>
-<li>一个新的属性，subject——这个属性包含了教师教授的学科。</li>
-</ul>
-<p>定义<code>Teacher</code>的构造函数</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params">name, age, subject</span>) </span>&#123;</span><br><span class="line">  Person.call(<span class="built_in">this</span>, name, age);</span><br><span class="line">  <span class="built_in">this</span>.subject = subject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>属性的继承是通过在一个类内执行另外一个类的构造函数，通过<code>call</code>指定<code>this</code>为当前执行环境，这样就可以得到另外一个类的所有属性。</strong></p>
-<blockquote>
-<p>Person.call(this, name, age)</p>
-</blockquote>
-<p>我们实例化一下看看</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher(<span class="string">&#x27;jack&#x27;</span>, <span class="number">25</span>, <span class="built_in">Math</span>);</span><br><span class="line"></span><br><span class="line">teacher.age;</span><br><span class="line"><span class="number">25</span>;</span><br><span class="line">teacher.name;</span><br><span class="line">(<span class="string">&#x27;jack&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>很明显<code>Teacher</code>成功继承了<code>Person</code>的属性</p>
-<h2 id="3-3-方法如何继承？"><a href="#3-3-方法如何继承？" class="headerlink" title="3.3 方法如何继承？"></a>3.3 方法如何继承？</h2><p>我们需要让<code>Teacher</code>从<code>Person</code>的原型对象里继承方法。我们要怎么做呢？</p>
-<p>我们都知道类的方法都定义在<code>prototype</code>里，那其实我们只需要把<code>Person.prototype</code>的备份赋值给<code>Teacher.prototype</code>即可</p>
-<blockquote>
-<p>Teacher.prototype = Object.create(Person.prototype)</p>
-</blockquote>
-<p><a href="https://link.zhihu.com/?target=https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>简单说就是新建一个对象，使用现有的对象赋值给新建对象的<code>__proto__</code></p>
-<p>可能有人会问为什么是备份呢？</p>
-<p>因为如果直接赋值，那会是引用关系，意味着修改<code>Teacher. prototype</code>，也会同时修改<code>Person.prototype</code>，这是不合理的。</p>
-<p>另外注意一点就是，在给<code>Teacher</code>类添加方法时，应该在修改<code>prototype</code>以后，否则会被覆盖掉，原因是赋值前后的属性值是不同的对象。</p>
-<p>最后还有一个问题，我们都知道<code>prototype</code>里有个属性<code>constructor</code>指向构造函数本身，但是因为我们是复制其他类的<code>prototype</code>，所以这个指向是不对的，需要更正一下。<br>如果不修改，会导致我们类型判断出错</p>
-<blockquote>
-<p>Teacher.prototype.constructor = Teacher</p>
-</blockquote>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype)</span><br><span class="line"></span><br><span class="line">Teacher.prototype.constructor</span><br><span class="line">ƒ <span class="function"><span class="title">Person</span>(<span class="params">name, age</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">    <span class="built_in">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">Teacher.prototype.constructor = Teacher</span><br><span class="line">ƒ <span class="function"><span class="title">Teacher</span>(<span class="params">name, age, subject</span>)</span> &#123;</span><br><span class="line">    Person.call(<span class="built_in">this</span>, name, age)</span><br><span class="line">    <span class="built_in">this</span>.subject = subject</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>继承方法的最终方案：</strong></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype);</span><br><span class="line">Teacher.prototype.constructor = Teacher;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-4-hasOwnProperty"><a href="#3-4-hasOwnProperty" class="headerlink" title="3.4 hasOwnProperty"></a>3.4 hasOwnProperty</h2><p>在原型链上查询属性比较耗时，对性能有影响，试图访问不存在的属性时会遍历整个原型链。</p>
-<p>遍历对象属性时，每个可枚举的属性都会被枚举出来。 要检查是否具有自己定义的属性，而不是原型链上的属性，必须使用<code>hasOwnProperty</code>方法。</p>
-<p><a href="https://link.zhihu.com/?target=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty">hasOwnProperty</a> 是 JavaScript 中唯一处理属性并且不会遍历原型链的方法。</p>
-<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><h2 id="prototype-和-proto"><a href="#prototype-和-proto" class="headerlink" title="prototype 和 __proto__"></a><code>prototype</code> 和 <code>__proto__</code></h2><ul>
-<li><p>每个对象都有一个<code>__proto__</code>属性，并且指向它的<code>prototype</code>原型对象</p>
-</li>
-<li><p>每个构造函数都有一个<code>prototype</code>原型对象</p>
-</li>
-<li><ul>
-<li><code>prototype</code>原型对象里的<code>constructor</code>指向构造函数本身</li>
-</ul>
-</li>
-</ul>
-<h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><p>每个对象都有一个<code>__proto__</code>，它指向它的<code>prototype</code>原型对象，而<code>prototype</code>原型对象又具有一个自己的<code>prototype</code>原型对象，就这样层层往上直到一个对象的原型<code>prototype</code>为<code>null</code></p>
-<p>这个查询的路径就是<code>原型链</code></p>
-<h2 id="JavaScript-中的继承"><a href="#JavaScript-中的继承" class="headerlink" title="JavaScript 中的继承"></a>JavaScript 中的继承</h2><ul>
-<li>属性继承</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法定义在构造函数的原型上</span></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params">name, age, subject</span>) </span>&#123;</span><br><span class="line">  Person.call(<span class="built_in">this</span>, name, age);</span><br><span class="line">  <span class="built_in">this</span>.subject = subject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>方法继承</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype);</span><br><span class="line">Teacher.prototype.constructor = Teacher;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JS</category>
-        <category>原型</category>
-      </categories>
-      <tags>
-        <tag>转载</tag>
-        <tag>原型</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>转载-这一次，彻底弄懂JavaScript执行机制</title>
     <url>/posts/37082/</url>
     <content><![CDATA[<p>转载自：<a href="https://juejin.cn/post/6844903512845860872">https://juejin.cn/post/6844903512845860872</a></p>
@@ -10013,6 +9877,142 @@ callee</code></pre>
       <tags>
         <tag>转载</tag>
         <tag>EventLoop</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>转载-说说原型（prototype）、原型链和原型继承</title>
+    <url>/posts/12455/</url>
+    <content><![CDATA[<p>转载自：<a href="https://zhuanlan.zhihu.com/p/35790971">https://zhuanlan.zhihu.com/p/35790971</a></p>
+<h2 id="一、原型-prototype-和-proto"><a href="#一、原型-prototype-和-proto" class="headerlink" title="一、原型 prototype 和 __proto__"></a>一、原型 <code>prototype</code> 和 <code>__proto__</code></h2><ul>
+<li><p>每个对象都有一个<code>__proto__</code>属性，并且指向它的<code>prototype</code>原型对象</p>
+</li>
+<li><p>每个构造函数都有一个<code>prototype</code>原型对象</p>
+</li>
+<li><ul>
+<li><code>prototype</code>原型对象里的<code>constructor</code>指向构造函数本身</li>
+</ul>
+</li>
+</ul>
+<img src="/posts/12455/v2-e722d5325f7d4215169f1d04296e0f89_720w.png" class="" title="v2-e722d5325f7d4215169f1d04296e0f89_720w">
+
+<a id="more"></a>
+
+<p><strong>有的同学可能会问<code>prototype</code> 和 <code>__proto__</code>有什么用呢？</strong></p>
+<p>实例对象的<code>__proto__</code>指向构造函数的<code>prototype</code>，从而实现继承。</p>
+<p><code>prototype</code>对象相当于特定类型所有实例对象都可以访问的公共容器</p>
+<img src="/posts/12455/v2-1ae63b09f2f38aee29efc79f1400b8d3_720w.jpg" class="" title="v2-1ae63b09f2f38aee29efc79f1400b8d3_720w">
+
+<p><strong>看一下代码就清楚了</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">nick, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.nick = nick;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.nick);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p1 = <span class="keyword">new</span> Person(<span class="string">&#x27;Byron&#x27;</span>, <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p2 = <span class="keyword">new</span> Person(<span class="string">&#x27;Casper&#x27;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line">p1.sayName(); <span class="comment">// Byron</span></span><br><span class="line"></span><br><span class="line">p2.sayName(); <span class="comment">// Casper</span></span><br><span class="line"></span><br><span class="line">p1.__proto__ === Person.prototype; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">p2.__proto__ === Person.prototype; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">p1.__proto__ === p2.__proto__; <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line">Person.prototype.constructor === Person; <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>\1. 当<code>Object.prototype.__proto__</code> 已被大多数浏览器厂商所支持的今天，其存在和确切行为仅在 ECMAScript 2015 规范中被标准化为传统功能，以确保 Web 浏览器的兼容性。为了更好的支持，建议只使用 <code>Object.getPrototypeOf()</code>。<br>\2. Object.create(null) 新建的对象是没有<strong>proto</strong>属性的。</p>
+</blockquote>
+<h2 id="二、原型链"><a href="#二、原型链" class="headerlink" title="二、原型链"></a>二、原型链</h2><p>请看以下代码</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"></span><br><span class="line">arr.valueOf(); <span class="comment">//  [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<p>我们再来看一张图</p>
+<img src="/posts/12455/v2-baca413d5f93e3b7194c13a0b3c4621d_720w.jpg" class="" title="v2-baca413d5f93e3b7194c13a0b3c4621d_720w">
+
+<p>按照之前的理论，如果自身没有该方法，我们应该去<code>Array.prototype</code>对象里去找，但是你会发现<code>arr.__proto__</code>上压根就没有<code>valueOf</code>方法，那它是从哪里来的呢？</p>
+<p><strong>各位客官，请看这张图</strong></p>
+<img src="/posts/12455/v2-cd7629e47fcb399e5f009c7dbb5149d8_720w.jpg" class="" title="v2-cd7629e47fcb399e5f009c7dbb5149d8_720w">
+
+<p>很奇怪我们在<code>Array.prototype.__proto__</code>里找到了<code>valueOf</code>方法，为什么呢？</p>
+<h2 id="查找valueOf方法的过程"><a href="#查找valueOf方法的过程" class="headerlink" title="查找valueOf方法的过程"></a>查找<code>valueOf</code>方法的过程</h2><p>当试图访问一个对象的属性时，它不仅仅在该对象上搜寻，还会搜寻该对象的原型，以及该对象的原型的原型，依次层层向上搜索，直到找到一个名字匹配的属性或到达原型链的末尾。</p>
+<p>查找 valueOf 大致流程</p>
+<ol>
+<li>当前实例对象 obj，查找 obj 的属性或方法，找到后返回</li>
+<li>没有找到，通过<code>obj. __proto__</code>，找到 obj 构造函数的<code>prototype</code>并且查找上面的属性和方法，找到后返回</li>
+<li>没有找到，把<code>Array.prototype</code>当做 obj，重复以上步骤</li>
+</ol>
+<p>当然不会一直找下去，原型链是有终点的，最后查找到<code>Object.prototype</code>时<br><code>Object.prototype.__proto__ === null</code>，意味着查找结束</p>
+<img src="/posts/12455/v2-78c74eec6cda54f09e10092a5080f739_720w.jpg" class="" title="v2-78c74eec6cda54f09e10092a5080f739_720w">
+
+<p>我们来看看上图的关系</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">arr.__proto__ === <span class="built_in">Array</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line"><span class="built_in">Array</span>.prototype.__proto__ === <span class="built_in">Object</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line">arr.__proto__.__proto__ === <span class="built_in">Object</span>.prototype;</span><br><span class="line"><span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 原型链的终点</span></span><br><span class="line"><span class="built_in">Object</span>.prototype.__proto__ === <span class="literal">null</span>;</span><br><span class="line"><span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>原型链如下：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">arr ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null</span><br></pre></td></tr></table></figure>
+
+<p><strong>这就是传说中的原型链，层层向上查找，最后还没有就返回 undefined</strong></p>
+<h2 id="三、JavaScript-中的继承"><a href="#三、JavaScript-中的继承" class="headerlink" title="三、JavaScript 中的继承"></a>三、JavaScript 中的继承</h2><h2 id="3-1-什么是继承？"><a href="#3-1-什么是继承？" class="headerlink" title="3.1 什么是继承？"></a>3.1 什么是继承？</h2><blockquote>
+<p>继承是指一个对象直接使用另外一个对象的属性和方法</p>
+</blockquote>
+<p>由此可见只要实现属性和方法的继承，就达到继承的效果</p>
+<ul>
+<li>得到一个对象的属性</li>
+<li>得到一个对象的方法</li>
+</ul>
+<h2 id="3-2-属性如何继承？"><a href="#3-2-属性如何继承？" class="headerlink" title="3.2 属性如何继承？"></a>3.2 属性如何继承？</h2><p>我们先创建一个<code>Person</code>类</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法定义在构造函数的原型上</span></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此时我想创建一个<code>Teacher</code>类，我希望它可以继承<code>Person</code>所有的属性，并且额外添加属于自己特定的属性；</p>
+<ul>
+<li>一个新的属性，subject——这个属性包含了教师教授的学科。</li>
+</ul>
+<p>定义<code>Teacher</code>的构造函数</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params">name, age, subject</span>) </span>&#123;</span><br><span class="line">  Person.call(<span class="built_in">this</span>, name, age);</span><br><span class="line">  <span class="built_in">this</span>.subject = subject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>属性的继承是通过在一个类内执行另外一个类的构造函数，通过<code>call</code>指定<code>this</code>为当前执行环境，这样就可以得到另外一个类的所有属性。</strong></p>
+<blockquote>
+<p>Person.call(this, name, age)</p>
+</blockquote>
+<p>我们实例化一下看看</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher(<span class="string">&#x27;jack&#x27;</span>, <span class="number">25</span>, <span class="built_in">Math</span>);</span><br><span class="line"></span><br><span class="line">teacher.age;</span><br><span class="line"><span class="number">25</span>;</span><br><span class="line">teacher.name;</span><br><span class="line">(<span class="string">&#x27;jack&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>很明显<code>Teacher</code>成功继承了<code>Person</code>的属性</p>
+<h2 id="3-3-方法如何继承？"><a href="#3-3-方法如何继承？" class="headerlink" title="3.3 方法如何继承？"></a>3.3 方法如何继承？</h2><p>我们需要让<code>Teacher</code>从<code>Person</code>的原型对象里继承方法。我们要怎么做呢？</p>
+<p>我们都知道类的方法都定义在<code>prototype</code>里，那其实我们只需要把<code>Person.prototype</code>的备份赋值给<code>Teacher.prototype</code>即可</p>
+<blockquote>
+<p>Teacher.prototype = Object.create(Person.prototype)</p>
+</blockquote>
+<p><a href="https://link.zhihu.com/?target=https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>简单说就是新建一个对象，使用现有的对象赋值给新建对象的<code>__proto__</code></p>
+<p>可能有人会问为什么是备份呢？</p>
+<p>因为如果直接赋值，那会是引用关系，意味着修改<code>Teacher. prototype</code>，也会同时修改<code>Person.prototype</code>，这是不合理的。</p>
+<p>另外注意一点就是，在给<code>Teacher</code>类添加方法时，应该在修改<code>prototype</code>以后，否则会被覆盖掉，原因是赋值前后的属性值是不同的对象。</p>
+<p>最后还有一个问题，我们都知道<code>prototype</code>里有个属性<code>constructor</code>指向构造函数本身，但是因为我们是复制其他类的<code>prototype</code>，所以这个指向是不对的，需要更正一下。<br>如果不修改，会导致我们类型判断出错</p>
+<blockquote>
+<p>Teacher.prototype.constructor = Teacher</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype)</span><br><span class="line"></span><br><span class="line">Teacher.prototype.constructor</span><br><span class="line">ƒ <span class="function"><span class="title">Person</span>(<span class="params">name, age</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">    <span class="built_in">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">Teacher.prototype.constructor = Teacher</span><br><span class="line">ƒ <span class="function"><span class="title">Teacher</span>(<span class="params">name, age, subject</span>)</span> &#123;</span><br><span class="line">    Person.call(<span class="built_in">this</span>, name, age)</span><br><span class="line">    <span class="built_in">this</span>.subject = subject</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>继承方法的最终方案：</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype);</span><br><span class="line">Teacher.prototype.constructor = Teacher;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-hasOwnProperty"><a href="#3-4-hasOwnProperty" class="headerlink" title="3.4 hasOwnProperty"></a>3.4 hasOwnProperty</h2><p>在原型链上查询属性比较耗时，对性能有影响，试图访问不存在的属性时会遍历整个原型链。</p>
+<p>遍历对象属性时，每个可枚举的属性都会被枚举出来。 要检查是否具有自己定义的属性，而不是原型链上的属性，必须使用<code>hasOwnProperty</code>方法。</p>
+<p><a href="https://link.zhihu.com/?target=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty">hasOwnProperty</a> 是 JavaScript 中唯一处理属性并且不会遍历原型链的方法。</p>
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><h2 id="prototype-和-proto"><a href="#prototype-和-proto" class="headerlink" title="prototype 和 __proto__"></a><code>prototype</code> 和 <code>__proto__</code></h2><ul>
+<li><p>每个对象都有一个<code>__proto__</code>属性，并且指向它的<code>prototype</code>原型对象</p>
+</li>
+<li><p>每个构造函数都有一个<code>prototype</code>原型对象</p>
+</li>
+<li><ul>
+<li><code>prototype</code>原型对象里的<code>constructor</code>指向构造函数本身</li>
+</ul>
+</li>
+</ul>
+<h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><p>每个对象都有一个<code>__proto__</code>，它指向它的<code>prototype</code>原型对象，而<code>prototype</code>原型对象又具有一个自己的<code>prototype</code>原型对象，就这样层层往上直到一个对象的原型<code>prototype</code>为<code>null</code></p>
+<p>这个查询的路径就是<code>原型链</code></p>
+<h2 id="JavaScript-中的继承"><a href="#JavaScript-中的继承" class="headerlink" title="JavaScript 中的继承"></a>JavaScript 中的继承</h2><ul>
+<li>属性继承</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法定义在构造函数的原型上</span></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params">name, age, subject</span>) </span>&#123;</span><br><span class="line">  Person.call(<span class="built_in">this</span>, name, age);</span><br><span class="line">  <span class="built_in">this</span>.subject = subject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>方法继承</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Teacher.prototype = <span class="built_in">Object</span>.create(Person.prototype);</span><br><span class="line">Teacher.prototype.constructor = Teacher;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JS</category>
+        <category>原型</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>原型</tag>
       </tags>
   </entry>
   <entry>
@@ -11385,21 +11385,21 @@ callee</code></pre>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      area: [</span><br><span class="line">        <span class="comment">// 数字类型 &#x27;number&#x27;, 整数: &#x27;integer&#x27;, 浮点数: &#x27;float&#x27;</span></span><br><span class="line">        <span class="comment">// &#123;type: &#x27;number&#x27;, message: &#x27;请输入数字类型&#x27;, trigger: &#x27;blur&#x27;&#125;,</span></span><br><span class="line">        <span class="comment">// &#123;type: &#x27;integer&#x27;, message: &#x27;请输入数字类型&#x27;, trigger: &#x27;change&#x27;&#125;, // &#x27;change&#x27;是表单的值改变的时候会触发验证</span></span><br><span class="line">        &#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&#x27;请输入区域面积&#x27;</span>, <span class="attr">trigger</span>: <span class="string">&#x27;blur&#x27;</span> &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="comment">// 自己写的正则验证,限制用户输入数字以外的字符</span></span><br><span class="line">    <span class="comment">// 过滤输入的金额</span></span><br><span class="line">    <span class="function"><span class="title">InputNumber</span>(<span class="params">property</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.registData[property] = <span class="built_in">this</span>.limitInputPointNumber(</span><br><span class="line">        <span class="built_in">this</span>.registData[property]</span><br><span class="line">      );</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 验证只能输入数字</span></span><br><span class="line">    <span class="function"><span class="title">limitInputNumber</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (val) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">String</span>(val).replace(<span class="regexp">/\D/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> val;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 限制只能输入数字(可以输入两位小数)</span></span><br><span class="line">    <span class="function"><span class="title">limitInputPointNumber</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (val === <span class="number">0</span> || val === <span class="string">&#x27;0&#x27;</span> || val === <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> value = <span class="literal">null</span>;</span><br><span class="line">        value = <span class="built_in">String</span>(val).replace(<span class="regexp">/[^\d.]/g</span>, <span class="string">&#x27;&#x27;</span>); <span class="comment">// 清除“数字”和“.”以外的字符</span></span><br><span class="line">        value = value.replace(<span class="regexp">/\.&#123;2,&#125;/g</span>, <span class="string">&#x27;.&#x27;</span>); <span class="comment">// 只保留第一个. 清除多余的</span></span><br><span class="line">        value = value</span><br><span class="line">          .replace(<span class="string">&#x27;.&#x27;</span>, <span class="string">&#x27;$#$&#x27;</span>)</span><br><span class="line">          .replace(<span class="regexp">/\./g</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">          .replace(<span class="string">&#x27;$#$&#x27;</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        value = value.replace(<span class="regexp">/^(-)*(\d+)\.(\d\d).*$/</span>, <span class="string">&#x27;$1$2.$3&#x27;</span>); <span class="comment">// 只能输入两个小数</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Number</span>(value);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="嵌套验证（独立验证）"><a href="#嵌套验证（独立验证）" class="headerlink" title="嵌套验证（独立验证）"></a>嵌套验证（独立验证）</h2><p>这种情况是一行里有多个输入框或选择的情况,这里有两种方法,第一种是 el-form 嵌套写法,验证是独立的</p>
-<img src="/posts/undefined/nest-form.png" class="" title="嵌套验证">
+<img src="/posts/38065/nest-form.png" class="" title="嵌套验证">
 
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;活动时间&quot;</span> <span class="attr">required</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-col</span> <span class="attr">:span</span>=<span class="string">&quot;11&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">prop</span>=<span class="string">&quot;date1&quot;</span>&gt;</span></span><br><span class="line">      &lt;el-date-picker</span><br><span class="line">        type=&quot;date&quot;</span><br><span class="line">        placeholder=&quot;选择日期&quot;</span><br><span class="line">        v-model=&quot;registData.date1&quot;</span><br><span class="line">        style=&quot;width: 100%;&quot;</span><br><span class="line">      &gt;<span class="tag">&lt;/<span class="name">el-date-picker</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-col</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-col</span> <span class="attr">class</span>=<span class="string">&quot;line&quot;</span> <span class="attr">:span</span>=<span class="string">&quot;2&quot;</span>&gt;</span>-<span class="tag">&lt;/<span class="name">el-col</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-col</span> <span class="attr">:span</span>=<span class="string">&quot;11&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">prop</span>=<span class="string">&quot;date2&quot;</span>&gt;</span></span><br><span class="line">      &lt;el-time-picker</span><br><span class="line">        type=&quot;fixed-time&quot;</span><br><span class="line">        placeholder=&quot;选择时间&quot;</span><br><span class="line">        v-model=&quot;registData.date2&quot;</span><br><span class="line">        style=&quot;width: 100%;&quot;</span><br><span class="line">      &gt;<span class="tag">&lt;/<span class="name">el-time-picker</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-col</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      date1: [</span><br><span class="line">        &#123;</span><br><span class="line">          type: <span class="string">&#x27;date&#x27;</span>,</span><br><span class="line">          required: <span class="literal">true</span>,</span><br><span class="line">          message: <span class="string">&#x27;请选择日期&#x27;</span>,</span><br><span class="line">          trigger: <span class="string">&#x27;change&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      date2: [</span><br><span class="line">        &#123;</span><br><span class="line">          type: <span class="string">&#x27;date&#x27;</span>,</span><br><span class="line">          required: <span class="literal">true</span>,</span><br><span class="line">          message: <span class="string">&#x27;请选择时间&#x27;</span>,</span><br><span class="line">          trigger: <span class="string">&#x27;change&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="嵌套验证（联动验证）"><a href="#嵌套验证（联动验证）" class="headerlink" title="嵌套验证（联动验证）"></a>嵌套验证（联动验证）</h2><p>这种是联动验证,适用省级联动场景,先选国家后触发城市验证</p>
-<img src="/posts/undefined/nest-form-linkage.png" class="" title="嵌套联动验证">
+<img src="/posts/38065/nest-form-linkage.png" class="" title="嵌套联动验证">
 
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- region是一个对象,国家和城市是它的属性 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;活动区域&quot;</span> <span class="attr">prop</span>=<span class="string">&quot;region&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-select</span> <span class="attr">v-model</span>=<span class="string">&quot;registData.region.country&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请选择国家&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-option</span> <span class="attr">label</span>=<span class="string">&quot;国家一&quot;</span> <span class="attr">value</span>=<span class="string">&quot;USA&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">el-option</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-option</span> <span class="attr">label</span>=<span class="string">&quot;国家二&quot;</span> <span class="attr">value</span>=<span class="string">&quot;China&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">el-option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-select</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-select</span> <span class="attr">v-model</span>=<span class="string">&quot;registData.region.city&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请选择城市&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-option</span> <span class="attr">label</span>=<span class="string">&quot;城市一&quot;</span> <span class="attr">value</span>=<span class="string">&quot;shanghai&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">el-option</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">el-option</span> <span class="attr">label</span>=<span class="string">&quot;城市二&quot;</span> <span class="attr">value</span>=<span class="string">&quot;beijing&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">el-option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-select</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      region: [</span><br><span class="line">        &#123;</span><br><span class="line">          type: <span class="string">&#x27;object&#x27;</span>,</span><br><span class="line">          required: <span class="literal">true</span>,</span><br><span class="line">          <span class="comment">// 这里有两种处理,一种是自定义验证,拿到值后自己对属性进行验证,比较麻烦</span></span><br><span class="line">          <span class="comment">// validator: (rule, value, callback) =&gt; &#123;</span></span><br><span class="line">          <span class="comment">//   console.log(55, value)</span></span><br><span class="line">          <span class="comment">//   if (!value.country) &#123;</span></span><br><span class="line">          <span class="comment">//     callback(new Error(&#x27;请选择国家&#x27;))</span></span><br><span class="line">          <span class="comment">//   &#125; else if (!value.city) &#123;</span></span><br><span class="line">          <span class="comment">//     callback(new Error(&#x27;请选择城市&#x27;))</span></span><br><span class="line">          <span class="comment">//   &#125; else &#123;</span></span><br><span class="line">          <span class="comment">//     callback()</span></span><br><span class="line">          <span class="comment">//   &#125;</span></span><br><span class="line">          <span class="comment">// &#125;,</span></span><br><span class="line">          trigger: <span class="string">&#x27;change&#x27;</span>,</span><br><span class="line">          <span class="comment">// 官网提供了对象的嵌套验证,只需要把需要验证的属性,放在fields对象里,就会按顺序进行验证</span></span><br><span class="line">          fields: &#123;</span><br><span class="line">            country: &#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&#x27;请选择国家&#x27;</span>, <span class="attr">trigger</span>: <span class="string">&#x27;blur&#x27;</span> &#125;,</span><br><span class="line">            city: &#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&#x27;请选择城市&#x27;</span>, <span class="attr">trigger</span>: <span class="string">&#x27;blur&#x27;</span> &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="图片上传验证（手动触发部分验证方法）"><a href="#图片上传验证（手动触发部分验证方法）" class="headerlink" title="图片上传验证（手动触发部分验证方法）"></a>图片上传验证（手动触发部分验证方法）</h2><p>有时候会需要在表单里上传图片,但是图片上传是一个异步过程,属性值改变后不会去触发验证规则</p>
-<img src="/posts/undefined/img-form.png" class="" title="图片验证">
+<img src="/posts/38065/img-form.png" class="" title="图片验证">
 
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line">el-form-item label=&quot;活动图片&quot; prop=&quot;fileUrl&quot;&gt;</span><br><span class="line">    &lt;el-upload</span><br><span class="line">      :action=&quot;action&quot;</span><br><span class="line">      :on-success=&quot;handleSuccess&quot;</span><br><span class="line">      :data=&quot;uploadData&quot;</span><br><span class="line">      :limit=&quot;20&quot;</span><br><span class="line">      list-type=&quot;picture-card&quot;</span><br><span class="line">      :on-preview=&quot;handlePreview&quot;</span><br><span class="line">      :on-remove=&quot;handleRemove&quot;&gt;</span><br><span class="line">      <span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">&quot;el-icon-plus&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">el-upload</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -11416,6 +11416,7 @@ callee</code></pre>
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;&quot;</span> <span class="attr">prop</span>=<span class="string">&quot;password&quot;</span>&gt;</span></span><br><span class="line">  &lt;el-input</span><br><span class="line">    v-model=&quot;perfectInfo.password&quot;</span><br><span class="line">    :placeholder=&quot;pwdPlaceholder&quot;</span><br><span class="line">    :maxlength=&quot;24&quot;</span><br><span class="line">    auto-complete=&quot;new-password&quot;</span><br><span class="line">  &gt;<span class="tag">&lt;/<span class="name">el-input</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot</span>=<span class="string">&quot;error&quot;</span> <span class="attr">slot-scope</span>=<span class="string">&quot;slot&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;el-form_tip tt&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item_tip&quot;</span>&gt;</span>&#123;&#123;pwdFormatTips1&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item_tip&quot;</span>&gt;</span>&#123;&#123;pwdFormatTips2&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item_tip&quot;</span>&gt;</span>&#123;&#123;pwdFormatTips3&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item_tip&quot;</span>&gt;</span>&#123;&#123;pwdFormatTips4&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
+        <category>前端</category>
         <category>UI</category>
         <category>element-ui</category>
       </categories>
@@ -14732,6 +14733,328 @@ chrome://inspect/#service-worker/
       </tags>
   </entry>
   <entry>
+    <title>转载-常用正则表达式大全</title>
+    <url>/posts/46804/</url>
+    <content><![CDATA[<ul>
+<li>转载自：<a href="https://www.yuque.com/gaoxizhi/linux/regex">https://www.yuque.com/gaoxizhi/linux/regex</a></li>
+</ul>
+<h3 id="一、校验数字的表达式"><a href="#一、校验数字的表达式" class="headerlink" title="一、校验数字的表达式"></a>一、校验数字的表达式</h3><ul>
+<li>正整数：^[0-9]*$</li>
+<li>n 位的正整数：^d{n}$</li>
+<li>至少 n 位的数字：^d{n,}$</li>
+<li>m-n 位的数字：^d{m,n}$</li>
+<li>零和非零开头的数字：^(0|[1-9][0-9]*)$</li>
+<li>非零开头的最多带两位小数的数字：^([1-9][0-9]*)+(.[0-9]{1,2})?$</li>
+<li>带 1-2 位小数的正数或负数：^(-)?d+(.d{1,2})?$</li>
+<li>正数、负数、和小数：^(-|+)?d+(.d+)?$</li>
+<li>有两位小数的正实数：^[0-9]+(.[0-9]{2})?$</li>
+<li>有 1~3 位小数的正实数：^[0-9]+(.[0-9]{1,3})?$</li>
+<li>非零的正整数：^[1-9]d*$ 或 ^([1-9][0-9]<em>){1,3}$ 或 ^+?[1-9][0-9]\</em>$</li>
+<li>非零的负整数：^-[1-9][]0-9″<em>$ 或 ^-[1-9]d</em>$</li>
+<li>非负整数：^d+$ 或 ^[1-9]d*|0$</li>
+<li>非正整数：^-[1-9]d*|0$ 或 ^((-d+)|(0+))$</li>
+<li>非负浮点数：^d+(.d+)?$ 或 ^[1-9]d*.d*|0.d*[1-9]d*|0?.0+|0$</li>
+<li>非正浮点数：^((-d+(.d+)?)|(0+(.0+)?))$ 或 ^(-([1-9]d*.d*|0.d*[1-9]d*))|0?.0+|0$</li>
+<li>正浮点数：^[1-9]d*.d*|0.d*[1-9]d*$ 或 ^(([0-9]+.[0-9]<em>[1-9][0-9]</em>)|([0-9]<em>[1-9][0-9]</em>.[0-9]+)|([0-9]<em>[1-9][0-9]</em>))$</li>
+<li>负浮点数：^-([1-9]d*.d*|0.d*[1-9]d*)$ 或 ^(-(([0-9]+.[0-9]<em>[1-9][0-9]</em>)|([0-9]<em>[1-9][0-9]</em>.[0-9]+)|([0-9]<em>[1-9][0-9]</em>)))$</li>
+<li>浮点数：^(-?d+)(.d+)?$ 或 ^-?([1-9]d*.d*|0.d*[1-9]d*|0?.0+|0)$</li>
+</ul>
+<h3 id="二、校验字符的表达式"><a href="#二、校验字符的表达式" class="headerlink" title="二、校验字符的表达式"></a>二、校验字符的表达式</h3><ul>
+<li>汉字：^[一-龥]{0,}$</li>
+<li>英文和数字：^[A-Za-z0-9]+$ 或 ^[A-Za-z0-9]{4,40}$</li>
+<li>长度为 3-20 的所有字符：^.{3,20}$</li>
+<li>由 26 个英文字母组成的字符串：^[A-Za-z]+$</li>
+<li>由 26 个大写英文字母组成的字符串：^[A-Z]+$</li>
+<li>由 26 个小写英文字母组成的字符串：^[a-z]+$</li>
+<li>由数字和 26 个英文字母组成的字符串：^[A-Za-z0-9]+$</li>
+<li>由数字、26 个英文字母或者下划线组成的字符串：^w+$ 或 ^w{3,20}$</li>
+<li>中文、英文、数字包括下划线：^[一-龥 A-Za-z0-9_]+$</li>
+<li>中文、英文、数字但不包括下划线等符号：^[一-龥 A-Za-z0-9]+$ 或 ^[一-龥 A-Za-z0-9]{2,20}$</li>
+<li>可以输入含有^%&amp;’,;=?$”等字符：[^%&amp;’,;=?$”]+</li>
+<li>禁止输入含有<del>的字符：[^</del>“]+</li>
+</ul>
+<h3 id="三、特殊需求表达式"><a href="#三、特殊需求表达式" class="headerlink" title="三、特殊需求表达式"></a>三、特殊需求表达式</h3><ul>
+<li><p>Email 地址：^w+([-+.]w+)<em>@w+([-.]w+)</em>.w+([-.]w+)*$</p>
+</li>
+<li><p>域名：[a-zA-Z0-9][-a-za-z0-9]{0,62}(/.[a-zA-Z0-9][-a-za-z0-9]{0,62})+/.?</p>
+</li>
+<li><p>InternetURL：[a-zA-z]+://[^s]_ 或 ^http://([w-]+.)+[w-]+(/[w-./?%&amp;=]_)?$</p>
+</li>
+<li><p>手机号码：^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])d{8}$</p>
+</li>
+<li><p>电话号码(“XXX-XXXXXXX”、”XXXX-XXXXXXXX”、”XXX-XXXXXXX”、”XXX-XXXXXXXX”、”XXXXXXX”和”XXXXXXXX)：^($$d{3,4}-)|d{3.4}-)?d{7,8}$</p>
+</li>
+<li><p>国内电话号码(0511-4405222、021-87888822)：d{3}-d{8}|d{4}-d{7}</p>
+</li>
+<li><p>身份证号(15 位、18 位数字)：^d{15}|d{18}$</p>
+</li>
+<li><p>短身份证号码(数字、字母 x 结尾)：^([0-9]){7,18}(x|X)?$ 或 ^d{8,18}|[0-9x]{8,18}|[0-9X]{8,18}?$</p>
+</li>
+<li><p>帐号是否合法(字母开头，允许 5-16 字节，允许字母数字下划线)：^[a-zA-Z][a-za-z0-9_]{4,15}$</p>
+</li>
+<li><p>密码(以字母开头，长度在 6~18 之间，只能包含字母、数字和下划线)：^[a-zA-Z]w{5,17}$</p>
+</li>
+<li><p>强密码(必须包含大小写字母和数字的组合，不能使用特殊字符，长度在 8-10 之间)：^(?=.<em>d)(?=.</em>[a-z])(?=.*[A-Z]).{8,10}$</p>
+</li>
+<li><p>日期格式：^d{4}-d{1,2}-d{1,2}</p>
+</li>
+<li><p>一年的 12 个月(01 ～ 09 和 1 ～ 12)：^(0?[1-9]|1[0-2])$</p>
+</li>
+<li><p>一个月的 31 天(01 ～ 09 和 1 ～ 31)：^((0?[1-9])|((1|2)[0-9])|30|31)$</p>
+</li>
+<li><p>钱的输入格式：</p>
+</li>
+<li><ul>
+<li>有四种钱的表示形式我们可以接受:”10000.00″ 和 “10,000.00″, 和没有 “分” 的 “10000″ 和 “10,000″：^[1-9][0-9]*$</li>
+<li>这表示任意一个不以 0 开头的数字，但是，这也意味着一个字符”0″不通过，所以我们采用下面的形式：^(0|[1-9][0-9]*)$</li>
+<li>一个 0 或者一个不以 0 开头的数字.我们还可以允许开头有一个负号：^(0|-?[1-9][0-9]*)$</li>
+<li>这表示一个 0 或者一个可能为负的开头不为 0 的数字.让用户以 0 开头好了.把负号的也去掉，因为钱总不能是负的吧.下面我们要加的是说明可能的小数部分：^[0-9]+(.[0-9]+)?$</li>
+<li>必须说明的是，小数点后面至少应该有 1 位数，所以”10.”是不通过的，但是 “10″ 和 “10.2″ 是通过的：^[0-9]+(.[0-9]{2})?$</li>
+<li>这样我们规定小数点后面必须有两位，如果你认为太苛刻了，可以这样：^[0-9]+(.[0-9]{1,2})?$</li>
+<li>这样就允许用户只写一位小数。下面我们该考虑数字中的逗号了，我们可以这样：^[0-9]{1,3}(,[0-9]{3})*(.[0-9]{1,2})?$</li>
+<li>1 到 3 个数字，后面跟着任意个 逗号+3 个数字，逗号成为可选，而不是必须：^([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(.[0-9]{1,2})?$</li>
+<li>备注：这就是最终结果了，别忘了”+”可以用”*”替代。如果你觉得空字符串也可以接受的话(奇怪，为什么?)最后，别忘了在用函数时去掉去掉那个反斜杠，一般的错误都在这里</li>
+</ul>
+</li>
+<li><p>xml 文件：^([a-zA-Z]+-?)+[a-zA-Z0-9]+.[x|X][m|m][l|L]$</p>
+</li>
+<li><p>中文字符的正则表达式：[一-龥]</p>
+</li>
+<li><p>双字节字符：[^-ÿ] (包括汉字在内，可以用来计算字符串的长度(一个双字节字符长度计 2，ASCII 字符计 1))</p>
+</li>
+<li><p>空白行的正则表达式：s* (可以用来删除空白行)</p>
+</li>
+<li><p>HTML 标记的正则表达式：&lt;(S*?)[^&gt;]*&gt;._?&lt;/&gt;|&lt;._? /&gt; (网上流传的版本太糟糕，上面这个也仅仅能部分，对于复杂的嵌套标记依旧无能为力)</p>
+</li>
+<li><p>首尾空白字符的正则表达式：^s*|s*$或(^s*)|(s*$) (可以用来删除行首行尾的空白字符(包括空格、制表符、换页符等等)，非常有用的表达式)</p>
+</li>
+<li><p>腾讯 QQ 号：[1-9][0-9]{4,} (腾讯 QQ 号从 10000 开始)</p>
+</li>
+<li><p>中国邮政编码：[1-9]d{5}(?!d) (中国邮政编码为 6 位数字)</p>
+</li>
+<li><p>IP 地址：d+.d+.d+.d+ (提取 IP 地址时有用)</p>
+</li>
+<li><p>IP 地址：(?=(\b|\d))(((\d{1,2})|(1\d{1,2})|(2[0-4]\d)|(25[0-5])).){3}((\d{1,2})|(1\d{1,2})|(2[0-4]\d)|(25[0-5]))(?=(\b|\d)) （校验时使用）</p>
+</li>
+<li><p>IPv6：</p>
+</li>
+</ul>
+<h3 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h3><p>| 验证手机号码                                   | <strong>1[3|5|7|8|]\d{9}</strong>                           |<br>| ———————————————- | ————————————————– | ————————– |<br>| 实现手机号前带 86 或是+86 的情况               | <strong>^((+86)|(86))?(13)\d{9}$</strong>                     |<br>| 电话号码与手机号码同时验证                     | <strong>(^(\d{3,4}-)?\d{7,8})$|(1[3|5|7|8]\d{9})</strong>   |<br>| 提取信息中的网络链接                           | **(h|H)(r|R)(e|E)(f|F)*=*(‘|“)?(\w|\    | /|.)+(‘|“|*|&gt;)?** |<br>| 提取信息中的邮件地址                           | <strong>\w+([-+.]\w+)*@\w+([-.]\w+)*.\w+([-.]\w+)*</strong> |<br>| 提取信息中的图片链接                           | **(s|S)(r|R)(c|C)*=*(‘|“)?(\w|\          | /|.)+(‘|“|*|&gt;)?** |<br>| 提取信息中的 IP 地址                           | <strong>(\d+).(\d+).(\d+).(\d+)</strong>                     |<br>| 提取信息中的中国手机号码                       | <strong>(86)*0*13\d{9}</strong>                               |<br>| 提取信息中的中国固定电话号码                   | <strong>((\d{3,4})|\d{3,4}-|\s)?\d{8}</strong>              |<br>| 提取信息中的中国电话号码（包括移动和固定电话） | <strong>((\d{3,4})|\d{3,4}-|\s)?\d{7,14}</strong>           |<br>| 提取信息中的中国邮政编码                       | <strong>[1-9]{1}(\d+){5}</strong>                               |<br>| 提取信息中的中国身份证号码                     | <strong>\d{18}|\d{15}</strong>                                 |<br>| 提取信息中的整数                               | <strong>\d+</strong>                                            |<br>| 提取信息中的浮点数（即小数）                   | <strong>(-?\d*).?\d+</strong>                                 |<br>| 提取信息中的任何数字                           | <strong>(-?\d*)(.\d+)?</strong>                               |<br>| 提取信息中的中文字符串                         | <strong>[\u4e00-\u9fa5]*</strong>                              |<br>| 提取信息中的双字节字符串(汉字)                 | <strong>[^\x00-\xff]*</strong>                                 |</p>
+<p>正则表达式（regex 或 regexp）在通过搜索特定搜索模式的一个或多个匹配（即 ASCII 或 unicode 字符的特定序列）<strong>从任何文本中提取信息时</strong>非常有用。</p>
+<p>应用领域从验证到解析/替换字符串，将数据转换为其他格式以及网络爬虫。</p>
+<p>最有趣的功能之一是，一旦你学会了语法，你就可以在（几乎）所有编程语言中使用这个工具（JavaScript，Java，VB，C#，C / C ++，Python，Perl，Ruby，Delphi，R，Tcl 等等），对引擎支持的最高级功能和语法版本的支持有一点区别）。</p>
+<h2 id="基本知识点"><a href="#基本知识点" class="headerlink" title="基本知识点"></a>基本知识点</h2><h3 id="先安利个表"><a href="#先安利个表" class="headerlink" title="先安利个表"></a>先安利个表</h3><p>| <strong>符号</strong>   | <strong>详解</strong>                            | <strong>例子</strong>                                                                                                     |<br>| ———- | ———————————– | ———————————————————————————————————— | —————————————- |<br>| 点号 .     | 匹配除换行符以外的任意单字符        | 匹配除换行符以外的任意单字符                                                                                 |<br>| 星号 *    | 任意个字符（包括 0 个）             | 例如，<code>zo*</code> 能匹配 “<code>z</code>“ 以及 “<code>zoo</code>“，* 等价于{0,}                                                         |<br>| 加号 +     | 至少一个字符                        | 例如，’<code>zo+</code>‘ 能匹配 “<code>zo</code>“ 以及 “<code>zoo</code>“，但不能匹配 “<code>z</code>“。+ 等价于 {1,}                                    |<br>| 问号？     | 表示 0 个或 1 个字符                | 例如，”<code>do(es)?</code>“ 可以匹配 “<code>do</code>“ 、 “<code>does</code>“ 中的 “<code>does</code>“ 、 “<code>doxy</code>“ 中的 “<code>do</code>“ 。? 等价于 {0,1}         |<br>| ^          | 表示行的开头                        | <code>^\d</code>表示必须以数字开头                                                                                      |<br>| $          | 表示行的结束                        | <code>\d$</code>表示必须以数字结束                                                                                      |<br>| {n}        | 表示 n 个字符                       | <code>\d&#123;3&#125;</code>表示匹配 3 个数字，例如’<code>010</code>‘                                                                        |<br>| {n,m}      | 表示 n-m 个字符                     | <code>\d&#123;3,8&#125;</code>表示 3-8 个数字，例如’<code>1234567</code>‘。                                                                  |<br>| \d         | 匹配一个数字                        | ‘<code>00\d</code>‘可以匹配’007’，但无法匹配’<code>00A</code>‘； ‘<code>\d\d\d</code>‘可以匹配’<code>010</code>‘ <code>\d&#123;3&#125;</code>表示匹配 3 个数字，例如’<code>010</code>‘； |<br>| \w         | 匹配一个字母或数字                  | ‘<code>\w\w\d</code>‘或’<code>\w\w\w</code>‘可以匹配’<code>py3</code>‘                                                                        |<br>| \s         | 匹配一个空格（也包括 Tab 等空白符） | <code>\s+</code>表示至少有一个空格，例如匹配’ ‘，’ ‘等                                                                  |<br>| A|B       | 可以匹配 A 或 B                     | (<code>P                                                                                                          | p)ython</code>可以匹配’<code>Python</code>‘或者’<code>python</code>‘ |<br>| 小括号()   | 表示匹配括号中全部字符              |                                                                                                              |<br>| [ ] 中括号 | 表示匹配括号中一个字符 范围描述     | 如[<code>0-9 a-z A-Z</code>]                                                                                            |<br>| \ 转义字符 | 基本符号匹配都需要转义字符          | 如 * 表示匹配*号                                                                                           |</p>
+<h3 id="锚-—-以及"><a href="#锚-—-以及" class="headerlink" title="锚 — ^ 以及 $"></a>锚 — ^ 以及 $</h3><table>
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>详解</strong></th>
+<th><strong>**例子**</strong></th>
+<th><strong>分析</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>^</td>
+<td>表示行的开头</td>
+<td>^The</td>
+<td>匹配任意字符串以 The 为开头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>表示行的结束</td>
+<td>end$</td>
+<td>匹配任意字符串以 end 为结尾</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>^The end$</td>
+<td>匹配字符串的(开头和结尾分别是 The end)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>^\d</td>
+<td>表示必须以数字开头</td>
+</tr>
+</tbody></table>
+<h3 id="量词-—-以及"><a href="#量词-—-以及" class="headerlink" title="量词 — * + ? 以及 {}"></a>量词 — * + ? 以及 {}</h3><table>
+<thead>
+<tr>
+<th><strong>星号 *</strong></th>
+<th>任意个字符（包括 0 个）</th>
+<th>例如，<code>zo*</code> 能匹配 “<code>z</code>“ 以及 “<code>zoo</code>“，* 等价于{0,}</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>加号 +</strong></td>
+<td>至少一个字符</td>
+<td>例如，’<code>zo+</code>‘ 能匹配 “<code>zo</code>“ 以及 “<code>zoo</code>“，但不能匹配 “<code>z</code>“。+ 等价于 {1,}</td>
+</tr>
+<tr>
+<td><strong>问号？</strong></td>
+<td>表示 0 个或 1 个字符</td>
+<td>例如，”<code>do(es)?</code>“ 可以匹配 “<code>do</code>“ 、 “<code>does</code>“ 中的 “<code>does</code>“ 、 “<code>doxy</code>“ 中的 “<code>do</code>“ 。? 等价于 {0,1}</td>
+</tr>
+<tr>
+<td><strong>{n}</strong></td>
+<td>表示 n 个字符</td>
+<td><code>\d&#123;3&#125;</code>表示匹配 3 个数字，例如’<code>010</code>‘</td>
+</tr>
+<tr>
+<td><strong>{n,m}</strong></td>
+<td>表示 n-m 个字符</td>
+<td><code>\d&#123;3,8&#125;</code>表示 3-8 个数字，例如’<code>1234567</code>‘。</td>
+</tr>
+</tbody></table>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><table>
+<thead>
+<tr>
+<th>abc*</th>
+<th>ab 其后有 0 个或者多个 c</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>abc+</td>
+<td>ab 其后有 1 个或者多个 c</td>
+</tr>
+<tr>
+<td>abc?</td>
+<td>ab 其后有 0 个或者 1 个 c</td>
+</tr>
+<tr>
+<td>abc{2}</td>
+<td>ab 其后有 2 个 c</td>
+</tr>
+<tr>
+<td>abc{2,}</td>
+<td>ab 其后有 2 个或者多个 c</td>
+</tr>
+<tr>
+<td>abc{2,5}</td>
+<td>ab 其后有 2 到 5 个 c</td>
+</tr>
+<tr>
+<td>a(bc)*</td>
+<td>a 其后有 0 到多个 bc 的副本</td>
+</tr>
+<tr>
+<td>a(bc){2,5}</td>
+<td>a 其后有 0 到 5 个 bc 的副本</td>
+</tr>
+</tbody></table>
+<h3 id="OR-操作符-—-或"><a href="#OR-操作符-—-或" class="headerlink" title="OR 操作符 — | 或 []"></a>OR 操作符 — | 或 []</h3><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>详解</th>
+<th>示例</th>
+<th>分析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>|</td>
+<td>或者</td>
+<td>A|B</td>
+<td>A 或者 B</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>范围区间</td>
+<td>[A-F]</td>
+<td>A 到 F 都可以匹配，适用复杂逻辑大范围区间</td>
+</tr>
+</tbody></table>
+<p>(P|p)ython 可以匹配’Python’或者’python’</p>
+<p>[0-9a-zA-Z]可以匹配所有字母和数字</p>
+<h3 id="字符类-d、-w、-s-以及转义字符"><a href="#字符类-d、-w、-s-以及转义字符" class="headerlink" title="字符类\d、\w、\s 以及转义字符"></a>字符类\d、\w、\s 以及转义字符</h3><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>详解</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\d</td>
+<td>匹配一个数字</td>
+<td>‘<code>00\d</code>‘可以匹配’007’，但无法匹配’<code>00A</code>‘； ‘<code>\d\d\d</code>‘可以匹配’<code>010</code>‘ <code>\d&#123;3&#125;</code>表示匹配 3 个数字，例如’<code>010</code>‘；</td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配一个字母或数字</td>
+<td>‘<code>\w\w\d</code>‘或’<code>\w\w\w</code>‘可以匹配’<code>py3</code>‘</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配一个空格（也包括 Tab 等空白符）</td>
+<td><code>\s+</code>表示至少有一个空格，例如匹配’ ‘，’ ‘等</td>
+</tr>
+<tr>
+<td>.（点号）</td>
+<td>匹配除换行符以外的任意单字符</td>
+<td>匹配除换行符以外的任意单字符</td>
+</tr>
+</tbody></table>
+<p><code>\d</code>, <code>\w</code> 以及 <code>\s</code> 分别对应其否定类 <code>\D</code>, <code>\W</code> 以及 <code>\S</code> 。例如： <code>\D</code> 将执行与 <code>\d</code> 获得的相反的匹配，即不是数字的字符。</p>
+<p>为了获取字面上疑似的字符，你必须使用反斜杠 <code>\</code> 来转义字符 <code>^.[$()|*+?&#123;\</code>，因为它们具有特殊含义。</p>
+<p>注意你也可以匹配<strong>非打印字符</strong>比如 tabs <code>\t</code>，换行 <code>\n</code>，回车 <code>\r</code>。</p>
+<h3 id="标志"><a href="#标志" class="headerlink" title="标志"></a>标志</h3><p>我们正在学习如何构建一个正则表达式但是却忘记了一个基础的概念：<strong>标志</strong>。</p>
+<p>一个正则表达式的格式通常是这个样子的 <code>/abc/</code>，搜索模式通过两个斜杠符 <code>/</code> 进行区分。在末尾我们可以规定一个标志使用以下的值（我们也可以将它们相互结合）：</p>
+<ul>
+<li><strong>g</strong>(全局的) 在第一匹配之后不会立即返回，从前面匹配之后继续搜索</li>
+<li><strong>m</strong> (多行的) 当使用 <code>^</code> 以及 <code>$</code> 的时候将会匹配行首和行尾而不是整个字符串</li>
+<li><strong>i</strong> (大小写不敏感的) 让整个表达式大小写不敏感（比如 <code>/aBc/i</code> 将匹配 <code>Abc</code>）</li>
+</ul>
+<h2 id="中级知识点"><a href="#中级知识点" class="headerlink" title="中级知识点"></a>中级知识点</h2><h3 id="分组以及捕获-—"><a href="#分组以及捕获-—" class="headerlink" title="分组以及捕获 — ()"></a>分组以及捕获 — ()</h3><p>a(bc) 括号产生一个值为 bc 的捕获分组</p>
+<p>a(?:bc)* 我么可以使用 ?: 让捕获分组不起作用</p>
+<p>a(?bc) 我们可以使用 ? 将名字放在分组中</p>
+<p>当我们需要使用你首选的编程语言从字符串或数据中提取信息时，此运算符非常有用。 由几个组捕获的任何多次出现都将以经典数组的形式公开：我们将使用匹配结果的索引来访问它们的值。</p>
+<p>如果我们选择为组添加名称（使用（<code>?&lt;foo&gt;</code> …）），我们将能够使用匹配结果检索组值，如字典，其中字典的名称就是刚才添加的名称。</p>
+<h3 id="方括号表达式"><a href="#方括号表达式" class="headerlink" title="方括号表达式   []"></a>方括号表达式   []</h3><p>[abc] 匹配一个具有 要么一个 a 或者一个 b 或者一个 c 的字符串等同于 <code>a|b|c</code></p>
+<p>[a-c] 与前一条相同</p>
+<p>[a-fA-F0-9] 十六进制数字符串，大小写不敏感</p>
+<p>[0-9]% 一个具有从 0 到 9 其后后一个 % 符号</p>
+<p>[^a-za-z] 一个不是大小写字母的字符串。在这种情况下，^ 被用为 表达式的否定。</p>
+<p><strong>注意：</strong>在括号内表达式中，所有特殊字符（包括反斜杠\）都会失去它们的特殊功能：因此我们不会应用“转义规则”。</p>
+<h3 id="贪婪和惰性匹配"><a href="#贪婪和惰性匹配" class="headerlink" title="贪婪和惰性匹配"></a>贪婪和惰性匹配</h3><p>量词 ( <code>* + &#123;&#125;</code>) 是贪婪操作符, 所以他们尽可能地通过提供的文本扩展匹配.</p>
+<p>比如， <code>&lt;.+&gt;</code> 会从 <code>This is a **&lt;div&gt; simple div&lt;/div&gt;** test</code> 中匹配 <code>&lt;div&gt;simple div&lt;/div&gt;</code>。 为了仅仅匹配 div 标签， 我们可以使用一个 <code>?</code> 让它变为惰性:</p>
+<p>&lt;.+?&gt; 匹配 任意字符被包含在 &lt; 以及 &gt;之中，出现一到多次, 需要的时候才会扩展</p>
+<p>注意更好的解决方案是避免使用 <code>.</code>来构建一个更严格的正则表达式：</p>
+<p>&lt;[^&lt;&gt;]+&gt; 匹配任意的字符除了 <code>&lt;</code> 或者 <code>&gt;</code> 一次或者多次被包含在 &lt; 以及 &gt; 之中</p>
+<h2 id="高级知识点"><a href="#高级知识点" class="headerlink" title="高级知识点"></a>高级知识点</h2><h3 id="边界-—-b-以及-B"><a href="#边界-—-b-以及-B" class="headerlink" title="边界 — \b 以及 \B"></a><strong>边界 — \b 以及 \B</strong></h3><p>\babc\b 执行“仅限整个单词”搜索<strong>abc</strong></p>
+<p><code>\b</code> 代表一个锚类似于符号 (等同于 <code>$</code> 以及 <code>^</code>) 的匹配位置， 其中一侧是单词字符（如 <code>\w</code>），另外一侧不是单词字符（例如它可能是字符串的开头或空格字符）。</p>
+<p>随之而来是它的否定, <code>\B</code>. 这将会匹配所有 <code>\b</code> 不会匹配的位置如果我们希望搜索模式可以被单词字符所匹配。</p>
+<p>\Babc\B 仅在搜索模式被单词字符包围的时候才会匹配</p>
+<h3 id="返回引用—-1"><a href="#返回引用—-1" class="headerlink" title="返回引用— \1"></a>返回引用— \1</h3><p>([abc])\1 使用 <code>\1</code> 将会匹配与第一个捕获分组相同的文本</p>
+<p>([abc])([de])\2\1 我们可以使用 \2 (\3, \4, 等等)来获取被第二个(第三个, 第四个, 等等.)捕获分组相同的文本</p>
+<p>(?[abc])\k 我们将分组名称命名为<code>foo</code> 并随后使用 <code>(\k&lt;foo&gt;)</code> 来进行引用。结果与第一个正则表达式相同</p>
+<h3 id="前瞻和后瞻-—-以及-lt"><a href="#前瞻和后瞻-—-以及-lt" class="headerlink" title="前瞻和后瞻 — (?=) 以及 (?&lt;=)"></a>前瞻和后瞻 — <strong>(?=)</strong> 以及 <strong>(?&lt;=)</strong></h3><p>d(?=r) 匹配一个 <code>d</code> 并且其后有一个 <code>r</code>, 但是 <code>r</code> 将不会是整个正则表达式匹配的一部分</p>
+<p>(?&lt;=r)d 匹配一个 <code>d</code> 并且前面有一个 <code>r</code>, 但是 <code>r</code> 将不会是整个正则表达式匹配的一部分</p>
+<p>我们也可以使用否定符号 !</p>
+<p>d(?!r) 匹配一个 <code>d</code> 并且其后不是一个 <code>r</code>, 但是 <code>r</code> 将不会是整个正则表达式匹配的一部分</p>
+<p>(?&lt;!r)d 匹配一个 <code>d</code> 并且前面不是一个 <code>r</code>, 但是 <code>r</code> 将不会是整个正则表达式匹配的一部分</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>正如你所见，正则表达式的应用程序字段可以是多个，我确信你已经认识到在开发人员职业生涯中看到的这些任务中的至少一个，这里有一个快速列表：</p>
+<ul>
+<li>数据验证 (比如检查一个时间字符串 i 的格式是正确的)</li>
+<li>数据抓取（特别是网页抓取，最终按特定顺序查找包含特定单词集的所有页面）</li>
+<li>数据转换（将数据从“原始”转换为另一种格式）</li>
+<li>字符串解析（例如捕获所有 URL GET 参数，捕获一组括号内的文本）</li>
+<li>字符串替换（即使在使用通用 IDE 的代码会话期间，例如在相应的 JSON 对象中转换 Java 或 C# 类 - 将“;”替换为“,”将其设为小写，避免类型声明等）</li>
+<li>语法高亮，文件重命名，数据包嗅探和涉及字符串的许多其他应用程序（其中数据不必是文本）</li>
+</ul>
+<h3 id="参考其他"><a href="#参考其他" class="headerlink" title="参考其他"></a>参考其他</h3><p><a href="https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md">GitHub regex101</a></p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>正则</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+        <tag>正则</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>阿里云云服务器ECS购买与使用（笔记）</title>
     <url>/posts/40394/</url>
     <content><![CDATA[<h2 id="购买"><a href="#购买" class="headerlink" title="购买"></a>购买</h2><p>进入阿里云下拉菜单选择 ecs ：</p>
@@ -16395,7 +16718,7 @@ border-image
 
 <h3 id="写一个函数-isPhoneNum-str-，判断用户输入的是不是手机号？"><a href="#写一个函数-isPhoneNum-str-，判断用户输入的是不是手机号？" class="headerlink" title="写一个函数 isPhoneNum(str)，判断用户输入的是不是手机号？"></a>写一个函数 isPhoneNum(str)，判断用户输入的是不是手机号？</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isPhoneNum</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/^1[3578]\d&#123;9&#125;$/g</span>.test(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(isPhoneNum(<span class="string">&#x27;13871455497&#x27;</span>));</span><br></pre></td></tr></table></figure>
 
-<h3 id="写一个函数-isEmail-str-，-判断用户输入的是不是邮箱？（e-g-x78-x78-120-64-103-109-x61-x69-108-x2e-99-x6f-x6d-或者-120-120-x78-x40-x73-119-x6c-97-110-x63-101-x2e-x63-x6f-x6d-46-x63-x6e-）"><a href="#写一个函数-isEmail-str-，-判断用户输入的是不是邮箱？（e-g-x78-x78-120-64-103-109-x61-x69-108-x2e-99-x6f-x6d-或者-120-120-x78-x40-x73-119-x6c-97-110-x63-101-x2e-x63-x6f-x6d-46-x63-x6e-）" class="headerlink" title="写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. &#x78;&#x78;&#120;&#64;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d; 或者 &#120;&#120;&#x78;&#x40;&#x73;&#119;&#x6c;&#97;&#110;&#x63;&#101;&#x2e;&#x63;&#x6f;&#x6d;&#46;&#x63;&#x6e;）"></a>写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. <a href="mailto:&#x78;&#x78;&#120;&#64;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x78;&#x78;&#120;&#64;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;</a> 或者 <a href="mailto:&#120;&#120;&#x78;&#x40;&#x73;&#119;&#x6c;&#97;&#110;&#x63;&#101;&#x2e;&#x63;&#x6f;&#x6d;&#46;&#x63;&#x6e;">&#120;&#120;&#x78;&#x40;&#x73;&#119;&#x6c;&#97;&#110;&#x63;&#101;&#x2e;&#x63;&#x6f;&#x6d;&#46;&#x63;&#x6e;</a>）</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isEmail</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/^\w+@\w+(\.\w+)&#123;1,2&#125;$/</span>.test(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(isEmail(<span class="string">&#x27;xxx@swlance.com.cn&#x27;</span>));</span><br></pre></td></tr></table></figure>
+<h3 id="写一个函数-isEmail-str-，-判断用户输入的是不是邮箱？（e-g-120-120-120-x40-x67-x6d-97-x69-108-46-x63-111-109-或者-x78-120-x78-x40-x73-119-108-97-x6e-99-101-46-99-x6f-x6d-46-99-110-）"><a href="#写一个函数-isEmail-str-，-判断用户输入的是不是邮箱？（e-g-120-120-120-x40-x67-x6d-97-x69-108-46-x63-111-109-或者-x78-120-x78-x40-x73-119-108-97-x6e-99-101-46-99-x6f-x6d-46-99-110-）" class="headerlink" title="写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. &#120;&#120;&#120;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#111;&#109; 或者 &#x78;&#120;&#x78;&#x40;&#x73;&#119;&#108;&#97;&#x6e;&#99;&#101;&#46;&#99;&#x6f;&#x6d;&#46;&#99;&#110;）"></a>写一个函数 isEmail(str)， 判断用户输入的是不是邮箱？（e.g. <a href="mailto:&#120;&#120;&#120;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#111;&#109;">&#120;&#120;&#120;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#111;&#109;</a> 或者 <a href="mailto:&#x78;&#120;&#x78;&#x40;&#x73;&#119;&#108;&#97;&#x6e;&#99;&#101;&#46;&#99;&#x6f;&#x6d;&#46;&#99;&#110;">&#x78;&#120;&#x78;&#x40;&#x73;&#119;&#108;&#97;&#x6e;&#99;&#101;&#46;&#99;&#x6f;&#x6d;&#46;&#99;&#110;</a>）</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isEmail</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="regexp">/^\w+@\w+(\.\w+)&#123;1,2&#125;$/</span>.test(str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(isEmail(<span class="string">&#x27;xxx@swlance.com.cn&#x27;</span>));</span><br></pre></td></tr></table></figure>
 
 <h3 id="写一个函数-trim-str-，去除字符串两边的空白字符？"><a href="#写一个函数-trim-str-，去除字符串两边的空白字符？" class="headerlink" title="写一个函数 trim(str)，去除字符串两边的空白字符？"></a>写一个函数 trim(str)，去除字符串两边的空白字符？</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">trim</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.replace(<span class="regexp">/^\s+|\s+$/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(trim(<span class="string">&#x27;     xxxswlance.cn        &#x27;</span>));</span><br></pre></td></tr></table></figure>
 
