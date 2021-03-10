@@ -35,6 +35,8 @@ export default {
 };
 ```
 
+<!-- more -->
+
 ## 数字类型验证
 
 ```html
