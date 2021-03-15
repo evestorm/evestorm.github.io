@@ -220,7 +220,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">232</span>
+          <span class="site-state-item-count">234</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -279,6 +279,294 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/7128/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/7128/" class="post-title-link" itemprop="url">package.json配置一次npm run start执行多个指令</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-15 16:06:13 / 修改时间：16:17:32" itemprop="dateCreated datePublished" datetime="2021-03-15T16:06:13+08:00">2021-03-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">构建工具</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/npm/" itemprop="url" rel="index"><span itemprop="name">npm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/7128/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/7128/" class="cy_cmt_count" data-xid="posts/7128/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>前端项目设置了 express 编写的 mock 数据，每次启动项目得执行两个命令，一个用来开启 vue 客户端，一个用来开启 express 服务端。感觉每次输入两次命令太过麻烦。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>google 了下发现有个模块可以帮助我们实现一次指令执行多个命令：<code>concurrently</code>。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>全局安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -g concurrently</span><br></pre></td></tr></table></figure>
+
+<p>或者项目安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i concurrently -D</span><br></pre></td></tr></table></figure>
+
+<p>然后更改 <code>package.json</code>：</p>
+<blockquote>
+<p>旧</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;mock&quot;:&quot;vue-cli-service serve --mode mock&quot;,</span><br><span class="line">&quot;nodemon&quot;: &quot;nodemon server/index.js&quot;,</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>新</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;mock&quot;: &quot;concurrently \&quot;vue-cli-service serve --mode mock\&quot; \&quot;nodemon server/index.js\&quot;&quot;,</span><br></pre></td></tr></table></figure>
+
+<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>其实不安装 <code>concurrently</code> 也能实现执行多个命令，那就是：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;all&quot;: &quot;node server/server.js &amp;&amp; npm run start&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这种方案。</p>
+<p>不同的是 concurrently 是并联的，&amp;&amp; 是串联的。</p>
+<p>在速度上，第一个方法远比第二个方法要快。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/63036/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/63036/" class="post-title-link" itemprop="url">转载-husky+lint-staged助力团队编码规范</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-11 20:22:21 / 修改时间：20:30:34" itemprop="dateCreated datePublished" datetime="2021-03-11T20:22:21+08:00">2021-03-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E5%85%B7/IDE/" itemprop="url" rel="index"><span itemprop="name">IDE</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/63036/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/63036/" class="cy_cmt_count" data-xid="posts/63036/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>转载自：<a target="_blank" rel="noopener" href="https://neveryu.github.io/2020/06/10/husky-lint-staged/">https://neveryu.github.io/2020/06/10/husky-lint-staged/</a></p>
+<h2 id="快速集成"><a href="#快速集成" class="headerlink" title="快速集成"></a>快速集成</h2><p>在提交 git 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。</p>
+<p>首先，安装依赖：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm install -D husky</span><br><span class="line"></span><br><span class="line">// lint-staged 可以让husky只检验git工作区的文件，不会导致你一下出现成百上千个错误</span><br><span class="line">npm install -D lint-staged</span><br></pre></td></tr></table></figure>
+
+<p>然后修改 <code>package.json</code>，增加配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line"> &quot;precommit&quot;: &quot;eslint src/**/*.js&quot;</span><br><span class="line">&#125;</span><br><span class="line">&quot;husky&quot;: &#123;</span><br><span class="line">  &quot;hooks&quot;: &#123;</span><br><span class="line">    &quot;pre-commit&quot;: &quot;lint-staged&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line">&quot;lint-staged&quot;: &#123;</span><br><span class="line">  &quot;src/**/*.&#123;js,vue&#125;&quot;: [&quot;prettier --write&quot;, &quot;eslint --cache --fix&quot;, &quot;git add&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>git commit</code> 之前会进入 工作区文件的扫描，执行 <code>prettier</code> 脚本，修改 <code>eslint</code> 问题，然后重要提交到工作区。</p>
+<h2 id="深入了解"><a href="#深入了解" class="headerlink" title="深入了解"></a>深入了解</h2><h1 id="了解-githooks"><a href="#了解-githooks" class="headerlink" title="了解 githooks"></a>了解 githooks</h1><p>Git Hooks 就是在 Git 执行特定事件（如 commit、push、receive 等）时触发运行的脚本，类似于“钩子函数”，没有设置可执行的钩子将被忽略。</p>
+<p>在项目的 <code>.git/hooks</code> 目录中，有一些 <code>.sample</code> 结尾的钩子示例脚本，如果想启用对应的钩子，只需手动删除后缀，即可。（删除某一个 hook 的后缀 <code>.sample</code> 即可启用该 hook 脚本，默认是不启用的。）</p>
+<p>【但是，我们一般不去改动 <code>.git/hooks</code> 里面的文件，因为我们使用 husky 】</p>
+<h1 id="husky"><a href="#husky" class="headerlink" title="husky"></a>husky</h1><ul>
+<li>husky 的安装</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i husky -D --registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<p>husky 在安装过程中会在 <code>.git/hooks</code> 文件夹中生成一系列的 <code>git hook</code> 脚本。</p>
+<blockquote>
+<p>需要注意的是：你要留意 husky 的安装信息，是否为你安装了 <code>git</code> 钩子。</p>
+</blockquote>
+<p>如果安装正确的话，可以看到 husky 会打印出如下消息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> node husky install</span></span><br><span class="line">husky &gt; setting up git hooks</span><br><span class="line">husky &gt; done</span><br></pre></td></tr></table></figure>
+
+<p>h<img src="/posts/undefined/husky-2.png" class="" title="husky-2"></p>
+<p>但也有可能：</p>
+<img src="/posts/undefined/husky-1.png" class="" title="husky-1">
+
+<p>这个就是由于电脑 <code>node</code> 版本的原因，跳过了 Git 钩子安装，相当于是没有安装成功哦~</p>
+<p>OK，假设你的 husky 安装是正常的，那么 husky 为你安装的 hooks 将会生效。这样我们在 <code>git commit</code> 的时候会触发 <code>pre-commit</code> 钩子从而触发到 huksy。</p>
+<p>我们在 <code>package.json</code> 文件中配置 husky 的钩子需要执行的 命令 或 操作。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;husky&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;hooks&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;pre-commit&quot;</span>: <span class="string">&quot;echo \&quot;git commit trigger husky pre-commit hook\&quot; &quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，在 <code>git commit</code> 的时候就会看到 <code>pre-commit</code> 执行了。</p>
+<img src="/posts/undefined/husky-3.png" class="" title="husky-3.png">
+
+<p>从 1.0.0 开始，husky 的配置可以使用 <code>.huskyrc</code>、<code>.huskyrc.json</code>、<code>.huskyrc.js</code> 或 <code>husky.config.js</code> 文件</p>
+<h2 id="钩子中执行多个命令"><a href="#钩子中执行多个命令" class="headerlink" title="钩子中执行多个命令"></a>钩子中执行多个命令</h2><ul>
+<li><p>根据 npm script 的规则，使用 &amp;&amp;</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;husky&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;hooks&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;pre-commit&quot;</span>: <span class="string">&quot;echo \&quot;git commit trigger husky pre-commit hook\&quot; &amp;&amp; npm run test&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果您更喜欢使用数组，建议的方法是在 <code>.huskyrc.js</code> 中定义它们</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> tasks = <span class="function"><span class="params">arr</span> =&gt;</span> arr.join(<span class="string">&#x27; &amp;&amp; &#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  hooks: &#123;</span><br><span class="line">    <span class="string">&#x27;pre-commit&#x27;</span>: tasks([<span class="string">&#x27;npm run lint&#x27;</span>, <span class="string">&#x27;npm run test&#x27;</span>])</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="hook-拦截"><a href="#hook-拦截" class="headerlink" title="hook 拦截"></a>hook 拦截</h2><p>为了阻止提交，<code>pre-commit</code> 脚本必须以非零的退出代码退出。</p>
+<p>如果您的提交未被阻止，请检查脚本退出代码。</p>
+<p>当然 husky 不止能验证 <code>commit</code> ，也可以进行 <code>push</code> 等其他操作验证，这里就不一一举例了，具体可以参照 <a target="_blank" rel="noopener" href="https://www.npmjs.com/package/husky">npm husky</a> 。</p>
+<hr>
+<h1 id="lint-staged"><a href="#lint-staged" class="headerlink" title="lint-staged"></a>lint-staged</h1><p><code>lint-staged</code> 是一个在 git 暂存文件上（也就是被 <code>git add</code> 的文件）运行已配置的 linter（或其他）任务。<code>lint-staged</code> 总是将所有暂存文件的列表传递给任务。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;lint-staged&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;src/**/*.&#123;js,vue&#125;&quot;</span>: [</span><br><span class="line">    <span class="string">&quot;prettier --write&quot;</span>,</span><br><span class="line">    <span class="string">&quot;eslint --cache --fix&quot;</span>,</span><br><span class="line">    <span class="string">&quot;git add&quot;</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里 lint-staged 的配置是：在 git 的待提交的文件中，在 src 目录下的所有 <code>.js</code> <code>.vue</code> 都要执行三条命令。前两条一会儿说，后一条是将处理过的代码重新 add 到 git 中。</p>
+<p>结合我们前面介绍的 husky，配合 husky 的 pre-commit 钩子，将会形成一个自动化工具链。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;husky&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;hooks&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;pre-commit&quot;</span>: <span class="string">&quot;lint-staged&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line"><span class="string">&quot;lint-staged&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;src/**/*.&#123;js,vue&#125;&quot;</span>: [<span class="string">&quot;prettier --write&quot;</span>, <span class="string">&quot;eslint --cache --fix&quot;</span>, <span class="string">&quot;git add&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 commit 之前，将暂存区的内容做一次 代码检查 和 代码美化，然后再添加到暂存区；然后再 commit，完美！！</p>
+<p>从 v3.1 开始，您现在可以使用不同的方式进行 lint-staged 配置：</p>
+<ul>
+<li>lint-staged 在你的对象 package.json</li>
+<li>.lintstagedrc JSON 或 YML 格式的文件</li>
+<li>lint-staged.config.js JS 格式的文件</li>
+<li>使用 –config 或 -c 标志传递配置文件</li>
+</ul>
+<h1 id="mrm"><a href="#mrm" class="headerlink" title="mrm"></a>mrm</h1><p><a target="_blank" rel="noopener" href="https://github.com/sapegin/mrm">mrm</a> 是一个自动化工具。<strong>推荐</strong></p>
+<p>它将根据 package.json 依赖项中的代码质量工具来安装和配置 husky 和 lint-staged，因此请确保在此之前安装并配置所有代码质量工具，如 Prettier 和 ESlint</p>
+<p>安装 mrm 并执行 lint-staged 任务：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm i mrm -D --registry=https://registry.npm.taobao.org</span><br><span class="line">npx mrm lint-staged</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://mrm.js.org/">mrm 文档、mrm api doc</a></p>
+<h1 id="关于-prettier-的问题"><a href="#关于-prettier-的问题" class="headerlink" title="关于 prettier 的问题"></a>关于 prettier 的问题</h1><p>prettier 是一个很好的格式化代码的插件，但对已经有一定迭代完成度的代码不推荐使用。使用该插件后，它会将原有的代码也进行格式化，造成很多不可知的问题，我就是前车之鉴，使用 prettier 后，原本已经没有 eslint 问题的代码，又多出了更多的不知道什么原因的报错，只能将代码回退处理。</p>
+<p>所以，这也就是我们为什么在 <code>lint-staged</code> 中，执行 <code>prettier</code> 的原因。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/30080/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -304,7 +592,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2021-03-11 19:54:01 / 修改时间：20:08:35" itemprop="dateCreated datePublished" datetime="2021-03-11T19:54:01+08:00">2021-03-11</time>
+      <time title="创建时间：2021-03-11 19:54:01 / 修改时间：20:08:46" itemprop="dateCreated datePublished" datetime="2021-03-11T19:54:01+08:00">2021-03-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1167,234 +1455,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/46865/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/12455/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/12455/" class="post-title-link" itemprop="url">转载-说说原型（prototype）、原型链和原型继承</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-02-02 19:04:24 / 修改时间：19:22:13" itemprop="dateCreated datePublished" datetime="2021-02-02T19:04:24+08:00">2021-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/%E5%8E%9F%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">原型</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/12455/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/12455/" class="cy_cmt_count" data-xid="posts/12455/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>转载自：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/35790971">https://zhuanlan.zhihu.com/p/35790971</a></p>
-<h2 id="一、原型-prototype-和-proto"><a href="#一、原型-prototype-和-proto" class="headerlink" title="一、原型 prototype 和 __proto__"></a>一、原型 <code>prototype</code> 和 <code>__proto__</code></h2><ul>
-<li><p>每个对象都有一个<code>__proto__</code>属性，并且指向它的<code>prototype</code>原型对象</p>
-</li>
-<li><p>每个构造函数都有一个<code>prototype</code>原型对象</p>
-</li>
-<li><ul>
-<li><code>prototype</code>原型对象里的<code>constructor</code>指向构造函数本身</li>
-</ul>
-</li>
-</ul>
-<img src="/posts/12455/v2-e722d5325f7d4215169f1d04296e0f89_720w.png" class="" title="v2-e722d5325f7d4215169f1d04296e0f89_720w">
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/12455/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/56177/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/56177/" class="post-title-link" itemprop="url">扩展(spread)和剩余(rest)操作符</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-02-01 22:18:23" itemprop="dateCreated datePublished" datetime="2021-02-01T22:18:23+08:00">2021-02-01</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-02-02 09:40:45" itemprop="dateModified" datetime="2021-02-02T09:40:45+08:00">2021-02-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/56177/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/56177/" class="cy_cmt_count" data-xid="posts/56177/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>转载自：<a target="_blank" rel="noopener" href="https://github.com/coffe1891/frontend-hard-mode-interview/blob/master/1/1.2.12.md">https://github.com/coffe1891/frontend-hard-mode-interview/blob/master/1/1.2.12.md</a></p>
-<h2 id="spread-和-rest-的区别"><a href="#spread-和-rest-的区别" class="headerlink" title="spread 和 rest 的区别"></a>spread 和 rest 的区别</h2><p>spread 和 rest 运算符都是<code>...</code>+<code>变量/参数</code>的形式。是 spread 还是 rest，要根据上下文情境来判断。</p>
-<h3 id="1-spread"><a href="#1-spread" class="headerlink" title="1.spread"></a>1.spread</h3><p>当被用于迭代器中时，它是 spread 操作符：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span>, ...[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="number">5</span>);</span><br><span class="line"><span class="comment">// 1 2 3 4 5</span></span><br><span class="line"><span class="built_in">console</span>.log([<span class="number">1</span>, ...[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="number">5</span>]);</span><br><span class="line"><span class="comment">//[1,2,3,4,5]</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> numbers = [<span class="number">4</span>, <span class="number">38</span>];</span><br><span class="line">add(...numbers); <span class="comment">// 42</span></span><br></pre></td></tr></table></figure>
-
-<p>spread 主要形式是<code>...[Array]</code>，表示对数组的展开。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/56177/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
