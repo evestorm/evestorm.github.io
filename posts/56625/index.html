@@ -30,17 +30,18 @@
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
 <meta property="og:description" content="转载自：https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;gxck9-n4Vi-vMLhNf2dnuA z-index 这个属性表面看上去很简单，但如果你想搞清楚其工作原理的话，其实是有不少值得探讨之处的。本文将从层叠上下文（stacking contexts）和一些实际案例出发，谈一谈 z-index 的内部工作原理。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/zIndex.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/context.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/order.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/demo.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/56625/zIndex.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/56625/context.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/56625/order.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/56625/demo.png">
 <meta property="article:published_time" content="2021-03-17T07:34:42.000Z">
-<meta property="article:modified_time" content="2021-03-17T08:38:42.344Z">
+<meta property="article:modified_time" content="2021-03-17T08:44:42.430Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="技巧">
 <meta property="article:tag" content="转载">
+<meta property="article:tag" content="CSS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/zIndex.png">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/56625/zIndex.png">
 
 
 <link rel="canonical" href="https://evestorm.github.io/posts/56625/">
@@ -229,7 +230,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">237</span>
+          <span class="site-state-item-count">238</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -314,7 +315,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2021-03-17 15:34:42 / 修改时间：16:38:42" itemprop="dateCreated datePublished" datetime="2021-03-17T15:34:42+08:00">2021-03-17</time>
+      <time title="创建时间：2021-03-17 15:34:42 / 修改时间：16:44:42" itemprop="dateCreated datePublished" datetime="2021-03-17T15:34:42+08:00">2021-03-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -378,7 +379,7 @@
 <p>表面看起来，<code>z-index</code> 似乎是一个很简单的属性，你给它设置哪个值，元素就会位于 y 轴的哪个位置，就这样。但它实际上并没有我们想象的这么简单，这个属性背后是一系列决定元素所在层级的规则。</p>
 <p>为了保证我们在同一个“频道”上，这里我先普及一些基础概念，之后再解释层叠的相关知识，并在一些场景中体会 <strong><a target="_blank" rel="noopener" href="http://www.vanseodesign.com/css/css-stack-z-index/">z-index</a></strong> 作用的机制。</p>
 <h2 id="Z-Index-的基础概念"><a href="#Z-Index-的基础概念" class="headerlink" title="Z-Index 的基础概念"></a>Z-Index 的基础概念</h2><p>对于三维空间坐标系，你肯定很熟悉了。x 轴代表水平方向，y 轴代表垂直方向，z 轴则代表我们的目光向页面（屏幕）看进去的时候，各元素的布局情况。</p>
-<img src="/posts/undefined/zIndex.png" class="" title="zIndex">
+<img src="/posts/56625/zIndex.png" class="" title="zIndex">
 
 <p>由于屏幕是一块二维平面，我们实际上并没有真的看到 z 轴，更多的是通过透视的形式。具体地说，多个元素共享同一块二维平面时，有的元素在顶部，有的元素在底部，我们由此感受到了 z 轴的存在。</p>
 <p>为了决定某个元素在 z 轴方向上的位置，CSS 允许我们为 **<a target="_blank" rel="noopener" href="http://www.w3.org/TR/CSS21/visuren.html#propdef-z-index">z-index 属性设置三种值</a>**：</p>
@@ -397,7 +398,7 @@
 </ul>
 <p>为了更好地理清这些问题，我们有必要进一步理解与 <code>z-index</code> 工作原理相关的一些概念，也就是层叠上下文、层叠等级和层叠顺序。</p>
 <h2 id="层叠上下文和层叠等级"><a href="#层叠上下文和层叠等级" class="headerlink" title="层叠上下文和层叠等级"></a>层叠上下文和层叠等级</h2><p>针对**<a target="_blank" rel="noopener" href="http://timkadlec.com/2008/01/detailed-look-at-stacking-in-css/">层叠上下文和层叠等级</a>** ，可能很难给出一个清晰易懂的概念，所以我们这里用通俗的例子来理解。想象一下，现在有一张桌子，上面摆满了各种东西。那么这张桌子就代表了一个层叠上下文，假设还有另一张与之并排的桌子，那么就产生了另一个层叠上下文。</p>
-<img src="/posts/undefined/context.png" class="" title="context">
+<img src="/posts/56625/context.png" class="" title="context">
 
 <p>如图所示，层叠上下文 1 指的就是文档根部，而层叠上下文 2 和 3 位于 1 的某个层叠等级中。此外，这两个层叠上下文各自会包含新的层叠等级。</p>
 <p>现在想象一下，第一张桌子上面并排摆了四个砖头，这四个砖头上面放着一个玻璃杯，而玻璃杯上面还放着一个水果盘。那么，砖头、玻璃杯、水果盘，各自都处于不同的层叠等级中，但它们共处于“桌子”这一层叠上下文中。</p>
@@ -419,7 +420,7 @@
 <li><strong>Z-index 为 0</strong>：设置了 <code>z-index</code> 为 0 的、定位的子元素以及由它所产生的层叠上下文</li>
 <li><strong>Z-Index 为正数</strong> ：设置了 <code>z-index</code> 为正数的、定位的子元素以及由它所产生的层叠上下文，它是整个上下文中层叠等级最高的</li>
 </ol>
-<img src="/posts/undefined/order.png" class="" title="order">
+<img src="/posts/56625/order.png" class="" title="order">
 
 <p>这七个层叠等级就构成了层叠顺序的规则。符合层叠等级七的元素，会比层叠等级在一到六的元素更“贴近我们”，符合层叠等级五的元素，会比层叠等级二的元素更“贴近我们”，以此类推。</p>
 <p>第一次学习这些层叠规则的时候，我感觉收获了很多新的东西。如果只着眼于层叠等级二、六和七（也就是涉及到 <code>z-index</code> 的等级），那么大部分时候，我们对于 <code>z-index</code> 的理解是正确的。正的 <code>z-index</code> 的层级比 0 要高，而 0 又比负的要高，一切都符合直觉，可能大多数人到这里就不继续往后探究了。</p>
@@ -440,7 +441,7 @@
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">20px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.one</span>,</span><br><span class="line"><span class="selector-class">.two</span>,</span><br><span class="line"><span class="selector-class">.three</span>,</span><br><span class="line"><span class="selector-class">.four</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.one</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#f00</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">100px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.two</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#0f0</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">50px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">75px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.three</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#0ff</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">125px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">25px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">150</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.four</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#00f</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#ff0</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">350px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">50</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>尽管 div.two 有更高的 z-index（100），但在页面上，它的层级实际上比 div.four （z-index 为 50）要低。下图就是页面元素的层级情况，根据黑色和黄色边框，我们可以区分每个元素生成的不同的层叠上下文。</p>
-<img src="/posts/undefined/demo.png" class="" title="demo">
+<img src="/posts/56625/demo.png" class="" title="demo">
 
 <p>由于 <code>div.two</code> 位于 <code>div.one</code> 中，所以它的 <code>z-index</code> 是和 <code>div.one</code> 的层叠上下文相关的，也就是说，实际表现出来的 <code>z-index</code> 是下面这样的：</p>
 <ul>
@@ -471,6 +472,7 @@
           <div class="post-tags">
               <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"><i class="fa fa-tag"></i> 技巧</a>
               <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
+              <a href="/tags/CSS/" rel="tag"><i class="fa fa-tag"></i> CSS</a>
           </div>
 
         
@@ -482,6 +484,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/posts/43718/" rel="next" title="转载-CSS整块文本溢出省略方案">
+                  转载-CSS整块文本溢出省略方案 <i class="fa fa-chevron-right"></i>
+                </a>
             </div>
           </div>
     </footer>
