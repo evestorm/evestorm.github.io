@@ -189,6 +189,72 @@ date: 2019-06-11 13:23:28
 }
 ```
 
+## css div 垂直水平居中，并完成 div 高度永远是宽度的一半（宽度可以不指定）
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      .outer {
+        width: 400px;
+        height: 100%;
+        background: blue;
+        margin: 0 auto;
+
+        display: flex;
+        align-items: center;
+      }
+
+      .inner {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 50%;
+        background: red;
+      }
+
+      .box {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="inner">
+        <div class="box">hello</div>
+      </div>
+    </div>
+  </body>
+</html>
+```
+
+<iframe height="486" style="width: 100%;" scrolling="no" title="高度是宽度一半" src="https://codepen.io/JingW/embed/oNYJovB?height=486&theme-id=light&default-tab=html,result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href='https://codepen.io/JingW/pen/oNYJovB'>高度是宽度一半</a> by JingW
+  (<a href='https://codepen.io/JingW'>@JingW</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
+来源：https://github.com/cttin/cttin.github.io/issues/2
+
 ## 有一个高度自适应的 div ，里面有两个 div ，一个高度 100px ，希望另一个填满剩下的高度。
 
 > HTML
@@ -904,6 +970,10 @@ span {
 
 参考：http://www.w3cplus.com/css3/flexbox-basics.html
 
+### flex 是什么属性的缩写
+
+flex 属性是 `flex-grow`、`flex-shrink` 和 `flex-basis` 的简写
+
 ### 如何使用 flex 实现三列等宽布局
 
 父元素 display: flex，子元素 flex: 1
@@ -1121,3 +1191,10 @@ p {
 ```
 
 题目来源：[Daily-Interview-Question 第 60 题](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/105)
+
+### 了解 box-sizing 吗？
+
+box-sizing 属性可以被用来调整这些表现:
+
+- `content-box` 是默认值。如果你设置一个元素的宽为 100px，那么这个元素的内容区会有 100px 宽，并且任何边框和内边距的宽度都会被增加到最后绘制出来的元素宽度中。
+- `border-box` 告诉浏览器：你想要设置的边框和内边距的值是包含在 width 内的。也就是说，如果你将一个元素的 width 设为 100px，那么这 100px 会包含它的 border 和 padding，内容区的实际宽度是 width 减去(border + padding)的值。大多数情况下，这使得我们更容易地设定一个元素的宽高。

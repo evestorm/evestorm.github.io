@@ -10,6 +10,18 @@ abbrlink: 34936
 date: 2019-10-11 20:41:30
 ---
 
+## HbuilderX
+
+### 在 HbuilderX 中第一次启动小程序
+
+在 HbuilderX 里运行编译 uni-app 的微信小程序版，报：enable ide service (y/n) [27d [27c
+
+解决方案：
+
+在微信开发者工具里点击设置》安全设置，开启服务端口
+
+{% asset_img serve.png serve %}
+
 ## 图片路径问题
 
 ### 在 .vue 文件中
