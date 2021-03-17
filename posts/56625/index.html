@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="转载自：https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;gxck9-n4Vi-vMLhNf2dnuA z-index 这个属性表面看上去很简单，但如果你想搞清楚其工作原理的话，其实是有不少值得探讨之处的。本文将从层叠上下文（stacking contexts）和一些实际案例出发，谈一谈 z-index 的内部工作原理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-关于z-index，你可能一直存在误区">
+<meta property="og:url" content="https://evestorm.github.io/posts/56625/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;gxck9-n4Vi-vMLhNf2dnuA z-index 这个属性表面看上去很简单，但如果你想搞清楚其工作原理的话，其实是有不少值得探讨之处的。本文将从层叠上下文（stacking contexts）和一些实际案例出发，谈一谈 z-index 的内部工作原理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/zIndex.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/context.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/order.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/demo.png">
+<meta property="article:published_time" content="2021-03-17T07:34:42.000Z">
+<meta property="article:modified_time" content="2021-03-17T08:38:42.344Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="转载">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/zIndex.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/56625/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>转载-关于z-index，你可能一直存在误区 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Z-Index-%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">Z-Index 的基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%82%E5%8F%A0%E4%B8%8A%E4%B8%8B%E6%96%87%E5%92%8C%E5%B1%82%E5%8F%A0%E7%AD%89%E7%BA%A7"><span class="nav-number">2.</span> <span class="nav-text">层叠上下文和层叠等级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%82%E5%8F%A0%E9%A1%BA%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">层叠顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A5%E7%9C%8B%E4%B8%AA%E6%A1%88%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">来看个案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95%E9%98%85%E8%AF%BB"><span class="nav-number">6.</span> <span class="nav-text">拓展阅读</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">237</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/56625/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-关于z-index，你可能一直存在误区
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-17 15:34:42 / 修改时间：16:38:42" itemprop="dateCreated datePublished" datetime="2021-03-17T15:34:42+08:00">2021-03-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/56625/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/56625/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/gxck9-n4Vi-vMLhNf2dnuA">https://mp.weixin.qq.com/s/gxck9-n4Vi-vMLhNf2dnuA</a></p>
+<p><code>z-index</code> 这个属性表面看上去很简单，但如果你想搞清楚其工作原理的话，其实是有不少值得探讨之处的。本文将从<strong>层叠上下文</strong>（stacking contexts）和一些实际案例出发，谈一谈 <code>z-index</code> 的内部工作原理。</p>
+<a id="more"></a>
+
+<p>CSS 为盒模型的布局提供了三种不同的**<a target="_blank" rel="noopener" href="https://www.w3.org/TR/CSS2/visuren.html#positioning-scheme">定位方案</a>** ：</p>
+<ul>
+<li>正常文档流</li>
+<li>浮动</li>
+<li>定位</li>
+</ul>
+<p>最后一种方案（特指绝对定位）将会把元素从正常文档流中完全移走，其最终的落脚点将取决于开发者。</p>
+<p>通过设置 <code>top</code>，<code>left</code>，<code>bottom</code> 和 <code>right</code> 的值，你可以在二维空间中对元素进行定位，但 CSS 同时也允许你使用 <strong><a target="_blank" rel="noopener" href="http://www.w3.org/TR/CSS2/visuren.html#layers">z-index 属性</a></strong> 把它放置在三维空间中。</p>
+<p>表面看起来，<code>z-index</code> 似乎是一个很简单的属性，你给它设置哪个值，元素就会位于 y 轴的哪个位置，就这样。但它实际上并没有我们想象的这么简单，这个属性背后是一系列决定元素所在层级的规则。</p>
+<p>为了保证我们在同一个“频道”上，这里我先普及一些基础概念，之后再解释层叠的相关知识，并在一些场景中体会 <strong><a target="_blank" rel="noopener" href="http://www.vanseodesign.com/css/css-stack-z-index/">z-index</a></strong> 作用的机制。</p>
+<h2 id="Z-Index-的基础概念"><a href="#Z-Index-的基础概念" class="headerlink" title="Z-Index 的基础概念"></a>Z-Index 的基础概念</h2><p>对于三维空间坐标系，你肯定很熟悉了。x 轴代表水平方向，y 轴代表垂直方向，z 轴则代表我们的目光向页面（屏幕）看进去的时候，各元素的布局情况。</p>
+<img src="/posts/undefined/zIndex.png" class="" title="zIndex">
+
+<p>由于屏幕是一块二维平面，我们实际上并没有真的看到 z 轴，更多的是通过透视的形式。具体地说，多个元素共享同一块二维平面时，有的元素在顶部，有的元素在底部，我们由此感受到了 z 轴的存在。</p>
+<p>为了决定某个元素在 z 轴方向上的位置，CSS 允许我们为 **<a target="_blank" rel="noopener" href="http://www.w3.org/TR/CSS21/visuren.html#propdef-z-index">z-index 属性设置三种值</a>**：</p>
+<ul>
+<li>auto（默认值）</li>
+<li>整数</li>
+<li>inherit</li>
+</ul>
+<p>我们主要看一下整数值。它可以是正整数、负整数或者 0，值越大，元素就离我们“越近”，值越小，元素自然也就离我们“越远”。</p>
+<p>如果两个元素在定位之后共享同一块二维空间，那么在这块空间中， <code>z-index</code> 越大的元素将可能覆盖 <code>z-index</code> 较小的元素。</p>
+<p>很显然，上面讲的这些都是非常容易理解的，并且也和我们的直觉相符合。不过，下面的问题恐怕就不是很好回答了：</p>
+<ul>
+<li>当设置了定位和 <code>z-index</code> 的元素与一个位于正常文档流中的元素重叠时，哪一个在顶层呢？</li>
+<li>一个元素设置定位，另一个元素设置浮动，哪一个在顶层呢？</li>
+<li>如果父元素和子元素都设置了定位，会发生什么事？</li>
+</ul>
+<p>为了更好地理清这些问题，我们有必要进一步理解与 <code>z-index</code> 工作原理相关的一些概念，也就是层叠上下文、层叠等级和层叠顺序。</p>
+<h2 id="层叠上下文和层叠等级"><a href="#层叠上下文和层叠等级" class="headerlink" title="层叠上下文和层叠等级"></a>层叠上下文和层叠等级</h2><p>针对**<a target="_blank" rel="noopener" href="http://timkadlec.com/2008/01/detailed-look-at-stacking-in-css/">层叠上下文和层叠等级</a>** ，可能很难给出一个清晰易懂的概念，所以我们这里用通俗的例子来理解。想象一下，现在有一张桌子，上面摆满了各种东西。那么这张桌子就代表了一个层叠上下文，假设还有另一张与之并排的桌子，那么就产生了另一个层叠上下文。</p>
+<img src="/posts/undefined/context.png" class="" title="context">
+
+<p>如图所示，层叠上下文 1 指的就是文档根部，而层叠上下文 2 和 3 位于 1 的某个层叠等级中。此外，这两个层叠上下文各自会包含新的层叠等级。</p>
+<p>现在想象一下，第一张桌子上面并排摆了四个砖头，这四个砖头上面放着一个玻璃杯，而玻璃杯上面还放着一个水果盘。那么，砖头、玻璃杯、水果盘，各自都处于不同的层叠等级中，但它们共处于“桌子”这一层叠上下文中。</p>
+<p>对每一个网页来说，默认都会创建一个**<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context">层叠上下文</a>** ，这个上下文（这张桌子）的根部就是 <code>html</code> 元素，<code>html</code> 元素的所有子元素都会位于这个默认的层叠上下文中的某个层叠等级，就好比东西会摆放在桌子的不同位置上一样。</p>
+<p>当你给某个元素设置一个非 <code>auto</code> 的 <code>z-index</code> 时，就会创建一个新的 <strong><a target="_blank" rel="noopener" href="http://www.w3.org/TR/CSS21/zindex.html">层叠上下文</a></strong> ，它和它所包含的层叠等级都是独立于其它层叠上下文和层叠等级的，就好比你搬了一张新的桌子放在房间里，它和旧的桌子是互相独立的。</p>
+<h2 id="层叠顺序"><a href="#层叠顺序" class="headerlink" title="层叠顺序"></a>层叠顺序</h2><p>我们可以通过一个非常简单的例子来理解层叠顺序，这个例子甚至还不需要涉及到 <strong><a target="_blank" rel="noopener" href="http://www.vanseodesign.com/css/css-positioning/">定位元素</a></strong> 。</p>
+<p>想象一下，现在有一个非常简单的网页，不考虑默认的 <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code> 等元素，就只需要考虑每个网页至少都会有的一个 <code>&lt;div&gt;</code>。在 CSS 文件中设置 <code>html</code> 的背景颜色为蓝色，设置 <code>div</code> 的背景颜色为红色，并设置宽高。</p>
+<p>当加载页面的时候，你觉得会看到什么？</p>
+<p>这个自然不用多想，引入眼帘的肯定是一大片的蓝色，同时还有一个此前设置好尺寸的红色块级元素。除非你做了额外的设置，否则这个元素将正常地出现在左上角。</p>
+<p>你可能会说“就这？太简单了吧”，不过有一个问题可能不那么简单：为什么红色的块级元素就一定会位于蓝色背景的上层呢？为什么我们看到的就是 <code>div</code> 位于 <code>html</code> 的上层呢？原因是，它们都遵循了层叠顺序的规则。</p>
+<p>在这个简单的例子中，根据规则，正常文档流的子块（<code>div</code>）的层级将会高于根元素（<code>html</code>）的背景和边框。我们看到<code>div</code> 位于顶层，这是因为它的层叠等级更高。</p>
+<p>虽然上面这个例子只涉及到了两个层叠等级，但实际上，在一个层叠上下文中，一共可能出现<strong>七个层叠等级</strong>，从最低到最高排列，依次是：</p>
+<ol>
+<li><strong>背景和边框</strong> ：形成层叠上下文的元素的背景和边框，它是整个上下文中层叠等级最低的。</li>
+<li><strong>Z-Index 为负数</strong> ：设置了 <code>z-index</code> 为负数的子元素以及由它所产生的层叠上下文</li>
+<li><strong>块级盒模型</strong>：位于正常文档流中的、块级的、非定位的子元素</li>
+<li><strong>浮动盒模型</strong> ：浮动的、非定位的子元素</li>
+<li><strong>内联盒模型</strong> ：位于正常文档流中的、内联的、非定位的子元素</li>
+<li><strong>Z-index 为 0</strong>：设置了 <code>z-index</code> 为 0 的、定位的子元素以及由它所产生的层叠上下文</li>
+<li><strong>Z-Index 为正数</strong> ：设置了 <code>z-index</code> 为正数的、定位的子元素以及由它所产生的层叠上下文，它是整个上下文中层叠等级最高的</li>
+</ol>
+<img src="/posts/undefined/order.png" class="" title="order">
+
+<p>这七个层叠等级就构成了层叠顺序的规则。符合层叠等级七的元素，会比层叠等级在一到六的元素更“贴近我们”，符合层叠等级五的元素，会比层叠等级二的元素更“贴近我们”，以此类推。</p>
+<p>第一次学习这些层叠规则的时候，我感觉收获了很多新的东西。如果只着眼于层叠等级二、六和七（也就是涉及到 <code>z-index</code> 的等级），那么大部分时候，我们对于 <code>z-index</code> 的理解是正确的。正的 <code>z-index</code> 的层级比 0 要高，而 0 又比负的要高，一切都符合直觉，可能大多数人到这里就不继续往后探究了。</p>
+<p>我之前就是这样，在看到这些规则之前，以为除了正的和负的 <code>z-index</code> ，其它情况都可以看作是 <code>z-index</code> 为 0 —— 不过现在我们很清楚了，这种想法是错误的。事实是，大部分元素的层级都要低于 <code>z-index:0</code>。</p>
+<p>还有一个有趣的细节是，非定位的元素实际位于四种不同的层叠等级中。乍一想觉得很奇怪，不过其实这是很合理的。假设所有的非定位元素都位于同一个层叠等级，那么我们就没办法在 <code>div</code> （块级盒）上看到文本（内联盒）了。</p>
+<h2 id="来看个案例"><a href="#来看个案例" class="headerlink" title="来看个案例"></a>来看个案例</h2><p>我前面提到过很多次，当你给一个元素设置非 auto 的 <code>z-index</code> 时，会创建一个新的、完全独立的层叠上下文。</p>
+<p>重新回顾一下之前拿桌子做比喻的案例。一开始的时候，我们的桌子上摆满了四块砖头，上面是一个玻璃杯，再上面是一个水果盘。现在，假设又有一张新的桌子，它摆放的东西和旧桌子差不多，唯一的不同是，新桌子少了一个水果盘。</p>
+<p>不难想象，旧桌子的水果盘是整个房间中位于最顶层的物品（它有最大的 <code>z-index</code>），不过，如果把旧桌子以及它上面的所有东西整体搬到地下室呢？此时，水果盘的层级会比新桌子上的每一个物品都要低，这是因为，放置水果盘的旧桌子整体已经低于新桌子了。</p>
+<p>对于网页上的定位元素来说，其实道理是一样的。假设有如下代码，思考一个问题：<code>div.two</code> 和 <code>div.four</code>，哪个在上哪个在下？</p>
+<blockquote>
+<p>HTML</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;one&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;two&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;three&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;four&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>CSS</p>
+</blockquote>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">div</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">20px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.one</span>,</span><br><span class="line"><span class="selector-class">.two</span>,</span><br><span class="line"><span class="selector-class">.three</span>,</span><br><span class="line"><span class="selector-class">.four</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.one</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#f00</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">100px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.two</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#0f0</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">50px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">75px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.three</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#0ff</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#000</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">125px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">25px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">150</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.four</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="number">#00f</span>;</span><br><span class="line">  <span class="attribute">outline</span>: <span class="number">5px</span> solid <span class="number">#ff0</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">200px</span>;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">350px</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">50</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>尽管 div.two 有更高的 z-index（100），但在页面上，它的层级实际上比 div.four （z-index 为 50）要低。下图就是页面元素的层级情况，根据黑色和黄色边框，我们可以区分每个元素生成的不同的层叠上下文。</p>
+<img src="/posts/undefined/demo.png" class="" title="demo">
+
+<p>由于 <code>div.two</code> 位于 <code>div.one</code> 中，所以它的 <code>z-index</code> 是和 <code>div.one</code> 的层叠上下文相关的，也就是说，实际表现出来的 <code>z-index</code> 是下面这样的：</p>
+<ul>
+<li>.one —— z-index = 10</li>
+<li>.two —— z-index = 10.100</li>
+<li>.three —— z-index = 10.150</li>
+<li>.four —— z-index = 50</li>
+</ul>
+<p><code>div.one</code> 和内部包含的一切将会在层级上低于 <code>div.four</code>，无论给 <code>div.one</code> 的子元素设置多大的 <code>z-index</code>，子元素的层级都无法超过 <code>div.four</code>。</p>
+<p>看到这个例子是不是有一种熟悉的味道？我也曾经被 <code>z-index</code> 这么坑过一两次。我们都曾疑惑一个问题，为什么一个 <code>z-index</code> 非常大的元素，在层级上始终无法超过一个 <code>z-index</code> 比它小很多的元素？相信在学习了这些案例之后，你已经豁然开朗了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在最初学习 <code>z-index</code> 的时候，我们都会认为它很简单，这不就是代表元素在 z 轴上的位置吗？不过我们现在知道了，事情远没有这么简单。**<a target="_blank" rel="noopener" href="http://coding.smashingmagazine.com/2009/09/15/the-z-index-css-property-a-comprehensive-look/">深入理解 z-index</a>**[9] 一文也揭示了 <code>z-index</code> 背后一些原理层面的东西，包括层叠上下文，层叠等级以及一系列决定元素的层叠顺序的规则。</p>
+<p>最后，记住一个很重要的结论：定位元素可以创建新的层叠上下文，在这个上下文中的所有层叠等级，都会高于或者低于另一个层叠上下文的所有层叠等级。</p>
+<h2 id="拓展阅读"><a href="#拓展阅读" class="headerlink" title="拓展阅读"></a>拓展阅读</h2><ul>
+<li>What No One Told You About Z-Index by Philip Walton</li>
+<li>The Z-Index CSS Property: A Comprehensive Look on Smashing Magazine</li>
+<li>How Well Do You Understand CSS Positioning?</li>
+<li>The stacking context on Mozilla Developer Network</li>
+<li>Z-Index And The CSS Stack: Which Element Displays First?</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"><i class="fa fa-tag"></i> 技巧</a>
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/7386/" rel="prev" title="转载-傻傻分不清之Cookie、Session、Token、JWT">
+                  <i class="fa fa-chevron-left"></i> 转载-傻傻分不清之Cookie、Session、Token、JWT
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
