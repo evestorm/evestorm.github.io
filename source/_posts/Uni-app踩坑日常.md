@@ -22,6 +22,10 @@ date: 2019-10-11 20:41:30
 
 {% asset_img serve.png serve %}
 
+### 微信小程序报错：Cannot read property 'forceUpdate' of undefined
+
+需给 uniapp 配置小程序的 ID。在 `manifest.json` 文件中填入 AppID。重启微信开发者工具。
+
 ## 图片路径问题
 
 ### 在 .vue 文件中
@@ -41,7 +45,7 @@ date: 2019-10-11 20:41:30
 `background` 属性中，得使用下面写法引入本地图片：
 
 ```css
-background: url('~@/static/images.logo.png');
+background: url("~@/static/images.logo.png");
 ```
 
 否则图片无法被正确加载。
@@ -149,8 +153,7 @@ navigator[hidden] {
 - 如果使用的后者，要注意使用 snippet 智能提示后，自动生成的代码 `<uni-icon type=""></uni-icon>` 是有错误的，标签名最后少了个 `s` ，正确写法是：
 
   ```html
-  ✅
-  <uni-icons class="apply" type="plusempty" size="20"></uni-icons>
+  ✅ <uni-icons class="apply" type="plusempty" size="20"></uni-icons>
   ```
 
 **三种情况比较：**
@@ -168,7 +171,7 @@ import uniIcon from '@/components/uni-icon/uni-icon.vue' import swIcon from
 
 **插件地址：**
 
-https://ext.dcloud.net.cn/plugin?id=28
+<https://ext.dcloud.net.cn/plugin?id=28>
 
 ### 自定义 modal 弹窗
 
@@ -184,7 +187,7 @@ uni-app 自带的 [uni.showModal](https://uniapp.dcloud.io/api/ui/prompt?id=show
 
 在插件市场找到了一款自定义 modal 组件：
 
-文档：https://ext.dcloud.net.cn/plugin?id=134
+文档：<https://ext.dcloud.net.cn/plugin?id=134>
 
 {% asset_img image-20191011230508998.png image-20191011230508998 %}
 
@@ -198,7 +201,7 @@ uni-app 自带的 [uni.showModal](https://uniapp.dcloud.io/api/ui/prompt?id=show
 
 ### 小程序 scroll-view position-fixed 失效
 
-解决方案来源：https://segmentfault.com/q/1010000009866120
+解决方案来源：<https://segmentfault.com/q/1010000009866120>
 
 {% asset_img bVPyMk.jpeg bVPyMk %}
 
@@ -271,9 +274,9 @@ uni-app 自带的 [uni.showModal](https://uniapp.dcloud.io/api/ui/prompt?id=show
 
 ```js
 uni.showToast({
-  title: '标题',
+  title: "标题",
   duration: 2000,
-  image: '/static/images/success.png'
+  image: "/static/images/success.png",
 });
 ```
 
