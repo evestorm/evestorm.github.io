@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073  本文在 github 做了收录 github.com&#x2F;Michael-lzg… demo 源码地址 github.com&#x2F;Michael-lzg… 在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-前端性能优化之图片懒加载">
+<meta property="og:url" content="https://evestorm.github.io/posts/7617/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073  本文在 github 做了收录 github.com&#x2F;Michael-lzg… demo 源码地址 github.com&#x2F;Michael-lzg… 在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://segmentfault.com/img/remote/1460000038413076">
+<meta property="article:published_time" content="2020-12-17T10:46:17.000Z">
+<meta property="article:modified_time" content="2021-06-07T10:51:02.398Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="解决方案">
+<meta property="article:tag" content="性能优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://segmentfault.com/img/remote/1460000038413076">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/7617/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>转载-前端性能优化之图片懒加载 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E8%BF%9B%E8%A1%8C%E5%9B%BE%E7%89%87%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="nav-number">1.</span> <span class="nav-text">为什么要进行图片懒加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E6%87%92%E5%8A%A0%E8%BD%BD%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">图片懒加载的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IntersectionObserver"><span class="nav-number">3.</span> <span class="nav-text">IntersectionObserver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%87%92%E5%8A%A0%E8%BD%BD%E6%8C%87%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">懒加载指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">247</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/7617/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-前端性能优化之图片懒加载
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-17 18:46:17" itemprop="dateCreated datePublished" datetime="2020-12-17T18:46:17+08:00">2020-12-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-07 18:51:02" itemprop="dateModified" datetime="2021-06-07T18:51:02+08:00">2021-06-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">性能优化</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/7617/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/7617/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038413073">https://segmentfault.com/a/1190000038413073</a></p>
+<hr>
+<p>本文在 github 做了收录 <a target="_blank" rel="noopener" href="https://github.com/Michael-lzg/my--article/blob/master/other/%E5%89%8D%E7%AB%AF%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E4%B9%8B%E5%9B%BE%E7%89%87%E6%87%92%E5%8A%A0%E8%BD%BD.md">github.com/Michael-lzg…</a></p>
+<p>demo 源码地址 <a target="_blank" rel="noopener" href="https://github.com/Michael-lzg/demo-code/tree/master/lazyLoad">github.com/Michael-lzg…</a></p>
+<p>在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的用户体验，所以进行图片懒加载优化势在必行。</p>
+<a id="more"></a>
+
+<h3 id="为什么要进行图片懒加载"><a href="#为什么要进行图片懒加载" class="headerlink" title="为什么要进行图片懒加载"></a>为什么要进行图片懒加载</h3><p>我们先来看一下页面启动时加载的图片信息。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000038413076" alt="img"></p>
+<p>如图所示，这个页面启动时加载了几十张图片（甚至更多），而这些图片请求几乎是并发的，在 Chrome 浏览器，最多支持的并发请求次数是有限的，其他的请求会推入到队列中等待或者停滞不前，直到上轮请求完成后新的请求才会发出。所以相当一部分图片资源请求是需要排队等待时间的。</p>
+<p>在上面可以看出，有部分图片达到几百 kB，设置 2M(这锅必须运营背，非得上传高清大图不可？)，直接导致了加载时间过长。</p>
+<p>针对以上情况，进行图片懒加载有以下优点：</p>
+<ol>
+<li>减少资源的加载，页面启动只加载首屏的图片，这样能明显减少了服务器的压力和流量，也能够减小浏览器的负担。</li>
+<li>防止并发加载的资源过多而阻塞 js 的加载，影响整个网站的启动。</li>
+<li>能提升用户的体验，不妨设想下，用户打开页面的时候，如果页面上所有的图片都需要加载，由于图片数目较大，等待时间很长这就严重影响用户体验。</li>
+</ol>
+<h3 id="图片懒加载的原理"><a href="#图片懒加载的原理" class="headerlink" title="图片懒加载的原理"></a>图片懒加载的原理</h3><p>图片懒加载的原理主要是判断当前图片是否到了可视区域这一核心逻辑实现的</p>
+<ol>
+<li>拿到所有的图片 dome 。</li>
+<li>遍历每个图片判断当前图片是否到了可视区范围内。</li>
+<li>如果到了就设置图片的 src 属性。</li>
+<li>绑定 window 的 <code>scroll</code> 事件，对其进行事件监听。</li>
+</ol>
+<p>我们先来看下页面结构</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Lazyload<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line">      img &#123;</span><br><span class="line">        display: block;</span><br><span class="line">        margin-bottom: 50px;</span><br><span class="line">        height: 200px;</span><br><span class="line">        width: 400px;</span><br><span class="line">      &#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    &lt;img</span><br><span class="line">      class=&quot;lazy&quot;</span><br><span class="line">      referrerpolicy=&quot;no-referrer&quot;</span><br><span class="line">      data-src=&quot;./img/default.png&quot;</span><br><span class="line">      data-src=&quot;./img/1.jpg&quot;</span><br><span class="line">    /&gt;</span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/2.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/3.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/4.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/5.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/6.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/7.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/8.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/9.jpg&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/default.png&quot;</span> <span class="attr">data-src</span>=<span class="string">&quot;./img/10.jpg&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>先获取所有图片的 dom，通过 <code>document.body.clientHeight</code> 获取可视区高度，再使用 <code>element.getBoundingClientRect()</code> API 直接得到元素相对浏览的 top 值， 遍历每个图片判断当前图片是否到了可视区范围内。代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">lazyload</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> viewHeight = <span class="built_in">document</span>.body.clientHeight; <span class="comment">//获取可视区高度</span></span><br><span class="line">  <span class="keyword">let</span> imgs = <span class="built_in">document</span>.querySelectorAll(<span class="string">&quot;img[data-src]&quot;</span>);</span><br><span class="line">  imgs.forEach(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (item.dataset.src === <span class="string">&quot;&quot;</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于获得页面中某个元素的左，上，右和下分别相对浏览器视窗的位置</span></span><br><span class="line">    <span class="keyword">let</span> rect = item.getBoundingClientRect();</span><br><span class="line">    <span class="keyword">if</span> (rect.bottom &gt;= <span class="number">0</span> &amp;&amp; rect.top &lt; viewHeight) &#123;</span><br><span class="line">      item.src = item.dataset.src;</span><br><span class="line">      item.removeAttribute(<span class="string">&quot;data-src&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后给 window 绑定 <code>onscroll</code> 事件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">&quot;scroll&quot;</span>, lazyload);</span><br></pre></td></tr></table></figure>
+
+<p>主要就完成了一个图片懒加载的操作了。但是这样存在较大的性能问题，因为 <code>scroll</code> 事件会在很短的时间内触发很多次，严重影响页面性能，为了提高网页性能，我们需要一个节流函数来控制函数的多次触发，在一段时间内（如 200ms）只执行一次回调。</p>
+<p>下面实现一个节流函数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timer;</span><br><span class="line">  <span class="keyword">let</span> prevTime;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> currTime = <span class="built_in">Date</span>.now();</span><br><span class="line">    <span class="keyword">const</span> context = <span class="built_in">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (!prevTime) prevTime = currTime;</span><br><span class="line">    <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (currTime - prevTime &gt; delay) &#123;</span><br><span class="line">      prevTime = currTime;</span><br><span class="line">      fn.apply(context, args);</span><br><span class="line">      <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    timer = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      prevTime = <span class="built_in">Date</span>.now();</span><br><span class="line">      timer = <span class="literal">null</span>;</span><br><span class="line">      fn.apply(context, args);</span><br><span class="line">    &#125;, delay);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后修改一下 <code>srcoll</code> 事件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">&quot;scroll&quot;</span>, throttle(lazyload, <span class="number">200</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="IntersectionObserver"><a href="#IntersectionObserver" class="headerlink" title="IntersectionObserver"></a>IntersectionObserver</h3><p>通过上面例子的实现，我们要实现懒加载都需要去监听 <code>scroll</code> 事件，尽管我们可以通过函数节流的方式来阻止高频率的执行函数，但是我们还是需要去计算 <code>scrollTop</code>，<code>offsetHeight</code> 等属性，有没有简单的不需要计算这些属性的方式呢，答案就是 <code>IntersectionObserver</code>。</p>
+<p><code>IntersectionObserver</code> 是一个新的 API，可以自动”观察”元素是否可见，Chrome 51+ 已经支持。由于可见（visible）的本质是，目标元素与视口产生一个交叉区，所以这个 API 叫做”交叉观察器”。我们来看一下它的用法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> io = <span class="keyword">new</span> IntersectionObserver(callback, option);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开始观察</span></span><br><span class="line">io.observe(<span class="built_in">document</span>.getElementById(<span class="string">&quot;example&quot;</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止观察</span></span><br><span class="line">io.unobserve(element);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭观察器</span></span><br><span class="line">io.disconnect();</span><br></pre></td></tr></table></figure>
+
+<p><code>IntersectionObserver</code> 是浏览器原生提供的构造函数，接受两个参数：callback 是可见性变化时的回调函数，option 是配置对象（该参数可选）。</p>
+<p>目标元素的可见性变化时，就会调用观察器的回调函数 callback。callback 一般会触发两次。一次是目标元素刚刚进入视口（开始可见），另一次是完全离开视口（开始不可见）。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> io = <span class="keyword">new</span> IntersectionObserver(<span class="function">(<span class="params">entries</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(entries);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>callback 函数的参数<code>（entries）</code>是一个数组，每个成员都是一个 <code>IntersectionObserverEntry</code> 对象。举例来说，如果同时有两个被观察的对象的可见性发生变化，<code>entries</code> 数组就会有两个成员。</p>
+<ul>
+<li>time：可见性发生变化的时间，是一个高精度时间戳，单位为毫秒</li>
+<li>target：被观察的目标元素，是一个 DOM 节点对象</li>
+<li>isIntersecting: 目标是否可见</li>
+<li>rootBounds：根元素的矩形区域的信息，<code>getBoundingClientRect()</code>方法的返回值，如果没有根元素（即直接相对于视口滚动），则返回 null</li>
+<li>boundingClientRect：目标元素的矩形区域的信息</li>
+<li>intersectionRect：目标元素与视口（或根元素）的交叉区域的信息</li>
+<li>intersectionRatio：目标元素的可见比例，即 <code>intersectionRect</code> 占 <code>boundingClientRect</code> 的比例，完全可见时为 1，完全不可见时小于等于 0</li>
+</ul>
+<p>下面我们用 <code>IntersectionObserver</code> 实现图片懒加载</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> imgs = <span class="built_in">document</span>.querySelectorAll(<span class="string">&quot;img[data-src]&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> config = &#123;</span><br><span class="line">  rootMargin: <span class="string">&quot;0px&quot;</span>,</span><br><span class="line">  threshold: <span class="number">0</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> observer = <span class="keyword">new</span> IntersectionObserver(<span class="function">(<span class="params">entries, self</span>) =&gt;</span> &#123;</span><br><span class="line">  entries.forEach(<span class="function">(<span class="params">entry</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (entry.isIntersecting) &#123;</span><br><span class="line">      <span class="keyword">let</span> img = entry.target;</span><br><span class="line">      <span class="keyword">let</span> src = img.dataset.src;</span><br><span class="line">      <span class="keyword">if</span> (src) &#123;</span><br><span class="line">        img.src = src;</span><br><span class="line">        img.removeAttribute(<span class="string">&quot;data-src&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 解除观察</span></span><br><span class="line">      self.unobserve(entry.target);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;, config);</span><br><span class="line"></span><br><span class="line">imgs.forEach(<span class="function">(<span class="params">image</span>) =&gt;</span> &#123;</span><br><span class="line">  observer.observe(image);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="懒加载指令"><a href="#懒加载指令" class="headerlink" title="懒加载指令"></a>懒加载指令</h3><p>Vue 中除了平时常用的 <code>v-show</code>、<code>v-bind</code>、<code>v-for</code> 等指令外，还可以自定义指令。Vue 指令定义函数提供了几个钩子函数（可选）：</p>
+<ul>
+<li>bind: 只调用一次，指令第一次绑定到元素时调用，可以定义一个在绑定时执行一次的初始化动作。</li>
+<li>inserted: 被绑定元素插入父节点时调用（父节点存在即可调用，不必存在于 document 中）。</li>
+<li>update: 被绑定元素所在的模板更新时调用，而不论绑定值是否变化。通过比较更新前后的绑定值。</li>
+<li>componentUpdated: 被绑定元素所在模板完成一次更新周期时调用。</li>
+<li>unbind: 只调用一次， 指令与元素解绑时调用。</li>
+</ul>
+<p>实现一个懒加载指令的思路</p>
+<ol>
+<li>判断浏览器是否支持 <code>IntersectionObserver</code> API，如果支持就使用 <code>IntersectionObserver</code> 实现懒加载，否则则使用 <code>srcoll</code> 事件监听 + 节流的方法实现。</li>
+<li>通过 <code>Vue.directive</code> 注册一个 <code>v-lazy</code> 的指令，暴露一个 <code>install()</code> 函数，供 Vue 调用。</li>
+<li>在 <code>main.js</code> 里 use(指令) 即可调用。</li>
+<li>将组件内 <code>&lt;img&gt;</code> 标签的 <code>src</code> 换成 <code>v-lazy</code> 即可实现图片懒加载。</li>
+</ol>
+<p>代码如下</p>
+<p>新建 <code>LazyLoad.js</code> 文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> LazyLoad = &#123;</span><br><span class="line">  <span class="comment">// install方法</span></span><br><span class="line">  <span class="function"><span class="title">install</span>(<span class="params">Vue, options</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> defaultSrc = options.default;</span><br><span class="line">    Vue.directive(<span class="string">&quot;lazy&quot;</span>, &#123;</span><br><span class="line">      <span class="function"><span class="title">bind</span>(<span class="params">el, binding</span>)</span> &#123;</span><br><span class="line">        LazyLoad.init(el, binding.value, defaultSrc);</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">inserted</span>(<span class="params">el</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (IntersectionObserver) &#123;</span><br><span class="line">          LazyLoad.observe(el);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          LazyLoad.listenerScroll(el);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 初始化</span></span><br><span class="line">  <span class="function"><span class="title">init</span>(<span class="params">el, val, def</span>)</span> &#123;</span><br><span class="line">    el.setAttribute(<span class="string">&quot;data-src&quot;</span>, val);</span><br><span class="line">    el.setAttribute(<span class="string">&quot;src&quot;</span>, def);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 利用IntersectionObserver监听el</span></span><br><span class="line">  <span class="function"><span class="title">observe</span>(<span class="params">el</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> io = <span class="keyword">new</span> IntersectionObserver(<span class="function">(<span class="params">entries</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> realSrc = el.dataset.src;</span><br><span class="line">      <span class="keyword">if</span> (entries[<span class="number">0</span>].isIntersecting) &#123;</span><br><span class="line">        <span class="keyword">if</span> (realSrc) &#123;</span><br><span class="line">          el.src = realSrc;</span><br><span class="line">          el.removeAttribute(<span class="string">&quot;data-src&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    io.observe(el);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 监听scroll事件</span></span><br><span class="line">  <span class="function"><span class="title">listenerScroll</span>(<span class="params">el</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> handler = LazyLoad.throttle(LazyLoad.load, <span class="number">300</span>);</span><br><span class="line">    LazyLoad.load(el);</span><br><span class="line">    <span class="built_in">window</span>.addEventListener(<span class="string">&quot;scroll&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      handler(el);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 加载真实图片</span></span><br><span class="line">  <span class="function"><span class="title">load</span>(<span class="params">el</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> windowHeight = <span class="built_in">document</span>.documentElement.clientHeight;</span><br><span class="line">    <span class="keyword">const</span> elTop = el.getBoundingClientRect().top;</span><br><span class="line">    <span class="keyword">const</span> elBtm = el.getBoundingClientRect().bottom;</span><br><span class="line">    <span class="keyword">const</span> realSrc = el.dataset.src;</span><br><span class="line">    <span class="keyword">if</span> (elTop - windowHeight &lt; <span class="number">0</span> &amp;&amp; elBtm &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (realSrc) &#123;</span><br><span class="line">        el.src = realSrc;</span><br><span class="line">        el.removeAttribute(<span class="string">&quot;data-src&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 节流</span></span><br><span class="line">  <span class="function"><span class="title">throttle</span>(<span class="params">fn, delay</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> timer;</span><br><span class="line">    <span class="keyword">let</span> prevTime;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> currTime = <span class="built_in">Date</span>.now();</span><br><span class="line">      <span class="keyword">const</span> context = <span class="built_in">this</span>;</span><br><span class="line">      <span class="keyword">if</span> (!prevTime) prevTime = currTime;</span><br><span class="line">      <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (currTime - prevTime &gt; delay) &#123;</span><br><span class="line">        prevTime = currTime;</span><br><span class="line">        fn.apply(context, args);</span><br><span class="line">        <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      timer = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        prevTime = <span class="built_in">Date</span>.now();</span><br><span class="line">        timer = <span class="literal">null</span>;</span><br><span class="line">        fn.apply(context, args);</span><br><span class="line">      &#125;, delay);</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> LazyLoad;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>main.js</code> 里 use 指令</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> LazyLoad <span class="keyword">from</span> <span class="string">&#x27;./LazyLoad.js&#x27;</span>Vue.use(LazyLoad, &#123;  <span class="attr">default</span>: <span class="string">&#x27;xxx.png&#x27;</span>,&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>将组件内 <code>&lt;img&gt;</code> 标签的 <code>src</code> 换成 <code>v-lazy</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">v-lazy</span>=<span class="string">&quot;xxx.jpg&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就能完成一个 vue 懒加载的指令了。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ol>
+<li>为提高网站加载性能，图片懒加载是必要的。</li>
+<li>图片懒加载是实现原理是判断当前图片是否到了可视区域进行加载，可通过监听 scroll 事件和 IntersectionObserver 实现相应的功能。</li>
+<li>可通过 Vue.directive 编写图片懒加载指令。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"><i class="fa fa-tag"></i> 技巧</a>
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> 转载</a>
+              <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
+              <a href="/tags/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" rel="tag"><i class="fa fa-tag"></i> 解决方案</a>
+              <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="tag"><i class="fa fa-tag"></i> 性能优化</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/5691/" rel="prev" title="Vue深度作用选择器">
+                  <i class="fa fa-chevron-left"></i> Vue深度作用选择器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/5764/" rel="next" title="iOS微信端字体图标iconfont显示不正常">
+                  iOS微信端字体图标iconfont显示不正常 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
