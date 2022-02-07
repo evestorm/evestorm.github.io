@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="作用定义对象属性的 参数 obj 要定义属性的对象 prop 要定义或修改的属性的名称或 Symbol descriptor 要定义或修改的属性描述符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Object.defineProperty基础">
+<meta property="og:url" content="https://evestorm.github.io/posts/64272/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="作用定义对象属性的 参数 obj 要定义属性的对象 prop 要定义或修改的属性的名称或 Symbol descriptor 要定义或修改的属性描述符">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/64272/1637908960169-1befe0b3-2785-4073-9661-3d961326be52.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/64272/1637909046397-df9ade35-53be-42c1-857b-ad530ad037d6.png">
+<meta property="article:published_time" content="2021-10-13T07:39:11.000Z">
+<meta property="article:modified_time" content="2022-02-07T08:39:20.860Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="ECMAScript">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/64272/1637908960169-1befe0b3-2785-4073-9661-3d961326be52.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/64272/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Object.defineProperty基础 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E9%80%9A%E8%BF%87-Object-defineProperty-%E5%AE%9A%E4%B9%89%E7%9A%84%E5%B1%9E%E6%80%A7%E4%B8%8D%E5%8F%AF%E4%BF%AE%E6%94%B9%E3%80%81%E4%B8%8D%E5%8F%AF%E5%88%A0%E9%99%A4%E4%B9%9F%E4%B8%8D%E5%8F%AF%E6%9E%9A%E4%B8%BE"><span class="nav-number">3.1.</span> <span class="nav-text">默认通过 Object.defineProperty 定义的属性不可修改、不可删除也不可枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#writeable%E5%8F%AF%E4%BF%AE%E6%94%B9%E3%80%81enumerable%E5%8F%AF%E6%9E%9A%E4%B8%BE%E3%80%81configurable%E5%8F%AF%E9%85%8D%E7%BD%AE%EF%BC%88%E4%B8%80%E8%88%AC%E7%94%A8%E4%BD%9C%E5%8F%AF%E5%88%A0%E9%99%A4%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">writeable可修改、enumerable可枚举、configurable可配置（一般用作可删除）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getter-setter"><span class="nav-number">3.3.</span> <span class="nav-text">getter&#x2F;setter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8A%AB%E6%8C%81"><span class="nav-number">3.3.1.</span> <span class="nav-text">数据劫持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E7%BB%99%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E4%BA%86-setter%E3%80%81getter-%E5%90%8E%EF%BC%8C%E4%B8%8D%E5%85%81%E8%AE%B8%E8%AE%BE%E7%BD%AE-value-%E5%92%8C-writeable"><span class="nav-number">3.3.2.</span> <span class="nav-text">当给属性设置了 setter、getter 后，不允许设置 value 和 writeable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-getter%E3%80%81setter-%E8%AE%BE%E7%BD%AE%E4%BA%86%E7%9A%84%E5%B1%9E%E6%80%A7%EF%BC%8C%E5%9C%A8%E5%8E%9F%E5%AF%B9%E8%B1%A1%E4%B8%AD%E4%B8%8D%E5%8F%AF%E8%A7%81%EF%BC%8C%E4%BD%86%E9%BB%98%E8%AE%A4%E5%8F%AF%E6%9E%9A%E4%B8%BE%E3%80%81%E5%8F%AF%E5%88%A0%E9%99%A4"><span class="nav-number">3.3.3.</span> <span class="nav-text">通过 getter、setter 设置了的属性，在原对象中不可见，但默认可枚举、可删除</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E5%99%A8"><span class="nav-number">4.1.</span> <span class="nav-text">计算器</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">259</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">89</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/64272/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Object.defineProperty基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-13 15:39:11" itemprop="dateCreated datePublished" datetime="2021-10-13T15:39:11+08:00">2021-10-13</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-02-07 16:39:20" itemprop="dateModified" datetime="2022-02-07T16:39:20+08:00">2022-02-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/64272/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/64272/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h1><p>定义对象属性的</p>
+<h1 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h1><ol>
+<li>obj 要定义属性的对象</li>
+<li>prop 要定义或修改的属性的名称或 Symbol</li>
+<li>descriptor 要定义或修改的属性描述符</li>
+</ol>
+<a id="more"></a>
+
+<h1 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h1><h2 id="默认通过-Object-defineProperty-定义的属性不可修改、不可删除也不可枚举"><a href="#默认通过-Object-defineProperty-定义的属性不可修改、不可删除也不可枚举" class="headerlink" title="默认通过 Object.defineProperty 定义的属性不可修改、不可删除也不可枚举"></a>默认通过 Object.defineProperty 定义的属性不可修改、不可删除也不可枚举</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defineProperty</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> _obj = &#123;&#125;;</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(_obj, <span class="string">&#x27;a&#x27;</span>, &#123;</span><br><span class="line">    <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">Object</span>.defineProperties(_obj, &#123;</span><br><span class="line">    b: &#123;</span><br><span class="line">      value: <span class="number">2</span></span><br><span class="line">    &#125;,</span><br><span class="line">    c: &#123;</span><br><span class="line">      value: <span class="number">3</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> _obj;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj = defineProperty();</span><br><span class="line"><span class="built_in">console</span>.log(obj.a); <span class="comment">// 1</span></span><br><span class="line">obj.a = <span class="number">15</span>;</span><br><span class="line"><span class="built_in">console</span>.log(obj.a); <span class="comment">// 不可修改，仍然是 1</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(key + <span class="string">&#x27;: &#x27;</span> + obj[key]); <span class="comment">// 通过定义的a,b,c默认都不可枚举</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">delete</span> obj.a; <span class="comment">// 无法删除a</span></span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123;a:1,b:2,c:3&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="writeable可修改、enumerable可枚举、configurable可配置（一般用作可删除）"><a href="#writeable可修改、enumerable可枚举、configurable可配置（一般用作可删除）" class="headerlink" title="writeable可修改、enumerable可枚举、configurable可配置（一般用作可删除）"></a>writeable可修改、enumerable可枚举、configurable可配置（一般用作可删除）</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defineProperty</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> _obj = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.defineProperties(_obj, &#123;</span><br><span class="line">    a: &#123;</span><br><span class="line">      value: <span class="number">1</span>,</span><br><span class="line">      writable: <span class="literal">true</span>, <span class="comment">// 可修改</span></span><br><span class="line">      enumerable: <span class="literal">true</span>, <span class="comment">// 可枚举</span></span><br><span class="line">      configurable: <span class="literal">true</span>, <span class="comment">// 可操作的（一般指删除）</span></span><br><span class="line">    &#125;,</span><br><span class="line">    b: &#123;</span><br><span class="line">      value: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> _obj;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> obj = defineProperty();</span><br><span class="line"></span><br><span class="line">obj.a = <span class="number">10</span>;</span><br><span class="line">obj.b = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123; a: 10, b: 2 &#125;</span></span><br><span class="line"><span class="comment">// a被改了，b没有</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(key + <span class="string">&#x27;: &#x27;</span> + obj[key]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 只打印 a: 10 ，不打印 b</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> obj.a; <span class="comment">// 此时可删除a了</span></span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123; b: 2 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="getter-setter"><a href="#getter-setter" class="headerlink" title="getter/setter"></a>getter/setter</h2><h3 id="数据劫持"><a href="#数据劫持" class="headerlink" title="数据劫持"></a>数据劫持</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defineProperty</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> _obj = &#123;&#125;;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">Object</span>.defineProperties(_obj, &#123;</span><br><span class="line">    a: &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;&quot;a&quot;\&#x27;s value is &#x27;</span> + a + <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;The value &quot;a&quot; has been designed a new value &quot;&#x27;</span> + newVal + <span class="string">&#x27;&quot;.&#x27;</span>);</span><br><span class="line">        a = newVal;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> _obj;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> obj = defineProperty();</span><br><span class="line"><span class="built_in">console</span>.log(obj.a); <span class="comment">// &quot;a&quot;&#x27;s value is 1.</span></span><br><span class="line">obj.a = <span class="number">233</span>; <span class="comment">// The value &quot;a&quot; has been designed a new value &quot;233&quot;.</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="当给属性设置了-setter、getter-后，不允许设置-value-和-writeable"><a href="#当给属性设置了-setter、getter-后，不允许设置-value-和-writeable" class="headerlink" title="当给属性设置了 setter、getter 后，不允许设置 value 和 writeable"></a>当给属性设置了 setter、getter 后，不允许设置 value 和 writeable</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;&#125;;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(obj, <span class="string">&#x27;a&#x27;</span>, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">  value: <span class="number">2</span>, <span class="comment">// 不可设置</span></span><br><span class="line">  writable: <span class="literal">true</span>, <span class="comment">// 不可设置</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// TypeError: Invalid property descriptor. Cannot both specify accessors and a value or writable attribute, #&lt;Object&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="通过-getter、setter-设置了的属性，在原对象中不可见，但默认可枚举、可删除"><a href="#通过-getter、setter-设置了的属性，在原对象中不可见，但默认可枚举、可删除" class="headerlink" title="通过 getter、setter 设置了的属性，在原对象中不可见，但默认可枚举、可删除"></a>通过 getter、setter 设置了的属性，在原对象中不可见，但默认可枚举、可删除</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	name: <span class="string">&#x27;Lance&#x27;</span>,</span><br><span class="line">  age: <span class="number">24</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _obj = &#123;&#125;;</span><br><span class="line"><span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">  _obj[key] = obj[key];</span><br><span class="line">	<span class="built_in">Object</span>.defineProperty(obj, key, &#123;</span><br><span class="line">  	<span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    	<span class="keyword">return</span> _obj[key];</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">    	_obj[key] = newVal;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(obj[key]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">delete</span> obj.name;</span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/64272/1637908960169-1befe0b3-2785-4073-9661-3d961326be52.png" class="" title="1637908960169-1befe0b3-2785-4073-9661-3d961326be52">
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	name: <span class="string">&#x27;Lance&#x27;</span>,</span><br><span class="line">  age: <span class="number">24</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _obj = &#123;&#125;;</span><br><span class="line"><span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">  _obj[key] = obj[key];</span><br><span class="line">	<span class="built_in">Object</span>.defineProperty(obj, key, &#123;</span><br><span class="line">    <span class="comment">// value: 1, // 不可配置</span></span><br><span class="line">    <span class="comment">// writeable: false, 不可配置</span></span><br><span class="line">  	<span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    	<span class="keyword">return</span> _obj[key];</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">    	_obj[key] = newVal;</span><br><span class="line">    &#125;,</span><br><span class="line">    enumerable: <span class="literal">false</span>, <span class="comment">// 可配置</span></span><br><span class="line">    configurable : <span class="literal">false</span> <span class="comment">// 可配置</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(obj[key]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">delete</span> obj.name;</span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/64272/1637909046397-df9ade35-53be-42c1-857b-ad530ad037d6.png" class="" title="1637909046397-df9ade35-53be-42c1-857b-ad530ad037d6">
+
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><h2 id="计算器"><a href="#计算器" class="headerlink" title="计算器"></a>计算器</h2><iframe height="300" style="width: 100%;" scrolling="no" title="Object.defineProperty计算器" src="https://codepen.io/JingW/embed/abVBrLw?default-tab=css%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/JingW/pen/abVBrLw">
+  Object.defineProperty计算器</a> by JingW (<a target="_blank" rel="noopener" href="https://codepen.io/JingW">@JingW</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
+</iframe>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/ECMAScript/" rel="tag"><i class="fa fa-tag"></i> ECMAScript</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/29404/" rel="prev" title="HTML基础知识">
+                  <i class="fa fa-chevron-left"></i> HTML基础知识
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/14594/" rel="next" title="自定义checkbox">
+                  自定义checkbox <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
