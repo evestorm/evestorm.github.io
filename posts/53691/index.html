@@ -30,15 +30,15 @@
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
 <meta property="og:description" content="预编译运行过程 通篇的检查是否有语法错误，有则直接抛错，不执行任何语句 预编译 解释一行，执行一行  变量提升 变量只把声明提升，赋值不提升 函数 函数声明：整体提升 函数表达式：只提升变量，字面量不提升    1234567test(); &#x2F;&#x2F; 1function test() &amp;#123;	console.log(1);&amp;#125;console.log(a); &#x2F;&#x2F; undefinedvar">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g1.png">
-<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/53691/g.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/53691/g1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/53691/g2.png">
 <meta property="article:published_time" content="2021-08-08T02:20:53.000Z">
-<meta property="article:modified_time" content="2022-02-08T02:28:39.593Z">
+<meta property="article:modified_time" content="2022-02-08T02:36:39.597Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/g.png">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/53691/g.png">
 
 
 <link rel="canonical" href="https://evestorm.github.io/posts/53691/">
@@ -447,15 +447,15 @@
 
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">true</span>;&#125;;</span><br><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">false</span>;&#125;;</span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(g);</span><br><span class="line">  <span class="keyword">if</span> (g() &amp;&amp; [] == ![]) &#123;</span><br><span class="line">  	f = <span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">false</span>;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">g</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">true</span>;&#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
 
-<img src="/posts/undefined/g.png" class="" title="g">
+<img src="/posts/53691/g.png" class="" title="g">
 
 <p>分析：</p>
 <ul>
 <li>if代码块中的 var 变量会提升，但函数声明并不会整体提升，而只会提升函数名到当前作用于顶端。</li>
 <li>赋值的执行一定会在if执行的过程中做。</li>
 </ul>
-<img src="/posts/undefined/g1.png" class="" title="g1">
-<img src="/posts/undefined/g2.png" class="" title="g2">
+<img src="/posts/53691/g1.png" class="" title="g1">
+<img src="/posts/53691/g2.png" class="" title="g2">
 
 <p>上面打断点会发现，function g的g变量是提升到if外边了，但此刻还是undefined。而iife外边的f，g此刻在iife中是可以访问的。但由于iife中有了同名g，所以还是undefined，然后if判断是g()由于g是undefined不是函数所以报错了。另外if中的f前面由于没有var ，所以改的是iife外边的f</p>
 <h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> a;</span><br><span class="line">  a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(test());</span><br></pre></td></tr></table></figure>
