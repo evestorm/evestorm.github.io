@@ -9,6 +9,7 @@ categories:
   - ECMAScript
 abbrlink: 49273
 date: 2021-10-17 16:50:46
+top: True
 ---
 
 # 认知
