@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="预编译运行过程 通篇的检查是否有语法错误，有则直接抛错，不执行任何语句 预编译 解释一行，执行一行  变量提升 变量只把声明提升，赋值不提升 函数 函数声明：整体提升 函数表达式：只提升变量，字面量不提升    1234567test(); &#x2F;&#x2F; 1function test() &amp;#123;	console.log(1);&amp;#125;console.log(a); &#x2F;&#x2F; undefinedvar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="预编译">
+<meta property="og:url" content="https://evestorm.github.io/posts/53691/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="预编译运行过程 通篇的检查是否有语法错误，有则直接抛错，不执行任何语句 预编译 解释一行，执行一行  变量提升 变量只把声明提升，赋值不提升 函数 函数声明：整体提升 函数表达式：只提升变量，字面量不提升    1234567test(); &#x2F;&#x2F; 1function test() &amp;#123;	console.log(1);&amp;#125;console.log(a); &#x2F;&#x2F; undefinedvar">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/g2.png">
+<meta property="article:published_time" content="2021-08-08T02:20:53.000Z">
+<meta property="article:modified_time" content="2022-02-08T02:28:39.593Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/g.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/53691/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>预编译 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">1.</span> <span class="nav-text">预编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">运行过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%87"><span class="nav-number">1.2.</span> <span class="nav-text">变量提升</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9A%97%E7%A4%BA%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F-imply-global-variable"><span class="nav-number">1.3.</span> <span class="nav-text">暗示全局变量 imply global variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88AO%EF%BC%88activation-object%EF%BC%89%E6%B4%BB%E8%B7%83%E5%AF%B9%E8%B1%A1%EF%BC%8C%E5%87%BD%E6%95%B0%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">1.4.</span> <span class="nav-text">🌈AO（activation object）活跃对象，函数上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GO%EF%BC%88global-object%EF%BC%89%E5%85%A8%E5%B1%80%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">1.5.</span> <span class="nav-text">GO（global object）全局上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-if%E4%BB%A3%E7%A0%81%E5%9D%97%E9%99%B7%E8%BF%9B"><span class="nav-number">1.6.</span> <span class="nav-text">🌈 if代码块陷进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0"><span class="nav-number">1.7.</span> <span class="nav-text">练习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">1.8.</span> <span class="nav-text">面试题</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">264</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">89</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/53691/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          预编译
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-08 10:20:53" itemprop="dateCreated datePublished" datetime="2021-08-08T10:20:53+08:00">2021-08-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/53691/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/53691/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="预编译"><a href="#预编译" class="headerlink" title="预编译"></a>预编译</h2><h3 id="运行过程"><a href="#运行过程" class="headerlink" title="运行过程"></a>运行过程</h3><ol>
+<li>通篇的检查是否有语法错误，有则直接抛错，不执行任何语句</li>
+<li>预编译</li>
+<li>解释一行，执行一行</li>
+</ol>
+<h3 id="变量提升"><a href="#变量提升" class="headerlink" title="变量提升"></a>变量提升</h3><ul>
+<li>变量只把声明提升，赋值不提升</li>
+<li>函数<ul>
+<li>函数声明：整体提升</li>
+<li>函数表达式：只提升变量，字面量不提升</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">test(); <span class="comment">// 1</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// undefined</span></span><br><span class="line"><span class="keyword">var</span> a;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h3 id="暗示全局变量-imply-global-variable"><a href="#暗示全局变量-imply-global-variable" class="headerlink" title="暗示全局变量 imply global variable"></a>暗示全局变量 imply global variable</h3><ul>
+<li>没有声明（没写var）就赋值的变量</li>
+<li>全局声明或者不声明（没写var）得变量都会挂在 window 上</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = b = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test();</span><br><span class="line"><span class="built_in">console</span>.log(b); <span class="comment">// 1 (b挂在了window，因为没有var声明)</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.b); <span class="comment">// 1</span></span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// ReferenceError: a is not defined</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.a); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="🌈AO（activation-object）活跃对象，函数上下文"><a href="#🌈AO（activation-object）活跃对象，函数上下文" class="headerlink" title="🌈AO（activation object）活跃对象，函数上下文"></a>🌈AO（activation object）活跃对象，函数上下文</h3><ol>
+<li>寻找<strong>形参和变量声明</strong>（<strong>没用var声明的变量不提升变量名，不声明var的变量被修改，当前作用域有此变量的，优先修改此作用域内的变量</strong>）</li>
+<li><strong>实参值赋值给形参</strong></li>
+<li>寻找<strong>函数声明并赋值</strong></li>
+<li>执行</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a); </span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a); </span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="built_in">console</span>.log(a); </span><br><span class="line">  <span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">d</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">2</span>);</span><br><span class="line"><span class="comment">// function a() &#123;&#125;</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="comment">// function() &#123;&#125;</span></span><br><span class="line">AO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt; </span><br><span class="line">  	 <span class="number">2</span> -&gt;,</span><br><span class="line">  	 <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>)</span>&#123;&#125; -&gt;</span><br><span class="line">     <span class="number">1</span>,</span><br><span class="line">       </span><br><span class="line">  b: <span class="literal">undefined</span> -&gt;</span><br><span class="line">     <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;,</span><br><span class="line">    </span><br><span class="line">  d: <span class="function"><span class="keyword">function</span> <span class="title">d</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a);</span><br><span class="line">  c = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">var</span> c;</span><br><span class="line">  a = <span class="number">5</span>;</span><br><span class="line">  b = <span class="number">6</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">d</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"> <span class="comment">// 1</span></span><br><span class="line"> <span class="comment">// 6</span></span><br><span class="line"> <span class="comment">// 6</span></span><br><span class="line">AO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  		<span class="number">1</span> -&gt;</span><br><span class="line">  		<span class="number">5</span>,</span><br><span class="line">  </span><br><span class="line">  b: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  		<span class="number">2</span> -&gt;</span><br><span class="line">  		<span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>) </span>&#123;&#125; -&gt;</span><br><span class="line">  		<span class="number">6</span>,</span><br><span class="line">  c: <span class="literal">undefined</span> -&gt; </span><br><span class="line">    	<span class="number">0</span>,</span><br><span class="line">  d: <span class="function"><span class="keyword">function</span> <span class="title">d</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>没用var声明的变量不会有变量提升</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line">a = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ReferenceError: a is not defined</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// vs</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a);</span><br><span class="line">  a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"></span><br><span class="line"><span class="comment">// ReferenceError: a is not defined</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// vs</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"></span><br><span class="line"><span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>if 、代码块中 var 变量，会提升到外层作用域</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ReferenceError: a is not defined</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// vs</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// undefined</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// ----------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  a = <span class="number">3</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a); <span class="comment">// 3</span></span><br><span class="line">  <span class="keyword">var</span> a;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    a = <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"><span class="comment">// ReferenceError: a is not defined</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// vs</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"><span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="GO（global-object）全局上下文"><a href="#GO（global-object）全局上下文" class="headerlink" title="GO（global object）全局上下文"></a>GO（global object）全局上下文</h3><ol>
+<li>寻找变量</li>
+<li>寻找函数声明</li>
+<li>执行</li>
+</ol>
+<blockquote>
+<p>GO === window</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line">GO = &#123;</span><br><span class="line">	a: undefiend -&gt;</span><br><span class="line">  	 <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>)</span>&#123;&#125; -&gt; </span><br><span class="line">     <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(a, b);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// function a() &#123;&#125; undefined</span></span><br><span class="line">GO = &#123;</span><br><span class="line">	b: <span class="literal">undefined</span>,</span><br><span class="line">  a: <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = b = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test();</span><br><span class="line"></span><br><span class="line">GO = &#123;</span><br><span class="line">	b: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  	<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> b = <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="keyword">var</span> b = <span class="number">5</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">// function a(a) &#123;&#125;</span></span><br><span class="line"> <span class="comment">// function a() &#123;&#125;</span></span><br><span class="line"> <span class="comment">// 2</span></span><br><span class="line"> <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line">GO = &#123;</span><br><span class="line">	b: <span class="number">3</span></span><br><span class="line">  a: <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  	 <span class="number">1</span> -&gt;</span><br><span class="line">  	 <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125; -&gt;</span><br><span class="line">		 <span class="number">2</span>,</span><br><span class="line">  b: <span class="literal">undefined</span> -&gt;</span><br><span class="line">     <span class="number">5</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">	b: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  	 <span class="number">5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a);</span><br><span class="line">  a = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">3</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"></span><br><span class="line"> <span class="comment">//undefined</span></span><br><span class="line"> <span class="comment">// 2</span></span><br><span class="line"> <span class="comment">// 3</span></span><br><span class="line"></span><br><span class="line">GO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  	 <span class="number">1</span>,</span><br><span class="line">  test: <span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">AO = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">  	 <span class="number">2</span> -&gt;</span><br><span class="line">  	 <span class="number">3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(b);</span><br><span class="line">  <span class="keyword">if</span> (a) &#123;</span><br><span class="line">  	<span class="keyword">var</span> b = <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  c = <span class="number">3</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(c);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a;</span><br><span class="line">test();</span><br><span class="line">a = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line"><span class="comment">// undefined</span></span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line">GO = &#123;</span><br><span class="line">	test: <span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;&#125;,</span><br><span class="line">  a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">      <span class="number">1</span>,</span><br><span class="line">  c: <span class="number">3</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">	b: <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="🌈-if代码块陷进"><a href="#🌈-if代码块陷进" class="headerlink" title="🌈 if代码块陷进"></a>🌈 if代码块陷进</h3><p>假定 if 中有一个函数声明 <code>function a() &#123;&#125;</code></p>
+<ol>
+<li>if 未执行时：<ol>
+<li>if 里的函数声明首先把<strong>变量名 a **提升到</strong>当前作用域<strong>（不是块作用域）的</strong>最顶部** <code>a = undefined</code></li>
+</ol>
+</li>
+<li>if 执行时：<ol>
+<li>函数声明<strong>整体</strong>会被提升到<strong>块作用域顶部</strong></li>
+<li>执行到函数声明语句时，会把块作用域里的 a 赋值到<strong>当前作用域</strong>同名变量 a</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(b);</span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 因为if中，function b() &#123;&#125; 会被看做函数表达式</span></span><br><span class="line"><span class="comment">// 所以会把函数名 b 变量提升到当前作用域的最顶部（也就是全局执行器上下文），b 定义没值 undefined</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// if 在执行时，会首先把函数声明提升到 if 代码块内部的顶端</span></span><br><span class="line"><span class="comment">// 所以内部打印 function b</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">true</span>;&#125;;</span><br><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">false</span>;&#125;;</span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(g);</span><br><span class="line">  <span class="keyword">if</span> (g() &amp;&amp; [] == ![]) &#123;</span><br><span class="line">  	f = <span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">false</span>;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">g</span>(<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="literal">true</span>;&#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/g.png" class="" title="g">
+
+<p>分析：</p>
+<ul>
+<li>if代码块中的 var 变量会提升，但函数声明并不会整体提升，而只会提升函数名到当前作用于顶端。</li>
+<li>赋值的执行一定会在if执行的过程中做。</li>
+</ul>
+<img src="/posts/undefined/g1.png" class="" title="g1">
+<img src="/posts/undefined/g2.png" class="" title="g2">
+
+<p>上面打断点会发现，function g的g变量是提升到if外边了，但此刻还是undefined。而iife外边的f，g此刻在iife中是可以访问的。但由于iife中有了同名g，所以还是undefined，然后if判断是g()由于g是undefined不是函数所以报错了。另外if中的f前面由于没有var ，所以改的是iife外边的f</p>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> a;</span><br><span class="line">  a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(test());</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(test());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">e</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">  <span class="keyword">if</span> (a) &#123;</span><br><span class="line">  	<span class="keyword">var</span> b = <span class="number">3</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> c;</span><br><span class="line">  a = <span class="number">4</span>;</span><br><span class="line">  <span class="keyword">var</span> a;</span><br><span class="line">  <span class="built_in">console</span>.log(b);</span><br><span class="line">  f = <span class="number">5</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(c);</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a;</span><br><span class="line">test(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">go = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt; <span class="number">1</span>,</span><br><span class="line">  test: <span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;&#125;,</span><br><span class="line">  f: <span class="literal">undefined</span> -&gt; <span class="number">5</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ao = &#123;</span><br><span class="line">	a: <span class="literal">undefined</span> -&gt;</span><br><span class="line">     <span class="number">4</span>,</span><br><span class="line">  b: <span class="literal">undefined</span>,</span><br><span class="line">  c: <span class="literal">undefined</span>,</span><br><span class="line">  e: <span class="literal">undefined</span> -&gt;</span><br><span class="line">     <span class="number">1</span> -&gt;</span><br><span class="line">     <span class="function"><span class="keyword">function</span> <span class="title">e</span>(<span class="params"></span>) </span>&#123;&#125; -&gt;</span><br><span class="line">     <span class="number">2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="literal">false</span> + <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 1 隐式转换，没有字符串，把非字符串转基本类型，再to number</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> b = <span class="literal">false</span> == <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(b); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//   string        -1         NaN    </span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span>(a) &amp;&amp; (-<span class="literal">true</span>) + (+ <span class="literal">undefined</span>) + <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">&#x27;通过&#x27;</span>); <span class="comment">// 执行</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">&#x27;未通过&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// hint: if 中 =&gt; &quot;undefined&quot; &amp;&amp; (-1 + NaN) + &#x27;&#x27; =&gt; </span></span><br><span class="line"><span class="comment">// &quot;undefined&quot; &amp;&amp; NaN + &#x27;&#x27; =&gt;</span></span><br><span class="line"><span class="comment">// &quot;undefined&quot; &amp;&amp; &#x27;NaN&#x27; =&gt; true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 1    15</span></span><br><span class="line"><span class="keyword">if</span>(<span class="number">1</span> + <span class="number">5</span> * <span class="string">&#x27;3&#x27;</span> === <span class="number">16</span>) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">&#x27;通过&#x27;</span>); <span class="comment">// 执行</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  consoel.log(<span class="string">&#x27;未通过&#x27;</span>); </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// hint: 乘法，会把非数字转数字</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 					true		false   false  </span></span><br><span class="line">🍒 <span class="built_in">console</span>.log(!!<span class="string">&#x27; &#x27;</span> + !!<span class="string">&#x27;&#x27;</span> - !!<span class="literal">false</span> || <span class="string">&#x27;通过了&#x27;</span>); <span class="comment">// 1</span></span><br><span class="line"><span class="comment">// hint: &#x27; &#x27;: 不是非空串，为真，两次取反，等于没反，最后为真</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.a || (<span class="built_in">window</span>.a = <span class="string">&#x27;1&#x27;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.a); <span class="comment">// &#x27;1&#x27;</span></span><br><span class="line"><span class="comment">// ()运算优先级高，所以先运行 window.a = &#x27;1&#x27; ， 然后 window.a 就是真</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a); <span class="comment">// undefined</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">false</span>) &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 报错</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;No.1&#x27;</span>, a);</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;No.2&#x27;</span>, a);</span><br><span class="line">  a = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;No.3&#x27;</span>, a);</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;No.4&#x27;</span>, a);</span><br><span class="line">  a = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;No.5&#x27;</span>, a);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;No.6&#x27;</span>, a);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. &#123;&#125; 块作用域中 function a 的 a 变量提前到当前作用域（也就是全局作用域）</span></span><br><span class="line"><span class="comment">// 2. 开始执行 a = 0, 所以 No.1 的 a 是 0</span></span><br><span class="line"><span class="comment">// 3. 开始执行 &#123;&#125; 代码块中的内容，首先把 function a() &#123;&#125; 整体提升到块作用域顶部</span></span><br><span class="line"><span class="comment">// ，此刻块作用域中有了变量 a，所以 No.2 的 a 是 function a() &#123;&#125;</span></span><br><span class="line"><span class="comment">// 4. 接着 a = 1, 就把块作用域中的 function a 改成了 1，所以 No.3 的 a 是 1</span></span><br><span class="line"><span class="comment">// 5. 执行到 function a() &#123;&#125; 这一步时，</span></span><br><span class="line"><span class="comment">// 会把块作用域里的 a 赋值到全局同名变量 a，此刻全局 a 变成了 1</span></span><br><span class="line"><span class="comment">// 6. 接着 a = 2 ，把块作用域的 a 变成了 2，所以 No.5 的 a 是 2</span></span><br><span class="line"><span class="comment">// 7. No.6 打印全局 a ，是 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * go: &#123;</span></span><br><span class="line"><span class="comment"> *  a: undefined -&gt; 0 -&gt; 1</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * ao: &#123;</span></span><br><span class="line"><span class="comment"> *  a: function a -&gt; 1</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  a = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这一题有点不一样，外部 a 是用 let 声明的 ，无法被 function a 覆盖</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 报错，暂时性死区</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/48513/" rel="prev" title="显型隐式类型转化">
+                  <i class="fa fa-chevron-left"></i> 显型隐式类型转化
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/13531/" rel="next" title="ul-li模拟table">
+                  ul-li模拟table <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
