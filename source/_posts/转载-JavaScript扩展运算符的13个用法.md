@@ -2,11 +2,11 @@
 title: 转载-JavaScript扩展运算符的13个用法
 tags:
   - 转载
-  - ES6
+  - ES6+
 categories:
   - 前端
   - JS
-  - ES6
+  - ES6+
 abbrlink: 46865
 date: 2021-02-08 10:19:19
 ---

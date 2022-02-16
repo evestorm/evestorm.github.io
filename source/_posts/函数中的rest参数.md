@@ -1,10 +1,11 @@
 ---
 title: 函数中的rest参数
 tags:
-  - ES6
+  - ES6+
 categories:
   - 前端
   - JS
+  - ES6+
 abbrlink: 29820
 date: 2019-01-02 23:47:13
 ---

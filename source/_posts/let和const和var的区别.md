@@ -1,10 +1,11 @@
 ---
 title: let和const和var的区别
 tags:
-  - ES6
+  - ES6+
 categories:
   - 前端
   - JS
+  - ES6+
 abbrlink: 37021
 date: 2019-01-03 23:48:36
 ---
