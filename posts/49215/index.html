@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="简易版vm.$data.xxx 与 vm.xxx 的关系 Vue 在创建实例的过程中调用了 data 函数 data 函数返回数据对象 Vue 将其包装成响应式对象后保存到 $data 中 而且实现了跨过 $data 还能访问属性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue数据响应式">
+<meta property="og:url" content="https://evestorm.github.io/posts/49215/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="简易版vm.$data.xxx 与 vm.xxx 的关系 Vue 在创建实例的过程中调用了 data 函数 data 函数返回数据对象 Vue 将其包装成响应式对象后保存到 $data 中 而且实现了跨过 $data 还能访问属性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1645697714959-a56e3823-6919-4ddc-98c2-b73dd2b383c7-20220308135017139.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1638253090165-e65f8193-aeef-4eb8-be60-f0b29f248eb3-20220308135017143.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1638253259730-e22dc6d8-7383-414c-bb77-946b2b189417-20220308135017139.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1638253365927-21c6189f-d2ad-4e30-9f9f-0c3747af2b6f-20220308135017162.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1645698421811-9f4df171-e23b-42a0-a05a-ce3d3e9d8984-20220308135017162.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1645698444402-8f1f5e5a-fa15-43ca-829a-162699b6b46e-20220308135017151.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1646211162044-27cd855b-90a2-49b1-8b38-4d87afa3a5d3-20220308135017179.png">
+<meta property="article:published_time" content="2021-07-08T05:47:18.000Z">
+<meta property="article:modified_time" content="2022-03-08T06:05:56.954Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1645697714959-a56e3823-6919-4ddc-98c2-b73dd2b383c7-20220308135017139.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/49215/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Vue数据响应式 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E6%98%93%E7%89%88"><span class="nav-number">1.</span> <span class="nav-text">简易版</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vm-data-xxx-%E4%B8%8E-vm-xxx-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.1.</span> <span class="nav-text">vm.$data.xxx 与 vm.xxx 的关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#data-%E6%98%AF%E5%93%8D%E5%BA%94%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.1.1.</span> <span class="nav-text">$data 是响应式数据对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%86%99%E7%AE%80%E6%98%93-Vue-%E8%AF%BB%E5%86%99-data"><span class="nav-number">1.1.2.</span> <span class="nav-text">手写简易 Vue 读写 data</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#defineGetter-%E3%80%81-defineSetter"><span class="nav-number">1.1.3.</span> <span class="nav-text">defineGetter__、__defineSetter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E5%BE%97%E6%98%AF%E4%B8%AA%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">data为什么必须得是个函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue2-%E6%95%B0%E7%BB%84%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.</span> <span class="nav-text">Vue2 数组结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%92%88%E5%AF%B9%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%96%B9%E6%B3%95%E5%90%8E%E4%B8%8D%E8%BF%94%E5%9B%9E%E6%96%B0%E6%95%B0%E7%BB%84%E7%9A%84%E6%96%B9%E6%B3%95%E8%BF%9B%E8%A1%8C%E4%BA%86%E5%B0%81%E8%A3%85"><span class="nav-number">1.3.1.</span> <span class="nav-text">针对修改原数组，执行方法后不返回新数组的方法进行了封装</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E7%89%88"><span class="nav-number">2.</span> <span class="nav-text">复杂版</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%A4%B9%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">文件夹结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#array-js"><span class="nav-number">2.3.1.</span> <span class="nav-text">array.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#config-js"><span class="nav-number">2.3.2.</span> <span class="nav-text">config.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#index-js"><span class="nav-number">2.3.3.</span> <span class="nav-text">index.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#init-js"><span class="nav-number">2.3.4.</span> <span class="nav-text">init.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#observe-js"><span class="nav-number">2.3.5.</span> <span class="nav-text">observe.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#observeArr-js"><span class="nav-number">2.3.6.</span> <span class="nav-text">observeArr.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#observer-js"><span class="nav-number">2.3.7.</span> <span class="nav-text">observer.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proxy-js"><span class="nav-number">2.3.8.</span> <span class="nav-text">proxy.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reactive-js"><span class="nav-number">2.3.9.</span> <span class="nav-text">reactive.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E5%8C%BA%E5%88%AB"><span class="nav-number">2.3.10.</span> <span class="nav-text">注意区别</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">273</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">91</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/49215/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue数据响应式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-08 13:47:18" itemprop="dateCreated datePublished" datetime="2021-07-08T13:47:18+08:00">2021-07-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">源码系列</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/49215/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/49215/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="简易版"><a href="#简易版" class="headerlink" title="简易版"></a>简易版</h1><h2 id="vm-data-xxx-与-vm-xxx-的关系"><a href="#vm-data-xxx-与-vm-xxx-的关系" class="headerlink" title="vm.$data.xxx 与 vm.xxx 的关系"></a>vm.$data.xxx 与 vm.xxx 的关系</h2><ol>
+<li>Vue 在创建实例的过程中调用了 data 函数</li>
+<li>data 函数返回数据对象</li>
+<li>Vue 将其包装成响应式对象后保存到 <code>$data</code> 中</li>
+<li>而且实现了跨过 <code>$data</code> 还能访问属性</li>
+</ol>
+<a id="more"></a>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> App = Vue.createApp(&#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      title: <span class="string">&#x27;This is my TITLE&#x27;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;h1&gt;&#123;&#123; title &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">  `</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm = App.mount(<span class="string">&#x27;#app&#x27;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"><span class="built_in">console</span>.log(vm.$data.title);</span><br><span class="line"><span class="built_in">console</span>.log(vm.title);</span><br><span class="line"></span><br><span class="line">vm.$data.title = <span class="string">&#x27;This is your TITLE&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm.title);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1645697714959-a56e3823-6919-4ddc-98c2-b73dd2b383c7-20220308135017139.png" class="" title="100%">
+
+<h3 id="data-是响应式数据对象"><a href="#data-是响应式数据对象" class="headerlink" title="$data 是响应式数据对象"></a>$data 是响应式数据对象</h3><p>后续在 vm 上添加 author ，不会出现在 vm.$data 上：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vm.author = <span class="string">&#x27;Lance&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1638253090165-e65f8193-aeef-4eb8-be60-f0b29f248eb3-20220308135017143.png" class="" title="100%">
+
+
+<p>在 $data 上添加属性，不会出现在 vm 上：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vm.$data.author = <span class="string">&#x27;Lance&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1638253259730-e22dc6d8-7383-414c-bb77-946b2b189417-20220308135017139.png" class="" title="100%">
+
+
+<p>两种添加方式都不能渲染到页面上：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> App = Vue.createApp(&#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      title: <span class="string">&#x27;This is my TITLE&#x27;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">      &lt;h1&gt;&#123;&#123; title &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">      &lt;h1&gt;&#123;&#123; author &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">  `</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> vm = App.mount(<span class="string">&#x27;#app&#x27;</span>);</span><br><span class="line"><span class="comment">// vm.author = &#x27;Lance&#x27;;</span></span><br><span class="line">vm.$data.author = <span class="string">&#x27;Lance&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1638253365927-21c6189f-d2ad-4e30-9f9f-0c3747af2b6f-20220308135017162.png" class="" title="100%">
+
+<h3 id="手写简易-Vue-读写-data"><a href="#手写简易-Vue-读写-data" class="headerlink" title="手写简易 Vue 读写 data"></a>手写简易 Vue 读写 data</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	<span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  	<span class="keyword">return</span> &#123;</span><br><span class="line">    	a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.a);</span><br><span class="line">vm.b = <span class="number">233</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm.b);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.$data = options.data();</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">var</span> _this = <span class="built_in">this</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> <span class="built_in">this</span>.$data) &#123;</span><br><span class="line">  	(<span class="function"><span class="keyword">function</span>(<span class="params">k</span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">Object</span>.defineProperty(_this, k, &#123;</span><br><span class="line">      	get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        	<span class="keyword">return</span> _this.$data[k];</span><br><span class="line">        &#125;,</span><br><span class="line">        set: <span class="function"><span class="keyword">function</span>(<span class="params">newVal</span>) </span>&#123;</span><br><span class="line">        	_this.$data[k] = newVal;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="defineGetter-、-defineSetter"><a href="#defineGetter-、-defineSetter" class="headerlink" title="defineGetter__、__defineSetter"></a><strong>defineGetter__、__defineSetter</strong></h3><p>Object.defineProperty 在 <strong>IE8 下只支持DOM</strong>，可以使用 <strong>defineGetter__、__defineSetter</strong> 替换方案：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	<span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  	<span class="keyword">return</span> &#123;</span><br><span class="line">    	a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.a);</span><br><span class="line">vm.b = <span class="number">233</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm.b);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.$data = options.data();</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">var</span> _this = <span class="built_in">this</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> <span class="built_in">this</span>.$data) &#123;</span><br><span class="line">  	(<span class="function"><span class="keyword">function</span>(<span class="params">k</span>) </span>&#123;</span><br><span class="line">    	<span class="comment">// Object.defineProperty(_this, k, &#123;</span></span><br><span class="line">      <span class="comment">// 	get: function() &#123;</span></span><br><span class="line">      <span class="comment">//   	return _this.$data[k];</span></span><br><span class="line">      <span class="comment">//   &#125;,</span></span><br><span class="line">      <span class="comment">//   set: function(newVal) &#123;</span></span><br><span class="line">      <span class="comment">//   	_this.$data[k] = newVal;</span></span><br><span class="line">      <span class="comment">//   &#125;</span></span><br><span class="line">      <span class="comment">// &#125;);</span></span><br><span class="line">      _this.__defineGetter__(k, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> _this.$data[k];</span><br><span class="line">      &#125;);</span><br><span class="line">      _this.__defineSetter__(k, <span class="function"><span class="keyword">function</span>(<span class="params">newVal</span>) </span>&#123;</span><br><span class="line">        _this.$data[k] = newVal;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="data为什么必须得是个函数"><a href="#data为什么必须得是个函数" class="headerlink" title="data为什么必须得是个函数"></a>data为什么必须得是个函数</h2><ul>
+<li>如果 data 不是个函数，则有可能出现不同实例、组件修改的是同一份 data 引用</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = &#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	data: data</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> vm2 = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	data: data</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">233</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm, vm2);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.$data = options.data;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">var</span> _this = <span class="built_in">this</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> <span class="built_in">this</span>.$data) &#123;</span><br><span class="line">  	(<span class="function"><span class="keyword">function</span>(<span class="params">k</span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">Object</span>.defineProperty(_this, k, &#123;</span><br><span class="line">      	get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        	<span class="keyword">return</span> _this.$data[k];</span><br><span class="line">        &#125;,</span><br><span class="line">        set: <span class="function"><span class="keyword">function</span>(<span class="params">newVal</span>) </span>&#123;</span><br><span class="line">        	_this.$data[k] = newVal;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1645698421811-9f4df171-e23b-42a0-a05a-ce3d3e9d8984-20220308135017162.png" class="" title="100%">
+
+<p>当然分别给两个新对象也没问题，但Vue为了避免出现上边情况，所以强制你得是个function，返回一个新对象，这样在Vue内部执行它时，每次就是新对象了:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	data: &#123;</span><br><span class="line">    a: <span class="number">1</span>,</span><br><span class="line">    b: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> vm2 = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	data: &#123;</span><br><span class="line">    a: <span class="number">1</span>,</span><br><span class="line">    b: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">233</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm, vm2);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.$data = options.data;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">var</span> _this = <span class="built_in">this</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> <span class="built_in">this</span>.$data) &#123;</span><br><span class="line">  	(<span class="function"><span class="keyword">function</span>(<span class="params">k</span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">Object</span>.defineProperty(_this, k, &#123;</span><br><span class="line">      	get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        	<span class="keyword">return</span> _this.$data[k];</span><br><span class="line">        &#125;,</span><br><span class="line">        set: <span class="function"><span class="keyword">function</span>(<span class="params">newVal</span>) </span>&#123;</span><br><span class="line">        	_this.$data[k] = newVal;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1645698444402-8f1f5e5a-fa15-43ca-829a-162699b6b46e-20220308135017151.png" class="" title="100%">
+
+
+<p><strong>Object.defineProperty 无法监听能修改原数组的数组方法</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 数据变更检测</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm = &#123;</span><br><span class="line">  data: &#123;</span><br><span class="line">    a: <span class="number">1</span>,</span><br><span class="line">    b: <span class="number">2</span>,</span><br><span class="line">    list: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> vm.data) &#123;</span><br><span class="line">  (<span class="function"><span class="keyword">function</span>(<span class="params">key</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;数据获取&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span> vm.data[key];</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;数据设置&#x27;</span>);</span><br><span class="line">        vm.data[key] = newValue;</span><br><span class="line">        <span class="comment">// 视图更新操作</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;)(key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">233</span>;</span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重新赋值能够触发 set</span></span><br><span class="line">vm.list = vm.list.map(<span class="function"><span class="params">item</span> =&gt;</span> item * <span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新增一个数组之前没监听的成员，数组倒是push了999，但没能触发set，间接导致没法更新视图</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 下列方法，都不返回新数组(7种)</span></span><br><span class="line"><span class="comment"> * Object.defineProperty 没办法监听下列方法对数组的操作变更</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// vm.list.unshift(1);</span></span><br><span class="line"><span class="comment">// vm.list.push(999);</span></span><br><span class="line"><span class="comment">// vm.list.pop();</span></span><br><span class="line"><span class="comment">// vm.list.shift();</span></span><br><span class="line"><span class="comment">// vm.list.splice(2, 1);</span></span><br><span class="line"><span class="comment">// vm.list.sort((a, b) =&gt; b - a);</span></span><br><span class="line"><span class="comment">// vm.list.reverse();</span></span><br><span class="line"><span class="built_in">console</span>.log(vm.list);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Vue对下列方法进行了包裹封装</span></span><br><span class="line"><span class="comment">// function push() &#123;</span></span><br><span class="line"><span class="comment">//   vm.list.push(233);</span></span><br><span class="line"><span class="comment">//   // 视图更新</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Vue2-数组结构"><a href="#Vue2-数组结构" class="headerlink" title="Vue2 数组结构"></a>Vue2 数组结构</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  template: <span class="string">`&lt;div&gt;&lt;/div&gt;`</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      list: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.list);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1646211162044-27cd855b-90a2-49b1-8b38-4d87afa3a5d3-20220308135017179.png" class="" title="100%">
+
+<h3 id="针对修改原数组，执行方法后不返回新数组的方法进行了封装"><a href="#针对修改原数组，执行方法后不返回新数组的方法进行了封装" class="headerlink" title="针对修改原数组，执行方法后不返回新数组的方法进行了封装"></a>针对修改原数组，执行方法后不返回新数组的方法进行了封装</h3><p>Vue类似做了这个操作：</p>
+<ol>
+<li>Vue先调用自己封装的 push 等方法</li>
+<li>再在里边调用原生的</li>
+<li>再进行一些更新视图操作 </li>
+</ol>
+<h1 id="复杂版"><a href="#复杂版" class="headerlink" title="复杂版"></a>复杂版</h1><h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
+<li>用 <code>_data</code> 去接收 <code>options.data()</code> 函数返回的对象，保存到 vm 实例中</li>
+<li>为了能直接 <code>vm.title</code> 的形式操作数据（跳过 <code>vm._data.title</code> 开发更方便），我们遍历 <code>_data</code>，通过 <code>Object.defineProperty</code> 在 <code>vm</code> 实例上挂载了所有 <code>_data</code> 下的属性</li>
+<li>有了 <code>_data</code> 后，我们就需要对 <code>_data</code> 本身的改变进行拦截观察了（为了更新值时做页面更新等操作）</li>
+<li>观察者模式，<code>new Observer(data)</code></li>
+<li>递归观察，因为 <code>_data</code> 下的属性也有可能是个对象，属性的属性也有可能是个对象…</li>
+<li>写 <code>Observer</code> 观察者构造函数</li>
+<li>观察者接收的 data 有可能是个数组也有可能是个对象，所以得分情况处理</li>
+<li><code>是[]</code> -  给数组的原型链上加中间桥梁<ol>
+<li> <code>[].__proto__ = arrMethods</code>、<code>arrMethods.__proto__ = Array.prototype</code></li>
+<li><code>arrMethods</code> 下挂载了 7 个属性，分别对应能原地改变数组的 7 个方法</li>
+<li>每个方法在执行的时候，先用原生方法执行一次，再执行自己的逻辑</li>
+<li><code>push、unshift、splice</code> 三个方法有可能新增数组成员，而新增的成员也有可能是数组或对象，所以还得用一个 <code>newArr</code> 保存下新数组成员，然后对它们进行遍历观察</li>
+<li>获取原生方法执行后的结果，返回出去</li>
+</ol>
+</li>
+<li><code>是&#123;&#125;</code> - 遍历对象属性并用 <code>Object.defineProperty</code> 进行数据劫持<ol>
+<li>每个对象属性有可能还是个对象或数组，记得再次调用 <code>new Observer(value)</code> 观察它</li>
+</ol>
+</li>
+</ol>
+<h2 id="文件夹结构"><a href="#文件夹结构" class="headerlink" title="文件夹结构"></a>文件夹结构</h2><ul>
+<li>index.js<ul>
+<li><code>function Vue(options)</code> <ul>
+<li><code>_init(options)</code> 初始化Vue<ul>
+<li><code>initState(this)</code> 初始化状态（data、computed …）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>init.js<ul>
+<li>包含 <code>initState(vm)</code> 方法，用来初始化各种状态<ul>
+<li><code>initData(vm)</code> 初始化 data<ul>
+<li>用临时变量 <code>vm._data</code> 保存 <code>options.data()</code> 返回的 data</li>
+<li>把 <code>vm._data</code> 挂载到 <code>vm</code> 下<ul>
+<li>目的：使 <code>vm.title</code> 能访问 <code>vm._data.title</code></li>
+<li>原理：利用 <code>Object.defineProperty</code></li>
+<li>方式：遍历 <code>vm._data</code> 调取 <code>proxyData(vm, &#39;_data&#39;, key)</code> </li>
+</ul>
+</li>
+<li>对 <code>vm._data</code> 进行劫持，监听 <code>vm._data</code> 的变化<ul>
+<li>方式：<code>observe(vm._data)</code></li>
+<li><code>observe</code> 在 <code>observe.js</code> 下</li>
+</ul>
+</li>
+<li>梳理上述两个过程<ul>
+<li>开发者对 <code>vm.title</code> 进行更改</li>
+<li>导致 <code>vm._data.title</code> 的更改</li>
+<li>而我们要监听的，是 <code>vm._data.title</code> 的变化</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>proxy.js<ul>
+<li><code>proxyData(vm, target, key)</code> 方法<ul>
+<li>给 <code>vm</code> 下挂载 <code>_data</code> 下的各个属性（利用 <code>Object.defineProperty</code>）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>observe.js<ul>
+<li><code>observe(data)</code> 方法<ul>
+<li>如果 <code>vm.data</code> 不是个对象，则直接 return 不做任何操作</li>
+<li>如果是对象，则调用 <code>new Observer(data)</code> 对 <code>vm._data</code> 进行观察<ul>
+<li><code>Observer</code> 方法在 <code>observer.js</code> 中</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>observer.js<ul>
+<li><code>Observer(data)</code> 方法<ul>
+<li>判断传入的 <code>data</code> 是否为数组<ul>
+<li>是<ul>
+<li><code>data.__proto__ = arrMethods</code>（来自下方 array.js）</li>
+<li>由于 <code>data</code> 这个数组的成员也有可能是对象或者数组，所以还得递归观察，所以得调用 <code>observeArr(data)</code> （在 <code>observeArr.js</code> 中）</li>
+</ul>
+</li>
+<li>否<ul>
+<li>调用 <code>Observer.prototype.walk(data)</code> 方法<ul>
+<li>遍历 data，调用 <code>defineReactiveData(data, key, value)</code> 观察data下每个属性</li>
+<li><code>defineReactiveData</code> 在 <code>reactive.js</code> 下</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>array.js<ul>
+<li>创建一个继承自Array原型的对象<ul>
+<li><code>const originArrMethods = Array.prototype</code></li>
+<li><code>const arrMethods = Object.create(originArrMethods)</code></li>
+</ul>
+</li>
+<li>用一个数组存 7 个原地更新数组的方法<ul>
+<li>遍历它们，把它们挂载到 <code>arrMethods</code> 下 <ul>
+<li><code>[ARR_METHODS].forEach(m =&gt; &#123; arrMethods[m] = functino() &#123;&#125; &#125;)</code><ul>
+<li>保存传入的参数为数组 <ul>
+<li><code>const args = [].slice.call(arguments)</code></li>
+</ul>
+</li>
+<li>先用原生方法执行一遍，改变数组 （别忘了保存返回值，最后得返回出去）<ul>
+<li><code>const ret = originArrMethods[m].apply(this, args)</code></li>
+</ul>
+</li>
+<li><code>push、unshift、splice</code> 有可能给数组新增成员，所以用 <code>newArr</code> 保存新增数据<ul>
+<li><code>push、unshift</code> 时 <code>newArr</code> 就是 <code>args</code></li>
+<li><code>unshift</code> 时从第三个参数开始才是新增的 <code>newArr = args.slice(2)</code></li>
+<li>如果最后发现 <code>newArr</code> 有值，则需要调用 <code>observeArr.js</code> 遍历并监听它们</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>导出 <code>arrMethods</code> </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>config.js<ul>
+<li>保存着 <code>ARR_METHODS</code> ，是个数组，保存着 7 个原地更新数组的方法名称</li>
+</ul>
+</li>
+<li>observeArr.js<ul>
+<li><code>observeArr(arr)</code><ul>
+<li>遍历 <code>arr</code> ，然后对每个数组成员调用 <code>observe(arr[i])</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>reactive.js<ul>
+<li><code>defineReactiveData(data, key, value)</code><ul>
+<li>有可能 value 本身也是个对象，所以先得 <code>observe(value)</code></li>
+<li>调用 <code>Object.defineProperty</code><ul>
+<li>get<ul>
+<li><code>return value</code></li>
+</ul>
+</li>
+<li>set<ul>
+<li><code>if (newValue === value) return</code></li>
+<li><code>value = newValue</code></li>
+<li>有可能 value 又是个对象，则再对 <code>value</code> 观察：<code>observe(newValue)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h3 id="array-js"><a href="#array-js" class="headerlink" title="array.js"></a>array.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; ARR_METHODS &#125; <span class="keyword">from</span> <span class="string">&#x27;./config&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> observeArr <span class="keyword">from</span> <span class="string">&#x27;./observeArr&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> originArrMethods = <span class="built_in">Array</span>.prototype,</span><br><span class="line">    <span class="comment">// 设置我们封装的对象的原型为 Array.prototype</span></span><br><span class="line">    arrMethods = <span class="built_in">Object</span>.create(originArrMethods);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 遍历7个方法</span></span><br><span class="line">ARR_METHODS.map(<span class="function"><span class="params">method</span> =&gt;</span> &#123;</span><br><span class="line">  arrMethods[method] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 把arguments转成真数组</span></span><br><span class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>),</span><br><span class="line">    <span class="comment">// 先用Array原生方法执行一遍，改变数组</span></span><br><span class="line">        rt = originArrMethods[method].apply(<span class="built_in">this</span>, args);</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 再用临时变量存一下给数组新增的项目</span></span><br><span class="line">    <span class="comment">// 因为只有新增的值没被劫持过，得提出来劫持</span></span><br><span class="line">    <span class="keyword">var</span> newArr;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (method) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;push&#x27;</span>:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;unshift&#x27;</span>:</span><br><span class="line">        newArr = args;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;splice&#x27;</span>:</span><br><span class="line">        <span class="comment">// arr.splice(1,1,2) splice从第三个参数开始才是新增的</span></span><br><span class="line">        newArr = args.slice(<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一旦发现有新增的成员，就再观察它</span></span><br><span class="line">    newArr &amp;&amp; observeArr(newArr);</span><br><span class="line">    <span class="keyword">return</span> rt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> &#123;</span><br><span class="line">  arrMethods</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="config-js"><a href="#config-js" class="headerlink" title="config.js"></a>config.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ARR_METHODS = [</span><br><span class="line">  <span class="string">&#x27;push&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;unshift&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;pop&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;shift&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;splice&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;sort&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;reverse&#x27;</span></span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> &#123;</span><br><span class="line">  ARR_METHODS</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a>index.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; initState &#125; <span class="keyword">from</span> <span class="string">&quot;./init&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>._init(options);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化Vue实例</span></span><br><span class="line">Vue.prototype._init = <span class="function"><span class="keyword">function</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 首先初始化后先保存 this</span></span><br><span class="line">  <span class="keyword">var</span> vm = <span class="built_in">this</span>;</span><br><span class="line">  <span class="comment">// 把options挂载到实例</span></span><br><span class="line">  vm.$options = options;</span><br><span class="line">  <span class="comment">// 首先就得数据劫持，不然没法后面通过劫持关联视图</span></span><br><span class="line">  initState(vm);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br></pre></td></tr></table></figure>
+
+<h3 id="init-js"><a href="#init-js" class="headerlink" title="init.js"></a>init.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> proxyData <span class="keyword">from</span> <span class="string">&quot;./proxy&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> observe <span class="keyword">from</span> <span class="string">&#x27;./observe&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">initState</span>(<span class="params">vm</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> options = vm.$options;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (options.data) &#123;</span><br><span class="line">    <span class="comment">// 除了data还有computed还有watch</span></span><br><span class="line">    <span class="comment">// 每一个功能都不一样，都得要初始化，所以拆分初始化方法</span></span><br><span class="line">    initData(vm);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">initData</span>(<span class="params">vm</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> data = vm.$options.data;</span><br><span class="line">  <span class="comment">// 一般我们不直接操作用户的数据，需要用一个临时变量保存起来</span></span><br><span class="line">  <span class="comment">// 所以我们让 vm._data = data ，而 vm._data 又等于传进来的data</span></span><br><span class="line">  vm._data = data = <span class="keyword">typeof</span> data === <span class="string">&#x27;function&#x27;</span></span><br><span class="line">                        ? data.call(vm)</span><br><span class="line">                        : data || &#123;&#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 遍历 vm._data 把 data 中属性挂载到 vm 下面(通过 Object.defineProperty) </span></span><br><span class="line">  <span class="comment">// 此时访问 vm.title 其实访问的是 vm._data.title</span></span><br><span class="line">  <span class="comment">// 此时更改 vm.title 其实更改的是 vm._data.title</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> data) &#123;</span><br><span class="line">    proxyData(vm, <span class="string">&#x27;_data&#x27;</span>, key);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 在没有执行下边 observe 观察 vm._data 时，vm._data 本身还没有被观测，_data 下的属性还都没有被劫持</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 一旦执行 observe ，其实也就是要对 vm._data 进行劫持</span></span><br><span class="line">  observe(vm._data); <span class="comment">// 观察 vm._data</span></span><br><span class="line">  <span class="built_in">console</span>.log(vm);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> &#123;</span><br><span class="line">  initState</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="observe-js"><a href="#observe-js" class="headerlink" title="observe.js"></a>observe.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Observer <span class="keyword">from</span> <span class="string">&#x27;./observer&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">observe</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 如果 vm._data 不是个对象或者是个null，就直接返回</span></span><br><span class="line">  <span class="keyword">if</span> (data == <span class="literal">null</span> || <span class="keyword">typeof</span> data !== <span class="string">&#x27;object&#x27;</span>) <span class="keyword">return</span>;</span><br><span class="line">  <span class="comment">// 如果是个对象，就对 vm._data 进行观察</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Observer(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> observe;</span><br></pre></td></tr></table></figure>
+
+<h3 id="observeArr-js"><a href="#observeArr-js" class="headerlink" title="observeArr.js"></a>observeArr.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> observe <span class="keyword">from</span> <span class="string">&quot;./observe&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">observeArr</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">    observe(arr[i]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> observeArr;</span><br></pre></td></tr></table></figure>
+
+<h3 id="observer-js"><a href="#observer-js" class="headerlink" title="observer.js"></a>observer.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> defineReactiveData <span class="keyword">from</span> <span class="string">&quot;./reactive&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; arrMethods &#125; <span class="keyword">from</span> <span class="string">&#x27;./array&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> observeArr <span class="keyword">from</span> <span class="string">&#x27;./observeArr&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Observer</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 针对数组：自己写相应方法</span></span><br><span class="line">  <span class="comment">// 针对对象：Object.defineProperty 给对象下每个属性添加数据劫持</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(data)) &#123;</span><br><span class="line">    <span class="comment">// 让数组的原型等于arrMethods，</span></span><br><span class="line">    <span class="comment">// 这样就会先看调用的方法会不会命中arrMethods中的7个方法中的任意一个</span></span><br><span class="line">    <span class="comment">// 如果有，就走自己封装的7个方法（内部会调用Array方法）。</span></span><br><span class="line">    <span class="comment">// 否则就走 Array.prototype 自身的方法</span></span><br><span class="line">    data.__proto__ = arrMethods;</span><br><span class="line">    <span class="comment">// console.log(data);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由于数组内的成员也有可能是对象或数组，所以得递归观察</span></span><br><span class="line">    observeArr(data);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.walk(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 劫持 vm._data 下属性</span></span><br><span class="line">Observer.prototype.walk = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(data);</span><br><span class="line">  <span class="built_in">console</span>.log(keys); <span class="comment">// [&#x27;title&#x27;, &#x27;classNum&#x27;, &#x27;total&#x27;, &#x27;teacher&#x27;, &#x27;students&#x27;]</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; keys.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> key = keys[i],</span><br><span class="line">        value = data[key];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// vm._data, &#x27;title&#x27;, &#x27;学生列表&#x27;</span></span><br><span class="line">    defineReactiveData(data, key, value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Observer;</span><br></pre></td></tr></table></figure>
+
+<h3 id="proxy-js"><a href="#proxy-js" class="headerlink" title="proxy.js"></a>proxy.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">proxyData</span>(<span class="params">vm, target, key</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">    <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;proxyData获取&#x27;</span> + key);</span><br><span class="line">      <span class="comment">// vm.title 相当于访问 vm._data.title</span></span><br><span class="line">      <span class="keyword">return</span> vm[target][key];</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">      <span class="comment">// vm.title = xxx 相当于 vm._data.title = xxx</span></span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;proxyData设置&#x27;</span> + key);</span><br><span class="line">      vm[target][key] = newValue;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> proxyData;</span><br></pre></td></tr></table></figure>
+
+<h3 id="reactive-js"><a href="#reactive-js" class="headerlink" title="reactive.js"></a>reactive.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> observe <span class="keyword">from</span> <span class="string">&quot;./observe&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defineReactiveData</span>(<span class="params">data, key, value</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 有可能 value 本身也是个对象，所以要递归调用</span></span><br><span class="line">  observe(value);</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(data, key, &#123;</span><br><span class="line">    get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;defineReactiveData获取&#x27;</span>, key);</span><br><span class="line">      <span class="keyword">return</span> value;</span><br><span class="line">      <span class="comment">// 注意这里是返回的 defineReactiveData 下的变量 value</span></span><br><span class="line">      <span class="comment">// 而不是 return 的 data[key]</span></span><br><span class="line">    &#125;,</span><br><span class="line">    set: <span class="function"><span class="keyword">function</span>(<span class="params">newValue</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (newValue === value) <span class="keyword">return</span>;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;defineReactiveData设置&#x27;</span>, key);</span><br><span class="line">      <span class="comment">// 此处改了value后，上边get获取value时也是新的</span></span><br><span class="line">      value = newValue; <span class="comment">// 注意这里不是 data[key] = newValue;</span></span><br><span class="line">      <span class="comment">// 有可能设置的值还是个对象，还得观察</span></span><br><span class="line">      observe(newValue);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> defineReactiveData;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意区别"><a href="#注意区别" class="headerlink" title="注意区别"></a>注意区别</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  name: <span class="string">&quot;Lance&quot;</span>,</span><br><span class="line">  age: <span class="number">28</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defineReactiveData</span>(<span class="params">data, key, value</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(data, key, &#123;</span><br><span class="line">    <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> value;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">      value = newVal;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">  <span class="comment">// 下边报错</span></span><br><span class="line">  <span class="comment">// Object.defineProperty(obj, key, &#123;</span></span><br><span class="line">  <span class="comment">//   get() &#123;</span></span><br><span class="line">  <span class="comment">//     return obj[key];</span></span><br><span class="line">  <span class="comment">//   &#125;,</span></span><br><span class="line">  <span class="comment">//   set(newVal) &#123;</span></span><br><span class="line">  <span class="comment">//     obj[key] = newVal;</span></span><br><span class="line">  <span class="comment">//   &#125;</span></span><br><span class="line">  <span class="comment">// &#125;)</span></span><br><span class="line">  <span class="comment">// 下边不报错</span></span><br><span class="line">  defineReactiveData(obj, key, obj[key]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj.name);</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/49515/" rel="prev" title="转载-javascript常见的内存泄漏">
+                  <i class="fa fa-chevron-left"></i> 转载-javascript常见的内存泄漏
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/11378/" rel="next" title="CSS中给背景色添加杂色(噪点)">
+                  CSS中给背景色添加杂色(噪点) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
