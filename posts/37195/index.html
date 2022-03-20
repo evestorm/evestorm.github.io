@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="前言 this 是 JavaScript 的关键字 是 当前环境 执行期上下文对象 的 一个属性 this明确指向的时机：执行期 this 在不同环境、不同作用域下，表现不同">
+<meta property="og:type" content="article">
+<meta property="og:title" content="总结This指向">
+<meta property="og:url" content="https://evestorm.github.io/posts/37195/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="前言 this 是 JavaScript 的关键字 是 当前环境 执行期上下文对象 的 一个属性 this明确指向的时机：执行期 this 在不同环境、不同作用域下，表现不同">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640935990950-bd04b9bc-e2a7-450e-af6e-bdc449646aab.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640936166568-307bc8d7-fe38-48e9-89e8-844e54acc302.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640936233376-1f35d3c2-8251-422b-b9bd-eaf3919b3bf9.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640936826388-bdc36e33-9a2c-43c0-8fdf-0a4e391116bb.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640939032529-3f4c2c18-000f-4ffa-9277-a00426b3487f.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640939048469-9efa13fa-3be8-437c-93c3-70108ad34a65.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640939537274-ef2fcc59-6f2a-4be5-94bc-7167a9f280b1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640969325138-0766e560-ef75-4802-8126-3b976e10c11a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640965304214-cade9585-e27d-4923-bea1-a46aa558ee41.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640965496284-3020ef26-ae32-4a7b-8873-7a3a25385f4c.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640965575217-74f8cfbd-96c1-449d-a10f-b1f54010b93d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640966314047-e656cf71-81ce-43f5-8e03-7b17f8e7aa7d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640967160797-5b63e55c-5a04-44ba-a164-4b910216e901.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640968720944-9d2f456c-b356-4bb3-b5c7-4bc8e8b3cb61.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640968896015-1b0d5ce6-eb35-4275-97fe-a024a33710e6.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640494512342-aeb9b2b5-6760-436a-9e8f-aad18b38d9dc.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640968939918-40472b0d-51c3-4175-82f0-850b4e02bb08.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640494541034-35314e9a-06b3-4028-88ba-caa53f529d11.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640494617021-81201173-cb2a-4495-a186-f736395ad30b.png">
+<meta property="article:published_time" content="2021-05-20T07:08:07.000Z">
+<meta property="article:modified_time" content="2022-03-20T07:17:54.083Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1640935990950-bd04b9bc-e2a7-450e-af6e-bdc449646aab.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/37195/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>总结This指向 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E5%B1%80this"><span class="nav-number">2.</span> <span class="nav-text">全局this</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E8%8E%B7%E5%8F%96%E5%85%A8%E5%B1%80%E5%AF%B9%E8%B1%A1this"><span class="nav-number">2.1.</span> <span class="nav-text">🌈获取全局对象this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web"><span class="nav-number">2.2.</span> <span class="nav-text">web</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#node"><span class="nav-number">2.3.</span> <span class="nav-text">node</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8C%88class-%E4%B8%AD-this"><span class="nav-number">3.</span> <span class="nav-text">🌈class 中 this</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E4%B9%8B%E9%97%B4%E6%93%8D%E4%BD%9Cthis"><span class="nav-number">3.1.</span> <span class="nav-text">类之间操作this</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8C%88-call%E3%80%81apply%E3%80%81bind-%E7%9A%84-this"><span class="nav-number">4.</span> <span class="nav-text">🌈 call、apply、bind 的 this</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0%E4%B8%AD-this"><span class="nav-number">5.</span> <span class="nav-text">箭头函数中 this</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E4%B8%AD%E7%9A%84-this"><span class="nav-number">6.</span> <span class="nav-text">对象中的 this</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9E%8Bthis"><span class="nav-number">6.1.</span> <span class="nav-text">原型this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0-return-this"><span class="nav-number">6.2.</span> <span class="nav-text">🌈构造函数 return this</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8C%88%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E4%B8%AD%E7%9A%84this"><span class="nav-number">7.</span> <span class="nav-text">🌈事件处理函数中的this</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Promise%E4%B8%AD%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0this%E8%BF%98%E6%98%AFwindow"><span class="nav-number">8.</span> <span class="nav-text">Promise中回调函数this还是window</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0"><span class="nav-number">9.</span> <span class="nav-text">练习</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">284</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/37195/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          总结This指向
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-20 15:08:07" itemprop="dateCreated datePublished" datetime="2021-05-20T15:08:07+08:00">2021-05-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/37195/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/37195/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
+<li>this 是 JavaScript 的关键字</li>
+<li>是 当前环境 执行期上下文对象 的 一个属性</li>
+<li>this明确指向的时机：<strong>执行期</strong></li>
+<li>this 在不同环境、不同作用域下，表现不同</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="全局this"><a href="#全局this" class="headerlink" title="全局this"></a>全局this</h1><h2 id="🌈获取全局对象this"><a href="#🌈获取全局对象this" class="headerlink" title="🌈获取全局对象this"></a>🌈获取全局对象this</h2><ul>
+<li>web 下的全局 this: <code>window、self、frames、this</code></li>
+<li>node 下的全局 this: <code>global、globalThis</code></li>
+<li>worker 下的全局 this: <code>self</code></li>
+<li>通用：<code>globalThis</code></li>
+</ul>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><ul>
+<li>全局 this = window</li>
+<li>严格模式下<ul>
+<li>未通过 var 声明的变量会报错</li>
+<li>函数自调用中 this 为 undefined</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">&#x27;fun b中的this:&#x27;</span>, <span class="built_in">this</span>) &#125;</span><br><span class="line">c = &#123;&#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;this === window&#x27;</span>, <span class="built_in">this</span> === <span class="built_in">window</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;window.a === a:&#x27;</span>, <span class="built_in">window</span>.a === a);</span><br><span class="line">b();</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;window.c === this.c:&#x27;</span>, <span class="built_in">window</span>.c === <span class="built_in">this</span>.c);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640935990950-bd04b9bc-e2a7-450e-af6e-bdc449646aab.png" class="" title="100%">
+
+<p>严格模式下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line">c = <span class="number">123</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640936166568-307bc8d7-fe38-48e9-89e8-844e54acc302.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">&#x27;fun b中的this:&#x27;</span>, <span class="built_in">this</span>) &#125;</span><br><span class="line">b();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640936233376-1f35d3c2-8251-422b-b9bd-eaf3919b3bf9.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">  &quot;use strict&quot;</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.test(); <span class="comment">// window</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 谁调用函数，函数内部的this指向谁</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="node"><a href="#node" class="headerlink" title="node"></a>node</h2><ul>
+<li>下面两种方式才能把变量挂载到 global 上<ul>
+<li><code>global.a</code></li>
+<li><code>a</code> （不通过 var、let、const，这些声明的变量会挂载到当前模块中而不是全局）</li>
+</ul>
+</li>
+<li>严格模式下<ul>
+<li>函数自调用中 global 为 undefined</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="built_in">this</span>) &#125;;</span><br><span class="line"><span class="built_in">global</span>.c = <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="built_in">console</span>.log(b);</span><br><span class="line"><span class="built_in">console</span>.log(c);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">global</span>.a);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">global</span>.b);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">global</span>.c);</span><br><span class="line">b();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640936826388-bdc36e33-9a2c-43c0-8fdf-0a4e391116bb.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="built_in">this</span>) &#125;;</span><br><span class="line">b(); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="🌈class-中-this"><a href="#🌈class-中-this" class="headerlink" title="🌈class 中 this"></a>🌈class 中 this</h1><ul>
+<li>super 做了什么：<ul>
+<li>调用父类的 constructor</li>
+<li>生成 this ，并把 this 指向 子类</li>
+</ul>
+</li>
+<li>如果没有调用 super<ul>
+<li>不会调用父类的 constructor 也就不生成父类的 this</li>
+</ul>
+</li>
+<li>子类 constructor 中，访问 this 前，必须得首先调用 super</li>
+<li>类中是严格模式</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">age</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">swim</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;Go swimming!!!&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(<span class="number">23</span>);</span><br><span class="line">    <span class="built_in">this</span>.hobby = <span class="string">&#x27;travel&#x27;</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>.age);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">study</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">    <span class="built_in">this</span>.swim();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> son = <span class="keyword">new</span> Son();</span><br><span class="line">son.study();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640939032529-3f4c2c18-000f-4ffa-9277-a00426b3487f.png" class="" title="100%">
+
+<img src="/posts/undefined/1640939048469-9efa13fa-3be8-437c-93c3-70108ad34a65.png" class="" title="100%">
+
+
+
+<p>不能调换super顺序，得首先调用 super：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.hobby = <span class="string">&#x27;travel&#x27;</span>;</span><br><span class="line">    <span class="built_in">super</span>(<span class="number">23</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640939537274-ef2fcc59-6f2a-4be5-94bc-7167a9f280b1.png" class="" title="100%">
+
+<p>原因是按照正常顺序：</p>
+<ol>
+<li>super() 被调用</li>
+<li>调用父类 constructor</li>
+<li>实例化父类 this，给父类 this 挂上 age 属性</li>
+<li>再执行子类 constructor 中代码</li>
+<li>先把父类 this 指向子类实例化的 this</li>
+<li>给子类 this 添加上 hobby 属性</li>
+<li>现在子类上有两个属性了，分别是 age、hobby</li>
+</ol>
+<p>而如果先执行子类 constructor 中代码，后执行 super，就会导致先实例化了子类 this，再实例化父类 this，这样逻辑就不对了。</p>
+<h2 id="类之间操作this"><a href="#类之间操作this" class="headerlink" title="类之间操作this"></a>类之间操作this</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">	<span class="keyword">get</span> <span class="title">fruit</span>() &#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="string">&#x27;apple&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">eat</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="string">&#x27;I am eating an &#x27;</span> + <span class="built_in">this</span>.fruit);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span> </span>&#123;</span><br><span class="line">	<span class="keyword">get</span> <span class="title">fruit</span>() &#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="string">&#x27;orange&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> father = <span class="keyword">new</span> Father();</span><br><span class="line"><span class="keyword">const</span> son = <span class="keyword">new</span> Son();</span><br><span class="line"></span><br><span class="line">father.eat(); <span class="comment">// apple</span></span><br><span class="line">son.eat = father.eat;</span><br><span class="line">son.eat(); <span class="comment">// orange</span></span><br></pre></td></tr></table></figure>
+
+<p>如果希望son调用eat时，还是拿的 father 中的 apple，可以在constructor中bind固定this：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 让函数内部的this指向固定</span></span><br><span class="line">    <span class="comment">// 这样无论再把eat赋给谁，this都不会改变了</span></span><br><span class="line">    <span class="built_in">this</span>.eat = <span class="built_in">this</span>.eat.bind(<span class="built_in">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">	<span class="keyword">get</span> <span class="title">fruit</span>() &#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="string">&#x27;apple&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">eat</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="string">&#x27;I am eating an &#x27;</span> + <span class="built_in">this</span>.fruit);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span> </span>&#123;</span><br><span class="line">	<span class="keyword">get</span> <span class="title">fruit</span>() &#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="string">&#x27;orange&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> father = <span class="keyword">new</span> Father();</span><br><span class="line"><span class="keyword">const</span> son = <span class="keyword">new</span> Son();</span><br><span class="line"></span><br><span class="line">father.eat(); <span class="comment">// apple</span></span><br><span class="line">son.eat = father.eat;</span><br><span class="line">son.eat(); <span class="comment">// apple</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640969325138-0766e560-ef75-4802-8126-3b976e10c11a.png" class="" title="100%">
+
+<h1 id="🌈-call、apply、bind-的-this"><a href="#🌈-call、apply、bind-的-this" class="headerlink" title="🌈 call、apply、bind 的 this"></a>🌈 call、apply、bind 的 this</h1><ul>
+<li>call、apply、bind 都能改变 this 指向</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">b, c</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test();</span><br><span class="line">test.call(obj, <span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">test.apply(obj, [<span class="number">3</span>, <span class="number">4</span>]);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640965304214-cade9585-e27d-4923-bea1-a46aa558ee41.png" class="" title="100%">
+
+
+
+<ul>
+<li><strong>bind 绑定只能生效一次</strong></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	a: <span class="number">100</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">b, c</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>, b, c);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> test1 = test.bind(obj, <span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">test1();</span><br><span class="line"><span class="keyword">var</span> test2 = test1.bind(obj2, <span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">test2();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640965496284-3020ef26-ae32-4a7b-8873-7a3a25385f4c.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	a: <span class="number">100</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">b, c</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>, b, c);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> test1 = test.bind(obj2, <span class="number">3</span>, <span class="number">4</span>).bind(obj, <span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">test1();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640965575217-74f8cfbd-96c1-449d-a10f-b1f54010b93d.png" class="" title="100%">
+
+
+<h1 id="箭头函数中-this"><a href="#箭头函数中-this" class="headerlink" title="箭头函数中 this"></a>箭头函数中 this</h1><ul>
+<li>箭头函数本身没有 this</li>
+<li>箭头函数内部 this 指向外层作用域 this</li>
+<li><strong>箭头函数中 this 不是在执行期确定，而是声明时就已确定，而且无法更改</strong></li>
+<li>箭头函数忽略任何形式的this指向的改变（apply，call，bind）</li>
+<li><strong>箭头函数无法通过 new 实例化</strong></li>
+</ul>
+<p>不管是否是严格模式，全局下箭头函数的this都为window</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> test = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">&#125;</span><br><span class="line">test(); <span class="comment">// window</span></span><br><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> test = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">&#125;</span><br><span class="line">test(); <span class="comment">// window</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>箭头函数忽略任何形式的this指向的改变（apply，call，bind）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> test = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>.a);</span><br><span class="line">&#125;</span><br><span class="line">test.call(obj); <span class="comment">// undefined</span></span><br><span class="line">test.apply(obj); <span class="comment">// undefined</span></span><br><span class="line"><span class="keyword">var</span> test1 = test.bind(obj);</span><br><span class="line">test1(); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<p>箭头函数中 this 不是在执行期确定，而是声明时就已确定，而且无法更改：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.test = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">&#125;</span><br><span class="line">obj.test(); <span class="comment">// window</span></span><br><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> t = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="built_in">this</span>); <span class="comment">// obj</span></span><br><span class="line">  &#125;</span><br><span class="line">  t();</span><br><span class="line">&#125;</span><br><span class="line">obj.test();</span><br><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> t1 = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  	<span class="keyword">var</span> t2 = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    	<span class="built_in">console</span>.log(<span class="built_in">this</span>); <span class="comment">// obj</span></span><br><span class="line">    &#125;</span><br><span class="line">    t2();</span><br><span class="line">  &#125;</span><br><span class="line">  t1();</span><br><span class="line">&#125;</span><br><span class="line">obj.test();</span><br><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> t1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="keyword">var</span> t2 = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    t2();</span><br><span class="line">  &#125;</span><br><span class="line">  t1();</span><br><span class="line">&#125;</span><br><span class="line">obj.test();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640966314047-e656cf71-81ce-43f5-8e03-7b17f8e7aa7d.png" class="" title="100%">
+
+
+<h1 id="对象中的-this"><a href="#对象中的-this" class="headerlink" title="对象中的 this"></a>对象中的 this</h1><ul>
+<li>this指向的基本原则：谁调用，this指向谁</li>
+<li>对象方法内部的this：指向最近作用域的引用</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span>,</span><br><span class="line">  test: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="built_in">this</span>.a); <span class="comment">// 1</span></span><br><span class="line">  &#125;,</span><br><span class="line">  test2: test2,</span><br><span class="line">  c: &#123;</span><br><span class="line">  	d: <span class="number">4</span>,</span><br><span class="line">    test3: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="built_in">this</span>.d);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">this</span>.b);</span><br><span class="line">&#125;</span><br><span class="line">obj.test();</span><br><span class="line">obj.test2();</span><br><span class="line">obj.c.test3();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640967160797-5b63e55c-5a04-44ba-a164-4b910216e901.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span>,</span><br><span class="line">  test3: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="function"><span class="keyword">function</span> <span class="title">t</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 这个函数t是孤立的，不是 obj2 内部的成员</span></span><br><span class="line">      <span class="comment">// 并不存在 obj2.t,  t()自调用，默认this为window</span></span><br><span class="line">    	<span class="built_in">console</span>.log(<span class="built_in">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    t(); <span class="comment">// window</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">obj2.test3();</span><br><span class="line"><span class="keyword">var</span> a = <span class="number">8</span>;</span><br><span class="line"><span class="keyword">var</span> o = &#123;</span><br><span class="line">	a: <span class="number">10</span>,</span><br><span class="line">  b: &#123;</span><br><span class="line">  	fn: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">console</span>.log(<span class="built_in">this</span>.a);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">o.b.fn(); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="原型this"><a href="#原型this" class="headerlink" title="原型this"></a>原型this</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;&#125;</span><br><span class="line">obj.__proto__ = &#123;</span><br><span class="line">	e: <span class="number">20</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(obj.e); <span class="comment">// 20 原型继承</span></span><br><span class="line"><span class="keyword">var</span> obj = <span class="built_in">Object</span>.create(&#123;</span><br><span class="line">	test4: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="built_in">this</span>.a + <span class="built_in">this</span>.b);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">obj.a = <span class="number">1</span>;</span><br><span class="line">obj.b = <span class="number">2</span>;</span><br><span class="line">obj.test4(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="🌈构造函数-return-this"><a href="#🌈构造函数-return-this" class="headerlink" title="🌈构造函数 return this"></a>🌈构造函数 return this</h2><ul>
+<li><p>new做了什么</p>
+</li>
+<li><ul>
+<li>实例化一个空对象</li>
+<li>把需要初始化的属性和方法挂载此对象上</li>
+<li>隐式的返回此 this</li>
+</ul>
+</li>
+<li><p>如果显示的 return 一个复杂类型的值，会把默认隐式return的实例化对象覆盖</p>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.a = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">this</span>.b = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">this</span>); <span class="comment">// &#123;a:1,b:2&#125;</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">  	c: <span class="number">3</span>,</span><br><span class="line">    d: <span class="number">4</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> test1 = <span class="keyword">new</span> Test();</span><br><span class="line"><span class="built_in">console</span>.log(test1); <span class="comment">// &#123;c:3,d:4&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="🌈事件处理函数中的this"><a href="#🌈事件处理函数中的this" class="headerlink" title="🌈事件处理函数中的this"></a>🌈事件处理函数中的this</h1><ul>
+<li>onclick、addEventListener事件处理函数内部的this总是指向被绑定的DOM元素</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">&quot;btn&quot;</span>&gt;</span>点我<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">var btn = document.getElementById(&#x27;btn&#x27;);</span><br><span class="line">btn.onclick = function() &#123;</span><br><span class="line">  console.log(this); // btn元素</span><br><span class="line">&#125;</span><br><span class="line">btn.addEventListener(&#x27;click&#x27;, function() &#123;</span><br><span class="line">  console.log(this); // btn元素</span><br><span class="line">&#125;, false);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640968720944-9d2f456c-b356-4bb3-b5c7-4bc8e8b3cb61.png" class="" title="100%">
+
+
+<p>直接在元素上绑定，this还是btn：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;button id=<span class="string">&quot;btn&quot;</span> onclick=<span class="string">&quot;console.log(this)&quot;</span>&gt;点我&lt;/button&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640968896015-1b0d5ce6-eb35-4275-97fe-a024a33710e6.png" class="" title="100%">
+
+<p>改变this指向：</p>
+<img src="/posts/undefined/1640494512342-aeb9b2b5-6760-436a-9e8f-aad18b38d9dc.png" class="" title="100%">
+
+<p>如果绑定箭头函数，this就是window：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;button id=<span class="string">&quot;btn&quot;</span> onclick=<span class="string">&quot;(function() &#123; console.log(this) &#125;)()&quot;</span>&gt;点我&lt;/button&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1640968939918-40472b0d-51c3-4175-82f0-850b4e02bb08.png" class="" title="100%">
+
+<h1 id="Promise中回调函数this还是window"><a href="#Promise中回调函数this还是window" class="headerlink" title="Promise中回调函数this还是window"></a>Promise中回调函数this还是window</h1><img src="/posts/undefined/1640494541034-35314e9a-06b3-4028-88ba-caa53f529d11.png" class="" title="100%">
+
+<img src="/posts/undefined/1640494617021-81201173-cb2a-4495-a186-f736395ad30b.png" class="" title="100%">
+
+<h1 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">8</span>;</span><br><span class="line"><span class="keyword">var</span> o = &#123;</span><br><span class="line">  a: <span class="number">10</span>,</span><br><span class="line">  b: &#123;</span><br><span class="line">    fn: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="built_in">this</span>.a);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">o.b.fn();</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/1853/" rel="prev" title="微信小程序真机调试很卡的解决办法">
+                  <i class="fa fa-chevron-left"></i> 微信小程序真机调试很卡的解决办法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/53669/" rel="next" title="element-ui的table设置fixed导致更新数据错位的解决方案">
+                  element-ui的table设置fixed导致更新数据错位的解决方案 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
