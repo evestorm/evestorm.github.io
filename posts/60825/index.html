@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="虚拟DOM🌈为什么需要虚拟DOM目的：为了解决频繁操作 DOM 导致性能开销大的问题 方案：JS运算效率 远高于 操作DOM效率，所以把真实DOM树抽象成JS对象树，运用 patch 算法 来用JS计算出真正需要更新的节点，最大限度地减少 DOM 操作，从而显著提高性能  Vue&#x2F;React 等框架都是数据驱动页面更新，让用户无需自己操作 DOM 由于操作 DOM 这个行为本身开销成本大，而数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟DOM和DIFF算法">
+<meta property="og:url" content="https://evestorm.github.io/posts/60825/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="虚拟DOM🌈为什么需要虚拟DOM目的：为了解决频繁操作 DOM 导致性能开销大的问题 方案：JS运算效率 远高于 操作DOM效率，所以把真实DOM树抽象成JS对象树，运用 patch 算法 来用JS计算出真正需要更新的节点，最大限度地减少 DOM 操作，从而显著提高性能  Vue&#x2F;React 等框架都是数据驱动页面更新，让用户无需自己操作 DOM 由于操作 DOM 这个行为本身开销成本大，而数据">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1641883396419-46210263-cce7-415c-8b98-ae71472eff75-20220407092515344.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640236159722-4819daaf-e042-453b-83a3-e855ec873973-20220407092515660.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640236274431-07ab9a77-fecd-493c-9608-9376599263b9-20220407092515866.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1640236356230-f4276ceb-ba15-469e-91fb-464d9be8d060-20220407092515481.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1641898274700-9053db85-649e-49f7-beca-ebd56ac234ff-20220407092515481.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1641898524214-f677f4a5-8fc5-4a34-8718-d1afe3c043bd-20220407092515349.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1641898732042-ce801167-ea6b-4205-83d2-88e1624bc8d6-20220407092515451.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/undefined/1641899501760-ecd21ede-70f5-4305-b63d-074ebdb630d0-20220407092515444.png">
+<meta property="article:published_time" content="2021-12-07T01:27:13.000Z">
+<meta property="article:modified_time" content="2022-04-07T01:34:25.408Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/undefined/1641883396419-46210263-cce7-415c-8b98-ae71472eff75-20220407092515344.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/60825/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>虚拟DOM和DIFF算法 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9FDOM"><span class="nav-number">1.</span> <span class="nav-text">虚拟DOM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%99%9A%E6%8B%9FDOM"><span class="nav-number">1.1.</span> <span class="nav-text">🌈为什么需要虚拟DOM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E4%BB%80%E4%B9%88%E6%98%AF%E8%99%9A%E6%8B%9FDOM"><span class="nav-number">1.2.</span> <span class="nav-text">🌈什么是虚拟DOM</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E8%BD%AC%E5%8C%96%E4%B8%BA%E8%A7%86%E5%9B%BE%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">模板转化为视图的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E6%9E%84%E5%BB%BA%E8%99%9A%E6%8B%9FDOM"><span class="nav-number">2.1.</span> <span class="nav-text">🌈构建虚拟DOM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88%E6%9B%B4%E6%96%B0%E8%A7%86%E5%9B%BE"><span class="nav-number">2.2.</span> <span class="nav-text">🌈更新视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8C%88%E8%99%9A%E6%8B%9F-DOM-%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">3.</span> <span class="nav-text">🌈虚拟 DOM 的优势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AST-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91%EF%BC%88Abstract-Syntax-Tree%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">AST 抽象语法树（Abstract Syntax Tree）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84"><span class="nav-number">4.1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-%E5%BA%94%E7%94%A8"><span class="nav-number">4.2.</span> <span class="nav-text">🌈 应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#template-%E8%BD%AC-AST"><span class="nav-number">4.3.</span> <span class="nav-text">template 转 AST</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84-1"><span class="nav-number">4.3.1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.3.2.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8C%88diff-%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">🌈diff 算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95"><span class="nav-number">5.1.</span> <span class="nav-text">算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">5.1.1.</span> <span class="nav-text">特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E5%B1%82%E6%AF%94%E8%BE%83%E3%80%81%E4%B8%8D%E8%B7%A8%E7%BA%A7"><span class="nav-number">5.1.1.1.</span> <span class="nav-text">同层比较、不跨级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E7%AD%BE%E5%90%8D%E4%B8%8D%E5%90%8C%EF%BC%8C%E7%9B%B4%E6%8E%A5%E6%9B%BF%E6%8D%A2%EF%BC%8C%E4%B8%8D%E6%B7%B1%E5%BA%A6%E6%AF%94%E8%BE%83"><span class="nav-number">5.1.1.2.</span> <span class="nav-text">标签名不同，直接替换，不深度比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E7%AD%BE%E5%90%8D%E5%92%8Ckey%E9%83%BD%E7%9B%B8%E5%90%8C%EF%BC%8C%E5%BD%93%E5%81%9A%E7%9B%B8%E5%90%8C%E8%8A%82%E7%82%B9%EF%BC%8C%E5%B1%9E%E6%80%A7%E6%94%B9%E5%8F%98%E5%88%99%E6%9B%B4%E6%96%B0%E5%B1%9E%E6%80%A7"><span class="nav-number">5.1.1.3.</span> <span class="nav-text">标签名和key都相同，当做相同节点，属性改变则更新属性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E6%AD%A5%E9%AA%A4"><span class="nav-number">5.1.2.</span> <span class="nav-text">🌈 步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#diff%E7%AE%97%E6%B3%95%E6%A0%B8%E5%BF%83%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.1.2.1.</span> <span class="nav-text">diff算法核心示例</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">289</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/60825/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          虚拟DOM和DIFF算法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-07 09:27:13" itemprop="dateCreated datePublished" datetime="2021-12-07T09:27:13+08:00">2021-12-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/60825/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/60825/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="虚拟DOM"><a href="#虚拟DOM" class="headerlink" title="虚拟DOM"></a>虚拟DOM</h1><h2 id="🌈为什么需要虚拟DOM"><a href="#🌈为什么需要虚拟DOM" class="headerlink" title="🌈为什么需要虚拟DOM"></a>🌈为什么需要虚拟DOM</h2><p>目的：为了解决频繁操作 DOM 导致性能开销大的问题</p>
+<p>方案：JS运算效率 远高于 操作DOM效率，所以把真实DOM树抽象成JS对象树，运用 <strong>patch 算法</strong> 来用JS计算出<strong>真正需要更新的节点</strong>，最大限度地<strong>减少 DOM 操作</strong>，从而显著<strong>提高性能</strong></p>
+<ol>
+<li>Vue/React 等框架都是数据驱动页面更新，让用户无需自己操作 DOM</li>
+<li>由于<strong>操作 DOM</strong> 这个行为本身<strong>开销成本大</strong>，而数据的频繁更新会导致 DOM 也得频繁操作</li>
+<li>所以框架本身就得想出一个解决方案，能够<strong>尽可能减少 DOM 操作</strong></li>
+<li>而执行 JS 的效率远高于操作真实 DOM，所以想到用 JavaScript对象树 来模拟 真实DOM树，这样一来，不直接操作 DOM ，而是操作 JS 数据。性能就能提高许多</li>
+<li><strong>再通过 diff 算法，把最终更新时需要操作的部分计算好，最后一次性操作 DOM</strong></li>
+<li>从而达到减少 DOM 操作，提升性能的目的</li>
+</ol>
+<h2 id="🌈什么是虚拟DOM"><a href="#🌈什么是虚拟DOM" class="headerlink" title="🌈什么是虚拟DOM"></a>🌈什么是虚拟DOM</h2><p>Virtual DOM 其实就是一棵以 JavaScript 对象（vNode节点）作为基础的树，用<strong>对象属性来描述节点</strong>，实际</p>
+<p>是一层<strong>对真实 DOM 的抽象</strong>。</p>
+<p>基本成员：</p>
+<ul>
+<li>tag        （标签名）</li>
+<li>props    （属性）</li>
+<li>children    （子元素对象集合）</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>虚拟DOM<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span> <span class="attr">style</span>=<span class="string">&quot;color: orange&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>第一项<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>第二项<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>第三项<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>虚拟DOM表示：</p>
+<a id="more"></a>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	tag: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">  	id: <span class="string">&#x27;app&#x27;</span>,</span><br><span class="line">    class: &#x27;container&#x27;</span><br><span class="line">  &#125;,</span><br><span class="line">  children: [</span><br><span class="line">    &#123;</span><br><span class="line">    	tag: <span class="string">&#x27;h1&#x27;</span>,</span><br><span class="line">      children: <span class="string">&#x27;虚拟DOM&#x27;</span> </span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">    	tag: <span class="string">&#x27;ul&#x27;</span>,</span><br><span class="line">      props: &#123; <span class="comment">// 节点属性及绑定事件...</span></span><br><span class="line">      	style: <span class="string">&#x27;color: orange&#x27;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      children: [</span><br><span class="line">        &#123;</span><br><span class="line">        	tag: <span class="string">&#x27;li&#x27;</span>,</span><br><span class="line">          children: <span class="string">&#x27;第一项&#x27;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">        	tag: <span class="string">&#x27;li&#x27;</span>,</span><br><span class="line">          children: <span class="string">&#x27;第二项&#x27;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">        	tag: <span class="string">&#x27;li&#x27;</span>,</span><br><span class="line">          children: <span class="string">&#x27;第二项&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="模板转化为视图的过程"><a href="#模板转化为视图的过程" class="headerlink" title="模板转化为视图的过程"></a>模板转化为视图的过程</h1><h2 id="🌈构建虚拟DOM"><a href="#🌈构建虚拟DOM" class="headerlink" title="🌈构建虚拟DOM"></a>🌈构建虚拟DOM</h2><p><code>获取 template</code> → </p>
+<p><code>template 转 AST 语法树</code> → </p>
+<p><code>AST 语法数 转 render 函数</code> → </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">render 函数 返回 VNode(虚拟DOM节点）</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/undefined/1641883396419-46210263-cce7-415c-8b98-ae71472eff75-20220407092515344.png" class="" title="100%">
+
+<h2 id="🌈更新视图"><a href="#🌈更新视图" class="headerlink" title="🌈更新视图"></a>🌈更新视图</h2><ol>
+<li>数据变化</li>
+<li>触发对应 Dep（订阅者） 中的 Watcher 对象们</li>
+<li>Watchers 会调用各自的 update 函数更新视图<ol>
+<li>利用 diff 算法将新旧虚拟节点进行差异对比</li>
+<li>根据对比结果进行 DOM 操作</li>
+</ol>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>转化过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">模板&#96;→  &#96;AST树&#96;→&#96;渲染函数&#96;→ &#96;虚拟DOM&#96;→ &#96;真实DOM</span><br></pre></td></tr></table></figure>
+
+
+
+<p>其中：</p>
+<ul>
+<li><p><strong>渲染函数</strong>：渲染函数是用来生成 Virtual DOM 的</p>
+</li>
+<li><p><strong>VNode 虚拟节点</strong>：代表一个真实的 DOM 节点。通过 createElement 方法能将 VNode 渲染成 DOM节点</p>
+</li>
+<li><p><strong>Patch 算法</strong>：通过对比新旧虚拟节点（diff 算法），找出需要更新的节点，将 VNode 渲染成真实的 DOM</p>
+</li>
+</ul>
+<h1 id="🌈虚拟-DOM-的优势"><a href="#🌈虚拟-DOM-的优势" class="headerlink" title="🌈虚拟 DOM 的优势"></a>🌈虚拟 DOM 的优势</h1><ul>
+<li><strong>运行效率高</strong><ul>
+<li>因为 DOM 操作的执行速度远不如 <strong>Javascript的运算速度快</strong>。因此，把大量的 DOM 操作放在到 Javascript 中，运用 <strong>patch 算法</strong>来计算出<strong>真正需要更新的节点</strong>，最大限度地<strong>减少 DOM 操作</strong>，从而显著<strong>提高性能</strong></li>
+</ul>
+</li>
+<li><strong>提高渲染的性能</strong><ul>
+<li>Virtual DOM的优势在于在<strong>大量、频繁的数据更新</strong>下，能够对视图进行<strong>合理、高效的更新</strong></li>
+</ul>
+</li>
+<li><strong>具备跨平台的优势</strong><ul>
+<li>由于 Virtual DOM 是<strong>以 Javascript 对象为基础而不依赖真实平台环境</strong>，所以使它具有了跨平台的能力</li>
+</ul>
+</li>
+</ul>
+<h1 id="AST-抽象语法树（Abstract-Syntax-Tree）"><a href="#AST-抽象语法树（Abstract-Syntax-Tree）" class="headerlink" title="AST 抽象语法树（Abstract Syntax Tree）"></a>AST 抽象语法树（Abstract Syntax Tree）</h1><p>源代码的抽象语法的树状描述</p>
+<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>把代码形成树状结构，然后对这个结构做分析、优化、处理，最终再把它转化为真正所需内容</p>
+<h2 id="🌈-应用"><a href="#🌈-应用" class="headerlink" title="🌈 应用"></a>🌈 应用</h2><ul>
+<li>webpack 利用AST：import 转 require()</li>
+<li>ts 利用AST：ts 转 js</li>
+<li>eslint 代码规范解析</li>
+</ul>
+<p>说白了就是字符串解析、拼接、再解析、再拼接…</p>
+<h2 id="template-转-AST"><a href="#template-转-AST" class="headerlink" title="template 转 AST"></a>template 转 AST</h2><p>对源代码的数据结构化</p>
+<h3 id="目的-1"><a href="#目的-1" class="headerlink" title="目的"></a>目的</h3><p>模板中有 <code>v-show</code> 、<code>v-if</code> 、<code>v-model</code> 这些指令等其他内容，而这些内容是不能存在于虚拟 DOM 中的，因为真实 html 不需要它们，它们是框架所需的，类似这种东西全部都得转为 AST 后做处理，把这些多余的（相对真实html）属性都<strong>解析成对应功能</strong>并最终<strong>删除它们</strong>。例如</p>
+<ul>
+<li>vue的各种指令 =&gt; 处理</li>
+<li>用户少写了结束标签 <code>&lt;/div&gt;</code> =&gt; 帮用户补上 or 给警告</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span> <span class="attr">style</span>=<span class="string">&quot;color: red;font-size: 20px;&quot;</span>&gt;</span></span><br><span class="line">  hello</span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;&#123; name &#125;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">style</span>=<span class="string">&quot;color: green&quot;</span>&gt;</span>&#123;&#123; age &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; info.job &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>转为 👇🏻</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	tag: &quot;div&quot;,</span><br><span class="line">  type: 1, // 1代表标签</span><br><span class="line">  attrs: [</span><br><span class="line">    &#123;</span><br><span class="line">    	name: &#x27;id&#x27;,</span><br><span class="line">      value &#x27;app&#x27;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">    	name: &#x27;style&#x27;,</span><br><span class="line">      value: &#123;</span><br><span class="line">      	&#x27;color&#x27;: &#x27;red&#x27;,</span><br><span class="line">        &#x27;font-size&#x27;: &#x27;20px&#x27;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  children: [</span><br><span class="line">    &#123;</span><br><span class="line">    	type: 3, // 3代表文本</span><br><span class="line">      text: &#x27;hello&#x27;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">    	type: 1,</span><br><span class="line">      tag: &#x27;h1&#x27;,</span><br><span class="line">      attr: null,</span><br><span class="line">      children: [</span><br><span class="line">        &#123;</span><br><span class="line">        	type: 3,</span><br><span class="line">          text: &#x27;&#123;&#123;name&#125;&#125;&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这不是虚拟 DOM ，只是类似。虚拟 DOM 是描述 DOM 对象（节点）的，最终是要变成真实 DOM 的</p>
+<h1 id="🌈diff-算法"><a href="#🌈diff-算法" class="headerlink" title="🌈diff 算法"></a>🌈diff 算法</h1><p>虚拟 DOM 的最终目的就是将虚拟节点渲染到视图上。</p>
+<ul>
+<li>直接替换（不推荐）：<ul>
+<li>如果是用新的虚拟节点直接覆盖原来旧的虚拟节点的话，就会有很多不必要的DOM操作。</li>
+</ul>
+</li>
+<li>新旧节点比较（推荐）：<ul>
+<li>为了避免这些不必要的 DOM 操作，就需要将新的虚拟节点与上一次渲染视图所使用的旧的虚拟节点做对比，找出真正需要更新的节点来进行DOM操作。最后在更新视图。</li>
+</ul>
+</li>
+</ul>
+<p>上面的过程就是所谓的虚拟 DOM 的算法，也就是 diff 算法，它主要包括两个步骤：</p>
+<ul>
+<li><strong>初次渲染</strong><ul>
+<li>把 JavaScript 对象结构表示的 DOM 树转化为虚拟节点，再渲染成真正的 DOM ，最终插入到容器里面</li>
+</ul>
+</li>
+<li><strong>再次渲染</strong><ul>
+<li>将新的 VNode 和旧的 VNode 进行对比，然后将两者之间的差异更新到真正的 DOM 树上，完成视图的更新</li>
+</ul>
+</li>
+</ul>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><h4 id="同层比较、不跨级"><a href="#同层比较、不跨级" class="headerlink" title="同层比较、不跨级"></a>同层比较、不跨级</h4><img src="/posts/undefined/1640236159722-4819daaf-e042-453b-83a3-e855ec873973-20220407092515660.png" class="" title="100%">
+
+<h4 id="标签名不同，直接替换，不深度比较"><a href="#标签名不同，直接替换，不深度比较" class="headerlink" title="标签名不同，直接替换，不深度比较"></a>标签名不同，直接替换，不深度比较</h4><img src="/posts/undefined/1640236274431-07ab9a77-fecd-493c-9608-9376599263b9-20220407092515866.png" class="" title="100%">
+
+<h4 id="标签名和key都相同，当做相同节点，属性改变则更新属性"><a href="#标签名和key都相同，当做相同节点，属性改变则更新属性" class="headerlink" title="标签名和key都相同，当做相同节点，属性改变则更新属性"></a>标签名和key都相同，当做相同节点，属性改变则更新属性</h4><img src="/posts/undefined/1640236356230-f4276ceb-ba15-469e-91fb-464d9be8d060-20220407092515481.png" class="" title="100%">
+
+<h3 id="🌈-步骤"><a href="#🌈-步骤" class="headerlink" title="🌈 步骤"></a>🌈 步骤</h3><ol>
+<li>如果新老节点不是同一个节点名称，那么就暴力删除旧的节点，创建插入新的节点。</li>
+<li>只能同级比较，不能跨层比较。如果跨层那么就暴力删除旧的节点，创建插入新的节点。</li>
+<li><strong>如果是相同节点，又分为很多情况</strong><ol>
+<li>新节点有没有children<ol>
+<li>如果新的节点没有children，那就证明新节点是文本，那直接把旧日的替换成新的文本</li>
+</ol>
+</li>
+<li>新节点有children<ol>
+<li><strong>新的有children，旧的也有 children</strong>  ====&gt; 就是diff算法的核心了</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">diff 算法核心（最复杂的情况）</span><br><span class="line"><span class="number">1.</span> 旧前 vs 新前</span><br><span class="line"><span class="number">2.</span> 旧后 vs 新后</span><br><span class="line"><span class="number">3.</span> 旧前 vs 新后</span><br><span class="line"><span class="number">4.</span> 旧后 vs 新前</span><br><span class="line"><span class="number">5.</span> 以上都不满足，遍历查找</span><br><span class="line"><span class="number">6.</span> 创建 or 删除</span><br></pre></td></tr></table></figure>
+
+<pre><code>  1. 新的有children，旧的没有 children  ====&gt; 创建元素添加（把旧的内容删除清空掉，增加新的)</code></pre>
+<p>注意：如果要提升性能，一定要加入key， key是唯一标示，在更改前后，确认是不是同一个节点</p>
+<h4 id="diff算法核心示例"><a href="#diff算法核心示例" class="headerlink" title="diff算法核心示例"></a>diff算法核心示例</h4><ul>
+<li><strong>旧前 vs 新前</strong><ul>
+<li>匹配：旧前的指针++、新前的指针++</li>
+</ul>
+</li>
+</ul>
+<p>每次都从第一个元素（从前往后）开始新旧两两比较，都从指针（索引index）0开始，如果两两相同，就原地复用，把a更新页面上，然后index++，直到比较完毕，最终全部复用</p>
+<img src="/posts/undefined/1641898274700-9053db85-649e-49f7-beca-ebd56ac234ff-20220407092515481.png" class="" title="100%">
+
+
+
+
+<ul>
+<li><strong>旧后 vs 新后</strong><ul>
+<li>匹配：旧后的指针–、新后的指针–</li>
+</ul>
+</li>
+</ul>
+<p>还是先从前往后比较，如果新旧节点从第一个开始比较，发现节点不一样，那么指针就从后边往前面比较</p>
+<img src="/posts/undefined/1641898524214-f677f4a5-8fc5-4a34-8718-d1afe3c043bd-20220407092515349.png" class="" title="100%">
+
+
+
+<ul>
+<li><p><strong>旧前 vs 新后</strong></p>
+</li>
+<li><ul>
+<li>匹配：旧前的指针++，新后的指针–</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>先走第一种策略，比较【旧a vs 新a】一样，新旧指针index都++，然后比较【旧b 和 新b】一样，又 index都++；</li>
+<li>比较到第三对 【旧c 和 新d】时，发现不一样了，就走第二种策略（旧后 vs 新后），发现 【旧d vs 旧c】不一样；</li>
+<li>改为第三种策略（旧前 vs 新后），此时【旧c vs 新c】一样了，那么此时旧index++，新index–；</li>
+<li>最后还是从第一种策略开始（不要以为此刻是下图的旧d和新d交叉在比较），此刻的比较对象就是【旧d vs 新d】了</li>
+</ol>
+<img src="/posts/undefined/1641898732042-ce801167-ea6b-4205-83d2-88e1624bc8d6-20220407092515451.png" class="" title="100%">
+
+<ul>
+<li><p><strong>旧后 vs 新前</strong></p>
+<ul>
+<li>匹配：旧后的指针–、新前的指针++</li>
+</ul>
+</li>
+<li><p><strong>以上都不满足条件，遍历查找</strong></p>
+</li>
+</ul>
+<ol>
+<li>先走第一种策略【旧a vs 新b】不一样</li>
+<li>然后走第二种策略【旧d vs 新m】不一样</li>
+<li>接着走第三种策略【旧a vs 新m】不一样</li>
+<li>再走第四种策略【旧d vs 新b】不一样</li>
+<li>上边都不满足</li>
+<li>遍历新节点找【旧a】，然后在新节点中找到了，此时先把【新b】放到页面中，然后新前指针 index++（此时指针情况：【旧前index=0；新前index=1】）<ol>
+<li>接着又会去旧节点中找【新b】，找到了，就把【旧b】设置为 undefined</li>
+</ol>
+</li>
+<li>接着还是从第一策略走一遍，1，2，3，4中策略都不满足，又从新节点中找【旧a】，找到了，此时又把【新c】放到页面中，新前指针又index++（此时指针情况：【旧前index=0；新前index=2】）<ol>
+<li>接着又会去旧节点中找【新c】，找到了，就把【旧c】设置为 undefined</li>
+</ol>
+</li>
+<li>接着继续从第一策略开始匹配，发现此时【旧a vs 新a】匹配上了，那么原地复用，旧前index++，新前index++（此时指针情况：【旧前index=1；新前index=3】）</li>
+<li>接着还是从第一策略开始匹配，发现此时【旧b】已经是 undefined 了，那么就会直接把旧前index++（此时指针情况：【旧前index=2；新前index=3】）</li>
+<li>仍然从第一策略开始匹配，发现此时【旧c】也是 undefined 了，重复上边步骤，旧前index++（此时指针情况：【旧前index=3；新前index=3】）</li>
+<li>继续从第一策略开始，此时【旧d vs 新d】，匹配上了，原地复用</li>
+<li>到最后m时，上边5种情况都走一遍，都不满足，就只剩最后的【创建 or 删除】了，最终创建m，添加到页面上</li>
+</ol>
+<img src="/posts/undefined/1641899501760-ecd21ede-70f5-4305-b63d-074ebdb630d0-20220407092515444.png" class="" title="100%">
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/3873/" rel="prev" title="attributes的传递与继承">
+                  <i class="fa fa-chevron-left"></i> attributes的传递与继承
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
