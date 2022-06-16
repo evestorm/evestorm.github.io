@@ -220,7 +220,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">292</span>
+          <span class="site-state-item-count">293</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -270,6 +270,104 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/50700/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/50700/" class="post-title-link" itemprop="url">element-ui树形组件tree选中用法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-16 09:00:21" itemprop="dateCreated datePublished" datetime="2022-06-16T09:00:21+08:00">2022-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/" itemprop="url" rel="index"><span itemprop="name">UI</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/element-ui/" itemprop="url" rel="index"><span itemprop="name">element-ui</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/50700/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/50700/" class="cy_cmt_count" data-xid="posts/50700/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;el-tree</span><br><span class="line">  :data=&quot;permissionForm.treeData&quot;</span><br><span class="line">  :props=&quot;permissionForm.defaultProps&quot;</span><br><span class="line">  show-checkbox</span><br><span class="line">  node-key=&quot;id&quot;</span><br><span class="line">  ref=&quot;permissionTreeRef&quot;</span><br><span class="line">  default-expand-all</span><br><span class="line">  :default-checked-keys=&quot;permissionForm.selectedList&quot;</span><br><span class="line">&gt;</span><br><span class="line"><span class="tag">&lt;/<span class="name">el-tree</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> permissionForm = reactive(&#123; <span class="comment">// 预案查看权限表单</span></span><br><span class="line">  preplanId: <span class="literal">null</span>, <span class="comment">// 预案id</span></span><br><span class="line">  treeData: [], <span class="comment">// 数据源</span></span><br><span class="line">  selectedList: [], <span class="comment">// 选中用户数组 e.g. [&#x27;1&#x27;, &#x27;2&#x27;, &#x27;5&#x27;]</span></span><br><span class="line">  defaultProps: &#123;</span><br><span class="line">    children: <span class="string">&#x27;children&#x27;</span>,</span><br><span class="line">    label: <span class="string">&#x27;name&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置查看权限</span></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="title">onPermissionAction</span>(<span class="params">&#123; row &#125;</span>)</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;设置查看权限&#x27;</span>);</span><br><span class="line">  permissionDialogRef.value.show();      </span><br><span class="line">  permissionForm.preplanId = row.id;</span><br><span class="line">  <span class="keyword">const</span> res = <span class="keyword">await</span> service.getPermissionById(&#123; <span class="attr">id</span>: row.id &#125;);</span><br><span class="line">  <span class="keyword">const</span> permissionList = res.data;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(permissionList)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (permissionList.length) &#123; <span class="comment">// 设置了权限</span></span><br><span class="line">      permissionTreeRef.value.setCheckedKeys(permissionList.map(<span class="function"><span class="params">v</span> =&gt;</span> v.userId));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 默认为空, 代表没有设置权限, 要全选</span></span><br><span class="line">      permissionTreeRef.value.setCheckedKeys(permissionForm.selectedList);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -350,7 +448,7 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>项目中，需要在 table 里做表单的验证：</p>
-<img src="/posts/undefined/table-rules.png" class="" title="100%">
+<img src="/posts/13510/table-rules.png" class="" title="100%">
 
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>el-form-item 动态绑定 prop</p>
 <p><code>:prop=&quot;&#39;tableData.&#39; + scope.$index + &#39;.字段名&#39;&quot;</code></p>
@@ -1255,107 +1353,6 @@
   element-ui table表格组件设置展示列的显示与隐藏</a> by JingW (<a target="_blank" rel="noopener" href="https://codepen.io/JingW">@JingW</a>)
   on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
 </iframe>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/46127/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/46127/" class="post-title-link" itemprop="url">pdf下载在iOS设备上下载失败</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-22 11:07:26" itemprop="dateCreated datePublished" datetime="2021-09-22T11:07:26+08:00">2021-09-22</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          /
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">解决方案</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/46127/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/46127/" class="cy_cmt_count" data-xid="posts/46127/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>我的 pdf 下载代码：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description </span>下载pdf</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> downloadPDF = <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  axios(&#123;</span><br><span class="line">    method: data.method || <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">    url: isCompleteURL(data.url) ? data.url : appConfig.baseURL + data.url,</span><br><span class="line">    data: data.params,</span><br><span class="line">    params: data.params,</span><br><span class="line">    responseType: <span class="string">&quot;blob&quot;</span>,</span><br><span class="line">  &#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> _res = res.data;</span><br><span class="line">    <span class="keyword">let</span> blob = <span class="keyword">new</span> Blob([_res], &#123; <span class="attr">type</span>: <span class="string">&quot;application/pdf&quot;</span> &#125;);</span><br><span class="line">    <span class="keyword">let</span> downloadElement = <span class="built_in">document</span>.createElement(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> href = <span class="built_in">window</span>.URL.createObjectURL(blob); <span class="comment">//创建下载的链接</span></span><br><span class="line">    downloadElement.href = href;</span><br><span class="line">    downloadElement.style.display = <span class="string">&quot;none&quot;</span>;</span><br><span class="line">    downloadElement.download = data.fileName; <span class="comment">//下载后文件名</span></span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(downloadElement);</span><br><span class="line">    downloadElement.click(); <span class="comment">//点击下载</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">document</span>.body.removeChild(downloadElement); <span class="comment">//下载完成移除元素</span></span><br><span class="line">    <span class="built_in">window</span>.URL.revokeObjectURL(href); <span class="comment">//释放掉blob对象</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>在 PC 端没啥问题，但是发现在 iPhone 设备 Safari 上会报错：</p>
-<blockquote>
-<p>未能完成操作。(WebKitBlobResource 错误”)</p>
-</blockquote>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>如果以编程方式将 a 标签注入 DOM，要确保不要过早移除它。可以 1s 后将其删除：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description </span>下载pdf</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> downloadPDF = <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  axios(&#123;</span><br><span class="line">    method: data.method || <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">    url: isCompleteURL(data.url) ? data.url : appConfig.baseURL + data.url,</span><br><span class="line">    data: data.params,</span><br><span class="line">    params: data.params,</span><br><span class="line">    responseType: <span class="string">&quot;blob&quot;</span>,</span><br><span class="line">  &#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// console.log(res)</span></span><br><span class="line">    <span class="keyword">const</span> _res = res.data;</span><br><span class="line">    <span class="keyword">let</span> blob = <span class="keyword">new</span> Blob([_res], &#123; <span class="attr">type</span>: <span class="string">&quot;application/pdf&quot;</span> &#125;);</span><br><span class="line">    <span class="keyword">let</span> downloadElement = <span class="built_in">document</span>.createElement(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> href = <span class="built_in">window</span>.URL.createObjectURL(blob); <span class="comment">//创建下载的链接</span></span><br><span class="line">    downloadElement.href = href;</span><br><span class="line">    downloadElement.style.display = <span class="string">&quot;none&quot;</span>;</span><br><span class="line">    <span class="comment">// downloadElement.download = fileName; //下载后文件名</span></span><br><span class="line">    downloadElement.download = data.fileName; <span class="comment">//下载后文件名</span></span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(downloadElement);</span><br><span class="line">    downloadElement.click(); <span class="comment">//点击下载</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">document</span>.body.removeChild(downloadElement); <span class="comment">//下载完成移除元素</span></span><br><span class="line">      <span class="built_in">window</span>.URL.revokeObjectURL(href); <span class="comment">//释放掉blob对象</span></span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
       
     </div>
