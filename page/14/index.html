@@ -220,7 +220,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -270,110 +270,6 @@
 
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/13740/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/13740/" class="post-title-link" itemprop="url">iOS13.4+版本h5拍照图片旋转问题的解决方案</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-12 23:13:11" itemprop="dateCreated datePublished" datetime="2020-08-12T23:13:11+08:00">2020-08-12</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          /
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">移动端</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/13740/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/13740/" class="cy_cmt_count" data-xid="posts/13740/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>前几天刚解决完 Safari 上 h5 拍照会旋转 90 度的问题，今天更新完苹果系统后（13.4 ——&gt; 13.6），突然发现图片又旋转了。前几天不刚测完是好的么，怎么又出问题了。拿公司测试机 12.6 版本测试了下发现没毛病，就基本定位到问题所在了：iOS13.4+版本可能都存在此问题。</p>
-<p>然后就是打断点调试，发现新系统下图片的 <code>Orientation</code> 仍然为 6 ，但其实照片（竖着拍）已经被苹果自动旋转回来了。然后我的代码中针对 6 的情况向右旋转了 90 度，这才导致图片又旋转回去了：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (Orientation) &#123;</span><br><span class="line">   <span class="keyword">case</span> <span class="number">6</span>: <span class="comment">//需要顺时针（向右）90度旋转</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="判断系统版本"><a href="#判断系统版本" class="headerlink" title="判断系统版本"></a>判断系统版本</h3><p>既然是 iOS 系统版本问题，那么最粗暴的方案就是对系统进行判断，如果高于 13.4，就不去旋转。具体封装的方法代码如下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 判断是IOS13.4以上的系统 13.4以上返回true</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param <span class="type">&#123;Object&#125;</span> </span>file 文件资源</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line"><span class="function"><span class="title">detectImageAutomaticRotation</span>(<span class="params">file</span>)</span> &#123;</span><br><span class="line">   <span class="keyword">let</span> u = navigator.userAgent,</span><br><span class="line">      app = navigator.appVersion;</span><br><span class="line">   <span class="keyword">let</span> isAndroid = u.indexOf(<span class="string">&#x27;Android&#x27;</span>) &gt; -<span class="number">1</span> || u.indexOf(<span class="string">&#x27;Linux&#x27;</span>) &gt; -<span class="number">1</span>; <span class="comment">//g</span></span><br><span class="line">   <span class="keyword">let</span> isIOS = !!u.match(<span class="regexp">/\(i[^;]+;( U;)? CPU.+Mac OS X/</span>); <span class="comment">//ios终端</span></span><br><span class="line">   <span class="keyword">if</span> (isIOS) &#123;</span><br><span class="line">      <span class="keyword">let</span> ver = (navigator.appVersion).match(<span class="regexp">/OS (\d+)_(\d+)_?(\d+)?/</span>);</span><br><span class="line">      <span class="keyword">let</span> ver1 = <span class="built_in">parseInt</span>(ver[<span class="number">1</span>])</span><br><span class="line">      <span class="keyword">let</span> ver2 = <span class="built_in">parseInt</span>(ver[<span class="number">2</span>])</span><br><span class="line">      <span class="keyword">if</span> (ver1 &gt;= <span class="number">13</span> &amp;&amp; ver2 &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">         <span class="comment">// if (file.name == &#x27;image.jpg&#x27;) &#123; //判断是拍照上传的还是相册选取的，IOS拍完照还没有确定的时候，图片的名字统一都是image.jpg</span></span><br><span class="line">         <span class="comment">//    return true</span></span><br><span class="line">         <span class="comment">// &#125;</span></span><br><span class="line">         <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">      &#125;</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-
-<p>但这个方案有个小的隐患，就是我们无法预知今后苹果是否会把这个“自我修正”行为改回去，一旦有这种情况，我们还要重新变动代码，略显麻烦。</p>
-<h3 id="用一张特殊的图片来检测当前浏览器是否对带-EXIF-信息的图片进行回正"><a href="#用一张特殊的图片来检测当前浏览器是否对带-EXIF-信息的图片进行回正" class="headerlink" title="用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正"></a>用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正</h3><p>这是网上找到的一种方案，思路就是用一张「 2x1 的 JPEG 且 EXIF Orientation 为 6」的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正，如果图片变成 1x2，说明浏览器对图片进行了回正。具体代码见下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用一张特殊的图片来检测当前浏览器是否对带 EXIF 信息的图片进行回正</span></span><br><span class="line"><span class="comment">// 方法来源: https://github.com/blueimp/JavaScript-Load-Image</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 一张 2x1 的 JPEG 图片, EXIF Orientation: 6</span></span><br><span class="line"><span class="keyword">const</span> testAutoOrientationImageURL =</span><br><span class="line">  <span class="string">&#x27;data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAA&#x27;</span> +</span><br><span class="line">  <span class="string">&#x27;AAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA&#x27;</span> +</span><br><span class="line">  <span class="string">&#x27;QEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE&#x27;</span> +</span><br><span class="line">  <span class="string">&#x27;BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/x&#x27;</span> +</span><br><span class="line">  <span class="string">&#x27;ABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAA&#x27;</span> +</span><br><span class="line">  <span class="string">&#x27;AAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> isImageAutomaticRotation;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">detectImageAutomaticRotation</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isImageAutomaticRotation === <span class="literal">undefined</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> img = <span class="keyword">new</span> Image();</span><br><span class="line"></span><br><span class="line">      img.onload = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 如果图片变成 1x2，说明浏览器对图片进行了回正</span></span><br><span class="line">        isImageAutomaticRotation = img.width === <span class="number">1</span> &amp;&amp; img.height === <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        resolve(isImageAutomaticRotation);</span><br><span class="line">      &#125;;</span><br><span class="line"></span><br><span class="line">      img.src = testAutoOrientationImageURL;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      resolve(isImageAutomaticRotation);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://juejin.im/post/6844904162220572686">关于 iOS 13.4.1 后照片在浏览器中旋转的兼容性处理</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -450,11 +346,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="必要准备"><a href="#必要准备" class="headerlink" title="必要准备"></a>必要准备</h2><p>开发者账号（不需要企业级别的开发账号，公司级别的也可以），Xcode</p>
-<h2 id="证书创建"><a href="#证书创建" class="headerlink" title="证书创建"></a>证书创建</h2><img src="/posts/38926/image-20200811210411909.png" class="" title="image-20200811210411909">
-
-<img src="/posts/38926/image-20200811210344729.png" class="" title="image-20200811210344729">
-
-<img src="/posts/38926/image-20200811210439870.png" class="" title="image-20200811210439870">
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/38926/#more" rel="contents">
@@ -555,18 +446,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>转载自：<a target="_blank" rel="noopener" href="https://www.zoo.team/article/git-exception">https://www.zoo.team/article/git-exception</a></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Git 作为一种分布式版本控制系统已经成为现在开发的宠儿，不仅应用在前端、后端、客户端等开发场景中，也成为各行业互联网企业分工协作的必备技能之一。</p>
-<p>大家在使用过程中总会碰到这样那样的问题，本文主要针对以下经常发生的几种异常情况提供一些解决方案：</p>
-<ol>
-<li>本地工作区文件恢复</li>
-<li>远程分支删除后，删除本地分支与其关联</li>
-<li>修改提交时的备注内容</li>
-<li>修改分支名，实现无缝衔接</li>
-<li>撤回提交</li>
-<li>撤销本地分支合并</li>
-<li>恢复误删的本地分支</li>
-<li>不确定哪个分支有自己提交的 commit</li>
-</ol>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/3646/#more" rel="contents">
@@ -668,13 +547,14 @@
     <div class="post-body" itemprop="articleBody">
           <p>在 <code>position:fixed/absolute</code> 内加入：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-webkit-transform</span>: <span class="selector-tag">translateZ</span>(0);</span><br></pre></td></tr></table></figure>
-
-<p>假如有遮罩情况则在内容区域加入：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">margin-bottom</span>: 30<span class="selector-tag">px</span>;</span><br><span class="line"><span class="selector-tag">margin-top</span>: 30<span class="selector-tag">px</span>;</span><br></pre></td></tr></table></figure>
-
-<p>抖动情况则在内容区域加入：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">overflow-y</span>: <span class="selector-tag">auto</span>;</span><br></pre></td></tr></table></figure>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/6653/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -767,8 +647,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。</p>
-<h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><p>从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取照片方向角属性，用户旋转控制</span></span><br><span class="line"><span class="keyword">let</span> Orientation = <span class="literal">null</span>;</span><br><span class="line">EXIF.getData(image, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  Orientation = EXIF.getTag(<span class="built_in">this</span>, <span class="string">&#x27;Orientation&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">switch</span> (Orientation) &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">1</span>: <span class="comment">// 不需要选择，正常</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">6</span>: <span class="comment">// 需要顺时针（向左）90度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">8</span>: <span class="comment">// 需要逆时针（向右）90度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">3</span>: <span class="comment">// 需要180度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/26493/#more" rel="contents">
@@ -870,13 +748,14 @@
     <div class="post-body" itemprop="articleBody">
           <p>偶尔发现 App 的拍照弹窗显示的是英文：</p>
 <img src="/posts/64032/language.jpeg" class="" title="拍照为英文">
-
-<p>但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 <code>Localization native development region</code> 为 <code>China</code> ：</p>
-<img src="/posts/64032/plist.png" class="" title="plist设置">
-
-<p>效果：</p>
-<img src="/posts/64032/plist-china.png" class="" title="效果">
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/64032/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1071,12 +950,14 @@
     <div class="post-body" itemprop="articleBody">
           <p>在 Xcode 中设置启动页图片发现上下 Safe Area 区域图片没能填满：</p>
 <img src="/posts/58404/safearea.png" class="" title="安全区域未填满">
-
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>设置相应约束的 FirstItem ，改 <code>Safe Area</code> 为 <code>SuperView</code> ：</p>
-<img src="/posts/58404/safearea2superview.png" class="" title="安全区域未填满">
-
-<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><img src="/posts/58404/superview.png" class="" title="安全区域未填满">
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/58404/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1272,10 +1153,110 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="转载来源"><a href="#转载来源" class="headerlink" title="转载来源"></a>转载来源</h2><p><a target="_blank" rel="noopener" href="https://juejin.im/post/6844903959287562254">掘金 - 稍微整理了几个经常在 H5 移动端开发遇到的东西 😢</a></p>
-<h2 id="弹出数字键盘"><a href="#弹出数字键盘" class="headerlink" title="弹出数字键盘"></a>弹出数字键盘</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 有&quot;#&quot; &quot;*&quot;符号输入 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;tel&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 纯数字 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">pattern</span>=<span class="string">&quot;\d*&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/9479/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/40889/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/40889/" class="post-title-link" itemprop="url">iOS上input输入内容拦腰截断</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-30 23:14:26" itemprop="dateCreated datePublished" datetime="2020-07-30T23:14:26+08:00">2020-07-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/40889/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/40889/" class="cy_cmt_count" data-xid="posts/40889/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 ios 上 input 输入框只显示一半高度的字:</p>
+<img src="/posts/40889/input-error.jpeg" class="" title="input输入内容只显示了一半">
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/40889/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="方案一：Vue.extend(Component) 获取组件构造函数Vue.extend 是 Vue 全局 API，官方文档 对其描述如下：  使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。  从官方文档的描述中，我们可以知道，extend 创建的是 Vue 构造器，而不是我们平时常写的组件实例，所以不可以通过 new Vue(&amp;#123; components: te">
+<meta name="description" content="方案一：Vue.extend(Component) 获取组件构造函数Vue.extend 是 Vue 全局 API，官方文档 对其描述如下：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue自定义create方法用于通过JS创建组件实例">
 <meta property="og:url" content="https://evestorm.github.io/posts/6559/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="方案一：Vue.extend(Component) 获取组件构造函数Vue.extend 是 Vue 全局 API，官方文档 对其描述如下：  使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。  从官方文档的描述中，我们可以知道，extend 创建的是 Vue 构造器，而不是我们平时常写的组件实例，所以不可以通过 new Vue(&amp;#123; components: te">
+<meta property="og:description" content="方案一：Vue.extend(Component) 获取组件构造函数Vue.extend 是 Vue 全局 API，官方文档 对其描述如下：">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-09-24T08:16:03.000Z">
-<meta property="article:modified_time" content="2020-12-25T08:18:51.273Z">
+<meta property="article:modified_time" content="2022-07-08T03:08:55.427Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary">
@@ -223,7 +223,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -361,12 +361,12 @@
     
     <div class="post-body" itemprop="articleBody">
         <h3 id="方案一：Vue-extend-Component-获取组件构造函数"><a href="#方案一：Vue-extend-Component-获取组件构造函数" class="headerlink" title="方案一：Vue.extend(Component) 获取组件构造函数"></a>方案一：Vue.extend(Component) 获取组件构造函数</h3><p><code>Vue.extend</code> 是 Vue 全局 API，<a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/api/#Vue-extend">官方文档</a> 对其描述如下：</p>
+<a id="more"></a>
+
 <blockquote>
 <p>使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。</p>
 </blockquote>
 <p>从官方文档的描述中，我们可以知道，<code>extend</code> 创建的是 Vue 构造器，而不是我们平时常写的组件实例，所以不可以通过 <code>new Vue(&#123; components: testExtend &#125;)</code> 来直接使用，需要通过 <code>new Profile().$mount(&#39;#mount-point&#39;)</code> 来挂载到指定的元素上。</p>
-<a id="more"></a>
-
 <h4 id="为什么使用-extend"><a href="#为什么使用-extend" class="headerlink" title="为什么使用 extend"></a>为什么使用 extend</h4><p>在 vue 项目中，我们有了初始化的根实例后，所有页面基本上都是通过 router 来管理，组件也是通过 <code>import</code> 来进行局部注册，所以组件的创建我们不需要去关注，相比 <code>extend</code> 要更省心一点点。但是这样做会有几个缺点：</p>
 <ol>
 <li>组件模板都是事先定义好的，如果我要从接口动态渲染组件怎么办？</li>

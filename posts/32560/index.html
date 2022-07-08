@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="文章来源: https:&#x2F;&#x2F;pangwu86.com&#x2F;posts&#x2F;1360575077&#x2F; 项目中使用了 Vuetify 这个 UI 库，现在要加上多国语言功能，踩了几个坑记录下。 使用 Vuetify 内置 i18n Vuetify 的国际化文档链接">
+<meta name="description" content="文章来源: https:&#x2F;&#x2F;pangwu86.com&#x2F;posts&#x2F;1360575077&#x2F;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-Vuetify与Vue-i18n整合踩坑指南">
 <meta property="og:url" content="https://evestorm.github.io/posts/32560/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="文章来源: https:&#x2F;&#x2F;pangwu86.com&#x2F;posts&#x2F;1360575077&#x2F; 项目中使用了 Vuetify 这个 UI 库，现在要加上多国语言功能，踩了几个坑记录下。 使用 Vuetify 内置 i18n Vuetify 的国际化文档链接">
+<meta property="og:description" content="文章来源: https:&#x2F;&#x2F;pangwu86.com&#x2F;posts&#x2F;1360575077&#x2F;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-07-26T08:36:26.000Z">
-<meta property="article:modified_time" content="2021-07-27T01:55:25.597Z">
+<meta property="article:modified_time" content="2022-07-08T03:32:37.172Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="vuetify">
 <meta property="article:tag" content="i18n">
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -362,11 +362,11 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>文章来源: <a target="_blank" rel="noopener" href="https://pangwu86.com/posts/1360575077/">https://pangwu86.com/posts/1360575077/</a></p>
+<a id="more"></a>
+
 <p>项目中使用了 <a target="_blank" rel="noopener" href="https://vuetifyjs.com/">Vuetify</a> 这个 UI 库，现在要加上多国语言功能，踩了几个坑记录下。</p>
 <h2 id="使用-Vuetify-内置-i18n"><a href="#使用-Vuetify-内置-i18n" class="headerlink" title="使用 Vuetify 内置 i18n"></a>使用 Vuetify 内置 i18n</h2><hr>
 <p>Vuetify 的<a target="_blank" rel="noopener" href="https://vuetifyjs.com/zh-Hans/features/internationalization/">国际化文档链接</a></p>
-<a id="more"></a>
-
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 引用vue,vuetify</span></span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&quot;vue&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> Vuetify <span class="keyword">from</span> <span class="string">&quot;vuetify/lib&quot;</span>;</span><br><span class="line">Vue.use(Vuetify);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 选择需要的语言</span></span><br><span class="line"><span class="comment">// 例如：简体中文 + 日文</span></span><br><span class="line"><span class="keyword">import</span> zhHans <span class="keyword">from</span> <span class="string">&quot;vuetify/es5/locale/zh-Hans&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> ja <span class="keyword">from</span> <span class="string">&quot;vuetify/es5/locale/ja&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置lang相关参数</span></span><br><span class="line"><span class="keyword">const</span> vuetify = <span class="keyword">new</span> Vuetify(&#123;</span><br><span class="line">  lang: &#123;</span><br><span class="line">    current: <span class="string">&quot;zhHans&quot;</span>,</span><br><span class="line">    locales: &#123; zhHans, ja &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  vuetify,</span><br><span class="line">&#125;).$mount(<span class="string">&quot;#app&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <h3 id="使用-t-函数"><a href="#使用-t-函数" class="headerlink" title="使用 t 函数"></a>使用 t 函数</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;my-component&quot;</span>&gt;</span>&#123;&#123; $vuetify.lang.t(&quot;$vuetify.hello&quot;) &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>

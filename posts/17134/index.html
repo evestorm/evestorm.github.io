@@ -23,12 +23,12 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="转载自：https:&#x2F;&#x2F;github.com&#x2F;chenqf&#x2F;frontEndBlog&#x2F;issues&#x2F;16 前言在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做长列表。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。 在高性能渲染十万条数据(时间分片)一文中，提到了可以使用时间分">
+<meta name="description" content="转载自：https:&#x2F;&#x2F;github.com&#x2F;chenqf&#x2F;frontEndBlog&#x2F;issues&#x2F;16">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-如何高性能的渲染十万条数据(虚拟列表)">
 <meta property="og:url" content="https://evestorm.github.io/posts/17134/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="转载自：https:&#x2F;&#x2F;github.com&#x2F;chenqf&#x2F;frontEndBlog&#x2F;issues&#x2F;16 前言在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做长列表。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。 在高性能渲染十万条数据(时间分片)一文中，提到了可以使用时间分">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;github.com&#x2F;chenqf&#x2F;frontEndBlog&#x2F;issues&#x2F;16">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://evestorm.github.io/posts/17134/Performance.gif">
 <meta property="og:image" content="https://evestorm.github.io/posts/17134/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531393563663136613535383f773d35303626683d36343226663d706e6726733d3338343436.png">
@@ -40,7 +40,7 @@
 <meta property="og:image" content="https://evestorm.github.io/posts/17134/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531613539333137636165373f773d34363126683d34393326663d706e6726733d3236343633.png">
 <meta property="og:image" content="https://evestorm.github.io/posts/17134/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f31302f32392f313665313531656530656230666338393f773d33363026683d36333626663d67696626733d31313537353835.gif">
 <meta property="article:published_time" content="2020-07-04T12:31:13.000Z">
-<meta property="article:modified_time" content="2020-12-17T12:44:56.003Z">
+<meta property="article:modified_time" content="2022-07-08T03:34:50.300Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="技巧">
 <meta property="article:tag" content="转载">
@@ -235,7 +235,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -369,10 +369,10 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>转载自：<a target="_blank" rel="noopener" href="https://github.com/chenqf/frontEndBlog/issues/16">https://github.com/chenqf/frontEndBlog/issues/16</a></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做<code>长列表</code>。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。</p>
-<p>在<a target="_blank" rel="noopener" href="https://juejin.im/post/5d76f469f265da039a28aff7">高性能渲染十万条数据(时间分片)</a>一文中，提到了可以使用<code>时间分片</code>的方式来对长列表进行渲染，但这种方式更适用于列表项的 DOM 结构十分简单的情况。本文会介绍使用<code>虚拟列表</code>的方式，来同时加载大量数据。</p>
 <a id="more"></a>
 
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在工作中，有时会遇到需要一些不能使用分页方式来加载列表数据的业务情况，对于此，我们称这种列表叫做<code>长列表</code>。比如，在一些外汇交易系统中，前端会实时的展示用户的持仓情况(收益、亏损、手数等)，此时对于用户的持仓列表一般是不能分页的。</p>
+<p>在<a target="_blank" rel="noopener" href="https://juejin.im/post/5d76f469f265da039a28aff7">高性能渲染十万条数据(时间分片)</a>一文中，提到了可以使用<code>时间分片</code>的方式来对长列表进行渲染，但这种方式更适用于列表项的 DOM 结构十分简单的情况。本文会介绍使用<code>虚拟列表</code>的方式，来同时加载大量数据。</p>
 <h2 id="为什么需要使用虚拟列表"><a href="#为什么需要使用虚拟列表" class="headerlink" title="为什么需要使用虚拟列表"></a>为什么需要使用虚拟列表</h2><p>假设我们的长列表需要展示 10000 条记录，我们同时将 10000 条记录渲染到页面中，先来看看需要花费多长时间：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;button id=<span class="string">&quot;button&quot;</span>&gt;button&lt;/button&gt;&lt;br&gt;</span><br><span class="line">&lt;ul id=<span class="string">&quot;container&quot;</span>&gt;&lt;/ul&gt;</span><br><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">&#x27;button&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 记录任务开始时间</span></span><br><span class="line">    <span class="keyword">let</span> now = <span class="built_in">Date</span>.now();</span><br><span class="line">    <span class="comment">// 插入一万条数据</span></span><br><span class="line">    <span class="keyword">const</span> total = <span class="number">10000</span>;</span><br><span class="line">    <span class="comment">// 获取容器</span></span><br><span class="line">    <span class="keyword">let</span> ul = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;container&#x27;</span>);</span><br><span class="line">    <span class="comment">// 将数据插入容器中</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; total; i++) &#123;</span><br><span class="line">        <span class="keyword">let</span> li = <span class="built_in">document</span>.createElement(<span class="string">&#x27;li&#x27;</span>);</span><br><span class="line">        li.innerText = ~~(<span class="built_in">Math</span>.random() * total)</span><br><span class="line">        ul.appendChild(li);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;JS运行时间：&#x27;</span>,<span class="built_in">Date</span>.now() - now);</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;总运行时间：&#x27;</span>,<span class="built_in">Date</span>.now() - now);</span><br><span class="line">    &#125;,<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// print JS运行时间： 38</span></span><br><span class="line">    <span class="comment">// print 总运行时间： 957</span></span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
 

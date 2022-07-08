@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="在使用 watch 监听属性的时候发现需要同时监听三个属性。 解决方案1234567891011121314151617181920212223242526export default &amp;#123;  data() &amp;#123;    return &amp;#123;      name1: &amp;#x27;&amp;#x27;,      name2: &amp;#x27;&amp;#x27;,      age: &amp;#x27;">
+<meta name="description" content="在使用 watch 监听属性的时候发现需要同时监听三个属性。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue如何同时监听多个属性">
 <meta property="og:url" content="https://evestorm.github.io/posts/13802/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="在使用 watch 监听属性的时候发现需要同时监听三个属性。 解决方案1234567891011121314151617181920212223242526export default &amp;#123;  data() &amp;#123;    return &amp;#123;      name1: &amp;#x27;&amp;#x27;,      name2: &amp;#x27;&amp;#x27;,      age: &amp;#x27;">
+<meta property="og:description" content="在使用 watch 监听属性的时候发现需要同时监听三个属性。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-12-24T07:56:59.000Z">
-<meta property="article:modified_time" content="2020-12-24T07:59:29.432Z">
+<meta property="article:modified_time" content="2022-07-08T03:07:18.743Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary">
@@ -223,7 +223,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -361,6 +361,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>在使用 watch 监听属性的时候发现需要同时监听三个属性。</p>
+<a id="more"></a>
+
 <h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      name1: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      name2: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      age: <span class="string">&#x27;&#x27;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="function"><span class="title">listenChange</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; name1, name2 &#125; = <span class="built_in">this</span>;</span><br><span class="line">      <span class="keyword">return</span> &#123; name1, name2 &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  watch: &#123;</span><br><span class="line">    <span class="function"><span class="title">listenChange</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;listenChange :&#x27;</span>, val);</span><br><span class="line">      <span class="keyword">if</span> (val.name1 === val.name2) &#123;</span><br><span class="line">        <span class="built_in">this</span>.$set(<span class="built_in">this</span>, <span class="string">&#x27;age&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.$set(<span class="built_in">this</span>, <span class="string">&#x27;age&#x27;</span>, <span class="literal">null</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>如果不能直接监听多个属性的话，我们可以换个想法，先将多个属性放在一个对象中，直接监听这个对象就可以了，这时候返回的 val 将会打印出你输入的 name1，name2 的内容，可以同时监听到这两个属性。</p>

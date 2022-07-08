@@ -23,16 +23,16 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073  本文在 github 做了收录 github.com&#x2F;Michael-lzg… demo 源码地址 github.com&#x2F;Michael-lzg… 在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的">
+<meta name="description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-前端性能优化之图片懒加载">
 <meta property="og:url" content="https://evestorm.github.io/posts/7617/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073  本文在 github 做了收录 github.com&#x2F;Michael-lzg… demo 源码地址 github.com&#x2F;Michael-lzg… 在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000038413073">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://segmentfault.com/img/remote/1460000038413076">
 <meta property="article:published_time" content="2020-12-17T10:46:17.000Z">
-<meta property="article:modified_time" content="2021-06-07T10:51:14.037Z">
+<meta property="article:modified_time" content="2022-07-08T03:34:42.194Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="技巧">
 <meta property="article:tag" content="转载">
@@ -229,7 +229,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -363,12 +363,11 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>转载自：<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038413073">https://segmentfault.com/a/1190000038413073</a></p>
-<hr>
+<a id="more"></a>
+
 <p>本文在 github 做了收录 <a target="_blank" rel="noopener" href="https://github.com/Michael-lzg/my--article/blob/master/other/%E5%89%8D%E7%AB%AF%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E4%B9%8B%E5%9B%BE%E7%89%87%E6%87%92%E5%8A%A0%E8%BD%BD.md">github.com/Michael-lzg…</a></p>
 <p>demo 源码地址 <a target="_blank" rel="noopener" href="https://github.com/Michael-lzg/demo-code/tree/master/lazyLoad">github.com/Michael-lzg…</a></p>
 <p>在类电商类项目，往往存在大量的图片，如 banner 广告图，菜单导航图，美团等商家列表头图等。图片众多以及图片体积过大往往会影响页面加载速度，造成不良的用户体验，所以进行图片懒加载优化势在必行。</p>
-<a id="more"></a>
-
 <h3 id="为什么要进行图片懒加载"><a href="#为什么要进行图片懒加载" class="headerlink" title="为什么要进行图片懒加载"></a>为什么要进行图片懒加载</h3><p>我们先来看一下页面启动时加载的图片信息。</p>
 <p><img src="https://segmentfault.com/img/remote/1460000038413076" alt="img"></p>
 <p>如图所示，这个页面启动时加载了几十张图片（甚至更多），而这些图片请求几乎是并发的，在 Chrome 浏览器，最多支持的并发请求次数是有限的，其他的请求会推入到队列中等待或者停滞不前，直到上轮请求完成后新的请求才会发出。所以相当一部分图片资源请求是需要排队等待时间的。</p>

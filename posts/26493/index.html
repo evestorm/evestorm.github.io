@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="问题移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。 解决思路从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向： 123456789101112131415&#x2F;&#x2F;获取照片方向角属性，用户旋转控制let Orientation &#x3D; null;EXIF.getData(image, function () &amp;#123;">
+<meta name="description" content="问题移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="H5在移动端上传头像图片旋转90度问题解决方案">
 <meta property="og:url" content="https://evestorm.github.io/posts/26493/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="问题移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。 解决思路从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向： 123456789101112131415&#x2F;&#x2F;获取照片方向角属性，用户旋转控制let Orientation &#x3D; null;EXIF.getData(image, function () &amp;#123;">
+<meta property="og:description" content="问题移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-05T14:57:48.000Z">
-<meta property="article:modified_time" content="2020-12-14T15:16:53.485Z">
+<meta property="article:modified_time" content="2022-07-08T02:39:24.005Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="uniapp">
@@ -226,7 +226,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -360,10 +360,10 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>移动端上的 H5 页面，在拍照上传后会出现图片自动旋转 90° 的问题，这里记录下解决方案。</p>
+<a id="more"></a>
+
 <h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><p>从图片 Exif 信息中读取 Orientation，根据它来判断是否该修正图片的方向：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取照片方向角属性，用户旋转控制</span></span><br><span class="line"><span class="keyword">let</span> Orientation = <span class="literal">null</span>;</span><br><span class="line">EXIF.getData(image, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  Orientation = EXIF.getTag(<span class="built_in">this</span>, <span class="string">&#x27;Orientation&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">switch</span> (Orientation) &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">1</span>: <span class="comment">// 不需要选择，正常</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">6</span>: <span class="comment">// 需要顺时针（向左）90度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">8</span>: <span class="comment">// 需要逆时针（向右）90度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">3</span>: <span class="comment">// 需要180度旋转</span></span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
 
 <p>然后用 canvas 的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage">ctx.drawImage</a> 对图片进行绘制，最后用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLCanvasElement/toDataURL">canvas.toDataURL</a> 将画布转为 base64 格式数据的 DataURL 传给后端。</p>
 <p>P.S. 什么是 EXIF</p>

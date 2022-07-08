@@ -23,18 +23,18 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="转载自：https:&#x2F;&#x2F;neveryu.github.io&#x2F;2020&#x2F;06&#x2F;10&#x2F;husky-lint-staged&#x2F; 快速集成在提交 git 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。 首先，安装依赖： 1234npm install -D husky&#x2F;&#x2F; lint-staged 可以让husky只检验git工作区的文件，不会导致你一下出现成百上千个错误npm in">
+<meta name="description" content="转载自：https:&#x2F;&#x2F;neveryu.github.io&#x2F;2020&#x2F;06&#x2F;10&#x2F;husky-lint-staged&#x2F;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-husky+lint-staged助力团队编码规范">
 <meta property="og:url" content="https://evestorm.github.io/posts/63036/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="转载自：https:&#x2F;&#x2F;neveryu.github.io&#x2F;2020&#x2F;06&#x2F;10&#x2F;husky-lint-staged&#x2F; 快速集成在提交 git 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。 首先，安装依赖： 1234npm install -D husky&#x2F;&#x2F; lint-staged 可以让husky只检验git工作区的文件，不会导致你一下出现成百上千个错误npm in">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;neveryu.github.io&#x2F;2020&#x2F;06&#x2F;10&#x2F;husky-lint-staged&#x2F;">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://evestorm.github.io/posts/63036/husky-2.png">
 <meta property="og:image" content="https://evestorm.github.io/posts/63036/husky-1.png">
 <meta property="og:image" content="https://evestorm.github.io/posts/63036/husky-3.png">
 <meta property="article:published_time" content="2021-03-11T12:22:21.000Z">
-<meta property="article:modified_time" content="2021-03-17T01:52:07.032Z">
+<meta property="article:modified_time" content="2022-07-08T03:30:48.218Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="转载">
 <meta property="article:tag" content="工具">
@@ -228,7 +228,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -362,11 +362,11 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>转载自：<a target="_blank" rel="noopener" href="https://neveryu.github.io/2020/06/10/husky-lint-staged/">https://neveryu.github.io/2020/06/10/husky-lint-staged/</a></p>
+<a id="more"></a>
+
 <h2 id="快速集成"><a href="#快速集成" class="headerlink" title="快速集成"></a>快速集成</h2><p>在提交 git 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。</p>
 <p>首先，安装依赖：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm install -D husky</span><br><span class="line"></span><br><span class="line">// lint-staged 可以让husky只检验git工作区的文件，不会导致你一下出现成百上千个错误</span><br><span class="line">npm install -D lint-staged</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
 
 <p>然后修改 <code>package.json</code>，增加配置：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line"> &quot;precommit&quot;: &quot;eslint src/**/*.js&quot;</span><br><span class="line">&#125;</span><br><span class="line">&quot;husky&quot;: &#123;</span><br><span class="line">  &quot;hooks&quot;: &#123;</span><br><span class="line">    &quot;pre-commit&quot;: &quot;lint-staged&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line">&quot;lint-staged&quot;: &#123;</span><br><span class="line">  &quot;src/**/*.&#123;js,vue&#125;&quot;: [&quot;prettier --write&quot;, &quot;eslint --cache --fix&quot;, &quot;git add&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

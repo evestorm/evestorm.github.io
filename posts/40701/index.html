@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="作者：jackyshan_链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5baafa39e51d450e664b53b4来源：掘金 前言了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。 iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC">
+<meta name="description" content="作者：jackyshan_链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5baafa39e51d450e664b53b4来源：掘金 前言了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-iOS中WKWebView和Native交互">
 <meta property="og:url" content="https://evestorm.github.io/posts/40701/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="作者：jackyshan_链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5baafa39e51d450e664b53b4来源：掘金 前言了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。 iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC">
+<meta property="og:description" content="作者：jackyshan_链接：https:&#x2F;&#x2F;juejin.im&#x2F;post&#x2F;5baafa39e51d450e664b53b4来源：掘金 前言了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-07-08T12:07:37.000Z">
-<meta property="article:modified_time" content="2020-12-17T12:17:39.059Z">
+<meta property="article:modified_time" content="2022-07-08T03:31:03.510Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="转载">
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -359,9 +359,9 @@
     <div class="post-body" itemprop="articleBody">
         <p>作者：jackyshan_<br>链接：<a target="_blank" rel="noopener" href="https://juejin.im/post/5baafa39e51d450e664b53b4">https://juejin.im/post/5baafa39e51d450e664b53b4</a><br>来源：掘金</p>
 <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。</p>
-<p>iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC 拿到 UIWebView 的 JSContext，通过 JSContext 实现交互。 WKWebView 有了新特性 MessageHandler 来实现 JS 调用原生方法。从实现思路是来讲，UIWebView 和 WKWebView 是一样的。 所以，本文只介绍 WKWebView 上 JS 和 Native 的交互思路，UIWebView 有需求的可以模仿实现。</p>
 <a id="more"></a>
 
+<p>iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC 拿到 UIWebView 的 JSContext，通过 JSContext 实现交互。 WKWebView 有了新特性 MessageHandler 来实现 JS 调用原生方法。从实现思路是来讲，UIWebView 和 WKWebView 是一样的。 所以，本文只介绍 WKWebView 上 JS 和 Native 的交互思路，UIWebView 有需求的可以模仿实现。</p>
 <h3 id="JS-和-Native-交互常用的场景"><a href="#JS-和-Native-交互常用的场景" class="headerlink" title="JS 和 Native 交互常用的场景"></a>JS 和 Native 交互常用的场景</h3><p>常用的分为下面几种场景：</p>
 <ul>
 <li>H5 获取 Native 用户信息（这种比较简单，只需要 Native 注入 JS 就行了，思路有三种下面介绍）</li>

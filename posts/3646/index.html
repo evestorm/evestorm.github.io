@@ -23,12 +23,12 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="转载自：https:&#x2F;&#x2F;www.zoo.team&#x2F;article&#x2F;git-exception 前言Git 作为一种分布式版本控制系统已经成为现在开发的宠儿，不仅应用在前端、后端、客户端等开发场景中，也成为各行业互联网企业分工协作的必备技能之一。 大家在使用过程中总会碰到这样那样的问题，本文主要针对以下经常发生的几种异常情况提供一些解决方案：  本地工作区文件恢复 远程分支删除后，删除本地分支与其关">
+<meta name="description" content="转载自：https:&#x2F;&#x2F;www.zoo.team&#x2F;article&#x2F;git-exception">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-一份值得收藏的Git异常处理清单">
 <meta property="og:url" content="https://evestorm.github.io/posts/3646/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="转载自：https:&#x2F;&#x2F;www.zoo.team&#x2F;article&#x2F;git-exception 前言Git 作为一种分布式版本控制系统已经成为现在开发的宠儿，不仅应用在前端、后端、客户端等开发场景中，也成为各行业互联网企业分工协作的必备技能之一。 大家在使用过程中总会碰到这样那样的问题，本文主要针对以下经常发生的几种异常情况提供一些解决方案：  本地工作区文件恢复 远程分支删除后，删除本地分支与其关">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;www.zoo.team&#x2F;article&#x2F;git-exception">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://evestorm.github.io/posts/3646/upload_920b7e3506bb38783b9fa76a02da6f08.jpeg">
 <meta property="og:image" content="https://evestorm.github.io/posts/3646/upload_99b520a28a62d42f3194b581ce5260de.jpeg">
@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://evestorm.github.io/posts/3646/upload_dfe14e32a79a8926637a10a6caffd761.jpeg">
 <meta property="og:image" content="https://evestorm.github.io/posts/3646/upload_04c088890f184b87c394a2759fc2eabd.jpeg">
 <meta property="article:published_time" content="2020-08-08T12:19:53.000Z">
-<meta property="article:modified_time" content="2020-12-17T12:44:55.996Z">
+<meta property="article:modified_time" content="2022-07-08T03:33:48.449Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="转载">
 <meta property="article:tag" content="Git">
@@ -240,7 +240,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -374,6 +374,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>转载自：<a target="_blank" rel="noopener" href="https://www.zoo.team/article/git-exception">https://www.zoo.team/article/git-exception</a></p>
+<a id="more"></a>
+
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Git 作为一种分布式版本控制系统已经成为现在开发的宠儿，不仅应用在前端、后端、客户端等开发场景中，也成为各行业互联网企业分工协作的必备技能之一。</p>
 <p>大家在使用过程中总会碰到这样那样的问题，本文主要针对以下经常发生的几种异常情况提供一些解决方案：</p>
 <ol>
@@ -386,8 +388,6 @@
 <li>恢复误删的本地分支</li>
 <li>不确定哪个分支有自己提交的 commit</li>
 </ol>
-<a id="more"></a>
-
 <h2 id="（一）本地工作区文件恢复"><a href="#（一）本地工作区文件恢复" class="headerlink" title="（一）本地工作区文件恢复"></a>（一）本地工作区文件恢复</h2><p>大家都知道，一个文件夹中的文件如果被删掉了，那只有在垃圾箱里面找了。如果垃圾箱里面的也被删掉了，以笔者的常识在不借助工具的情况下怕是就找不到了，emmmm。。。</p>
 <p>不过，关联了 Git 的文件和文件夹就不一样了，有了本地仓库和远程仓库的双重保护，找到一个被删除的文件也不过就分分钟，一个命令行的事情吧。</p>
 <p><strong>语法</strong>：<code>git checkout &lt;filename/dirname&gt;</code></p>

@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="问题描述项目中需要监听某个特定元素的宽度变化。 解决方案ResizeObserver 接口可以监听到 Element 的内容区域或 SVGElement的边界框改变。内容区域则需要减去内边距 padding。（有关内容区域、内边距资料见盒子模型 ）ResizeObserver 避免了在自身回调中调整大小，从而触发的无限回调和循环依赖。它仅通过在后续帧中处理 DOM 中更深层次的元素来实现这一点。如">
+<meta name="description" content="问题描述项目中需要监听某个特定元素的宽度变化。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="监听某个元素的宽度变化-ResizeObserver">
 <meta property="og:url" content="https://evestorm.github.io/posts/30804/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="问题描述项目中需要监听某个特定元素的宽度变化。 解决方案ResizeObserver 接口可以监听到 Element 的内容区域或 SVGElement的边界框改变。内容区域则需要减去内边距 padding。（有关内容区域、内边距资料见盒子模型 ）ResizeObserver 避免了在自身回调中调整大小，从而触发的无限回调和循环依赖。它仅通过在后续帧中处理 DOM 中更深层次的元素来实现这一点。如">
+<meta property="og:description" content="问题描述项目中需要监听某个特定元素的宽度变化。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-12-24T08:02:09.000Z">
-<meta property="article:modified_time" content="2020-12-28T06:32:24.659Z">
+<meta property="article:modified_time" content="2022-07-08T03:24:59.609Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="技巧">
 <meta property="article:tag" content="DOM">
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -362,10 +362,10 @@
     
     <div class="post-body" itemprop="articleBody">
         <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>项目中需要监听某个特定元素的宽度变化。</p>
+<a id="more"></a>
+
 <h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><blockquote><p><strong><code>ResizeObserver</code></strong> 接口可以监听到 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Element"><code>Element</code></a> 的内容区域或 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/SVGElement"><code>SVGElement</code></a>的边界框改变。内容区域则需要减去内边距 padding。（有关内容区域、内边距资料见<a target="_blank" rel="noopener" href="https://developer.mozilla.org/docs/Learn/CSS/Introduction_to_CSS/Box_model">盒子模型</a> ）<br>ResizeObserver 避免了在自身回调中调整大小，从而触发的无限回调和循环依赖。它仅通过在后续帧中处理 DOM 中更深层次的元素来实现这一点。如果（浏览器）遵循规范，只会在绘制前或布局后触发调用。</p>
 <footer><strong>MDN</strong><cite><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/ResizeObserver">ResizeObserver</a></cite></footer></blockquote>
-
-<a id="more"></a>
 
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ro = <span class="keyword">new</span> ResizeObserver(<span class="function"><span class="params">entries</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> entry <span class="keyword">of</span> entries) &#123;</span><br><span class="line">    <span class="keyword">const</span> cr = entry.contentRect;</span><br><span class="line">    <span class="comment">// console.log(&#x27;Element:&#x27;, entry.target)</span></span><br><span class="line">    <span class="comment">// console.log(`Element size: $&#123;cr.width&#125;px x $&#123;cr.height&#125;px`)</span></span><br><span class="line">    <span class="comment">// console.log(`Element padding: $&#123;cr.top&#125;px ; $&#123;cr.left&#125;px`)</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ro.observe(<span class="built_in">document</span>.querySelector(<span class="string">&#x27;target-element&#x27;</span>));</span><br></pre></td></tr></table></figure>
 

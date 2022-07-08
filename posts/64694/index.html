@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。 webpack hashwebpack 内置了多种可使用 hash，官网解释分别如下：  hash：the hash of the">
+<meta name="description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载-Webpack4 如何优雅打包缓存文件">
 <meta property="og:url" content="https://evestorm.github.io/posts/64694/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。 webpack hashwebpack 内置了多种可使用 hash，官网解释分别如下：  hash：the hash of the">
+<meta property="og:description" content="一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-03-14T02:34:04.000Z">
-<meta property="article:modified_time" content="2021-02-02T11:39:01.000Z">
+<meta property="article:modified_time" content="2022-07-08T03:33:09.079Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="转载">
 <meta property="article:tag" content="Webpack">
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -359,6 +359,8 @@
     <div class="post-body" itemprop="articleBody">
         <p>一般来说，对于静态资源，我们都希望浏览器能够进行缓存，那样以后进入页面就可以直接使用缓存资源，页面直接直逼火箭速度打开，既提高了用户的体验也节省了宽带资源。</p>
 <p>当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。</p>
+<a id="more"></a>
+
 <h2 id="webpack-hash"><a href="#webpack-hash" class="headerlink" title="webpack hash"></a>webpack hash</h2><p>webpack 内置了多种可使用 hash，官网解释分别如下：</p>
 <ul>
 <li><code>hash</code>：the hash of the module identifier</li>
@@ -367,8 +369,6 @@
 </ul>
 <p>注：hash 的默认长度为 20 个字符，可通过 <code>output.hashDigestLength</code> 全局配置，或使用 <code>[hash:16]</code> 方式配置，还可以通过 <code>output.hashDigest</code> 配置何时生成 hash。</p>
 <p>那么问题来了，这么多种 hash 该如何选择呢？</p>
-<a id="more"></a>
-
 <h2 id="实战-hash"><a href="#实战-hash" class="headerlink" title="实战 hash"></a>实战 hash</h2><p>基础的配置文件如下（基于 webpack 4，入口文件分别为 index 和 detail，其中每个文件中引入了一个图片）：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  mode: <span class="string">&#x27;none&#x27;</span>, <span class="comment">// 设置为 none，避免 development 或 production 默认设置的一些影响</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    index: <span class="string">&#x27;./src/index.js&#x27;</span>,</span><br><span class="line">    detail: <span class="string">&#x27;./src/detail.js&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  output: &#123;</span><br><span class="line">    filename: <span class="string">&#x27;[name].[hash].js&#x27;</span>,</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">&#x27;dist&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 

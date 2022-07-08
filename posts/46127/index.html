@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="问题我的 pdf 下载代码： 12345678910111213141516171819202122232425&#x2F;** * @description 下载pdf *&#x2F;export const downloadPDF &#x3D; (data) &#x3D;&gt; &amp;#123;  axios(&amp;#123;    method: data.method || &quot;POST&quot;,    url: isCo">
+<meta name="description" content="问题我的 pdf 下载代码：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="pdf下载在iOS设备上下载失败">
 <meta property="og:url" content="https://evestorm.github.io/posts/46127/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="问题我的 pdf 下载代码： 12345678910111213141516171819202122232425&#x2F;** * @description 下载pdf *&#x2F;export const downloadPDF &#x3D; (data) &#x3D;&gt; &amp;#123;  axios(&amp;#123;    method: data.method || &quot;POST&quot;,    url: isCo">
+<meta property="og:description" content="问题我的 pdf 下载代码：">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-22T03:07:26.000Z">
-<meta property="article:modified_time" content="2021-09-22T03:16:40.678Z">
+<meta property="article:modified_time" content="2022-07-08T02:55:42.303Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="解决方案">
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -358,6 +358,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>我的 pdf 下载代码：</p>
+<a id="more"></a>
+
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description </span>下载pdf</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> downloadPDF = <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  axios(&#123;</span><br><span class="line">    method: data.method || <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">    url: isCompleteURL(data.url) ? data.url : appConfig.baseURL + data.url,</span><br><span class="line">    data: data.params,</span><br><span class="line">    params: data.params,</span><br><span class="line">    responseType: <span class="string">&quot;blob&quot;</span>,</span><br><span class="line">  &#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> _res = res.data;</span><br><span class="line">    <span class="keyword">let</span> blob = <span class="keyword">new</span> Blob([_res], &#123; <span class="attr">type</span>: <span class="string">&quot;application/pdf&quot;</span> &#125;);</span><br><span class="line">    <span class="keyword">let</span> downloadElement = <span class="built_in">document</span>.createElement(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> href = <span class="built_in">window</span>.URL.createObjectURL(blob); <span class="comment">//创建下载的链接</span></span><br><span class="line">    downloadElement.href = href;</span><br><span class="line">    downloadElement.style.display = <span class="string">&quot;none&quot;</span>;</span><br><span class="line">    downloadElement.download = data.fileName; <span class="comment">//下载后文件名</span></span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(downloadElement);</span><br><span class="line">    downloadElement.click(); <span class="comment">//点击下载</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">document</span>.body.removeChild(downloadElement); <span class="comment">//下载完成移除元素</span></span><br><span class="line">    <span class="built_in">window</span>.URL.revokeObjectURL(href); <span class="comment">//释放掉blob对象</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>在 PC 端没啥问题，但是发现在 iPhone 设备 Safari 上会报错：</p>

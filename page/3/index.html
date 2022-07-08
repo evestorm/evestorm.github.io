@@ -220,7 +220,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">295</span>
+          <span class="site-state-item-count">294</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -350,84 +350,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="文章来源"><a href="#文章来源" class="headerlink" title="文章来源"></a>文章来源</h2><p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/263183">https://bbs.huaweicloud.com/blogs/263183</a></p>
-<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>将已有 H5 应用接入钉钉，用户免登陆</p>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ol>
-<li>注册钉钉</li>
-<li>负责开发的相关人员申请成为钉钉子管理员(找公司内的超管申请)</li>
-<li>注意需要管理员赋予必要的权限，例如：<ol>
-<li>开发应用的数据权限</li>
-<li>开发者权限</li>
-<li>工作台管理</li>
-<li>应用中心管理</li>
-</ol>
-</li>
-<li>登录钉钉开发者后台</li>
-<li>只有管理员和子管理员可登录开发者后台</li>
-<li>在应用开发页面，选择「企业内部开发 &gt; H5微应用」，然后单击创建应用<img src="/posts/40566/create-app.png" class="" title="80%"></li>
-<li>填写应用的基本信息，然后单击确定创建</li>
-<li>在应用信息页面，单击开发管理，然后单击修改<br>这里注意『开发模式』的选择。如果已有可接入的H5应用时，文档提示说选择『快捷链接』的方式，但是如果后端需要请求钉钉的话就要配置服务器出口IP(白名单)了，所以还是得选择『开发应用』，不然无法配置后端请求的白名单(坑)<img src="/posts/40566/dev-manage.png" class="" title="80%"></li>
-<li>单击凭证与基础信息获取应用的AppKey和AppSecret</li>
-<li>如果需要获取通讯录权限，就要添加合适的接口权限<img src="/posts/40566/add-api-permission.png" class="" title="80%">
-
-</li>
-</ol>
-<h2 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h2><ol>
-<li>获取免登授权码。</li>
-</ol>
-<ul>
-<li>H5微应用免登流程</li>
-</ul>
-<ol start="2">
-<li>获取access_token。</li>
-</ol>
-<ul>
-<li>调用gettoken接口获取access_token。</li>
-</ul>
-<ol start="3">
-<li>获取用户userid。</li>
-</ol>
-<ul>
-<li>调用user/getuserinfo接口获取用户的userid，通过免登码获取用户userid。</li>
-</ul>
-<ol start="4">
-<li>获取用户详情。</li>
-</ol>
-<ul>
-<li>调用user/get接口获取用户详情信息。</li>
-</ul>
-<ol start="5">
-<li>根据手机号做登录。</li>
-</ol>
-<ul>
-<li>视自己应用情况而定</li>
-</ul>
-<h2 id="项目修改"><a href="#项目修改" class="headerlink" title="项目修改"></a>项目修改</h2><h3 id="项目情况"><a href="#项目情况" class="headerlink" title="项目情况"></a>项目情况</h3><h4 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h4><ul>
-<li>vue 2.6.11</li>
-<li>vue-cli 2.9.6</li>
-</ul>
-<h4 id="接入步骤"><a href="#接入步骤" class="headerlink" title="接入步骤"></a>接入步骤</h4><p>依赖安装</p>
-<p>更目录执行以下命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install dingtalk-jsapi --save</span><br></pre></td></tr></table></figure>
-
-<p>获取微应用免登授权码方法封装</p>
-<p>项目的 utils 目录下(当然也可以选择 common 组件目录)新建文件 <code>dd.js</code> </p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> dd <span class="keyword">from</span> <span class="string">&#x27;dingtalk-jsapi&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">getCode</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> corpId = <span class="string">&#x27;your corpId&#x27;</span></span><br><span class="line">  <span class="keyword">if</span> (dd.env.platform !== <span class="string">&#x27;notInDingTalk&#x27;</span>) &#123;</span><br><span class="line">    dd.ready(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">//使用SDK 获取免登授权码</span></span><br><span class="line">      dd.runtime.permission.requestAuthCode(&#123;</span><br><span class="line">        corpId: corpId,</span><br><span class="line">        onSuccess: <span class="function"><span class="params">info</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 根据钉钉提供的api 获得code后,再次调用这个callback方法</span></span><br><span class="line">          <span class="comment">// 由于是钉钉获取code是异步操作,不知道什么时候执行完毕</span></span><br><span class="line">          <span class="comment">// callback 函数会等他执行完毕后在自己调用自己</span></span><br><span class="line">          callback(info.code)</span><br><span class="line">        &#125;,</span><br><span class="line">        onFail: <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">          alert(<span class="string">&#x27;fail&#x27;</span>)</span><br><span class="line">          alert(<span class="built_in">JSON</span>.stringify(err))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>corpId 可到后台 基本信息-&gt;开发信息(旧版)-&gt;企业自用账号信息 下查看。</p>
-<p>应用入口页面修改</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; getCode &#125; <span class="keyword">from</span> <span class="string">&#x27;@/utils/dd&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;&#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    getCode(<span class="function"><span class="params">code</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 登录处理</span></span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="对接感受"><a href="#对接感受" class="headerlink" title="对接感受"></a>对接感受</h2><p>从 H5 微应用的对接来看没有特别复杂的配置，对接起来很流畅，基本没有卡壳的地方</p>
-<ul>
-<li>官方文档有一处写的不够准确，已有H5应用时引导用户选择快捷链接开发模式，但是这种模式下如果后端需要请求钉钉接口的话就找不到配置IP白名单的地方了，比较尴尬。</li>
-<li>权限管理的地方，涉及到通讯录权限时，基本信息与成员手机号、邮箱都是分开的权限需要手动添加，不然是获取不到相应信息的</li>
-<li>参与测试人员需要在应用的版本管理与发布tab页单独设置可使用范围才能使相关开发人员在钉钉客户端上看见入口</li>
-</ul>
-<h2 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/879346">DingTalk「开发者说」第8期 钉钉微应用开发实战</a></li>
-<li><a target="_blank" rel="noopener" href="https://open.dingtalk.com/document/orgapp-client/read-before-development">钉钉开发文档</a></li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/40566/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -524,17 +454,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>期望在表单页面超出一页滚屏的情况下，校验表单时如果表单校验不通过，能够向上滚动到第一个未通过校验的 <code>&lt;el-form-item</code> 处。</p>
-<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><ol>
-<li>给 validate 回调函数中添加一个参数 object</li>
-<li>当校验不通过时收集所有未通过字段项提示信息，将其通过 push 方法添加到定义好的数组中（str）</li>
-<li>通过 <code>this.$refs[Object.keys(object)[0]]</code> 获取到首个字段校验不通过的提示信息</li>
-<li>利用 <code>Object.prototype.toString.call()</code> 方法判断 <code>this.$refs[Object.keys(object)[0]]</code> 的类型是否为对象的字符串形式</li>
-<li>最后通过 <code>scrollIntoView</code> 方法滚动到首个不通过校验字段项</li>
-</ol>
-<h2 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 添加或者更新预案</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> addOrUpdatePlan = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    baseFormRef.value.$refs.planFormRef.validate(<span class="keyword">async</span> (valid, object) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (valid) &#123; <span class="comment">// 验证通过</span></span><br><span class="line">        <span class="comment">// todo</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123; <span class="comment">// 验证不通过</span></span><br><span class="line">        <span class="keyword">let</span> noValidArr = [];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> object) &#123;</span><br><span class="line">          object[key].map(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">            noValidArr.push(item.message);</span><br><span class="line">          &#125;);</span><br><span class="line">          <span class="keyword">let</span> dom = baseFormRef.value.$refs[<span class="built_in">Object</span>.keys(object)[<span class="number">0</span>]];</span><br><span class="line">          <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(dom) !== <span class="string">&#x27;[object Object]&#x27;</span>) &#123;</span><br><span class="line">            dom = dom[<span class="number">0</span>];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          dom.$el.scrollIntoView(&#123;</span><br><span class="line">            behavior: <span class="string">&#x27;smooth&#x27;</span></span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        reject(<span class="literal">false</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注意: 需要校验的字段项的 <code>&lt;el-form-item&gt;</code> 需要添加 <code>ref</code> ，作用主要是用来定位（ref 的值建议与 prop 同名）。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;el-form</span><br><span class="line">  ref=&quot;planFormRef&quot;</span><br><span class="line">  :model=&quot;form.data&quot;</span><br><span class="line">  :rules=&quot;form.rules&quot;</span><br><span class="line">  ...</span><br><span class="line">&gt;</span><br><span class="line">  &lt;el-form-item</span><br><span class="line">    label=&quot;预案名称&quot;</span><br><span class="line">    prop=&quot;name&quot;</span><br><span class="line">    ref=&quot;name&quot;</span><br><span class="line">  &gt;</span><br><span class="line">    ...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;所属分类&quot;</span> <span class="attr">prop</span>=<span class="string">&quot;classificationId&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;classificationId&quot;</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;可用部门&quot;</span> <span class="attr">prop</span>=<span class="string">&quot;deptList&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;deptList&quot;</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">el-form-item</span> <span class="attr">label</span>=<span class="string">&quot;编写人&quot;</span> <span class="attr">prop</span>=<span class="string">&quot;writers&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;writers&quot;</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">el-form-item</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">el-form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/34961/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -630,9 +557,15 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;el-tree</span><br><span class="line">  :data=&quot;permissionForm.treeData&quot;</span><br><span class="line">  :props=&quot;permissionForm.defaultProps&quot;</span><br><span class="line">  show-checkbox</span><br><span class="line">  node-key=&quot;id&quot;</span><br><span class="line">  ref=&quot;permissionTreeRef&quot;</span><br><span class="line">  default-expand-all</span><br><span class="line">  :default-checked-keys=&quot;permissionForm.selectedList&quot;</span><br><span class="line">&gt;</span><br><span class="line"><span class="tag">&lt;/<span class="name">el-tree</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> permissionForm = reactive(&#123; <span class="comment">// 预案查看权限表单</span></span><br><span class="line">  preplanId: <span class="literal">null</span>, <span class="comment">// 预案id</span></span><br><span class="line">  treeData: [], <span class="comment">// 数据源</span></span><br><span class="line">  selectedList: [], <span class="comment">// 选中用户数组 e.g. [&#x27;1&#x27;, &#x27;2&#x27;, &#x27;5&#x27;]</span></span><br><span class="line">  defaultProps: &#123;</span><br><span class="line">    children: <span class="string">&#x27;children&#x27;</span>,</span><br><span class="line">    label: <span class="string">&#x27;name&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置查看权限</span></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="title">onPermissionAction</span>(<span class="params">&#123; row &#125;</span>)</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;设置查看权限&#x27;</span>);</span><br><span class="line">  permissionDialogRef.value.show();      </span><br><span class="line">  permissionForm.preplanId = row.id;</span><br><span class="line">  <span class="keyword">const</span> res = <span class="keyword">await</span> service.getPermissionById(&#123; <span class="attr">id</span>: row.id &#125;);</span><br><span class="line">  <span class="keyword">const</span> permissionList = res.data;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(permissionList)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (permissionList.length) &#123; <span class="comment">// 设置了权限</span></span><br><span class="line">      permissionTreeRef.value.setCheckedKeys(permissionList.map(<span class="function"><span class="params">v</span> =&gt;</span> v.userId));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 默认为空, 代表没有设置权限, 要全选</span></span><br><span class="line">      permissionTreeRef.value.setCheckedKeys(permissionForm.selectedList);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+          <p>tree选中笔记</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/50700/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -729,11 +662,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>项目中，需要在 table 里做表单的验证：</p>
-<img src="/posts/13510/table-rules.png" class="" title="100%">
-
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>el-form-item 动态绑定 prop</p>
-<p><code>:prop=&quot;&#39;tableData.&#39; + scope.$index + &#39;.字段名&#39;&quot;</code></p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;el-form :rules&#x3D;&quot;model.rules&quot; :model&#x3D;&quot;model&quot; label-position&#x3D;&quot;right&quot; label-width&#x3D;&quot;120px&quot; ref&#x3D;&quot;form&quot;&gt;</span><br><span class="line">    &lt;el-form-item label&#x3D;&quot;请选择备份点: &quot;&gt;</span><br><span class="line">      &lt;el-table</span><br><span class="line">        :data&#x3D;&quot;model.appBackupList&quot;</span><br><span class="line">        style&#x3D;&quot;width: 500px; margin: 0 auto;&quot;</span><br><span class="line">        max-height&#x3D;&quot;300&quot;&gt;</span><br><span class="line">        &lt;el-table-column</span><br><span class="line">          label&#x3D;&quot;应用&quot;&gt;</span><br><span class="line">          &lt;template slot-scope&#x3D;&quot;scope&quot;&gt;</span><br><span class="line">            &lt;span style&#x3D;&quot;margin-left: 10px&quot;&gt;&#123;&#123; scope.row.applicationName &#125;&#125;&lt;&#x2F;span&gt;</span><br><span class="line">          &lt;&#x2F;template&gt;</span><br><span class="line">        &lt;&#x2F;el-table-column&gt;</span><br><span class="line">        &lt;el-table-column</span><br><span class="line">          label&#x3D;&quot;备份点选择&quot;&gt;</span><br><span class="line">          &lt;template slot-scope&#x3D;&quot;scope&quot;&gt;</span><br><span class="line">            &lt;el-form-item :prop&#x3D;&quot;&#39;appBackupList.&#39; + scope.$index + &#39;.backupId&#39;&quot; :rules&#x3D;&#39;model.rules.backupId&#39;&gt;</span><br><span class="line">              &lt;el-select</span><br><span class="line">                v-model&#x3D;&quot;scope.row.backupId&quot;</span><br><span class="line">                placeholder&#x3D;&quot;请选择备份点&quot;</span><br><span class="line">                @change&#x3D;&quot;backupChange($event, scope.row)&quot;&gt;</span><br><span class="line">                &lt;el-option</span><br><span class="line">                  v-for&#x3D;&quot;item in scope.row.backupList&quot;</span><br><span class="line">                  :key&#x3D;&quot;item.backupId&quot;</span><br><span class="line">                  :label&#x3D;&quot;item.backupName&quot;</span><br><span class="line">                  :value&#x3D;&quot;item.backupId&quot;&gt;</span><br><span class="line">                &lt;&#x2F;el-option&gt;</span><br><span class="line">              &lt;&#x2F;el-select&gt;</span><br><span class="line">            &lt;&#x2F;el-form-item&gt;</span><br><span class="line">          &lt;&#x2F;template&gt;</span><br><span class="line">        &lt;&#x2F;el-table-column&gt;</span><br><span class="line">      &lt;&#x2F;el-table&gt;</span><br><span class="line">    &lt;&#x2F;el-form-item&gt;</span><br><span class="line">  &lt;&#x2F;el-form&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      model: &#123;</span><br><span class="line">        rules: &#123;</span><br><span class="line">          backupId: [</span><br><span class="line">            &#123;</span><br><span class="line">              required: true,</span><br><span class="line">              message: &#39;请选择备份点&#39;,</span><br><span class="line">              trigger: &#39;change&#39;</span><br><span class="line">            &#125;</span><br><span class="line">          ],</span><br><span class="line">        &#125;,</span><br><span class="line">        appBackupList: [&#123;</span><br><span class="line">          applicationId: 1,</span><br><span class="line">          applicationName: &#39;应用A&#39;,</span><br><span class="line">          backupId: null,</span><br><span class="line">          backupList: [&#123;</span><br><span class="line">            backupId: &#39;1&#39;,</span><br><span class="line">            backupName: &#39;备份点1&#39;</span><br><span class="line">          &#125;, &#123;</span><br><span class="line">            backupId: &#39;2&#39;,</span><br><span class="line">            backupName: &#39;备份点2&#39;</span><br><span class="line">          &#125;, &#123;</span><br><span class="line">            backupId: &#39;3&#39;,</span><br><span class="line">            backupName: &#39;备份点3&#39;</span><br><span class="line">          &#125;]</span><br><span class="line">        &#125;], &#x2F;&#x2F; 备份点列表</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/13510/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -826,15 +762,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>工作需要，有时需要在家远程连接公司 mac ，目前采取的比较方便的方案是向日葵桌面端。但发现一旦 mac 息屏休眠后就无法在家远程开机了。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
-<li>wifi换成有线，因为息屏后WiFi就会自动断开</li>
-<li>设置修改，点亮唤醒网络不勾选，进入休眠不勾选</li>
-</ol>
-<img src="/posts/63710/battery.png" class="" title="100%">
-<img src="/posts/63710/battery-nocheck.png" class="" title="100%">
-<img src="/posts/63710/power-nocheck.png" class="" title="100%">
-
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/63710/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -936,8 +871,6 @@
 </ul>
 </li>
 </ul>
-<h2 id="常规父传子，父监听子组件方案"><a href="#常规父传子，父监听子组件方案" class="headerlink" title="常规父传子，父监听子组件方案"></a>常规父传子，父监听子组件方案</h2><p>App.vue</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;my-selector</span><br><span class="line">      :value&#x3D;&quot;selectorValue&quot;</span><br><span class="line">      @changeOption&#x3D;&quot;changeOption&quot;</span><br><span class="line">    &gt;&lt;&#x2F;my-selector&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import MySelector from &#39;.&#x2F;components&#x2F;MySelector.vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  components: &#123;</span><br><span class="line">    MySelector</span><br><span class="line">  &#125;,</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      selectorValue: &#39;3&#39;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    changeOption(val) &#123;</span><br><span class="line">      console.log(val);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/3873/#more" rel="contents">
@@ -1044,11 +977,14 @@
 <li>当选中 label 时，input 会把状态改为 <code>checked</code></li>
 <li>最后再利用 <code>:checked</code> 伪类选择器 和 <code>input:checked + label</code> 相邻兄弟选择器设置 label 的 <code>opacity: 1</code></li>
 </ol>
-<iframe height="564" style="width: 100%;" scrolling="no" title="自定义checkbox" src="https://codepen.io/JingW/embed/jOaVROz?default-tab=css%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/JingW/pen/jOaVROz">
-  自定义checkbox</a> by JingW (<a target="_blank" rel="noopener" href="https://codepen.io/JingW">@JingW</a>)
-  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
-</iframe>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/14594/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1145,11 +1081,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h1><p>定义对象属性的</p>
-<h1 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h1><ol>
-<li>obj 要定义属性的对象</li>
-<li>prop 要定义或修改的属性的名称或 Symbol</li>
-<li>descriptor 要定义或修改的属性描述符</li>
-</ol>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/64272/#more" rel="contents">
@@ -1254,16 +1185,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h1><h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>如果不是字符串－＞toString(开头的空白忽略）</p>
-<h2 id="Radix-2-36"><a href="#Radix-2-36" class="headerlink" title="Radix (2-36)"></a>Radix (2-36)</h2><blockquote>
-<p>解析一个字符串（string）并返回指定基数（Radix）的十进制整数。</p>
-</blockquote>
-<ul>
-<li>Radix 2-36 之间的整数，要解析成整数的字符串是多少进制 -&gt; 进制数 -&gt; 十进制整数<ul>
-<li>e.g. 参数为 16 ：要解析的整数的字符串是16进制数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(<span class="string">&#x27;10&#x27;</span>, <span class="number">2</span>)); <span class="comment">// 2</span></span><br><span class="line"><span class="comment">// &#x27;10&#x27; 被当做 2 进制数，要通过 parseInt 转成 -&gt; 10进制的整数 -&gt; 返回</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/3682/#more" rel="contents">
@@ -1368,58 +1289,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="写法"><a href="#写法" class="headerlink" title="写法"></a>写法</h2><h3 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> 函数名(<span class="params">参数</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// 执行语句</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="🌈-函数表达式（有名）"><a href="#🌈-函数表达式（有名）" class="headerlink" title="🌈 函数表达式（有名）"></a>🌈 函数表达式（有名）</h3><ul>
-<li>函数表达式<strong>右侧</strong>函数有<strong>函数名</strong>，也<strong>会被系统忽略</strong>。外部无法调用</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> test = <span class="function"><span class="keyword">function</span> <span class="title">test1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 执行语句</span></span><br><span class="line">  <span class="comment">// test1 内部可见</span></span><br><span class="line">  <span class="comment">// test1(); // 能够执行</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test.name; <span class="comment">// test1</span></span><br><span class="line"></span><br><span class="line">test(); <span class="comment">// 可执行</span></span><br><span class="line">test1(); <span class="comment">//报错，test1函数外部不可见</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="函数表达式（匿名）"><a href="#函数表达式（匿名）" class="headerlink" title="函数表达式（匿名）"></a>函数表达式（匿名）</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 整体是个匿名函数表达式，function匿名函数这个值，这个整体是字面量</span></span><br><span class="line"><span class="keyword">var</span> test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="number">1</span>, b = <span class="number">1</span>; <span class="comment">// 推荐</span></span><br><span class="line">  <span class="comment">// var a = b = 1; //不推荐，此时的 b 并没有被 var ，b 为全局变量</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="number">10</span>; <span class="comment">// 10这个值就是字面量</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a, b); <span class="comment">// [Function: b] [Function: b]</span></span><br><span class="line">  <span class="built_in">console</span>.log(a.name, b.name); <span class="comment">// b b</span></span><br><span class="line">&#125;</span><br><span class="line">a();</span><br></pre></td></tr></table></figure>
-
-<h2 id="形参、实参"><a href="#形参、实参" class="headerlink" title="形参、实参"></a>形参、实参</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b</span>) </span>&#123; <span class="comment">// a, b 是形参</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// 1, 2 是实参</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="🌈-形参、实参个数可以不相等"><a href="#🌈-形参、实参个数可以不相等" class="headerlink" title="🌈 形参、实参个数可以不相等"></a>🌈 形参、实参个数可以不相等</h3><ul>
-<li>arguments.length 是 实参个数</li>
-<li>[function name].length 是 形参个数</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">arguments</span>.length); <span class="comment">// 实参有 2 个：1 跟 2</span></span><br><span class="line">  <span class="built_in">console</span>.log(test.length); <span class="comment">// 形参有3个：a, b, c</span></span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;).length;							<span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="实参求和"><a href="#实参求和" class="headerlink" title="实参求和"></a>实参求和</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> [...arguments].reduce(<span class="function">(<span class="params">total, cur</span>) =&gt;</span> total += cur, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sum(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="🌈-arguments"><a href="#🌈-arguments" class="headerlink" title="🌈 arguments"></a>🌈 arguments</h3><ul>
-<li>函数内部可以修改实参的值</li>
-<li>实参如果没有传入的形参，则这个形参在函数内部无法赋值</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">	a = <span class="number">3</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">arguments</span>[<span class="number">0</span>]); <span class="comment">// 值为3，修改形参会影响 arguments 映射的值</span></span><br><span class="line">  </span><br><span class="line">  b = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">arguments</span>[<span class="number">1</span>]);</span><br><span class="line">  <span class="comment">// 值为undefined，由于没有传入形参对应的实参，导致更改形参无法改变 arguments 中对应的值</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="return"><a href="#return" class="headerlink" title="return"></a>return</h3><ul>
-<li>终止函数的执行，return 后边的语句不会被执行</li>
-<li>返回相应的值</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">&#x27;1&#x27;</span>); <span class="comment">// 1</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">123</span>; <span class="comment">// test函数返回123</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;2&#x27;</span>); <span class="comment">// 未被执行，不会打印</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="函数参数默认值"><a href="#函数参数默认值" class="headerlink" title="函数参数默认值"></a>函数参数默认值</h2><ul>
-<li>函数参数默认值：undefined</li>
-<li>可以在定义形参时赋值默认值</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a, b); <span class="comment">// 1, undefined</span></span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a = <span class="number">1</span>, b = <span class="number">2</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a, b); <span class="comment">// 1, 2</span></span><br><span class="line">&#125;</span><br><span class="line">test();</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>不想传的值，可用 undefined 占位代替</strong></li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a = <span class="number">1</span>, b</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(a, b); <span class="comment">// 1, 2</span></span><br><span class="line">&#125;</span><br><span class="line">test(<span class="literal">undefined</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>兼容IE等旧版本浏览器</strong></li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="keyword">typeof</span>(<span class="built_in">arguments</span>[<span class="number">0</span>]) !== <span class="string">&#x27;undefined&#x27;</span> ? <span class="built_in">arguments</span>[<span class="number">0</span>] : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">var</span> b = <span class="keyword">typeof</span>(<span class="built_in">arguments</span>[<span class="number">1</span>]) !== <span class="string">&#x27;undefined&#x27;</span> ? <span class="built_in">arguments</span>[<span class="number">1</span>] : <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a, b);</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br></pre></td></tr></table></figure>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/47013/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
