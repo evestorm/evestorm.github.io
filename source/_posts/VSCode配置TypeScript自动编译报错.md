@@ -16,6 +16,8 @@ em… 我在 github 上提问有了回复，链接在此：https://github.com/mi
 
 具体解决方案就是，打开 `settings.json` ，设置 `"terminal.integrated.inheritEnv"` 为 true 。
 
+<!-- more -->
+
 ---
 
 之前在 VSCode 中能通过运行任务来监听 ts 文件的代码变更来实时编译 js。然而我今天发现这样会导致报错：

@@ -14,6 +14,8 @@ date: 2019-11-11 00:15:05
 
 项目中使用到了 select 标签，但在 Android 和 iOS 上默认展示的效果都很丑而且不一致，网上搜到一个 css 样式可以重置效果，这里记下笔记：
 
+<!-- more -->
+
 ```css
 select {
   /*移除浏览器默认特殊样式*/
@@ -35,8 +37,6 @@ select {
   background-color: transparent;
 }
 ```
-
-<!-- more -->
 
 ### 选中项右对齐
 

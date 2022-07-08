@@ -16,6 +16,8 @@ date: 2020-06-21 20:40:15
 import amap from '@/lib/amap/amap-wx.js';
 ```
 
+<!-- more -->
+
 ## 初始化
 
 ```js
@@ -23,8 +25,6 @@ myAmapFun = new amap.AMapWX({
   key: this.key //该key 是在高德中申请的微信小程序key
 });
 ```
-
-<!-- more -->
 
 ### 获取当前定位信息
 

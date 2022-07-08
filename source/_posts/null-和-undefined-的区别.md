@@ -13,12 +13,12 @@ tags:
 - null 表示一个对象是“没有值”的值，也就是值为“空”
 - undefined 表示一个变量声明了没有初始化(赋值)
 
+<!-- more -->
+
 ## 类型
 
 - undefined 的类型(typeof)是 undefined
 - null 的类型(typeof)是 object
-
-<!-- more -->
 
 ## 双等三等
 

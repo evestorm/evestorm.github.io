@@ -10,6 +10,8 @@ date: 2018-05-06 12:14:33
 
 先把下面插件都安装下，最后使用 `settings.json` 去覆盖你本地自己的文件。
 
+<!-- more -->
+
 ### 外观配置
 
 - **主题**：
@@ -17,8 +19,6 @@ date: 2018-05-06 12:14:33
   - [One Monokai Theme](https://marketplace.visualstudio.com/items?itemName=azemoh.one-monokai) [目前在使用]
 - **图标**：[VSCode Great Icons](https://marketplace.visualstudio.com/items?itemName=emmanuelbeziat.vscode-great-icons)
 - **字体**：[Fira Code](https://github.com/tonsky/FiraCode/wiki)
-
-<!-- more -->
 
 #### 预览
 

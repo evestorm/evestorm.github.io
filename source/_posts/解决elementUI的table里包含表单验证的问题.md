@@ -12,6 +12,8 @@ date: 2022-05-27 15:18:00
 
 项目中，需要在 table 里做表单的验证：
 
+<!-- more -->
+
 {% asset_img table-rules.png 100% %}
 
 ## 解决方案

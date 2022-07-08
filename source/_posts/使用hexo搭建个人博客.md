@@ -12,6 +12,8 @@ date: 2018-03-13 14:10:09
 
 利用 [Hexo](https://hexo.io/zh-cn/) 在 [GitHub](https://baike.baidu.com/item/github/10145341?fr=aladdin) 上搭建个人博客。
 
+<!-- more -->
+
 ## 准备工作
 
 你的电脑需要安装下面两个应用程序：
@@ -20,8 +22,6 @@ date: 2018-03-13 14:10:09
 - Git [如何安装](http://www.runoob.com/git/git-install-setup.html)
 
 或者直接查看 hexo 的[官方文档](https://hexo.io/zh-cn/docs/#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90)查看安装教程。
-
-<!-- more -->
 
 ## 安装 Hexo
 

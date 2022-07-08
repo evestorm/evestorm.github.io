@@ -9,6 +9,10 @@ abbrlink: 23085
 date: 2020-08-26 19:56:43
 ---
 
+记一下笔记：
+
+<!-- more -->
+
 ```swift
 let userInfo = launchOptions?[UIApplication.LaunchOptionsKey.remoteNotification] as? [AnyHashable: Any]
 if userInfo != nil {

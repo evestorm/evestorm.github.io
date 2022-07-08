@@ -19,6 +19,8 @@ date: 2021-07-10 14:30:04
 - 方法要避免使用箭头函数（箭头函数没法改变this指向，本身指向父级）
   - 箭头函数会阻止Vue正确绑定组件实例this
 
+<!-- more -->
+
 ```javascript
 var app = Vue.createApp({
   data() {
@@ -39,8 +41,6 @@ var app = Vue.createApp({
 
 const vm = app.mount('#app');
 ```
-
-<!-- more -->
 
 - `@click="changeTitle('This is your TITLE')"`
   - 函数名 + () 不是执行，而是传入实参的容器

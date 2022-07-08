@@ -16,13 +16,13 @@ date: 2019-06-21 20:33:40
 sudo ufw enable
 ```
 
+<!-- more -->
+
 ## 关闭防火墙
 
 ```shell
 sudo ufw disable
 ```
-
-<!-- more -->
 
 ## 重启防火墙
 

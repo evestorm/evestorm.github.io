@@ -12,6 +12,8 @@ date: 2020-10-09 22:52:40
 
 ## 设置 input 的 placeholder 的字体样式
 
+<!-- more -->
+
 ```css
 input::-webkit-input-placeholder {
   /* Chrome/Opera/Safari */
@@ -30,8 +32,6 @@ input:-moz-placeholder {
   color: red;
 }
 ```
-
-<!-- more -->
 
 ### 设置 input 聚焦时的样式
 

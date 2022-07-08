@@ -14,6 +14,8 @@ date: 2020-12-02 09:19:02
 
 > 已改名为 tasksfile ，`npm install tasksfile` 代替
 
+<!-- more -->
+
 ### 介绍
 
 一个小型构件工具
@@ -23,8 +25,6 @@ date: 2020-12-02 09:19:02
 ```shell
 npm install runjs -D
 ```
-
-<!-- more -->
 
 ### 使用
 

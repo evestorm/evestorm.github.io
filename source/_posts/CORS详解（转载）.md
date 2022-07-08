@@ -15,6 +15,8 @@ date: 2019-04-15 13:18:05
 
 博客源：[CORS 详解](https://github.com/hstarorg/HstarDoc/blob/master/前端相关/CORS详解.md)
 
+<!-- more -->
+
 ## 关于 CORS
 
 说到 CORS，就不得不先了解跨站 HTTP 请求（Cross-site HTTP request）。
@@ -28,8 +30,6 @@ date: 2019-04-15 13:18:05
 W3C 的 Web 应用工作组推荐了一种新的机制，即跨域资源共享（Cross-Origin Resource Sharing），也就是当前我们提到的 CORS。
 
 CORS 的核心，就是让服务器来确定是否允许跨域访问。
-
-<!-- more -->
 
 ## 1、典型场景
 

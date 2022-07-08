@@ -16,6 +16,8 @@ top: True
 
 不要因为 Vue 使用到了 `Object.defineProperty()` 数据劫持，就把它和 Proxy 混为一谈。它俩不是一个东西
 
+<!-- more -->
+
 - `Object.defineProperty(obj, prop, descriptor)` 是直接处理 obj，然后当操作 obj 时，会在 set、get 方法中进行拦截
    - **对 obj 本身操作**
    - 给 obj 上新增没有的属性
@@ -26,8 +28,6 @@ top: True
 # 功能
 
 自定义对象属性的获取、赋值、枚举、函数调用等功能
-
-<!-- more -->
 
 # 💄用法
 

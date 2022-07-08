@@ -19,6 +19,8 @@ npm i @vue/cli -g
 vue create 项目名称
 ```
 
+<!-- more -->
+
 {% asset_img 1646820208737-dbfbb531-0b7c-457a-96bc-5d75458933ad.png 100% %}
 
 # composition api （组合API）概念
@@ -31,8 +33,6 @@ vue create 项目名称
 import { watch, ref, toRef, onMounted, computed } from 'vue';
 // 在 setup 中使用 composition api
 ```
-
-<!-- more -->
 
 # setup
 

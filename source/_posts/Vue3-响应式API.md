@@ -20,6 +20,8 @@ date: 2021-10-15 09:01:52
   - **深度响应**
   - **递归代理**
 
+<!-- more -->
+
 ```vue
 <template>
   <div>{{ proxyObj.name }}</div>
@@ -47,8 +49,6 @@ export default {
 ```
 
 {% asset_img 1646907263944-c9ce8065-cc0a-4b7e-8c14-46cc35605336.png 100% %}
-
-<!-- more -->
 
 ```vue
 <template></template>

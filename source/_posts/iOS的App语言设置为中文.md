@@ -13,6 +13,8 @@ date: 2020-08-05 22:47:14
 
 {% asset_img language.jpeg 拍照为英文 %}
 
+<!-- more -->
+
 但我在 AppStore 上架的时候明明设置的语言是中文啊。后来网上查询后发现，还需要在项目的 plist 中添加 `Localization native development region` 为 `China` ：
 
 {% asset_img plist.png plist设置 %}

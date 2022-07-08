@@ -14,6 +14,8 @@ date: 2020-01-21 22:46:40
 
 安装链接：[起步 - 安装 Git](https://git-scm.com/book/zh/v2/起步-安装-Git)
 
+<!-- more -->
+
 ## 配置
 
 ### 配置 user.name 和 user.email
@@ -22,8 +24,6 @@ date: 2020-01-21 22:46:40
 git config --global user.name 'your name'
 git config --global user.email 'your_email@domain.com'
 ```
-
-<!-- more -->
 
 ### 相关配置说明
 

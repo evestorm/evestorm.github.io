@@ -13,13 +13,13 @@ date: 2019-03-15 10:48:13
 
 有时候我们也希望能够跟踪数据库的更改，像 git 一样在各个不同时期的数据库状态之间进行切换。或者能通过一套工具将数据库迁移到本机，让我们在家也能进行测试开发，而不用依赖公司的测试环境。这些特性，作为今天的主角 `sequelize-cli` 都能提供给我们。
 
+<!-- more -->
+
 > npm链接请 [点击这里](https://www.npmjs.com/package/sequelize-cli)。
 
 ## 安装
 
 首先创建项目，项目名随意，创建完毕后cd到项目根目录，老规矩命令行 `npm init -y` 创建 `package.json` ，然后输入安装一步到位：`npm i sequelize mysql2 sequelize-cli` 。
-
-<!-- more -->
 
 **注意：** `sequelize-cli` 依赖 `sequelize`，`sequelize` 依赖 `mysql2`
 

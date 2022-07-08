@@ -16,6 +16,8 @@ date: 2019-10-11 20:41:30
 
 在 HbuilderX 里运行编译 uni-app 的微信小程序版，报：enable ide service (y/n) [27d [27c
 
+<!-- more -->
+
 解决方案：
 
 在微信开发者工具里点击设置》安全设置，开启服务端口
@@ -38,8 +40,6 @@ date: 2019-10-11 20:41:30
 <image src="../../static/images/logo.png"></image>
 ```
 
-<!-- more -->
-
 ### 在 .css 样式文件中
 
 `background` 属性中，得使用下面写法引入本地图片：
@@ -49,8 +49,6 @@ background: url("~@/static/images.logo.png");
 ```
 
 否则图片无法被正确加载。
-
-<!-- more -->
 
 ### 自定义组件 image 的 src 路径
 

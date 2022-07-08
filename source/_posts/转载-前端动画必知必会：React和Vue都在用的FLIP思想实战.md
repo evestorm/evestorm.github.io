@@ -15,6 +15,8 @@ date: 2021-03-05 17:13:07
 
 转载自：https://zhuanlan.zhihu.com/p/146641652
 
+<!-- more -->
+
 ## 前言
 
 在 Vue 的官网中的过渡动画章节中，可以看到一个很酷炫的**[动画效果](https://link.zhihu.com/?target=https%3A//cn.vuejs.org/v2/guide/transitions.html%23%E5%88%97%E8%A1%A8%E7%9A%84%E6%8E%92%E5%BA%8F%E8%BF%87%E6%B8%A1)**
@@ -22,8 +24,6 @@ date: 2021-03-05 17:13:07
 {% asset_img v2-741e6456c4471c34f6e346d3032ff323_b.jpg v2-741e6456c4471c34f6e346d3032ff323_b %}
 
 乍一看，让我们手写出这个逻辑应该是非常复杂的，先看看本文最后要实现的效果吧，和这个案例是非常类似的。
-
-<!-- more -->
 
 ## 预览
 

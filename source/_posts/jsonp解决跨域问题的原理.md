@@ -15,11 +15,11 @@ date: 2019-04-14 23:01:54
 
 ———— [菜鸟教程-jsonp](https://www.runoob.com/json/json-jsonp.html)
 
+<!-- more -->
+
 ## 原理
 
 script 标签的 src 不受同源策略影响，允许跨域。但需要借助服务端的配合。
-
-<!-- more -->
 
 ## 示例
 

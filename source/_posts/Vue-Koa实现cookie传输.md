@@ -14,6 +14,8 @@ date: 2019-04-17 21:33:26
 
 登录接口设置 cookie：
 
+<!-- more -->
+
 ```js
 router.post('/login', async ctx => {
     ...
@@ -30,8 +32,6 @@ router.post('/login', async ctx => {
     ...
 });
 ```
-
-<!-- more -->
 
 读取浏览器自动带上的 cookie：
 

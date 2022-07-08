@@ -14,11 +14,11 @@ date: 2019-12-19 21:03:41
 
 {% asset_img 吸顶效果.gif 吸顶效果 %}
 
+<!-- more -->
+
 ## 案例
 
 <iframe height="502" scrolling="no" title="列表标题吸顶效果" src="https://codepen.io/JingW/embed/GRgWvKb?height=502&amp;theme-id=default&amp;default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
-
-<!-- more -->
 
 ## uni-app 写法
 

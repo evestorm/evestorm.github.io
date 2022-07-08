@@ -15,6 +15,8 @@ date: 2020-07-17 23:01:46
 
 > src/utils/confirm.js
 
+<!-- more -->
+
 ```js
 import { MessageBox, Message } from "element-ui";
 

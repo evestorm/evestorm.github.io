@@ -14,6 +14,8 @@ date: 2019-03-09 10:18:06
 - [animation动画（一）](https://evestorm.github.io/posts/31280/)
 - [animation动画（二）](https://evestorm.github.io/posts/20298/)
 
+<!-- more -->
+
 老规矩，二系列来谈谈具体每个动画属性的含义和用法，算是一个对知识点的总结吧。
 
 ## animation-name 动画名称
@@ -21,8 +23,6 @@ date: 2019-03-09 10:18:06
 CSS语法：`animation-name: shrink`
 
 用来设置元素的动画名称。
-
-<!-- more -->
 
 ## animation-duration 持续时间
 

@@ -14,6 +14,8 @@ date: 2019-06-12 15:54:50
 
 进入阿里云下拉菜单选择 ecs ：
 
+<!-- more -->
+
 {% asset_img ecs_config.png ecs_config %}
 
 我购买的配置如下：
@@ -30,8 +32,6 @@ date: 2019-06-12 15:54:50
 ## 域名解析
 
 [阿里云如何解析域名](https://jingyan.baidu.com/article/48b558e3f25e6d7f38c09aec.html)
-
-<!-- more -->
 
 ## Github Page 自定义域名
 

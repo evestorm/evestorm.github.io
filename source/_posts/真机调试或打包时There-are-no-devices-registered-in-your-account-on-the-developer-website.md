@@ -15,6 +15,8 @@ date: 2020-07-14 19:38:04
 
 > There are no devices registered in your account on the developer website. Plug in and select a device to have Xcode register it
 
+<!-- more -->
+
 {% asset_img signing.png signing %}
 
 原因：

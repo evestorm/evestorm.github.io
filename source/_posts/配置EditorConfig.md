@@ -14,6 +14,8 @@ date: 2021-03-11 19:54:01
 
 EditorConfig 有助于 `一个项目` 且 `多个开发者` 所用编辑器各不相同的团队维护编码风格。
 
+<!-- more -->
+
 ## 官网
 
 https://editorconfig.org/
@@ -25,8 +27,6 @@ https://editorconfig.org/#pre-installed
 ### 需要下载插件的编辑器
 
 https://editorconfig.org/#download
-
-<!-- more -->
 
 > 提示：
 >

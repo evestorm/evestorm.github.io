@@ -13,6 +13,8 @@ date: 2021-07-26 16:36:26
 
 文章来源: <https://pangwu86.com/posts/1360575077/>
 
+<!-- more -->
+
 项目中使用了 [Vuetify](https://vuetifyjs.com/) 这个 UI 库，现在要加上多国语言功能，踩了几个坑记录下。
 
 ## 使用 Vuetify 内置 i18n
@@ -20,8 +22,6 @@ date: 2021-07-26 16:36:26
 ---
 
 Vuetify 的[国际化文档链接](https://vuetifyjs.com/zh-Hans/features/internationalization/)
-
-<!-- more -->
 
 ### 初始化
 

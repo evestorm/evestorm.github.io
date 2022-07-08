@@ -15,6 +15,8 @@ date: 2021-01-14 14:35:02
 
 在 Vue 中使用 `document.addEventListener` 需要把回调函数抽离出去放到 `methods` 中，然而 `methods` 中的默认 this 是 vue 实例，如果想要获取 `addEventListener` 的 event 事件对象，就得把方法改成箭头函数的形式：
 
+<!-- more -->
+
 ```js
 methods: {
   handleKeyDown: event => {};
@@ -22,8 +24,6 @@ methods: {
 ```
 
 然而此时在 `handleKeyDown` 中又拿不到当前 vue 实例了。
-
-<!-- more -->
 
 ## 解决方案
 

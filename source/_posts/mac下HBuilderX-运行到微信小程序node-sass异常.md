@@ -12,6 +12,8 @@ date: 2021-04-21 15:22:44
 
 使用 cli 方式创建了 uniapp ，由于项目中使用到了 scss ，所以安装了 node-sass 和 sass-loader 。
 
+<!-- more -->
+
 在 VSCode 通过命令行的方式运行项目，可以编译成功，但在 HBuilderX 中直接编译无法通过，会报错：
 
 ```shell

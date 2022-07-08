@@ -13,6 +13,8 @@ date: 2021-01-13 11:10:53
 
 在 Vue 中，我们通过 `Vue.component('MyComponentName', { /* ... */ })` 的方式来进行全局组件注册，但如果需要全局注册的组件很多，这时代码就会变得比较臃肿，例如：
 
+<!-- more -->
+
 ```js
 // 注册 5 个全局组件
 import ExampleComponent1 from './components/exampleComponent1/index';
@@ -29,8 +31,6 @@ Vue.component('ExampleComponent5', ExampleComponent5);
 ```
 
 下面我们就针对这块痛点，做些优化。
-
-<!-- more -->
 
 ## 循环注册
 

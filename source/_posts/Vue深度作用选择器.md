@@ -12,6 +12,8 @@ date: 2020-12-08 10:01:06
 
 之前写 uni-app 在修改三方深层样式时，会使用 `/deep/` ，例如：
 
+<!-- more -->
+
 ```css
 .container /deep/ .el-input__inner {
 }

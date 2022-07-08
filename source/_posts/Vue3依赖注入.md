@@ -15,6 +15,8 @@ date: 2021-10-16 11:20:19
   - `provide(name, value)`
   - `inject(name, default value)` 第二个参数可选
 
+<!-- more -->
+
 ## 基本用法
 
 App.vue
@@ -73,8 +75,6 @@ export default {
 ```
 
 {% asset_img 1647178473111-afcb93d4-6db1-4ad3-b2da-252a49274464-20220315092026850.png 100% %}
-
-<!-- more -->
 
 ## provide 响应式
 

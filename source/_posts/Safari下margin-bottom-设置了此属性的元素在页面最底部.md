@@ -14,6 +14,8 @@ date: 2020-07-16 00:13:14
 
 Safari 下页面最底部元素的 margin-bottom 失效：
 
+<!-- more -->
+
 <iframe height="265" scrolling="no" title="Margin not working only in Safari (element is at the bottom of the page)" src="https://codepen.io/JingW/embed/QWyZjgV?height=265&amp;theme-id=light&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
 
 {% asset_img chrome_safari.png chrome_safari %}

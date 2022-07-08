@@ -12,6 +12,8 @@ date: 2020-11-16 23:06:43
 
 来源：https://jekyllrb.com/docs/installation/
 
+<!-- more -->
+
 ### macOS
 
 终端运行：
@@ -23,8 +25,6 @@ xcode-select --install
 安装 Ruby：
 
 Jekyll 依赖 Ruby v2.5.0+，如果你的 macOS 版本为 Catalina 10.15 或以上，则不需要再手动安装，因为系统自带 Ruby 2.6.3 。
-
-<!-- more -->
 
 > 查看本地 Ruby 版本：`ruby -v`
 >

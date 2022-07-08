@@ -13,6 +13,8 @@ date: 2021-10-16 09:12:58
 
 ## getCurrentInstance 获取当前组件实例
 
+<!-- more -->
+
 ```vue
 <template>
 </template>
@@ -29,8 +31,6 @@ export default {
 ```
 
 {% asset_img 1647156814286-7983bfe0-bb18-432f-86ec-c45933e88184.png 100% %}
-
-<!-- more -->
 
 ## options api 和 composition api 区别
 

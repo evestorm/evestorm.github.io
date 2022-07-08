@@ -14,6 +14,8 @@ date: 2020-08-04 23:17:26
 
 {% asset_img safearea.png 安全区域未填满 %}
 
+<!-- more -->
+
 ## 解决方法
 
 设置相应约束的 FirstItem ，改 `Safe Area` 为 `SuperView` ：

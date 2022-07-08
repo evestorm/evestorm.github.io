@@ -16,6 +16,8 @@ date: 2019-11-09 23:12:30
 
 **GitHub Repo 地址：** [soimort/you-get](https://github.com/soimort/you-get)
 
+<!-- more -->
+
 ## 起因
 
 有时候希望能在 B 站下载在线视频到本地，然而 B 站只支持在手机端缓存。所以 Google 了下发现了一个插件：「[bilibili 哔哩哔哩下载助手](https://chrome.google.com/webstore/detail/bilibili哔哩哔哩下载助手/bfcbfobhcjbkilcbehlnlchiinokiijp?utm_source=chrome-ntp-icon)」（点击左侧链接在 google 应用商店直接下载），下载完成后打开你要下载的 B 站 视频链接，右下角就会出现一个按钮：

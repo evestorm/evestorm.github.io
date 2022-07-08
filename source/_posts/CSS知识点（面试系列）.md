@@ -15,11 +15,11 @@ date: 2019-06-09 13:35:40
 
 一个块的总宽度 = **内容宽度** + margin(左右) + padding(左右) + border(左右)
 
+<!-- more -->
+
 怪异盒模型（IE 标准）：
 
 一个块的总宽度 = **width（包含 padding 和 border）** + margin(左右)
-
-<!-- more -->
 
 ### 怪异盒模型触发条件
 

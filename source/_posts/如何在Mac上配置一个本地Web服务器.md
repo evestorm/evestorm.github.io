@@ -10,6 +10,8 @@ tags:
 
 来源：https://shannonchenchn.github.io/2018/10/22/How-do-you-set-up-a-local-web-server-on-Mac/
 
+<!-- more -->
+
 ## 目录
 
 - 我们为什么需要服务器？
@@ -17,8 +19,6 @@ tags:
   - 1. 直接访问本地文件时存在的问题
 - 方法一、启动 Mac 自带的 Apache 服务器
 - 方法二：使用 Python 的 SimpleHTTPServer 模块启动服务器
-
-<!-- more -->
 
 ### 我们为什么需要服务器？
 

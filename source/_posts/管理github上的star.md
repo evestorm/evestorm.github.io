@@ -13,6 +13,8 @@ categories:
 
 Google 了一下发现个不错的网站能帮我们管理 star：[https://astralapp.com/](https://link.zhihu.com/?target=https%3A//astralapp.com/)
 
+<!-- more -->
+
 特性：
 
 - GitHub 授权之后自动同步所有 Star 项目

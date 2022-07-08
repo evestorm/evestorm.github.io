@@ -14,6 +14,8 @@ date: 2019-03-05 09:47:28
 - [animation动画（一）](https://evestorm.github.io/posts/31280/)
 - [animation动画（二）](https://evestorm.github.io/posts/20298/)
 
+<!-- more -->
+
 ## 介绍
 
 > CSS Animations 是CSS的一个模块，它定义了如何用关键帧来随时间推移对CSS属性的值进行动画处理。关键帧动画的行为可以通过指定它们的持续时间，它们的重复次数以及它们如何重复来控制。

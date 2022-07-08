@@ -15,6 +15,8 @@ date: 2021-01-12 16:28:54
 
 UI 设计稿中，分页部分的文字和 element-ui 中的有点偏差。
 
+<!-- more -->
+
 > element-ui
 
 {% asset_img page.png page %}
@@ -24,8 +26,6 @@ UI 设计稿中，分页部分的文字和 element-ui 中的有点偏差。
 {% asset_img page-ui.png page-ui %}
 
 现在想要把「前往」改成「前往第」。然而 element-ui 文档中并没有给出跳转页面文字部分的配置。
-
-<!-- more -->
 
 ## 解决方案
 

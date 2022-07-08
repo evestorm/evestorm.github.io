@@ -16,6 +16,8 @@ date: 2019-06-09 23:41:10
 - 未声明的变量使用 typeof 返回字符串 "undefined"
 - typeof 一个 let 定义的变量会因为暂时性死区报错 [ReferenceError](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError)（前提：let/const 未声明之前赋值或使用）
 
+<!-- more -->
+
 ```js
 var tmp = 123;
 if (true) {

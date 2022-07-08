@@ -14,6 +14,8 @@ date: 2019-11-05 22:09:33
 
 假设我们一个用 webpack 打包的项目有以下场景
 
+<!-- more -->
+
 > index.js
 
 ```js
@@ -26,8 +28,6 @@ $('body').append($div);
 
 initUI();
 ```
-
-<!-- more -->
 
 > ui.js
 

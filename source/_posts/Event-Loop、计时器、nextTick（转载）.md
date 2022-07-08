@@ -15,6 +15,8 @@ date: 2019-04-28 14:31:44
 
 原文：https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/
 
+<!-- more -->
+
 以下是译文：
 
 ## 什么是事件循环（Event Loop，注意空格）
@@ -22,8 +24,6 @@ date: 2019-04-28 14:31:44
 JavaScript 是单线程的，有了 event loop 的加持，Node.js 才可以非阻塞地执行 I/O 操作，把这些操作尽量转移给操作系统来执行。
 
 我们知道大部分现代操作系统都是多线程的，这些操作系统可以在后台执行多个操作。当某个操作结束了，操作系统就会通知 Node.js，然后 Node.js 就（可能）会把对应的回调函数添加到 poll（轮询）队列，最终这些回调函数会被执行。下文中我们会阐述其细节。
-
-<!-- more -->
 
 ## Event Loop 详解
 

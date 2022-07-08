@@ -12,6 +12,8 @@ date: 2021-07-28 17:38:28
 
 如标题所示，今天推送远端发现了此错误，google 了下在 [Stack Overflow](https://stackoverflow.com/questions/68191392/password-authentication-is-temporarily-disabled-as-part-of-a-brownout-please-us) 上找到了类似问题的解决方案。但某些操作在我电脑上执行不了。所以特此记录下。
 
+<!-- more -->
+
 1. 首先进入到 github 上创建一个 token ，教程在此：<https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token>
 2. 然后进入 keyChain 搜索 github ，找到分类为 application password 的那条 sourceTree 关联的文件
 3. 双击秘钥文件点击 show password ，此时需要输入电脑开机密码查看密码

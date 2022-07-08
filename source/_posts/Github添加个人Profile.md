@@ -12,13 +12,13 @@ categories:
 
 效果：https://github.com/evestorm
 
+<!-- more -->
+
 ## 步骤
 
 摘自：https://zhuanlan.zhihu.com/p/161029860
 
 第一步，创建与 GitHub 用户名同名的代码仓库。
-
-<!-- more -->
 
 {% asset_img step1.jpg step1 %}
 

@@ -15,6 +15,8 @@ date: 2019-11-17 15:38:03
 - 原文: [Art of debugging with Chrome DevTools](https://medium.com/frontmen/art-of-debugging-with-chrome-devtools-ab7b5fd8e0b4)
 - 译者: [Fundebug](https://www.fundebug.com/)
 
+<!-- more -->
+
 **为了保证可读性，本文采用意译而非直译。另外，本文版权归原作者所有，翻译仅用于学习。**
 
 **小编推荐：[Fundebug](https://www.fundebug.com/)专注于 JavaScript、微信小程序、微信小游戏，Node.js 和 Java 线上 bug 实时监控。真的是一个很好用的 bug 监控服务，众多大佬公司都在使用。**
@@ -24,8 +26,6 @@ date: 2019-11-17 15:38:03
 _简洁起见，接下来我会使用`开发者工具`来指代`谷歌开发者工具`_。
 
 在我们开始之前，你需要做一些准备工作。
-
-<!-- more -->
 
 ### **使用金丝雀版**
 

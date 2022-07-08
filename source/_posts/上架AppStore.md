@@ -15,13 +15,14 @@ date: 2020-07-18 22:31:55
 
 点击「Certificates, Identifiers & Profiles」
 
+<!-- more -->
+
 {% asset_img 1594882664645-69f13a17-f828-4f4f-8549-8456bf43955c.png 1594882664645-69f13a17-f828-4f4f-8549-8456bf43955c %}
 
 点击添加 Certificates ：
 
 {% asset_img 1594880841216-49e2644f-7fdd-4118-a903-6b65b1062d1c.png 1594880841216-49e2644f-7fdd-4118-a903-6b65b1062d1c %}
 
-<!-- more -->
 
 选择「iOS App Development」后直接点继续：
 

@@ -12,6 +12,8 @@ date: 2021-03-11 20:22:21
 
 转载自：https://neveryu.github.io/2020/06/10/husky-lint-staged/
 
+<!-- more -->
+
 ## 快速集成
 
 在提交 git 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。
@@ -24,8 +26,6 @@ npm install -D husky
 // lint-staged 可以让husky只检验git工作区的文件，不会导致你一下出现成百上千个错误
 npm install -D lint-staged
 ```
-
-<!-- more -->
 
 然后修改 `package.json`，增加配置：
 

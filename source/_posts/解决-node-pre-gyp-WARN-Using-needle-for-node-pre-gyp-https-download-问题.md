@@ -17,9 +17,9 @@ date: 2021-01-20 15:42:34
 node-pre-gyp WARN Using needle for node-pre-gyp https download
 ```
 
-进行不下去。
-
 <!-- more -->
+
+进行不下去。
 
 在本机进行测试：删除项目根目录下 `node_modules` 文件夹重新进行 `npm i ` 安装发现也卡在这儿。但 `CTRL+C` 停止脚本执行后再 `npm i` 就不会卡主了，而且 `npm run dev` 执行脚本也能正常启动项目。如果你只是在本地安装，这也算是一个解决办法。
 

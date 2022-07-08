@@ -14,6 +14,8 @@ date: 2021-03-15 18:47:54
 
 原文：https://zhuanlan.zhihu.com/p/81764012
 
+<!-- more -->
+
 ## 相关链接
 
 - [prettier](https://prettier.io/docs/en/options.html)

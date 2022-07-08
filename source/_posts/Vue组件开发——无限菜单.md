@@ -14,6 +14,8 @@ date: 2019-07-13 21:50:10
 
 该 npm 包可以让你在零配置情况下，直接使用 `vue serve` 和 `vue build` 命令跑 `*.vue` 文件，并且可以把它编译打包成一个 Vue 插件。
 
+<!-- more -->
+
 ## 全局安装
 
 ```shell
@@ -41,8 +43,6 @@ npm install -g @vue/cli-service-global
 
 <style lang="scss" scoped></style>
 ```
-
-<!-- more -->
 
 然后命令行中输入：
 

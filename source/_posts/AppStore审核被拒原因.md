@@ -15,11 +15,11 @@ date: 2020-07-20 16:02:40
 
 > We noticed that your app requests the user’s consent to access their contacts, camera, and photos but does not clarify the use of the contacts, camera, and photos in the applicable purpose string.
 
+<!-- more -->
+
 意思就是没有对请求的相关权限进行描述，或者描述的不够准确，比如使用到了定位，相册相机，通讯录等权限，要把为什么使用这些权限做下详细描述!
 
 例如一个外卖应用，获取定位后需要展示附近的美食信息。那么，相应的定位权限描述，应当是类似“获取定位信息用于为用户提供附近的美食信息”这样的描述。
-
-<!-- more -->
 
 ## Guideline 5.1.2 Legal: Privacy - Data Use and Sharing
 

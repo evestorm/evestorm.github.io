@@ -16,9 +16,10 @@ date: 2020-01-04 22:52:47
 
 Grid Layout 翻译过来是[网格布局]的意思，它是一个二维系统，包含了行（row）与列（column）以及间距（gap）。下图能够很好的说明这一点（图片来自[mdn](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/CSS_layout/Grids)）：
 
+<!-- more -->
+
 {% asset_img grid.png grid_layout %}
 
-<!-- more -->
 
 ### Grid vs Flex
 

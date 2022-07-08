@@ -17,6 +17,8 @@ date: 2020-10-21 00:00:28
 
 原因是 github 的 raw.githubusercontent.com 域名解析被污染了。
 
+<!-- more -->
+
 ## 解决方案
 
 修改 hosts 文件

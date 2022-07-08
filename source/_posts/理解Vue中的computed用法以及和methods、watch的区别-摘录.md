@@ -13,6 +13,8 @@ date: 2019-10-23 13:49:12
 
 摘录来源：https://www.cnblogs.com/tugenhua0707/p/11760466.html
 
+<!-- more -->
+
 ## 一. 理解 Vue 中的 computed 用法
 
 computed 是计算属性的; 它会根据所依赖的数据动态显示新的计算结果, 该计算结果会被缓存起来。computed 的值在 getter 执行后是会被缓存的。如果所依赖的数据发生改变时候, 就会重新调用 getter 来计算最新的结果。
@@ -20,8 +22,6 @@ computed 是计算属性的; 它会根据所依赖的数据动态显示新的计
 下面我们根据官网中的 demo 来理解下 computed 的使用及何时使用 computed。
 
 computed 设计的初衷是为了使模板中的逻辑运算更简单, 比如在 Vue 模板中有很多复杂的数据计算的话, 我们可以把该计算逻辑放入到 computed 中去计算。
-
-<!-- more -->
 
 下面我们看下官网中的一个 demo 如下:
 

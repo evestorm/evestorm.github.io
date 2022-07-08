@@ -18,6 +18,8 @@ date: 2020-07-03 19:45:51
 sudo gem install cocoapods
 ```
 
+<!-- more -->
+
 等待了几分钟后，显示下面的信息，便表示已经安装成功了:
 
 ```shell
@@ -25,8 +27,6 @@ Installing ri documentation for cocoapods-1.8.4
 Done installing documentation for thread_safe, tzinfo, concurrent-ruby, i18n, activesupport, nap, fuzzy_match, httpclient, algoliasearch, cocoapods-core, claide, cocoapods-deintegrate, cocoapods-downloader, cocoapods-plugins, cocoapods-search, cocoapods-stats, netrc, cocoapods-trunk, cocoapods-try, molinillo, atomos, colored2, nanaimo, xcodeproj, escape, fourflusher, gh_inspector, ruby-macho, cocoapods after 21 seconds
 29 gems installed
 ```
-
-<!-- more -->
 
 最后一步 ，下载文件:
 

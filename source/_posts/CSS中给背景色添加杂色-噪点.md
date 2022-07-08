@@ -12,6 +12,8 @@ date: 2021-07-16 17:43:59
 
 很简单，一句话：
 
+<!-- more -->
+
 ```css
 background: linear-gradient(
     to right,

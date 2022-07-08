@@ -16,6 +16,8 @@ date: 2019-04-16 16:05:12
 
 在 vue 开发过程中使用 axios 发起 POST 请求：
 
+<!-- more -->
+
 ```js
 axios({
   method: 'GET',
@@ -28,8 +30,6 @@ axios({
 [![跨域](Axios异步请求跨域解决方案/跨域.png)](https://gitee.com/evestorm/various_resources/raw/master/ajax/跨域.png)
 
 原因是浏览器同源策略，只有 **同协议、同域名、同端口** 三同的地址才能互相通过 AJAX 的方式请求。而上面情形虽然协议（http）和域名（127.0.0.1）都相同，但端口不同（80 和 8081），所以无法正常请求。
-
-<!-- more -->
 
 ## 解决方案
 

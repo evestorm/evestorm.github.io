@@ -14,9 +14,9 @@ date: 2020-03-09 13:32:41
 
 当 `padding/margin` 取形式为百分比的值时，无论是 `left/right`，还是 `top/bottom` ，都是以父元素的 `width` 为参照物。
 
-{% asset_img margin-top.png margin-top %}
-
 <!-- more -->
+
+{% asset_img margin-top.png margin-top %}
 
 ## 1. 给容器设置 padding-top/bottom
 

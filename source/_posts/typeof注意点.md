@@ -14,6 +14,8 @@ date: 2021-09-21 20:11:42
 - typeof 返回的值是**字符串类型**
 - typeof 一个不存在（未定义）的值，不报错，返回**字符串undefined**
 
+<!-- more -->
+
 ```js
 typeof(123) // number
 typeof('123') // string

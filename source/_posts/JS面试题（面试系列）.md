@@ -17,6 +17,8 @@ date: 2019-06-11 23:53:44
 
 ES6 规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属性，但 let、const、class 命令声明的全局变量，不属于顶层对象的属性。只在一个块级作用域（Script）中，获取时不加 `window/global` 就好：
 
+<!-- more -->
+
 ```js
 let aa = 1;
 const bb = 2;
@@ -24,8 +26,6 @@ const bb = 2;
 console.log(aa); // 1
 console.log(bb); // 2
 ```
-
-<!-- more -->
 
 答案链接：[关于 const 和 let 声明的变量不在 window 上](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/30)
 

@@ -11,6 +11,8 @@ date: 2020-09-18 00:05:09
 
 来源：http://blog.sina.com.cn/s/blog_146b3a65e0102yemg.html
 
+<!-- more -->
+
 1. 要把分页的内容分别在 ps 中建立不同的文档
 
 {% asset_img pdf1.png pdf1 %}

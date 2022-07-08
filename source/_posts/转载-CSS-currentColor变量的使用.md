@@ -15,11 +15,11 @@ date: 2020-12-30 10:24:10
 
 CSS 中存在一个神秘的变量，少有人知自然也不怎么为人所用。它就是`currentColor`变量（或者说是 CSS 关键字，但我觉得称为变量好理解些）。
 
+<!-- more -->
+
 # 初识
 
 它是何物？具有怎样的功效？它从哪里来？带着这些疑问我们继续。
-
-<!-- more -->
 
 下面是来自[MDN 的解释](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentColor_keyword)：
 

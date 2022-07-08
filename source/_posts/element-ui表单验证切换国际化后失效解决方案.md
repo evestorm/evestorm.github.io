@@ -13,6 +13,8 @@ date: 2021-03-10 13:59:29
 
 转载自：https://www.cnblogs.com/listen9436/p/10644527.html
 
+<!-- more -->
+
 ```html
 <el-form
   :model="ruleForm"
@@ -58,8 +60,6 @@ date: 2021-03-10 13:59:29
   </el-row>
 </el-form>
 ```
-
-<!-- more -->
 
 需求：
 必填：

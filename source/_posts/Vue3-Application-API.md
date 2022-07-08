@@ -16,6 +16,8 @@ date: 2021-10-16 11:16:28
 - 通过 createApp 创建 App 实例
 - 类似于 Vue2 中的 new Vue
 
+<!-- more -->
+
 ```javascript
 const app = createApp({
   name: 'MyApp',
@@ -29,8 +31,6 @@ const vm = new Vue({
   ...
 })
 ```
-
-<!-- more -->
 
 ## app.component
 

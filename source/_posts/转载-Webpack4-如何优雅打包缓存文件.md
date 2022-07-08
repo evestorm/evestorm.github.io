@@ -14,6 +14,8 @@ date: 2019-03-14 10:34:04
 
 当然浏览器缓存方法有很多种，这里只简单讨论下 webpack 利用 hash 方式修改文件名，以达到缓存目的。
 
+<!-- more -->
+
 ## webpack hash
 
 webpack 内置了多种可使用 hash，官网解释分别如下：
@@ -25,8 +27,6 @@ webpack 内置了多种可使用 hash，官网解释分别如下：
 注：hash 的默认长度为 20 个字符，可通过 `output.hashDigestLength` 全局配置，或使用 `[hash:16]` 方式配置，还可以通过 `output.hashDigest` 配置何时生成 hash。
 
 那么问题来了，这么多种 hash 该如何选择呢？
-
-<!-- more -->
 
 ## 实战 hash
 

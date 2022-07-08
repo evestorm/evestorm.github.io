@@ -17,6 +17,8 @@ date: 2021-09-07 08:58:13
 
 - - 实现 `install` 方法
 
+<!-- more -->
+
 # 全局注册加载组件库
 
 思路：
@@ -48,8 +50,6 @@ MyUI.install = (Vue, options) {
 
 export default MyUI;
 ```
-
-<!-- more -->
 
 main.js 使用
 

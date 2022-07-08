@@ -13,6 +13,8 @@ date: 2020-07-29 21:09:18
 
 转载自：https://blog.csdn.net/u012780176/article/details/82586358
 
+<!-- more -->
+
 打开终端：
 
 ```shell

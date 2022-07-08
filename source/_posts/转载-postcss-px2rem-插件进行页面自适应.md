@@ -13,6 +13,8 @@ date: 2020-08-14 00:11:39
 
 转载自：https://blog.csdn.net/qq_24991841/article/details/88887053
 
+<!-- more -->
+
 ## 1.安装
 
 > npm i postcss-px2rem -D
@@ -35,8 +37,6 @@ module.exports = {
   }
 };
 ```
-
-<!-- more -->
 
 ## 3.在 src 下创建 rem.js 文件夹
 

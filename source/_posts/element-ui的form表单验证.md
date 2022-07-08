@@ -14,6 +14,8 @@ date: 2021-02-25 14:59:37
 
 ## 普通输入验证
 
+<!-- more -->
+
 ```html
 <el-form-item label="活动名称" prop="name">
   <!-- validate-event属性的作用是: 输入时不触发表单验证.提交时再验证,你也可以设置成动态验证 -->
@@ -34,8 +36,6 @@ export default {
   }
 };
 ```
-
-<!-- more -->
 
 ## 数字类型验证
 

@@ -17,6 +17,8 @@ date: 2019-11-20 16:07:34
 
 使用 `console.table()` 可以将传入的对象，或数组以表格形式输出。适合排列整齐的元素：
 
+<!-- more -->
+
 {% asset_img console_table.png console_table效果图 %}
 
 ### 让日志更易读
@@ -30,8 +32,6 @@ date: 2019-11-20 16:07:34
 为了让它变得更加易读，你可以打印一个对象 - 只需将所有`console.log` 的参数包装在大括号中。感谢 ECMAScript 2015 中引入了 `enhanced object literal(增强对象文字面量)` ，所以这（加了个括号）就是你需要做的全部了：
 
 {% asset_img log-nice.png 友好的日志 %}
-
-<!-- more -->
 
 ## 触发伪类
 

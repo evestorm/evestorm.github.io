@@ -11,6 +11,8 @@ date: 2020-07-17 20:00:06
 
 在 iOS 中加载 H5 时需要注入一些 JS 变量供前端使用，例如把 App 相关的信息存进 JS ，好让 JS 调用：
 
+<!-- more -->
+
 ```swift
 // MARK: 获取App信息
 
@@ -31,8 +33,6 @@ let scriptStr = """
    }
 """
 ```
-
-<!-- more -->
 
 上面的代码注入到 JS 中会导致前端无法通过 `iOS.getAppInfo.name` 获取到 App 的名称，明明我的 `appInfo["name"]` 是个 String 字符串类型，为什么会拿不到了？
 

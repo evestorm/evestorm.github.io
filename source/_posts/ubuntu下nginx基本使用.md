@@ -20,6 +20,8 @@ sudo apt update
 sudo apt install nginx
 ```
 
+<!-- more -->
+
 安装完成后查看版本：
 
 ```shell
@@ -31,8 +33,6 @@ sudo nginx -v
 ```shell
 nginx version: nginx/1.14.0 (Ubuntu)
 ```
-
-<!-- more -->
 
 ## 配置防火墙
 

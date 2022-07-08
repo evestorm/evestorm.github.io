@@ -1,6 +1,7 @@
 ---
 title: CSS使用技巧汇总
 tags:
+  - CSS
   - 技巧
 categories:
   - 前端
@@ -12,6 +13,8 @@ date: 2020-09-20 13:21:07
 ## CSS 样式
 
 ### css 设置文字无法选中
+
+<!-- more -->
 
 ```css
 -webkit-user-select: none;
@@ -25,8 +28,6 @@ user-select: none;
 转载自：https://blog.csdn.net/qq449245884/article/details/108467025
 
 DEMO 地址：https://codepen.io/protic_milos/pen/GRpYJKd
-
-<!-- more -->
 
 ### attr()
 

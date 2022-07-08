@@ -11,6 +11,8 @@ date: 2019-07-09 14:08:33
 
 ## CSS 实现单行省略号
 
+<!-- more -->
+
 ```css
 p {
   overflow: hidden;
@@ -29,8 +31,6 @@ p {
   overflow: hidden;
 }
 ```
-
-<!-- more -->
 
 -webkit-line-clamp 用来限制在一个块元素显示的文本的行数。 为了实现该效果，它需要组合其他的 WebKit 属性。常见结合属性：
 

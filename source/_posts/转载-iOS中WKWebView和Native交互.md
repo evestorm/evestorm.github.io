@@ -18,9 +18,9 @@ date: 2020-07-08 20:07:37
 
 了解本文之前需要准备 JS 和 WebView 的一些基础知识，需要知道 JS 的基本语法和 WebView 调用 JS 的常用接口。
 
-iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC 拿到 UIWebView 的 JSContext，通过 JSContext 实现交互。 WKWebView 有了新特性 MessageHandler 来实现 JS 调用原生方法。从实现思路是来讲，UIWebView 和 WKWebView 是一样的。 所以，本文只介绍 WKWebView 上 JS 和 Native 的交互思路，UIWebView 有需求的可以模仿实现。
-
 <!-- more -->
+
+iOS 实现 JS 和 Native 交互的 WebView 有 UIWebView 和 WKWebView。通过 KVC 拿到 UIWebView 的 JSContext，通过 JSContext 实现交互。 WKWebView 有了新特性 MessageHandler 来实现 JS 调用原生方法。从实现思路是来讲，UIWebView 和 WKWebView 是一样的。 所以，本文只介绍 WKWebView 上 JS 和 Native 的交互思路，UIWebView 有需求的可以模仿实现。
 
 ### JS 和 Native 交互常用的场景
 

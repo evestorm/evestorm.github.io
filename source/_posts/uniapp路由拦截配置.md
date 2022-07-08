@@ -12,6 +12,8 @@ date: 2020-06-21 21:22:13
 
 项目的百度埋点需要做路由拦截，找了个路由插件 `uni-simple-router` 。下面是按照和基本使用步骤：
 
+<!-- more -->
+
 ## 安装 uni-simple-router 插件
 
 1. 如果是用 hbuilderX 创建的项目，就在插件库中找。
@@ -21,8 +23,6 @@ date: 2020-06-21 21:22:13
    ```shell
    npm install uni-simple-router uni-read-pages
    ```
-
-<!-- more -->
 
 ## App 下 main.js 中引用
 

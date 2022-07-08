@@ -15,11 +15,11 @@ date: 2020-12-07 13:35:30
 
 后端希望前端能动态配置 API 地址，但前端往往在 `npm run build` 生成 `dist` 后，配置就无法更改了。
 
+<!-- more -->
+
 ## 解决方案
 
 利用 `generate-asset-webpack-plugin` 插件，在 build 的时候生成 json 配置文件，然后再使用 axios 异步获取 json 配置，从而达到动态配置 API 的目的。
-
-<!-- more -->
 
 ## 使用步骤
 

@@ -14,13 +14,13 @@ date: 2020-05-04 09:03:13
 
 {% asset_img account-info.png account-info %}
 
+<!-- more -->
+
 ## 开发账号注册
 
 打开 https://developer.apple.com/cn/
 
 {% asset_img 1593654146303-a3ecaffd-b89e-4424-9ee4-7c49766d5227.png 1593654146303-a3ecaffd-b89e-4424-9ee4-7c49766d5227 %}
-
-<!-- more -->
 
 下拉到底部，点击加入 Developer Program 计划：
 

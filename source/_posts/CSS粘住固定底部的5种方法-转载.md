@@ -15,11 +15,11 @@ date: 2020-05-18 14:06:28
 原文地址：https://css-tricks.com/couple-takes-sticky-footer/
 译者：前端开发博客-Jack
 
+<!-- more -->
+
 ### 方法一：全局增加一个负值下边距等于底部高度
 
 有一个全局的元素包含除了底部之外的所有内容。它有一个负值下边距等于底部的高度，就像[这个演示链接](http://ryanfait.com/html5-sticky-footer/)。
-
-<!-- more -->
 
 [HTML](http://caibaojian.com/t/html)代码
 

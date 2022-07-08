@@ -14,6 +14,8 @@ date: 2021-04-13 14:56:54
 
 错误警告：JSON standard does not allow comments. Use JSMin or similar tool to remove comments before parsing.
 
+<!-- more -->
+
 ### 解决方案
 
 文章：[WebStorm 2018.2 Early Access Preview: React code snippets, actions on Touch Bar, improvements in JSON support](https://blog.jetbrains.com/webstorm/2018/05/webstorm-2018-2-eap/)

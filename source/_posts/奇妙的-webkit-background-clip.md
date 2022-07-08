@@ -12,6 +12,8 @@ date: 2020-01-01 15:36:50
 
 github 链接：https://github.com/chokcoco/iCSS/issues/14
 
+<!-- more -->
+
 ## 效果
 
 <iframe height="1449" scrolling="no" title="existential gradient buttons" src="https://codepen.io/JingW/embed/gObGjww?height=1449&amp;theme-id=default&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>

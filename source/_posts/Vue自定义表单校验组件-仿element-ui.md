@@ -12,6 +12,8 @@ date: 2020-01-31 21:58:54
 
 相关代码见[github](https://github.com/evestorm/front-end-playground/tree/master/vue/vue-element-form)
 
+<!-- more -->
+
 ## 准备工作
 
 ### 项目创建
@@ -27,8 +29,6 @@ npm i element-ui -S # 安装 element-ui
 npm i babel-plugin-component -D # 准备按需引入
 npm i async-validator -S # Form 表单校验
 ```
-
-<!-- more -->
 
 #### 修改 `babel.config.js`
 

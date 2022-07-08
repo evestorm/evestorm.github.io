@@ -13,6 +13,8 @@ date: 2019-06-11 13:23:28
 
 ### 行内元素水平居中
 
+<!-- more -->
+
 ```css
 #container {
   text-align: center;
@@ -27,8 +29,6 @@ date: 2019-06-11 13:23:28
   margin: 0 auto;
 }
 ```
-
-<!-- more -->
 
 ### 多个 div 水平居中
 

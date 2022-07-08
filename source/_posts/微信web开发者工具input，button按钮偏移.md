@@ -12,6 +12,8 @@ date: 2019-12-02 13:38:44
 
 使用微信 web 开发者工具开发时有时会发现如图，明明 input 框和 button 框在下面，但只有点击箭头位置时才能有效果
 
+<!-- more -->
+
 {% asset_img huanghelou.png huanghelou %}
 
 解决方法：

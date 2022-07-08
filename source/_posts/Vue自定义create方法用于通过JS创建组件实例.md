@@ -14,11 +14,11 @@ date: 2020-09-24 16:16:03
 
 `Vue.extend` 是 Vue 全局 API，[官方文档](https://cn.vuejs.org/v2/api/#Vue-extend) 对其描述如下：
 
+<!-- more -->
+
 > 使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。
 
 从官方文档的描述中，我们可以知道，`extend` 创建的是 Vue 构造器，而不是我们平时常写的组件实例，所以不可以通过 `new Vue({ components: testExtend })` 来直接使用，需要通过 `new Profile().$mount('#mount-point')` 来挂载到指定的元素上。
-
-<!-- more -->
 
 #### 为什么使用 extend
 

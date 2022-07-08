@@ -6,17 +6,20 @@ categories:
 abbrlink: 63891
 date: 2019-01-10 00:16:15
 tags:
+  - Cookie
+  - Session
 ---
 
 ## 保存状态
 
 cookie 是通过在客户端记录信息确定用户身份的，而 session 则通过在服务器端记录信息来确定用户身份。下面是网上找到的两张图，能够对 cookie 以及 session 在客户端与服务端传递的过程有个较清晰的认识：
 
+<!-- more -->
+
 {% asset_img 1550245038963-b61378bb-65db-411e-9069-cf7d2b7a2908-20201119143043224.png cookie %}
 
 {% asset_img 1550245194054-9e6b0a42-c09e-4a8b-8e7e-93ba715e6e5a-20201119143043424.png session %}
 
-<!-- more -->
 
 ## 使用方式
 

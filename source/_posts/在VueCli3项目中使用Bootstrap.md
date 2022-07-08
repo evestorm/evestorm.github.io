@@ -17,11 +17,11 @@ date: 2020-08-14 13:07:56
 npm i bootstrap jquery popper.js --save
 ```
 
+<!-- more -->
+
 ## 配置
 
 在项目根目录下新建或修改`vue.config.js`
-
-<!-- more -->
 
 ```js
 const webpack = require('webpack');

@@ -2,6 +2,7 @@
 title: cnchar.js获取汉字的拼音
 tags:
   - 技巧
+  - 解决方案
 categories:
   - 前端
   - 解决方案
@@ -12,6 +13,8 @@ date: 2020-08-21 13:16:05
 分享一个获取汉字拼音的库：
 
 https://github.com/theajack/cnchar
+
+<!-- more -->
 
 几种常用方法：
 

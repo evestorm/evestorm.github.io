@@ -13,6 +13,8 @@ date: 2020-01-17 20:38:31
 
 转载来源：https://blog.csdn.net/Dream_Weave/article/details/87722578
 
+<!-- more -->
+
 ### **uni-app 事件**
 
 事件映射表，左侧为 WEB 事件，右侧为 `uni-app` 对应事件
@@ -41,8 +43,6 @@ date: 2020-01-17 20:38:31
   scroll: 'scroll'
 }
 ```
-
-<!-- more -->
 
 **\*在 input 和 textarea 中 change 事件会被转为 blur 事件。\***
 

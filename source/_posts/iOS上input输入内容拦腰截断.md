@@ -15,6 +15,8 @@ date: 2020-07-30 23:14:26
 
 {% asset_img input-error.jpeg input输入内容只显示了一半 %}
 
+<!-- more -->
+
 ## 解决方案
 
 固定 input 输入框的高度，把 input 输入框写死高度:

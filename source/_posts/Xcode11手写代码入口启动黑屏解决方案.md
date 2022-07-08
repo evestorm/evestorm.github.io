@@ -16,12 +16,12 @@ date: 2020-07-15 22:21:38
 
 用 Swift 编写后发现编译通过但启动黑屏。
 
+<!-- more -->
+
 ## 原因
 
 - Xcode11 默认是会创建通过 UIScene 管理多个 UIWindow 的应用，工程中除了 AppDelegate 外会多一个 SceneDelegate
 - AppDelegate 和 SceneDelegate 这是 iPadOS 带来的新的多窗口支持的结果，并且有效地将应用程序委托的工作分成两部分
-
-<!-- more -->
 
 ## 解决方案
 

@@ -14,6 +14,8 @@ date: 2019-02-19 09:29:51
 - [transition过渡（一）](https://evestorm.github.io/posts/24967/)
 - [transition过渡（二）](https://evestorm.github.io/posts/13167/)
 
+<!-- more -->
+
 ## 介绍
 
 > CSS3 过渡是元素从一种样式逐渐改变为另一种的效果。
@@ -23,8 +25,6 @@ date: 2019-02-19 09:29:51
 > - 指定效果的持续时间。
 
 ———— 出自 [菜鸟教程](http://www.runoob.com/css3/css3-transitions.html)
-
-<!-- more -->
 
 ## 语法
 

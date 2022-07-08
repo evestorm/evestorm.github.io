@@ -10,6 +10,8 @@ tags:
 
 > 在 HTML5 中我们可以自定义属性，其格式为 `data-*=""`
 
+<!-- more -->
+
 ```html
 <div id="demo" data-my-name="sw" data-age="10">
 <script>

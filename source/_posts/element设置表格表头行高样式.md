@@ -13,6 +13,8 @@ date: 2021-01-07 16:36:49
 
 element-ui 设置表头地址：https://element.eleme.io/#/zh-CN/component/table#table-attributes
 
+<!-- more -->
+
 - max-height Table 的最大高度。合法的值为数字或者单位为 px 的高度。
 - header-row-style 表头行的 style
 - header-cell-style 表头单元格的 style

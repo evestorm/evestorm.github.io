@@ -13,6 +13,8 @@ date: 2019-06-09 23:15:17
 
 string，number，boolean，undefined，null，symbol（es6），BigInt（es10），object
 
+<!-- more -->
+
 ### 值类型和引用类型的区别
 
 两种类型的区别是：存储位置不同；
@@ -21,8 +23,6 @@ string，number，boolean，undefined，null，symbol（es6），BigInt（es10�
 - 引用类型存储在堆（heap）中,占据空间大、大小不固定。如果存在栈中，影响程序运行性能；引用类型在栈中存储了指针，该指针指向堆中该实体的起始地址。当解释器寻找引用值时，会首先检索其在栈中的地址，取得地址后从堆中获得实体。
 
 {% asset_img 1549856966458-39b2f008-64fc-4753-936b-e513a5de46d2.png js类型堆栈图 %}
-
-<!-- more -->
 
 ### JS 的类型检测
 

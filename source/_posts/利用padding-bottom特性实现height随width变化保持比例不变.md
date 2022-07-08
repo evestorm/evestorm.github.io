@@ -14,9 +14,9 @@ date: 2019-12-12 12:54:41
 
 希望每个网格高度等于宽度，而宽度已被设为 33.333%：
 
-{% asset_img grid-padding-bottom.png grid %}
-
 <!-- more -->
+
+{% asset_img grid-padding-bottom.png grid %}
 
 ## 解决方案
 

@@ -13,6 +13,8 @@ date: 2021-02-02 19:04:24
 
 转载自：https://zhuanlan.zhihu.com/p/35790971
 
+<!-- more -->
+
 ## 一、原型 `prototype` 和 `__proto__`
 
 - 每个对象都有一个`__proto__`属性，并且指向它的`prototype`原型对象
@@ -22,8 +24,6 @@ date: 2021-02-02 19:04:24
 - - `prototype`原型对象里的`constructor`指向构造函数本身
 
 {% asset_img v2-e722d5325f7d4215169f1d04296e0f89_720w.png v2-e722d5325f7d4215169f1d04296e0f89_720w %}
-
-<!-- more -->
 
 **有的同学可能会问`prototype` 和 `__proto__`有什么用呢？**
 

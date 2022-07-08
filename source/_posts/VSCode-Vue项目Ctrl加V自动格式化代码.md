@@ -13,14 +13,14 @@ date: 2020-11-23 13:48:36
 
 期望多人开发 Vue 项目时，大家的代码风格保持一致。并且在 VSCode 中，Ctrl+V 保存代码时自动按照 eslint 规范格式化代码。
 
+<!-- more -->
+
 ## 插件安装
 
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur)
 - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense)
-
-<!-- more -->
 
 ## 配置 VSCode 用户 Settings.json
 

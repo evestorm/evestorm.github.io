@@ -11,6 +11,8 @@ date: 2020-06-08 00:03:50
 
 最近升级了 node14，发现在用 hexo 写博客部署时失败了，报错大致如下：
 
+<!-- more -->
+
 ```shell
 FATAL Something's wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html
 TypeError [ERR_INVALID_ARG_TYPE]: The "mode" argument must be integer. Received an instance of Object
