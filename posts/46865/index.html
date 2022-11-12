@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="转载自：https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;57rsKjxtXcmpOLz61u4l2g 我相信你一定或多或少的接触或使用过 JS 中的扩展操作符（Spread Operator），在基本形式中，扩展操作符看起来像三个点，比如如下这样：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-JavaScript扩展运算符的13个用法">
+<meta property="og:url" content="https://evestorm.github.io/posts/46865/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s&#x2F;57rsKjxtXcmpOLz61u4l2g 我相信你一定或多或少的接触或使用过 JS 中的扩展操作符（Spread Operator），在基本形式中，扩展操作符看起来像三个点，比如如下这样：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/46865/comb.png">
+<meta property="article:published_time" content="2021-02-08T02:19:19.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.035Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="ES6+">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/46865/comb.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/46865/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-JavaScript扩展运算符的13个用法 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%95%B0%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">字符串转数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E7%B1%BB%E6%95%B0%E7%BB%84%E8%BD%AC%E6%8D%A2%E4%B8%BA%E6%95%B0%E7%BB%84"><span class="nav-number">2.</span> <span class="nav-text">将类数组转换为数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E6%95%B0%E7%BB%84%E4%B8%AD%E6%B7%BB%E5%8A%A0%E9%A1%B9"><span class="nav-number">3.</span> <span class="nav-text">向数组中添加项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%B7%E8%B4%9D%E6%95%B0%E7%BB%84%E5%92%8C%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.</span> <span class="nav-text">拷贝数组和对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E6%95%B0%E7%BB%84%E6%88%96%E5%AF%B9%E8%B1%A1"><span class="nav-number">5.</span> <span class="nav-text">合并数组或对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%9E%84%E5%AF%B9%E8%B1%A1"><span class="nav-number">6.</span> <span class="nav-text">解构对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%99%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7"><span class="nav-number">7.</span> <span class="nav-text">给对象添加属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%AF%B9%E8%B1%A1-Getter"><span class="nav-number">8.</span> <span class="nav-text">设置对象 Getter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E6%95%B0%E7%BB%84%E4%BD%9C%E4%B8%BA%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E5%B1%95%E5%BC%80"><span class="nav-number">9.</span> <span class="nav-text">将数组作为函数参数展开</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E9%99%90%E5%8F%82%E6%95%B0%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">10.</span> <span class="nav-text">无限参数的函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0%E7%9A%84%E5%89%A9%E4%BD%99%E5%8F%82%E6%95%B0"><span class="nav-number">11.</span> <span class="nav-text">扩展函数的剩余参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E5%90%88-Math-%E5%87%BD%E6%95%B0%E4%BD%BF%E7%94%A8"><span class="nav-number">12.</span> <span class="nav-text">结合 Math 函数使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8-new-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%AD%E4%BD%BF%E7%94%A8"><span class="nav-number">13.</span> <span class="nav-text">在 new 表达式中使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">14.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/46865/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-JavaScript扩展运算符的13个用法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-08 10:19:19" itemprop="dateCreated datePublished" datetime="2021-02-08T10:19:19+08:00">2021-02-08</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ES6/" itemprop="url" rel="index"><span itemprop="name">ES6+</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/57rsKjxtXcmpOLz61u4l2g">https://mp.weixin.qq.com/s/57rsKjxtXcmpOLz61u4l2g</a></p>
+<p>我相信你一定或多或少的接触或使用过 <code>JS</code> 中的扩展操作符（Spread Operator），在基本形式中，扩展操作符看起来像三个点，比如如下这样：</p>
+<a id="more"></a>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[...arr];</span><br></pre></td></tr></table></figure>
+
+<p>而实际上，它也就是这么用的，但是如果事情有这么简单，就不用我在这里写了。扩展操作符给我最大的印象就是，这玩意还挺方便的，然而最近写代码的时候经常性的遇到需要使用扩展操作符的场景，所以我干脆在网上找了些资料，把平时常见的应用场景给罗列了下，发现这个操作符是真的强大，有多强大？来看看下面这些用法吧。</p>
+<!-- more -->
+
+<h2 id="字符串转数组"><a href="#字符串转数组" class="headerlink" title="字符串转数组"></a>字符串转数组</h2><p>字符串转数组最普遍的做法是这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> str = <span class="string">&#x27;hello&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> arr = str.split(<span class="string">&#x27;&#x27;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [&#x27;h&#x27;, &#x27;e&#x27;, &#x27;l&#x27;, &#x27;l&#x27;, &#x27;o&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<p>而使用了扩展操作符后可以这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> str = <span class="string">&#x27;hello&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> arr = [...str];</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [&#x27;h&#x27;, &#x27;e&#x27;, &#x27;l&#x27;, &#x27;l&#x27;, &#x27;o&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="将类数组转换为数组"><a href="#将类数组转换为数组" class="headerlink" title="将类数组转换为数组"></a>将类数组转换为数组</h2><p>在 <code>JS</code> 中有一种数据结构叫做 <code>NodeList</code>，它和数组很相似，也被叫做“类数组”，类数组是什么？在 MDN 中是这么定义它的：</p>
+<blockquote>
+<p>类数组：拥有一个 length 属性和若干索引属性的任意对象。</p>
+</blockquote>
+<p>类数组有哪些呢？以下这些可以看成是类数组：</p>
+<ul>
+<li><code>NodeList</code>：<code>document.querySelectorAll()</code> 返回的对象；</li>
+<li><code>HTMLCollection</code>：<code>document.getElementsByTagName()</code> 返回的对象；</li>
+<li><code>Arguments</code>：函数里的参数对象；</li>
+</ul>
+<p>类数组没有数组的一些方法比如 <code>push</code>、<code>map</code> 等，所以经常需要将它们转成数组，而通常我们是这么转化的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> nodeList = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;div&#x27;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(nodeList <span class="keyword">instanceof</span> NodeList); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> arr = <span class="built_in">Array</span>.apply(<span class="literal">null</span>, nodeList);</span><br><span class="line"><span class="built_in">console</span>.log(arr <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line"><span class="keyword">let</span> arr2 = [].slice.call(nodeList);</span><br><span class="line"><span class="built_in">console</span>.log(arr2 <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 又或者</span></span><br><span class="line"><span class="keyword">let</span> arr3 = <span class="built_in">Array</span>.from(nodeList);</span><br><span class="line"><span class="built_in">console</span>.log(arr3 <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<p>而有了扩展操作符可以这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> nodeList = <span class="built_in">document</span>.querySelectorAll(<span class="string">&#x27;div&#x27;</span>);</span><br><span class="line"><span class="keyword">let</span> arr = [...nodeList];</span><br><span class="line"><span class="built_in">console</span>.log(arr <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="向数组中添加项"><a href="#向数组中添加项" class="headerlink" title="向数组中添加项"></a>向数组中添加项</h2><p>往数组中添加几项通常这样操作：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从头部添加</span></span><br><span class="line">arr.unshift(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [1, 2, 5]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从尾部添加</span></span><br><span class="line">arr.push(<span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [1，2, 5, 6, 7]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从任意位置添加</span></span><br><span class="line">arr.splice(<span class="number">2</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [1，2, 3, 4, 5, 6, 7]</span></span><br></pre></td></tr></table></figure>
+
+<p>使用扩展操作符后：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">3</span>, <span class="number">4</span>];</span><br><span class="line">arr = [<span class="number">1</span>, <span class="number">2</span>, ...arr, <span class="number">5</span>, <span class="number">6</span>];</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [1, 2, 3, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拷贝数组和对象"><a href="#拷贝数组和对象" class="headerlink" title="拷贝数组和对象"></a>拷贝数组和对象</h2><p>通常拷贝一个数组，可以这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>];</span><br><span class="line"><span class="keyword">let</span> arr2 = arr.concat();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line"><span class="keyword">let</span> arr3 = arr.slice();</span><br><span class="line">arr[<span class="number">0</span>] = <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(arr); <span class="comment">// [2, 3, 5, 7]</span></span><br><span class="line"><span class="built_in">console</span>.log(arr2); <span class="comment">// [1, 3, 5, 7]</span></span><br><span class="line"><span class="built_in">console</span>.log(arr3); <span class="comment">// [1, 3, 5, 7]</span></span><br></pre></td></tr></table></figure>
+
+<p>但是有了扩展操作符，拷贝数组就能写得很简单：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>];</span><br><span class="line"><span class="keyword">let</span> arr2 = [...arr];</span><br><span class="line">arr[<span class="number">0</span>] = <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(arr2); <span class="comment">// [1, 3, 5, 7]</span></span><br></pre></td></tr></table></figure>
+
+<p>同样的，扩展操作符还能拷贝对象。拷贝对象的通常做法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span>, <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p2 = <span class="built_in">Object</span>.assign(&#123;&#125;, person);</span><br><span class="line">person.age = <span class="number">20</span>;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 20 &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(p2); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>有了扩展操作符，拷贝一个对象就相当方便了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span>, <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p2 = &#123; ...person &#125;;</span><br><span class="line">person.age = <span class="number">20</span>;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 20 &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(p2); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12 &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 甚至还可以这么写</span></span><br><span class="line"><span class="keyword">let</span> &#123; ...p3 &#125; = person;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：扩展操作符只能深拷贝结构为一层的对象，如果对象是两层的结构，那么使用扩展操作符拷贝会是浅拷贝。</p>
+</blockquote>
+<h2 id="合并数组或对象"><a href="#合并数组或对象" class="headerlink" title="合并数组或对象"></a>合并数组或对象</h2><p>数组合并通常是这么做的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr1 = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>];</span><br><span class="line"><span class="keyword">let</span> arr2 = [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>];</span><br><span class="line"><span class="keyword">let</span> arr3 = arr1.concat(arr2);</span><br><span class="line"><span class="built_in">console</span>.log(arr3); <span class="comment">// [1, 3, 5, 2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<p>使用扩展操作符后，可以这么写：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr1 = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>];</span><br><span class="line"><span class="keyword">let</span> arr2 = [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>];</span><br><span class="line"><span class="keyword">let</span> arr3 = [...arr1, ...arr2];</span><br><span class="line"><span class="built_in">console</span>.log(arr3); <span class="comment">// [1, 3, 5, 2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+
+<p>对了，它除了能合并数组外还能合并对象呢。合并对象，通常的做法是：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> p1 = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p2 = &#123; <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p3 = <span class="built_in">Object</span>.assign(&#123;&#125;, p1, p2);</span><br><span class="line"><span class="built_in">console</span>.log(p3); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>用扩展操作符合并对象：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> p1 = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p2 = &#123; <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> p3 = &#123; ...p1, ...p2 &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(p3); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="解构对象"><a href="#解构对象" class="headerlink" title="解构对象"></a>解构对象</h2><p>经常我们给对象设置参数的时候会这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123;</span><br><span class="line">  name: <span class="string">&#x27;布兰&#x27;</span>,</span><br><span class="line">  age: <span class="number">12</span>,</span><br><span class="line">  sex: <span class="string">&#x27;male&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> name = person.name;</span><br><span class="line"><span class="keyword">let</span> age = person.age;</span><br><span class="line"><span class="keyword">let</span> sex = person.sex;</span><br></pre></td></tr></table></figure>
+
+<p>而有了扩展操作符，我们就可以这么写，不过其实如下这种写法并不是扩展操作符的写法 🤣，而是剩余操作符的写法，虽然写出来后看起来差不多，但就在操作对象这一点上，基本上可以认为它和扩展操作符是相反的操作，扩展操作符是用来展开对象的属性到多个变量上，而剩余操作符是用来把多个参数凝聚到一个变量上。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123;</span><br><span class="line">  name: <span class="string">&#x27;布兰&#x27;</span>,</span><br><span class="line">  age: <span class="number">12</span>,</span><br><span class="line">  sex: <span class="string">&#x27;male&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123; name, ...reset &#125; = person;</span><br><span class="line"><span class="built_in">console</span>.log(name); <span class="comment">// &#x27;布兰&#x27;</span></span><br><span class="line"><span class="built_in">console</span>.log(reset); <span class="comment">// &#123; age: 12, sex: &#x27;male&#x27; &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="给对象添加属性"><a href="#给对象添加属性" class="headerlink" title="给对象添加属性"></a>给对象添加属性</h2><p>给对象加属性通常这样加：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line">person.age = <span class="number">12</span>;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用扩展操作符给对象添加属性：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line">person = &#123; ...person, <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 12 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>关于使用扩展操作符给对象添加属性，这里有 2 个小技巧：</p>
+<p>-</p>
+<ul>
+<li><ol>
+<li>给新对象设置默认值：</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认 person 对象的 age 属性值 为 12</span></span><br><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">age</span>: <span class="number">12</span>, ...&#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125; &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; age: 12, name: &#x27;布兰&#x27; &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>-</p>
+<ul>
+<li><ol>
+<li>重写对象属性</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span>, <span class="attr">age</span>: <span class="number">12</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// person 对象的 age 属性被重写为 20</span></span><br><span class="line">person = &#123; ...person, <span class="attr">age</span>: <span class="number">20</span> &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(person); <span class="comment">// &#123; name: &#x27;布兰&#x27;, age: 20 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="设置对象-Getter"><a href="#设置对象-Getter" class="headerlink" title="设置对象 Getter"></a>设置对象 Getter</h2><p>设置对象 <code>Getter</code> 通常做法是这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person, <span class="string">&#x27;age&#x27;</span>, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">12</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">  enumerable: <span class="literal">true</span>,</span><br><span class="line">  configurable: <span class="literal">true</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(person.age); <span class="comment">// 12</span></span><br></pre></td></tr></table></figure>
+
+<p>而有了扩展操作符后可以这么写：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123; <span class="attr">name</span>: <span class="string">&#x27;布兰&#x27;</span> &#125;;</span><br><span class="line">person = &#123;</span><br><span class="line">  ...person,</span><br><span class="line">  <span class="keyword">get</span> <span class="title">age</span>() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">12</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">console</span>.log(person.age); <span class="comment">// 12</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="将数组作为函数参数展开"><a href="#将数组作为函数参数展开" class="headerlink" title="将数组作为函数参数展开"></a>将数组作为函数参数展开</h2><p>如果我们有一个形参是多个参数的函数，但是当调用的时候发现入参却是一个数组，常规做法是这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">a, b, c</span>) </span>&#123;&#125;</span><br><span class="line">fn.apply(<span class="literal">null</span>, arr);</span><br></pre></td></tr></table></figure>
+
+<p>使用扩展操作符后，就简单多了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">a, b, c</span>) </span>&#123;&#125;</span><br><span class="line">fn(...arr);</span><br></pre></td></tr></table></figure>
+
+<h2 id="无限参数的函数"><a href="#无限参数的函数" class="headerlink" title="无限参数的函数"></a>无限参数的函数</h2><p>如果有这么一个累加函数，他会把所有传递进来的参数都加起来，普通做法是把参数都整合到数组里，然后这样做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSum</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> arr.reduce(<span class="function">(<span class="params">acc, cur</span>) =&gt;</span> acc + cur);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(doSum([<span class="number">1</span>, <span class="number">3</span>])); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(doSum([<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>])); <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+
+<p>如果参数不是数组，而是需要一个个传递，相当于函数必须支持无限参数，那可能会这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSum</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> sum = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>, l = <span class="built_in">arguments</span>.length; i &lt; l; i++) &#123;</span><br><span class="line">    sum += <span class="built_in">arguments</span>[i];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> sum;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 或者</span></span><br><span class="line">  <span class="comment">// let args = [].slice.call(arguments)</span></span><br><span class="line">  <span class="comment">// return args.reduce((acc, cur) =&gt; acc + cur)</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>)); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>)); <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>)); <span class="comment">// 16</span></span><br></pre></td></tr></table></figure>
+
+<p>而有了扩展操作符，就简单多了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSum</span>(<span class="params">...arr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> arr.reduce(<span class="function">(<span class="params">acc, cur</span>) =&gt;</span> acc + cur);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>)); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>)); <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(doSum(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>)); <span class="comment">// 16</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展函数的剩余参数"><a href="#扩展函数的剩余参数" class="headerlink" title="扩展函数的剩余参数"></a>扩展函数的剩余参数</h2><p>有的时候一个函数需要传递很多的参数，比如小程序页面（<code>WePY</code>）的 <code>onLoad</code> 生命周期函数里就可能有很多别的页面传递过来的参数，然后还需要在函数里进行一些数据初始化工作，这样一来就会显得很臃肿不美观，比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params">a, b, x, y</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 进行一系列初始化数据工作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而使用了扩展操作符后，我们就可以按照业务把参数进行解构，把本该在一个函数里进行初始化的工作拆分成多个，可以这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">other</span>(<span class="params">x, y</span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params">a, b, ...restConfig</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 使用 a 和 b 参数进行操作</span></span><br><span class="line">  <span class="comment">// 其余参数传给原始函数</span></span><br><span class="line">  <span class="keyword">return</span> other(...restConfig);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结合-Math-函数使用"><a href="#结合-Math-函数使用" class="headerlink" title="结合 Math 函数使用"></a>结合 Math 函数使用</h2><p>比如当需要对一个数组求最大值的时候，通常会这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">3</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">5</span>, <span class="number">4</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">max</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> [].concat(arr).sort(<span class="function">(<span class="params">a, b</span>) =&gt;</span> b - a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(max(arr)[<span class="number">0</span>]); <span class="comment">// 8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line">arr.reduce(<span class="function">(<span class="params">acc, cur</span>) =&gt;</span> <span class="built_in">Math</span>.max(acc, cur)); <span class="comment">// 8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 又或者</span></span><br><span class="line"><span class="built_in">Math</span>.max.apply(<span class="literal">null</span>, arr); <span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+
+<p>但是使用扩展操作符后，能够把给数组求最大值写得更加简洁：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">3</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">5</span>, <span class="number">4</span>];</span><br><span class="line"><span class="keyword">let</span> max = <span class="built_in">Math</span>.max(...arr);</span><br><span class="line"><span class="built_in">console</span>.log(max); <span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="在-new-表达式中使用"><a href="#在-new-表达式中使用" class="headerlink" title="在 new 表达式中使用"></a>在 new 表达式中使用</h2><p>假设有一个数组格式的日期，想要通过 Date 构造函数创建一个日期实例的话，可能会这么做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">2021</span>, <span class="number">1</span>, <span class="number">1</span>];</span><br><span class="line"><span class="keyword">let</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>([].toString.call(arr));</span><br><span class="line"><span class="built_in">console</span>.log(date); <span class="comment">// &#x27;Mon Feb 01 2021 00:00:00 GMT+0800 (中国标准时间)&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line"><span class="keyword">let</span> date2 = <span class="keyword">new</span> (<span class="built_in">Function</span>.prototype.bind.apply(<span class="built_in">Date</span>, [<span class="literal">null</span>].concat(arr)))();</span><br><span class="line"><span class="built_in">console</span>.log(date2); <span class="comment">// &#x27;Mon Feb 01 2021 00:00:00 GMT+0800 (中国标准时间)&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>而有了扩展操作符就简单多了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">2021</span>, <span class="number">1</span>, <span class="number">1</span>];</span><br><span class="line"><span class="keyword">let</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>(...arr);</span><br><span class="line"><span class="built_in">console</span>.log(date); <span class="comment">// &#x27;Mon Feb 01 2021 00:00:00 GMT+0800 (中国标准时间)&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个操作符真可谓使用简单无脑，但是功能效率上不得不说很强大，所以我们要做的就是只要记住在什么时候使用它就好了，于是乎为了让大家能更好的记住这 13 种使用场景，我特意做了一个图，方便大家记忆，是不是很贴？是的话请不要吝啬你的爱心，给个小星星 👍 吧，感谢感谢。以上这些只列了 13 种写法，我觉得作为一个这么强大的操作符，肯定有更多使用的场景，欢迎把你们知道的写到评论区吧。</p>
+<img src="/posts/46865/comb.png" class="" title="comb">
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/ES6/" rel="tag"># ES6+</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/12455/" rel="prev" title="转载-说说原型（prototype）、原型链和原型继承">
+                  <i class="fa fa-chevron-left"></i> 转载-说说原型（prototype）、原型链和原型继承
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/38065/" rel="next" title="element-ui的form表单验证">
+                  element-ui的form表单验证 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

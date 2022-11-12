@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="页面表现 v-if true: 显示DOM false: 用注释节点占位 注释节点与DOM之间的切换   v-show true: 不作处理（用户自己设置的 display） false:  行内样式设置**display: none** 行内样式：style or style&#x3D;”display: none”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue的v-if和v-show实现原理">
+<meta property="og:url" content="https://evestorm.github.io/posts/49974/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="页面表现 v-if true: 显示DOM false: 用注释节点占位 注释节点与DOM之间的切换   v-show true: 不作处理（用户自己设置的 display） false:  行内样式设置**display: none** 行内样式：style or style&#x3D;”display: none”">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/49974/1645884012619-84958914-d101-4ec9-b6bf-ece41aed2770.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49974/1645884042516-4e587e7d-e55b-48c2-8088-93f6a06c9a70.png">
+<meta property="article:published_time" content="2021-08-02T06:35:00.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.322Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/49974/1645884012619-84958914-d101-4ec9-b6bf-ece41aed2770.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/49974/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue的v-if和v-show实现原理 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E8%A1%A8%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">页面表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.</span> <span class="nav-text">实现代码</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/49974/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue的v-if和v-show实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-02 14:35:00" itemprop="dateCreated datePublished" datetime="2021-08-02T14:35:00+08:00">2021-08-02</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">源码系列</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="页面表现"><a href="#页面表现" class="headerlink" title="页面表现"></a>页面表现</h1><ul>
+<li>v-if<ul>
+<li>true: 显示DOM</li>
+<li>false: 用<strong>注释节点占位</strong></li>
+<li><strong>注释节点与DOM之间的切换</strong></li>
+</ul>
+</li>
+<li>v-show<ul>
+<li>true: 不作处理（用户自己设置的 <code>display</code>）</li>
+<li>false:  行内样式设置<code>**display: none**</code></li>
+<li><strong>行内样式：style or style=”display: none”</strong></li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
+<li>对 data 进行<strong>数据劫持</strong></li>
+<li><strong>分析 ast 数</strong>，找到元素绑定的 <code>v-if</code> 以及 <code>@methods</code> 事件函数</li>
+<li>分别放进 <strong>showPool 和 eventPool</strong> 中（数据格式为 <code>Map</code>）<ol>
+<li>showPool 数据格式</li>
+<li>key: DOM对象</li>
+<li>value: <code>&#123; type: &#39;if/show&#39;, prop: data.xxx &#125;</code></li>
+<li>eventPool 数据格式</li>
+<li>key: DOM对象</li>
+<li>value: <code>methods.xxx 方法</code></li>
+</ol>
+</li>
+<li><strong>绑定事件</strong>处理函数</li>
+<li><strong>初次渲染</strong></li>
+<li>如果遇到 v-if ，先给 showPool 中对应 value 加个 comment 注释节点用于后续占位</li>
+<li>用户触发 <code>methods</code> 事件函数</li>
+<li>data<strong>数据更新</strong></li>
+<li>触发了属性 setter</li>
+<li>进行 <code>update</code> 更新页面</li>
+</ol>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ul>
+<li><code>initData</code> 数据响应式<ul>
+<li>参数：<ul>
+<li>vm 实例（获取 vm.$data）</li>
+<li>showPool（setter 触发，在 showPool 中找对应dom）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>initPool</code> v-if、v-show、event 放进对应 pool<ul>
+<li>参数：<ul>
+<li>template（ast树分析模板）</li>
+<li>methods（找到事件函数）</li>
+<li>showPool</li>
+<li>eventPool</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>bindEvent</code> 事件绑定<ul>
+<li>参数：<ul>
+<li>vm 实例（需要把方法放进实例）</li>
+<li>eventPool（遍历 eventPool 挂载方法到 实例 上）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>render</code> 页面渲染<ul>
+<li>参数：<ul>
+<li>vm 实例（vm.$data 查模板绑定的属性；vm.$el 找到根容器最后把模板 append 进去）</li>
+<li>showPool（遍历 pool 根据绑定属性的 true、false 初始化页面的显示状态）</li>
+<li>container（append 进根容器）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>update</code> 页面更新<ul>
+<li>vm 实例（获取属性值）</li>
+<li>key（那个属性更新了）</li>
+<li>showPool（找到相应key的DOM更新）</li>
+</ul>
+</li>
+</ul>
+<p>showPool：</p>
+<img src="/posts/49974/1645884012619-84958914-d101-4ec9-b6bf-ece41aed2770.png" class="" title="100%">
+
+<p>eventPool：</p>
+<img src="/posts/49974/1645884042516-4e587e7d-e55b-48c2-8088-93f6a06c9a70.png" class="" title="100%">
+
+<h2 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * showPool Map &#123;dom: &#123;&#125;&#125;</span></span><br><span class="line"><span class="comment"> * [</span></span><br><span class="line"><span class="comment"> *  [</span></span><br><span class="line"><span class="comment"> *    dom,</span></span><br><span class="line"><span class="comment"> *    &#123;</span></span><br><span class="line"><span class="comment"> *      type: if/show</span></span><br><span class="line"><span class="comment"> *      prop: data下边的对应属性</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *  ]</span></span><br><span class="line"><span class="comment"> * ]</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * eventPool</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * [</span></span><br><span class="line"><span class="comment"> *   [</span></span><br><span class="line"><span class="comment"> *    dom,</span></span><br><span class="line"><span class="comment"> *    handler</span></span><br><span class="line"><span class="comment"> *   ]</span></span><br><span class="line"><span class="comment"> * ]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Vue = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// el</span></span><br><span class="line">    <span class="built_in">this</span>.$el = <span class="built_in">document</span>.querySelector(options.el);</span><br><span class="line">    <span class="built_in">this</span>.$data = options.data();</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">this</span>._init(<span class="built_in">this</span>, options.template, options.methods);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  Vue.prototype._init = <span class="function"><span class="keyword">function</span>(<span class="params">vm, template, methods</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> container = <span class="built_in">document</span>.createElement(<span class="string">&#x27;div&#x27;</span>);</span><br><span class="line">    container.innerHTML = template;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> showPool = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">    <span class="keyword">var</span> eventPool = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">    initData(vm, showPool); <span class="comment">// 更新的时候要用到showPool</span></span><br><span class="line">    initPool(container, methods, showPool, eventPool);</span><br><span class="line">    bindEvent(vm, eventPool);</span><br><span class="line">    render(vm, showPool, container);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">initData</span>(<span class="params">vm, showPool</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _data = vm.$data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> _data) &#123;</span><br><span class="line">      (<span class="function"><span class="keyword">function</span>(<span class="params">key</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">          get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> _data[key];</span><br><span class="line">          &#125;,</span><br><span class="line">          set: <span class="function"><span class="keyword">function</span>(<span class="params">newVal</span>) </span>&#123;</span><br><span class="line">            <span class="comment">// this.isShowImg1 = true;</span></span><br><span class="line">            _data[key] = newVal;</span><br><span class="line">            update(vm, key, showPool)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;)(key);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">initPool</span>(<span class="params">container, methods, showPool, eventPool</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _allNodes = container.getElementsByTagName(<span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> dom = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; _allNodes.length; i++) &#123;</span><br><span class="line">      dom = _allNodes[i];</span><br><span class="line">      </span><br><span class="line">      <span class="keyword">var</span> vIfData = dom.getAttribute(<span class="string">&#x27;v-if&#x27;</span>);</span><br><span class="line">      <span class="keyword">var</span> vShowData = dom.getAttribute(<span class="string">&#x27;v-show&#x27;</span>);</span><br><span class="line">      <span class="keyword">var</span> vEvent = dom.getAttribute(<span class="string">&#x27;@click&#x27;</span>);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (vIfData) &#123;</span><br><span class="line">        showPool.set(</span><br><span class="line">          dom,</span><br><span class="line">          &#123;</span><br><span class="line">            type: <span class="string">&#x27;if&#x27;</span>,</span><br><span class="line">            prop: vIfData</span><br><span class="line">          &#125;</span><br><span class="line">        )</span><br><span class="line">        dom.removeAttribute(<span class="string">&#x27;v-if&#x27;</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vShowData) &#123;</span><br><span class="line">        showPool.set(</span><br><span class="line">          dom,</span><br><span class="line">          &#123;</span><br><span class="line">            type: <span class="string">&#x27;show&#x27;</span>,</span><br><span class="line">            prop: vShowData</span><br><span class="line">          &#125;</span><br><span class="line">        )</span><br><span class="line">        dom.removeAttribute(<span class="string">&#x27;v-show&#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (vEvent) &#123;</span><br><span class="line">        eventPool.set(</span><br><span class="line">          dom,</span><br><span class="line">          methods[vEvent]</span><br><span class="line">        )</span><br><span class="line">        dom.removeAttribute(<span class="string">&#x27;@click&#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(eventPool);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">bindEvent</span>(<span class="params">vm, eventPool</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> [dom, handler] <span class="keyword">of</span> eventPool) &#123;</span><br><span class="line">      vm[handler.name] = handler;</span><br><span class="line">      dom.addEventListener(<span class="string">&#x27;click&#x27;</span>, vm[handler.name].bind(vm), <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">vm, showPool, container</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _data = vm.$data;</span><br><span class="line">    <span class="keyword">var</span> _el = vm.$el;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> [dom, info] <span class="keyword">of</span> showPool) &#123;</span><br><span class="line">      <span class="keyword">switch</span> (info.type) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;if&#x27;</span>:</span><br><span class="line">          info.comment = <span class="built_in">document</span>.createComment(<span class="string">&#x27;v-if&#x27;</span>);</span><br><span class="line">          <span class="comment">// 如果为假，就用 comment 节点替换 dom 节点</span></span><br><span class="line">          <span class="comment">// replaceChild(newNode, oldNode);</span></span><br><span class="line">          !_data[info.prop] &amp;&amp; dom.parentNode.replaceChild(info.comment, dom);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;show&#x27;</span>:</span><br><span class="line">          <span class="comment">// 如果为假，就设置display为none</span></span><br><span class="line">          !_data[info.prop] &amp;&amp; (dom.style.display = <span class="string">&#x27;none&#x27;</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _el.appendChild(container);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">update</span>(<span class="params">vm, key, showPool</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _data = vm.$data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> [dom, info] <span class="keyword">of</span> showPool) &#123;</span><br><span class="line">      <span class="keyword">if</span> (info.prop === key) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (info.type) &#123;</span><br><span class="line">          <span class="keyword">case</span> <span class="string">&#x27;if&#x27;</span>:</span><br><span class="line">            !_data[key] ? dom.parentNode.replaceChild(info.comment, dom)</span><br><span class="line">                        : info.comment.parentNode.replaceChild(dom, info.comment);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          <span class="keyword">case</span> <span class="string">&#x27;show&#x27;</span>:</span><br><span class="line">            !_data[key] ? (dom.style.display = <span class="string">&#x27;none&#x27;</span>)</span><br><span class="line">                        : (dom.removeAttribute(<span class="string">&#x27;style&#x27;</span>));</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> Vue;</span><br><span class="line">&#125;)();</span><br><span class="line">  </span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/35510/" rel="prev" title="sourceTree推送远端遇到Please use a personal access token instead报错">
+                  <i class="fa fa-chevron-left"></i> sourceTree推送远端遇到Please use a personal access token instead报错
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/48513/" rel="next" title="显式隐式类型转化">
+                  显式隐式类型转化 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

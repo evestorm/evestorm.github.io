@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="特性 类数组 没有继承 Array.prototype 可迭代 箭头函数内部没有 arguments">
+<meta property="og:type" content="article">
+<meta property="og:title" content="arguments详解">
+<meta property="og:url" content="https://evestorm.github.io/posts/31289/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="特性 类数组 没有继承 Array.prototype 可迭代 箭头函数内部没有 arguments">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-10T02:44:40.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.371Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/31289/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>arguments详解 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">可迭代对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E5%AF%B9%E8%B1%A1%E6%B2%A1%E6%9C%89%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%97%A0%E6%B3%95%E8%BF%AD%E4%BB%A3"><span class="nav-number">2.1.</span> <span class="nav-text">普通对象没有迭代器无法迭代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-arguments%E5%8F%AF%E4%BB%A5%E8%BF%AD%E4%BB%A3"><span class="nav-number">2.2.</span> <span class="nav-text">🌈 arguments可以迭代</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%9E%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0%E7%9A%84%E5%85%B6%E4%BB%96%E5%87%BD%E6%95%B0%E7%9A%84%E5%86%85%E7%BD%AE%E7%9A%84%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.</span> <span class="nav-text">非箭头函数的其他函数的内置的局部变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#arguments-%E8%BD%AC%E7%9C%9F%E6%95%B0%E7%BB%84"><span class="nav-number">3.1.</span> <span class="nav-text">arguments 转真数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#arguments%E4%BD%9C%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">arguments作用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%BF%E5%88%B0%E5%AE%9E%E5%8F%82-%E5%AE%9E%E5%8F%82%E4%B8%AA%E6%95%B0-gt-%E5%BD%A2%E5%8F%82%E4%B8%AA%E6%95%B0"><span class="nav-number">4.1.</span> <span class="nav-text">拿到实参 - 实参个数 &gt; 形参个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%AE%9A%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">不定参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E5%BD%A2%E5%AE%9E%E5%8F%82%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB-%E5%85%B1%E4%BA%AB%E5%85%B3%E7%B3%BB"><span class="nav-number">4.3.</span> <span class="nav-text">🌈 形实参的对应关系 - 共享关系</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BD%A2%E5%AE%9E%E5%8F%82%E9%BB%98%E8%AE%A4%E6%83%85%E5%86%B5%E4%B8%8B%E4%BC%9A%E6%9C%89%E5%85%B1%E4%BA%AB%E5%85%B3%E7%B3%BB"><span class="nav-number">4.3.1.</span> <span class="nav-text">形实参默认情况下会有共享关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%BD%A2%E5%8F%82-%E5%8F%AA%E8%A6%81%E6%9C%89%E4%B8%80%E4%B8%AA%E5%BD%A2%E5%8F%82%E6%9C%89%E9%BB%98%E8%AE%A4%E5%80%BC%EF%BC%8Carguments%E5%B0%B1%E4%B8%8D%E8%B7%9F%E8%B8%AA%E5%BD%A2%E5%8F%82"><span class="nav-number">4.3.2.</span> <span class="nav-text">🌈 形参 - 只要有一个形参有默认值，arguments就不跟踪形参</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%BD%A2%E5%8F%82-%E5%89%A9%E4%BD%99%E5%8F%82%E6%95%B0%EF%BC%8Carguments%E4%B8%8D%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.3.3.</span> <span class="nav-text">🌈 形参 - 剩余参数，arguments不跟踪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%BD%A2%E5%8F%82-%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%84%EF%BC%8Carguments%E4%B8%8D%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.3.4.</span> <span class="nav-text">🌈 形参 - 参数解构，arguments不跟踪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E4%B8%A5%E6%A0%BC%E6%A8%A1%E5%BC%8F%E4%B8%8B-arguments%E4%B8%8D%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.3.5.</span> <span class="nav-text">🌈 严格模式下 - arguments不跟踪</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E6%96%B9%E6%B3%95-%E5%AF%B9%E8%B1%A1-or-%E5%86%85%E9%83%A8%E6%96%B9%E6%B3%95"><span class="nav-number">5.1.</span> <span class="nav-text">内置方法&#x2F;对象 or 内部方法</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/31289/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          arguments详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-09-10 10:44:40" itemprop="dateCreated datePublished" datetime="2021-09-10T10:44:40+08:00">2021-09-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ul>
+<li>类数组</li>
+<li>没有继承 Array.prototype</li>
+<li>可迭代</li>
+<li>箭头函数内部没有 arguments</li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * callee: 宿主函数 test</span></span><br><span class="line"><span class="comment"> * Symbol.iterator 可迭代对象标志</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 类数组 Array like</span></span><br><span class="line"><span class="comment"> * 	有 length 从 0 开始的属性下标</span></span><br><span class="line"><span class="comment"> *  没有数组的内置方法(build-in methods/object)</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">arguments</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">arguments</span>.toString()); <span class="comment">// [object Arguments]</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">Array</span>.isArray(<span class="built_in">arguments</span>)); <span class="comment">// false</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">arguments</span>.callee);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test();</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="可迭代对象"><a href="#可迭代对象" class="headerlink" title="可迭代对象"></a>可迭代对象</h2><h3 id="普通对象没有迭代器无法迭代"><a href="#普通对象没有迭代器无法迭代" class="headerlink" title="普通对象没有迭代器无法迭代"></a>普通对象没有迭代器无法迭代</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span>,</span><br><span class="line">  c: <span class="number">3</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> * <span class="title">generator</span>(<span class="params">args</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> args) &#123;</span><br><span class="line">  	<span class="keyword">yield</span> item;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = generator(obj);</span><br><span class="line"></span><br><span class="line">it.next();</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h3 id="🌈-arguments可以迭代"><a href="#🌈-arguments可以迭代" class="headerlink" title="🌈 arguments可以迭代"></a>🌈 arguments可以迭代</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> * <span class="title">generator</span>(<span class="params">args</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> args) &#123;</span><br><span class="line">  	<span class="keyword">yield</span> item;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> it = generator(<span class="built_in">arguments</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(it.next());</span><br><span class="line">  <span class="built_in">console</span>.log(it.next());</span><br><span class="line">  <span class="built_in">console</span>.log(it.next());</span><br><span class="line">  <span class="built_in">console</span>.log(it.next());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="非箭头函数的其他函数的内置的局部变量"><a href="#非箭头函数的其他函数的内置的局部变量" class="headerlink" title="非箭头函数的其他函数的内置的局部变量"></a>非箭头函数的其他函数的内置的局部变量</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> test = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">arguments</span>);</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>改用剩余参数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> test = <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(args);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="built_in">Array</span>.isArray(args));</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> test = <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// console.log(arguments.callee); // 直接拿 test 能拿到，不需要 .callee</span></span><br><span class="line">  <span class="built_in">console</span>.log(test);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="arguments-转真数组"><a href="#arguments-转真数组" class="headerlink" title="arguments 转真数组"></a>arguments 转真数组</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// var params = Array.prototype.slice.call(arguments); // ↓简便写法</span></span><br><span class="line">	<span class="keyword">var</span> params = [].slice.call(<span class="built_in">arguments</span>); <span class="comment">// 把 arguments 当 [] 去调用 slice</span></span><br><span class="line">  <span class="built_in">console</span>.log(params);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> params = <span class="built_in">arguments</span>.length === <span class="number">1</span> </span><br><span class="line">  				? [<span class="built_in">arguments</span>[<span class="number">0</span>]] </span><br><span class="line">  				: <span class="built_in">Array</span>.apply(<span class="literal">null</span>, <span class="built_in">arguments</span>); <span class="comment">// Array是构造函数，传递null当this，参数是arguments</span></span><br><span class="line">  <span class="built_in">console</span>.log(params);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="arguments作用"><a href="#arguments作用" class="headerlink" title="arguments作用"></a>arguments作用</h2><h3 id="拿到实参-实参个数-gt-形参个数"><a href="#拿到实参-实参个数-gt-形参个数" class="headerlink" title="拿到实参 - 实参个数 &gt; 形参个数"></a>拿到实参 - 实参个数 &gt; 形参个数</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="built_in">arguments</span>[<span class="number">3</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="不定参数"><a href="#不定参数" class="headerlink" title="不定参数"></a>不定参数</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> [...arguments].reduce(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> pre + cur, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> res = add(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">console</span>.log(res);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="🌈-形实参的对应关系-共享关系"><a href="#🌈-形实参的对应关系-共享关系" class="headerlink" title="🌈 形实参的对应关系 - 共享关系"></a>🌈 形实参的对应关系 - 共享关系</h3><p>形参赋值的有内部作用域</p>
+<h4 id="形实参默认情况下会有共享关系"><a href="#形实参默认情况下会有共享关系" class="headerlink" title="形实参默认情况下会有共享关系"></a>形实参默认情况下会有共享关系</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">	a = <span class="number">10</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="🌈-形参-只要有一个形参有默认值，arguments就不跟踪形参"><a href="#🌈-形参-只要有一个形参有默认值，arguments就不跟踪形参" class="headerlink" title="🌈 形参 - 只要有一个形参有默认值，arguments就不跟踪形参"></a>🌈 形参 - 只要有一个形参有默认值，arguments就不跟踪形参</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a = <span class="number">100</span></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a = <span class="number">100</span></span>) </span>&#123;</span><br><span class="line">	a = <span class="number">10000</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b, c = <span class="number">10</span></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">100</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">1</span>] = <span class="number">200</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">2</span>] = <span class="number">300</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(b, <span class="built_in">arguments</span>[<span class="number">1</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(c, <span class="built_in">arguments</span>[<span class="number">2</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="🌈-形参-剩余参数，arguments不跟踪"><a href="#🌈-形参-剩余参数，arguments不跟踪" class="headerlink" title="🌈 形参 - 剩余参数，arguments不跟踪"></a>🌈 形参 - 剩余参数，arguments不跟踪</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">100</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">1</span>] = <span class="number">200</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">2</span>] = <span class="number">300</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(args[<span class="number">0</span>], <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(args[<span class="number">1</span>], <span class="built_in">arguments</span>[<span class="number">1</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(args[<span class="number">2</span>], <span class="built_in">arguments</span>[<span class="number">2</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="🌈-形参-参数解构，arguments不跟踪"><a href="#🌈-形参-参数解构，arguments不跟踪" class="headerlink" title="🌈 形参 - 参数解构，arguments不跟踪"></a>🌈 形参 - 参数解构，arguments不跟踪</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">&#123; a, b, c &#125;</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">100</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">1</span>] = <span class="number">200</span>;</span><br><span class="line">	<span class="built_in">arguments</span>[<span class="number">2</span>] = <span class="number">300</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(a, <span class="built_in">arguments</span>[<span class="number">0</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(b, <span class="built_in">arguments</span>[<span class="number">1</span>]);</span><br><span class="line">  <span class="built_in">console</span>.log(c, <span class="built_in">arguments</span>[<span class="number">2</span>]);</span><br><span class="line">&#125;</span><br><span class="line">test(&#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span>,</span><br><span class="line">  c: <span class="number">3</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="🌈-严格模式下-arguments不跟踪"><a href="#🌈-严格模式下-arguments不跟踪" class="headerlink" title="🌈 严格模式下 - arguments不跟踪"></a>🌈 严格模式下 - arguments不跟踪</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line"><span class="meta">	&#x27;use strict&#x27;</span>;</span><br><span class="line">  </span><br><span class="line">  a = <span class="number">10</span>;</span><br><span class="line">  b = <span class="number">20</span>;</span><br><span class="line">  c = <span class="number">30</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(a, b, c);</span><br><span class="line">  <span class="built_in">console</span>.log([...arguments]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line"><span class="meta">	&#x27;use strict&#x27;</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">arguments</span>[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line">  <span class="built_in">arguments</span>[<span class="number">1</span>] = <span class="number">20</span>;</span><br><span class="line">  <span class="built_in">arguments</span>[<span class="number">2</span>] = <span class="number">30</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">console</span>.log(a, b, c);</span><br><span class="line">  <span class="built_in">console</span>.log([...arguments]);</span><br><span class="line">&#125;</span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><h3 id="内置方法-对象-or-内部方法"><a href="#内置方法-对象-or-内部方法" class="headerlink" title="内置方法/对象 or 内部方法"></a>内置方法/对象 or 内部方法</h3><ul>
+<li>内置方法、对象：build-in methods/object</li>
+<li>内部方法：internal methods</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/13177/" rel="prev" title="Vue组件库全局注册加载、按需注册加载的实现思路">
+                  <i class="fa fa-chevron-left"></i> Vue组件库全局注册加载、按需注册加载的实现思路
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/42396/" rel="next" title="解决vue中v-html元素中标签样式">
+                  解决vue中v-html元素中标签样式 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

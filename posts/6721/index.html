@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="reactive 接收一个对象，返回一个响应式的被Proxy包装过的对象（返回的对象 不等于 源对象） 基本类型无法被 reactive 代理   等同于 Vue2.0 中的 Vue.observable() 原理：Proxy 代理 深度响应 递归代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue3响应式API">
+<meta property="og:url" content="https://evestorm.github.io/posts/6721/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="reactive 接收一个对象，返回一个响应式的被Proxy包装过的对象（返回的对象 不等于 源对象） 基本类型无法被 reactive 代理   等同于 Vue2.0 中的 Vue.observable() 原理：Proxy 代理 深度响应 递归代理">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646907263944-c9ce8065-cc0a-4b7e-8c14-46cc35605336.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647136979250-6937a003-38d1-41f0-b03b-0cea5288e65f.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646909423008-a47fd37a-0b9e-49ae-ad01-2f37be6cb9dd.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646908426634-c50fc760-99fe-4ca2-ae67-1961d83ff71d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646908773357-cc569fae-5362-48ee-84db-38a7d7fb61cd.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646909950255-9454bf23-843b-4ad1-a473-1485fedae167.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646910174254-5513542a-aa29-4783-b11b-934df576bd08.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646910891822-3a621501-efeb-4770-ab9c-d4fc4512dc3f.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646911229231-891dd691-e7df-4963-a9dd-666cf715919f.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646911517689-3958cefa-921e-49ed-a9db-2d635cd80da6.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646911694478-59a0ee81-375b-4dff-b2e1-02ba093db013.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1646912349889-c3e915a5-708c-484a-ae89-49d2a5b8b694.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647075389173-cfdd9248-6cb1-4539-986e-aecc5b3a2d97.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647078456088-eba4dbd0-ba20-4c0a-9954-f45c7b4b449e.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647078656470-61e439a6-3ebb-4b98-8298-ffa5f787dae7.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647079962315-2ce5c980-a860-4f76-8b34-d94df0fcfbee.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647080391398-2d8681e0-2051-4af5-845f-b0b80fa18ff6.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647089087587-c429cadb-f1a6-4761-a344-da78cdb16386.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647089101778-e7ed038b-c9c2-4d94-9fcc-87614f72a78d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647089480881-14202643-7708-41ff-8bac-0dfb73986df7.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647089672030-b7e44d43-8af5-4957-831c-79eab4d0046d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647090263688-d608c3ec-15d1-46f6-8e00-a40a1135fa1b.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647091468788-93cc179d-6527-4d8a-87ef-7285de1dfb55.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647093277494-abf6c488-4798-4dea-8017-666f5bcb34e2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647093533850-75c4d88c-e654-409d-be63-493e039cb73a.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647094035226-10558a09-1500-40f0-a5a5-87aaf23e8a37.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647094146064-017510d8-071c-48da-ae9f-2224072627c3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647135720121-3519692c-1980-4504-91fc-a1b651e2cafb.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647137350474-7b2fcf97-69ce-4938-aa26-3343c5ba771b.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647140581392-6d78b44c-b12a-4cae-bbdf-b03d5efed7be.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647141911211-b3fe9c17-814d-41c8-aade-f2173bdc2552.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6721/1647144014708-a83d5991-7580-42f9-be61-c1dde72c4a49.png">
+<meta property="article:published_time" content="2021-10-15T01:01:52.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.292Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/6721/1646907263944-c9ce8065-cc0a-4b7e-8c14-46cc35605336.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/6721/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue3响应式API | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#reactive"><span class="nav-number">1.</span> <span class="nav-text">reactive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-ref"><span class="nav-number">2.</span> <span class="nav-text">🌈 ref</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#reactive%E5%8C%85%E8%A3%B9ref"><span class="nav-number">2.1.</span> <span class="nav-text">reactive包裹ref</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E7%9A%84ref%E4%BC%9A%E8%A6%86%E7%9B%96%E8%80%81%E7%9A%84ref"><span class="nav-number">2.2.</span> <span class="nav-text">新的ref会覆盖老的ref</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ref%E6%94%BE%E8%BF%9B%E6%95%B0%E7%BB%84%E3%80%81Map%E7%AD%89%E5%8E%9F%E5%A7%8B%E9%9B%86%E5%90%88%E7%B1%BB%E5%9E%8B%E7%9A%84reactive%E4%B8%AD%E6%97%B6%E4%B8%8D%E4%BC%9A%E8%87%AA%E5%8A%A8%E6%8B%86%E5%8C%85"><span class="nav-number">2.3.</span> <span class="nav-text">ref放进数组、Map等原始集合类型的reactive中时不会自动拆包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unref"><span class="nav-number">3.</span> <span class="nav-text">unref</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.2.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#toRef"><span class="nav-number">4.</span> <span class="nav-text">toRef</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89-composition-api-%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%93%8D%E5%BA%94%E5%BC%8F%E5%AF%B9%E8%B1%A1%E4%B8%8B%E6%9F%90%E4%B8%AA%E5%B1%9E%E6%80%A7"><span class="nav-number">4.1.</span> <span class="nav-text">使用场景：自定义 composition api 中使用响应式对象下某个属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-toRefs"><span class="nav-number">5.</span> <span class="nav-text">🌈 toRefs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">5.1.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isRef"><span class="nav-number">6.</span> <span class="nav-text">isRef</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-customRef"><span class="nav-number">7.</span> <span class="nav-text">🌈 customRef</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shallowRef-triggerRef"><span class="nav-number">8.</span> <span class="nav-text">shallowRef&#x2F;triggerRef</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#shallowRef"><span class="nav-number">8.1.</span> <span class="nav-text">shallowRef</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#triggerRef"><span class="nav-number">8.2.</span> <span class="nav-text">triggerRef</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-computed"><span class="nav-number">9.</span> <span class="nav-text">🌈 computed</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#readonly"><span class="nav-number">10.</span> <span class="nav-text">readonly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-watchEffect"><span class="nav-number">11.</span> <span class="nav-text">🌈 watchEffect</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E5%89%AF%E4%BD%9C%E7%94%A8"><span class="nav-number">11.1.</span> <span class="nav-text">清除副作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%AF%E4%BD%9C%E7%94%A8%E5%88%B7%E6%96%B0%E6%97%B6%E6%9C%BA"><span class="nav-number">11.2.</span> <span class="nav-text">副作用刷新时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watch-debug"><span class="nav-number">11.3.</span> <span class="nav-text">watch debug</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-watch"><span class="nav-number">12.</span> <span class="nav-text">🌈 watch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E5%8D%95%E4%B8%AA%E5%80%BC"><span class="nav-number">12.1.</span> <span class="nav-text">监听单个值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E5%A4%9A%E4%B8%AA%E5%80%BC"><span class="nav-number">12.2.</span> <span class="nav-text">监听多个值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E-watchEffect-%E5%85%B1%E4%BA%AB%E7%9A%84%E8%A1%8C%E4%B8%BA"><span class="nav-number">12.3.</span> <span class="nav-text">与 watchEffect 共享的行为</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isProxy"><span class="nav-number">13.</span> <span class="nav-text">isProxy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isReactive"><span class="nav-number">14.</span> <span class="nav-text">isReactive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shallowReactive"><span class="nav-number">15.</span> <span class="nav-text">shallowReactive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shallowReadonly"><span class="nav-number">16.</span> <span class="nav-text">shallowReadonly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#toRaw"><span class="nav-number">17.</span> <span class="nav-text">toRaw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#markRaw"><span class="nav-number">18.</span> <span class="nav-text">markRaw</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/6721/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue3响应式API
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-15 09:01:52" itemprop="dateCreated datePublished" datetime="2021-10-15T09:01:52+08:00">2021-10-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue3/" itemprop="url" rel="index"><span itemprop="name">Vue3</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="reactive"><a href="#reactive" class="headerlink" title="reactive"></a>reactive</h2><ul>
+<li>接收一个<strong>对象</strong>，返回一个响应式的被Proxy包装过的对象（返回的对象 不等于 源对象）<ul>
+<li>基本类型无法被 reactive 代理</li>
+</ul>
+</li>
+<li>等同于 Vue2.0 中的 <code>Vue.observable()</code></li>
+<li>原理：Proxy 代理<ul>
+<li><strong>深度响应</strong></li>
+<li><strong>递归代理</strong></li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; proxyObj.name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const proxyObj &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    console.log(proxyObj);</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      proxyObj</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646907263944-c9ce8065-cc0a-4b7e-8c14-46cc35605336.png" class="" title="100%">
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; reactive(1); &#x2F;&#x2F; 无法包装基本类型</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647136979250-6937a003-38d1-41f0-b03b-0cea5288e65f.png" class="" title="100%">
+
+<h2 id="🌈-ref"><a href="#🌈-ref" class="headerlink" title="🌈 ref"></a>🌈 ref</h2><ul>
+<li><strong>数据响应式</strong><ul>
+<li>ref(基本类型的值)<ul>
+<li>return 一个 RefObject，其中的 value 就是ref包裹的值</li>
+</ul>
+</li>
+<li>ref(复杂类型的值)<ul>
+<li>return 一个 RefObject，其中的 value 是用 reactive 包装过的 Proxy 代理对象</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>得通过</strong> <code>**.value**</code> <strong>的方式读写属性</strong></li>
+<li>return 出去后会被 vue <strong>自动拆包，template</strong> 中不需要 <code>.value</code> 访问</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    console.log(&quot;count:&quot;, count);</span><br><span class="line">    console.log(&quot;&#x3D;&#x3D;&#x3D;&quot;);</span><br><span class="line">    console.log(&quot;count.value:&quot;, count.value);</span><br><span class="line">    console.log(&quot;&#x3D;&#x3D;&#x3D;&quot;);</span><br><span class="line"></span><br><span class="line">    const obj &#x3D; ref(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 120</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    console.log(&quot;obj&quot;, obj);</span><br><span class="line">    console.log(&quot;&#x3D;&#x3D;&#x3D;&quot;);</span><br><span class="line">    console.log(&quot;obj.value&quot;, obj.value); &#x2F;&#x2F; 第一层需要 .value 拆包</span><br><span class="line">    console.log(&quot;&#x3D;&#x3D;&#x3D;&quot;);</span><br><span class="line">    console.log(&quot;obj.value.info&quot;, obj.value.info); &#x2F;&#x2F; 后续都是 Proxy 对象了，不用拆包</span><br><span class="line">    console.log(&quot;&#x3D;&#x3D;&#x3D;&quot;);</span><br><span class="line">    console.log(&quot;obj.value.info.grade&quot;, obj.value.info.grade);</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      obj</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646909423008-a47fd37a-0b9e-49ae-ad01-2f37be6cb9dd.png" class="" title="100%">
+
+<h3 id="reactive包裹ref"><a href="#reactive包裹ref" class="headerlink" title="reactive包裹ref"></a>reactive包裹ref</h3><ul>
+<li>就不用再对此 ref 拆包 <code>.value</code> 了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; proxyObj.count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, reactive &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    const proxyObj &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233,</span><br><span class="line">      count &#x2F;&#x2F; 相当于vue给你解包了：count: count.value</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    console.log(proxyObj.count); &#x2F;&#x2F; 所以此处不用再 .value，template 中 也不用</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      proxyObj</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="新的ref会覆盖老的ref"><a href="#新的ref会覆盖老的ref" class="headerlink" title="新的ref会覆盖老的ref"></a>新的ref会覆盖老的ref</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, ref &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    </span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    const newCount &#x3D; ref(1);</span><br><span class="line">    state.count &#x3D; newCount; &#x2F;&#x2F; 新的ref替换旧的ref</span><br><span class="line">    console.log(&quot;state.count:&quot;, state.count); &#x2F;&#x2F; 新的会覆盖旧的</span><br><span class="line">    console.log(&quot;count:&quot;, count.value); &#x2F;&#x2F; 原来的不变</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      state</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646908426634-c50fc760-99fe-4ca2-ae67-1961d83ff71d.png" class="" title="100%">
+
+<h3 id="ref放进数组、Map等原始集合类型的reactive中时不会自动拆包"><a href="#ref放进数组、Map等原始集合类型的reactive中时不会自动拆包" class="headerlink" title="ref放进数组、Map等原始集合类型的reactive中时不会自动拆包"></a>ref放进数组、Map等原始集合类型的reactive中时不会自动拆包</h3><ul>
+<li>native collection type（array、Map、Set、…）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, ref &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line"></span><br><span class="line">    const arr &#x3D; reactive([count]);</span><br><span class="line">    console.log(arr[0].value); &#x2F;&#x2F; 需要手动拆包</span><br><span class="line"></span><br><span class="line">    const map &#x3D; reactive( new Map( [[&#39;name&#39;, ref(233)]] ) );</span><br><span class="line">    console.log(map.get(&#39;name&#39;).value); &#x2F;&#x2F; 需要手动拆包</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646908773357-cc569fae-5362-48ee-84db-38a7d7fb61cd.png" class="" title="100%">
+
+<h2 id="unref"><a href="#unref" class="headerlink" title="unref"></a>unref</h2><ul>
+<li>拆包语法糖</li>
+<li>如果被包裹值是个 ref ，就返回拆包后的 <code>.value</code> 值；否则就返回原值</li>
+</ul>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; isRef, ref &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const info &#x3D; &#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233</span><br><span class="line">    &#125;;</span><br><span class="line">    const refInfo &#x3D; ref(&#123;</span><br><span class="line">      name: &#39;GC&#39;,</span><br><span class="line">      age: 111</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    const obj &#x3D; isRef(info) ? info.value : info;</span><br><span class="line">    const obj2 &#x3D; isRef(refInfo) ? refInfo.value : refInfo;</span><br><span class="line">    console.log(obj);</span><br><span class="line">    console.log(obj2);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646909950255-9454bf23-843b-4ad1-a473-1485fedae167.png" class="" title="100%">
+
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, unref &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const info &#x3D; &#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 2333</span><br><span class="line">    &#125;;</span><br><span class="line">    const refInfo &#x3D; ref(&#123;</span><br><span class="line">      name: &#39;GC&#39;,</span><br><span class="line">      age: 111</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    const obj &#x3D; unref(info); &#x2F;&#x2F; 返回原始对象</span><br><span class="line">    const obj2 &#x3D; unref(refInfo); &#x2F;&#x2F; 会拆包，返回 Proxy 对象</span><br><span class="line">    console.log(obj);</span><br><span class="line">    console.log(obj2);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646910174254-5513542a-aa29-4783-b11b-934df576bd08.png" class="" title="100%">
+
+<h2 id="toRef"><a href="#toRef" class="headerlink" title="toRef"></a>toRef</h2><ul>
+<li><p>主要针对的是 reactive 中的数据</p>
+</li>
+<li><p>toRef 的值更新，会同步 reactive 对象中的相同属性更新</p>
+</li>
+<li><p>reactive 对象属性更新，对应 toRef 值也会更新</p>
+</li>
+<li><p>使用场景：</p>
+</li>
+<li><ul>
+<li>不需要整个 reactive 响应式对象，只想使用其下的某个属性单独拿出来作为响应式 ref 使用</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRef &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const nameRef &#x3D; toRef(state, &#39;name&#39;);</span><br><span class="line">    nameRef.value &#x3D; &#39;GC&#39;;</span><br><span class="line">    console.log(state.name); &#x2F;&#x2F; 同步更新了</span><br><span class="line">    state.name &#x3D; &#39;Lance&#39;;</span><br><span class="line">    console.log(nameRef.value); &#x2F;&#x2F; 也更新了</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用场景：自定义-composition-api-中使用响应式对象下某个属性"><a href="#使用场景：自定义-composition-api-中使用响应式对象下某个属性" class="headerlink" title="使用场景：自定义 composition api 中使用响应式对象下某个属性"></a>使用场景：自定义 composition api 中使用响应式对象下某个属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRef &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">function useDoSth(name) &#123;</span><br><span class="line">  return &#96;My name is $&#123;name.value&#125;&#96;;</span><br><span class="line">&#125;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const nameRef &#x3D; toRef(state, &#39;name&#39;);</span><br><span class="line">    </span><br><span class="line">    const sentence &#x3D; useDoSth(nameRef);</span><br><span class="line">    console.log(sentence);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646910891822-3a621501-efeb-4770-ab9c-d4fc4512dc3f.png" class="" title="100%">
+
+<h2 id="🌈-toRefs"><a href="#🌈-toRefs" class="headerlink" title="🌈 toRefs"></a>🌈 toRefs</h2><ul>
+<li>给 reactive 响应式对象下每个属性都转成 ref</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRefs &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const stateRefs &#x3D; toRefs(state);</span><br><span class="line">    console.log(stateRefs);</span><br><span class="line">    console.log(stateRefs.name.value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646911229231-891dd691-e7df-4963-a9dd-666cf715919f.png" class="" title="100%">
+
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li>展开 reactive ，能在 template 中省去对象名直接访问对象下的属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;!-- 通过 reactive 访问属性 --&gt;</span><br><span class="line">    &lt;div&gt;&#123;&#123; state.name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">    &lt;!-- 通过 toRefs reactive 之后越过对象名直接访问属性 --&gt;</span><br><span class="line">    &lt;div&gt;&#123;&#123; name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRefs &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const stateRefs &#x3D; toRefs(state);</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">      state,</span><br><span class="line">      ...stateRefs</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646911517689-3958cefa-921e-49ed-a9db-2d635cd80da6.png" class="" title="100%">
+
+<h2 id="isRef"><a href="#isRef" class="headerlink" title="isRef"></a>isRef</h2><ul>
+<li>判断一个值是不是 ref 值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRefs, isRef &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      age: 233,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const stateRefs &#x3D; toRefs(state);</span><br><span class="line">    console.log(&quot;isRef(stateRefs):&quot;, isRef(stateRefs));</span><br><span class="line">    console.log(&quot;isRef(stateRefs.name):&quot;, isRef(stateRefs.name));</span><br><span class="line">    return &#123;</span><br><span class="line">      state,</span><br><span class="line">      ...stateRefs</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646911694478-59a0ee81-375b-4dff-b2e1-02ba093db013.png" class="" title="100%">
+
+<h2 id="🌈-customRef"><a href="#🌈-customRef" class="headerlink" title="🌈 customRef"></a>🌈 customRef</h2><ul>
+<li>自定义ref</li>
+<li>应用：防抖节流</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;span&gt;&#123;&#123; text &#125;&#125;&lt;&#x2F;span&gt;</span><br><span class="line">    &lt;input type&#x3D;&quot;text&quot; v-model&#x3D;&quot;text&quot;&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; customRef &#125; from &#39;vue&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * value: 值</span><br><span class="line"> * delay: 延迟</span><br><span class="line"> *&#x2F;</span><br><span class="line">function useDebounce(value, delay &#x3D; 200) &#123;</span><br><span class="line">  let t &#x3D; null;</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; 返回 customRef, customRef 接收一个工厂函数</span><br><span class="line">  &#x2F;**</span><br><span class="line">   * track: getter访问时执行</span><br><span class="line">   * trigger: setter触发更新时执行</span><br><span class="line">   *&#x2F;</span><br><span class="line">  return customRef((track, trigger) &#x3D;&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F; 返回一个对象, 包含 getter、setter</span><br><span class="line">    return &#123;</span><br><span class="line">      get() &#123;</span><br><span class="line">        track();</span><br><span class="line">        return value;</span><br><span class="line">      &#125;,</span><br><span class="line">      set(newVal) &#123;</span><br><span class="line">        clearTimeout(t);</span><br><span class="line">        t &#x3D; setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">          value &#x3D; newVal;</span><br><span class="line">          trigger();</span><br><span class="line">        &#125;, delay);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const text &#x3D; useDebounce(&#39;&#39;, 500);</span><br><span class="line">    return &#123;</span><br><span class="line">      text</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1646912349889-c3e915a5-708c-484a-ae89-49d2a5b8b694.png" class="" title="100%">
+
+<h2 id="shallowRef-triggerRef"><a href="#shallowRef-triggerRef" class="headerlink" title="shallowRef/triggerRef"></a>shallowRef/triggerRef</h2><h3 id="shallowRef"><a href="#shallowRef" class="headerlink" title="shallowRef"></a>shallowRef</h3><ul>
+<li>如果 <code>shallowRef()</code> 的是个对象，则不会把它包装成 reactive 响应式对象，但对象本身改变能够被监听到</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; shallowInfo.name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; isReactive, ref, shallowRef &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const info &#x3D; ref(&#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;)</span><br><span class="line">    info.value.name &#x3D; &#39;Lance1&#39;</span><br><span class="line">    console.log(info.value); &#x2F;&#x2F; Proxy &#123; name: &#39;Lance1&#39; &#125;</span><br><span class="line">    console.log(isReactive(info.value)); &#x2F;&#x2F; true</span><br><span class="line"></span><br><span class="line">    const shallowInfo &#x3D; shallowRef(&#123;</span><br><span class="line">      name: &#39;GC&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      &#x2F;&#x2F; shallowInfo.value.name &#x3D; &#39;GC1&#39;; &#x2F;&#x2F; shadowRef 会追踪 value 本身的变化（直接赋值新对象）；但不会把value包装成reactive响应式对象</span><br><span class="line">      shallowInfo.value &#x3D; &#123; name: &#39;GC1&#39; &#125;; &#x2F;&#x2F; 页面1s后变成 GC1</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    &#x2F;&#x2F; shallowInfo.value.name &#x3D; &#39;GC1&#39;;</span><br><span class="line">    console.log(shallowInfo); &#x2F;&#x2F; 普通值 &#123; name: &#39;GC1&#39; &#125;</span><br><span class="line">    console.log(isReactive(shallowInfo)); &#x2F;&#x2F; false</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      shallowInfo</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; shallowInfo.name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; isReactive, ref, shallowRef, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const shallowInfo &#x3D; shallowRef(&#123;</span><br><span class="line">      name: &#39;GC&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(shallowInfo.value.name); &#x2F;&#x2F; 监听不到</span><br><span class="line">    &#125;);</span><br><span class="line">    shallowInfo.value.name &#x3D; &#39;GC1&#39;; &#x2F;&#x2F; 上边 watchEffect 监听不到这里的变化</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      shallowInfo</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="triggerRef"><a href="#triggerRef" class="headerlink" title="triggerRef"></a>triggerRef</h3><ul>
+<li>上边 <code>shallowRef</code> 的变化监听不到了，如果想要监听，就用 <code>triggerRef</code> 手动触发监听</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; shallowInfo.name &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; isReactive, ref, shallowRef, triggerRef, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const shallowInfo &#x3D; shallowRef(&#123;</span><br><span class="line">      name: &#39;GC&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(shallowInfo.value.name); &#x2F;&#x2F; 监听不到</span><br><span class="line">    &#125;);</span><br><span class="line">    shallowInfo.value.name &#x3D; &#39;GC1&#39;; &#x2F;&#x2F; 上边 watchEffect 监听不到这里的变化</span><br><span class="line">    triggerRef(shallowInfo); &#x2F;&#x2F; 手动触发更新: watchEffect 监听到了；template也更新了</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      shallowInfo</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="🌈-computed"><a href="#🌈-computed" class="headerlink" title="🌈 computed"></a>🌈 computed</h2><ul>
+<li>返回一个不可变的响应式ref，computed 的返回值是从 Proxy 的 getter 中取的</li>
+<li>内部也是用 Proxy 实现的</li>
+<li>用法<ul>
+<li><code>computed(() =&gt; &#39;xxx&#39;)</code></li>
+<li><code>computed(&#123; get() &#123;&#125;, set() &#123;&#125; &#125;)</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; sentence &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, computed &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const name &#x3D; ref(&#39;Lance&#39;);</span><br><span class="line">    const sentence &#x3D; computed(() &#x3D;&gt; &#96;欢迎$&#123;name.value&#125;的到来&#96;);</span><br><span class="line">    return &#123;</span><br><span class="line">      sentence</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; sentence &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; sentence2 &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, computed &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const name &#x3D; ref(&#39;Lance&#39;);</span><br><span class="line">    const sentence &#x3D; computed(() &#x3D;&gt; &#96;欢迎$&#123;name.value&#125;的到来&#96;);</span><br><span class="line">    const sentence2 &#x3D; computed(&#123;</span><br><span class="line">      get() &#123;</span><br><span class="line">        return &#96;获取$&#123;name.value&#125;&#96;</span><br><span class="line">      &#125;,</span><br><span class="line">      set(val) &#123;</span><br><span class="line">        console.log(&#96;我被修改成了$&#123;val&#125;&#96;);</span><br><span class="line">        name.value &#x3D; &#39;GC&#39;;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    sentence2.value &#x3D; 233;</span><br><span class="line">    return &#123;</span><br><span class="line">      sentence,</span><br><span class="line">      sentence2</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="readonly"><a href="#readonly" class="headerlink" title="readonly"></a>readonly</h2><ul>
+<li>深度设置属性的 readonly</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;123&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, readonly, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const reactiveObj &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 120,</span><br><span class="line">        weight: 130</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const readonlyReactiveObj &#x3D; readonly(reactiveObj);</span><br><span class="line"></span><br><span class="line">    reactiveObj.name &#x3D; &#39;GC&#39;;</span><br><span class="line">    console.log(reactiveObj); &#x2F;&#x2F; 能够改变</span><br><span class="line">    readonlyReactiveObj.name &#x3D; &#39;GC1&#39;; &#x2F;&#x2F; info 下的属性也无法改变</span><br><span class="line">    console.log(readonlyReactiveObj); &#x2F;&#x2F; 无法改变</span><br><span class="line"></span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(readonlyReactiveObj.name);</span><br><span class="line">      &#x2F;&#x2F; 源对象reactiveObj改变，readonlyReactiveObj也会同步更新，而且会被 watchEffect 监听到</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647075389173-cfdd9248-6cb1-4539-986e-aecc5b3a2d97.png" class="" title="100%">
+
+<h2 id="🌈-watchEffect"><a href="#🌈-watchEffect" class="headerlink" title="🌈 watchEffect"></a>🌈 watchEffect</h2><ul>
+<li>首次加载会被立即执行一次</li>
+<li>自动收集 watchEffect 中的依赖</li>
+<li>依赖改变后，watchEffect 会被重新执行一次</li>
+<li>组件被卸载后会自动停止（unmounted）</li>
+<li>watchEffect 返回 stop 函数，显示的执行能够立即停止 watchEffect 的监听</li>
+<li>执行时期<ul>
+<li>首次执行：在组件 <code>mounted</code> 之前被调用</li>
+<li>后续执行：默认在组件 <code>beforeUpdate</code> ，也就是组件更新之前被调用</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line"></span><br><span class="line">    const stop &#x3D; watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value); &#x2F;&#x2F; 0 2</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      stop();</span><br><span class="line">      &#x2F;&#x2F; 此处显示调用后，就无法监听到下边 3s 后对 count.value 的改变了</span><br><span class="line">    &#125;, 2000);</span><br><span class="line"></span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line"></span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 233; &#x2F;&#x2F; 没能被 watchEffect 监听到，因为被显示 stop 了</span><br><span class="line">    &#125;, 3000);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="清除副作用"><a href="#清除副作用" class="headerlink" title="清除副作用"></a>清除副作用</h3><ul>
+<li>有时我们会在 watchEffect 中做一些副作用操作<ul>
+<li>e.g. axios 异步数据数据、Promise、input 防抖搜索</li>
+<li>此刻传入 watchEffect 中的函数是个异步函数</li>
+<li>我们可以在 onInvalidate 回调中清除副作用</li>
+</ul>
+</li>
+<li>onInvalidate 执行时机<ul>
+<li>watch(副作用) 即将被执行时</li>
+<li>watch 被 stop 停止</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    &#x2F;&#x2F; effect function（副作用函数） 指的是：</span><br><span class="line">        &#x2F;&#x2F; async (onInvalidate) &#x3D;&gt; &#123;&#125; 这个异步函数整体</span><br><span class="line">    &#x2F;&#x2F; effect（副作用）指的是：</span><br><span class="line">        &#x2F;&#x2F; const data &#x3D; await Promise.resolve(count.value); 这个异步Promise</span><br><span class="line">    const stop &#x3D; watchEffect(async (onInvalidate) &#x3D;&gt; &#123;</span><br><span class="line">      const data &#x3D; await Promise.resolve(count.value);</span><br><span class="line">      console.log(data);</span><br><span class="line"></span><br><span class="line">      onInvalidate(() &#x3D;&gt; &#123;</span><br><span class="line">        &#x2F;&#x2F; 可以在 onInvalidate 回调中拦截 上边 await 函数产生的副作用</span><br><span class="line">        &#x2F;&#x2F; 即 onInvalidate 会在外层这个副作用函数（async (onInvalidate) &#x3D;&gt; &#123;&#125;）调用之前执行</span><br><span class="line">        console.log(&#39;onInvalidate is triggered&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      stop();</span><br><span class="line">      console.log(&#39;watchEffect is stopped&#39;);</span><br><span class="line">    &#125;, 2000);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647078456088-eba4dbd0-ba20-4c0a-9954-f45c7b4b449e.png" class="" title="100%">
+
+<p>即使没有产生副作用，onInvalidate 也先于 watchEffect 函数执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    const stop &#x3D; watchEffect((onInvalidate) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line"></span><br><span class="line">      onInvalidate(() &#x3D;&gt; &#123;</span><br><span class="line">        &#x2F;&#x2F; 此回调也会先于 上边 log 所在的函数之前执行</span><br><span class="line">        console.log(&#39;onInvalidate is triggered&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      stop();</span><br><span class="line">      console.log(&#39;watchEffect is stopped&#39;);</span><br><span class="line">    &#125;, 2000);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647078656470-61e439a6-3ebb-4b98-8298-ffa5f787dae7.png" class="" title="100%">
+
+<p>更清晰的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    function getData() &#123;</span><br><span class="line">      return new Promise((resolve, reject) &#x3D;&gt; &#123;</span><br><span class="line">        resolve(100);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    watchEffect(async (onInvalidate) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&quot;count.value&quot;, count.value);</span><br><span class="line">      const data &#x3D; await getData();</span><br><span class="line">      console.log(&quot;data&quot;, data);</span><br><span class="line">      onInvalidate(() &#x3D;&gt; &#123;</span><br><span class="line">        console.log(&#39;onInvalidate is triggered&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 233;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>先立即执行一次 watchEffect 打印 count.value 0，接着打印 data 100</li>
+<li>然后1s后改变了count</li>
+<li>在 watchEffect 执行之前先执行了 onInvalidate 中的回调 <code>onInvalidate is triggered</code></li>
+<li>然后才再次执行 watchEffect 打印 count.value 233，最后打印 data 100</li>
+</ol>
+<img src="/posts/6721/1647079962315-2ce5c980-a860-4f76-8b34-d94df0fcfbee.png" class="" title="100%">
+
+<ul>
+<li>如果 watchEffect 产生了副作用，vue会自动捕获这个异步函数隐式返回的promise的错误</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    function getData() &#123;</span><br><span class="line">      return new Promise((resolve, reject) &#x3D;&gt; &#123;</span><br><span class="line">        reject(&#39;err&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    watchEffect(async (onInvalidate) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&quot;count.value&quot;, count.value);</span><br><span class="line">      const data &#x3D; await getData();</span><br><span class="line">      console.log(&quot;data&quot;, data);</span><br><span class="line">      onInvalidate(() &#x3D;&gt; &#123;</span><br><span class="line">        console.log(&#39;onInvalidate is triggered&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 233;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647080391398-2d8681e0-2051-4af5-845f-b0b80fa18ff6.png" class="" title="100%">
+
+<h3 id="副作用刷新时机"><a href="#副作用刷新时机" class="headerlink" title="副作用刷新时机"></a>副作用刷新时机</h3><p>当一个用户定义的副作用函数进入队列时，默认情况下，会在<strong>所有的组件 update 前执行</strong></p>
+<ul>
+<li><strong>也就是说，watchEffect 会在组件更新之前调用</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect, onBeforeUpdate &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2333;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">    &#125;);</span><br><span class="line">    onBeforeUpdate(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;onBeforeUpdate&#39;);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647089087587-c429cadb-f1a6-4761-a344-da78cdb16386.png" class="" title="100%">
+
+<p>如果想要在组件更新之后才调用，则给 watchEffect 追加一个参数，参数是对象，设置 <code>flush</code> 属性</p>
+<ul>
+<li>flush<ul>
+<li><code>pre</code> 默认值：组件更新前调用</li>
+<li><code>post</code> ：组件更新后调用</li>
+<li><code>sync</code> ：同步执行（用得少）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect, onBeforeUpdate &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2333;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      flush: &#39;post&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    onBeforeUpdate(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;onBeforeUpdate&#39;);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647089101778-e7ed038b-c9c2-4d94-9fcc-87614f72a78d.png" class="" title="100%">
+
+
+
+<ul>
+<li>首次执行 watchEffect ，是在组件 <code>mounted</code> 之前被调用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect, onBeforeUpdate, onMounted &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2333;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">    &#125;);</span><br><span class="line">    onMounted(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;onMounted&#39;);</span><br><span class="line">    &#125;);</span><br><span class="line">    onBeforeUpdate(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;onBeforeUpdate&#39;);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647089480881-14202643-7708-41ff-8bac-0dfb73986df7.png" class="" title="100%">
+
+<ul>
+<li>如果需要在 watchEffect 中使用到 DOM ，请在外表包裹一层 <code>onMounted</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div ref&#x3D;&quot;myRef&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect, onMounted &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const myRef &#x3D; ref(null);</span><br><span class="line">    </span><br><span class="line">    onMounted(() &#x3D;&gt; &#123;</span><br><span class="line">      watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">        console.log(myRef.value);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      myRef</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647089672030-b7e44d43-8af5-4957-831c-79eab4d0046d.png" class="" title="100%">
+
+<h3 id="watch-debug"><a href="#watch-debug" class="headerlink" title="watch debug"></a>watch debug</h3><ul>
+<li>watchEffect 第二个参数对象中接收两个函数<ul>
+<li><code>onTrack</code> 依赖被追踪时被调用</li>
+<li><code>onTrigger</code> 依赖变更导致 watch 副作用被触发时被调用</li>
+<li>要调试的时候就在这俩函数中打 <code>debugger</code></li>
+<li>这俩函数只会在开发模式下生效，生产环境不生效</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watchEffect &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 2333;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      onTrack(e) &#123; &#x2F;&#x2F; 依赖项被追踪时调用</span><br><span class="line">        console.log(&#39;track&#39;, e);</span><br><span class="line">      &#125;,</span><br><span class="line">      onTrigger(e) &#123; &#x2F;&#x2F; 依赖更新导致watch副作用被调用时调用</span><br><span class="line">        debugger;</span><br><span class="line">        console.log(&#39;trigger&#39;, e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647090263688-d608c3ec-15d1-46f6-8e00-a40a1135fa1b.png" class="" title="100%">
+
+<h2 id="🌈-watch"><a href="#🌈-watch" class="headerlink" title="🌈 watch"></a>🌈 watch</h2><ul>
+<li>懒加载<ul>
+<li>区别于 watchEffect ，首次加载不被监听</li>
+</ul>
+</li>
+<li>接收两个函数<ul>
+<li>第一个函数中：return 要监听的对象</li>
+<li>第二个函数中：监听后要处理的逻辑</li>
+</ul>
+</li>
+</ul>
+<h3 id="监听单个值"><a href="#监听单个值" class="headerlink" title="监听单个值"></a>监听单个值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 233;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    &#x2F;&#x2F; 第一种写法</span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return count.value; &#x2F;&#x2F; 要监听的对象</span><br><span class="line">    &#125;, (newVal, oldVal) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">      console.log(&#39;newVal:&#39;, newVal, &#39;oldVal:&#39;, oldVal);</span><br><span class="line">    &#125;);</span><br><span class="line">    &#x2F;&#x2F; 简写</span><br><span class="line">    watch(() &#x3D;&gt; count.value, (newVal, oldVal) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">      console.log(&#39;newVal:&#39;, newVal, &#39;oldVal:&#39;, oldVal);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647091468788-93cc179d-6527-4d8a-87ef-7285de1dfb55.png" class="" title="100%">
+
+<p>第二种写法：</p>
+<ul>
+<li>只支持 <code>ref</code> ，<code>reactive</code> 数据只能用第一种方案</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 233;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    &#x2F;&#x2F; 第二种写法</span><br><span class="line">    watch(count, (newVal, oldVal) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(count.value);</span><br><span class="line">      console.log(&#39;newVal:&#39;, newVal, &#39;oldVal:&#39;, oldVal);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      count</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>reactive:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;lance&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      obj.name &#x3D; &#39;GC&#39;;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return obj.name;</span><br><span class="line">    &#125;, () &#x3D;&gt; &#123;</span><br><span class="line">      console.log(obj.name);</span><br><span class="line">    &#125;);</span><br><span class="line">    &#x2F;&#x2F; 简写形式：</span><br><span class="line">    watch(() &#x3D;&gt; obj.name, () &#x3D;&gt; &#123;</span><br><span class="line">      console.log(obj.name);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="监听多个值"><a href="#监听多个值" class="headerlink" title="监听多个值"></a>监听多个值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    const name &#x3D; ref(&#39;张三&#39;);</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      count.value &#x3D; 1;</span><br><span class="line">      name.value &#x3D; &#39;李四&#39;;</span><br><span class="line">    &#125;, 1000);</span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return [count.value, name.value];</span><br><span class="line">    &#125;, ([newCount, newName], [oldCount, oldName]) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#123;</span><br><span class="line">        &#39;newCount&#39;: newCount,</span><br><span class="line">        &#39;newName&#39;: newName,</span><br><span class="line">        &#39;oldCount&#39;: oldCount,</span><br><span class="line">        &#39;oldName&#39;: oldName</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647093277494-abf6c488-4798-4dea-8017-666f5bcb34e2.png" class="" title="100%">
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; name &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;changeName&quot;&gt;change&lt;&#x2F;button&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    const name &#x3D; ref(&#39;张三&#39;);</span><br><span class="line"></span><br><span class="line">    const changeName &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      name.value &#x3D; &#39;李四&#39;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return [count.value, name.value];</span><br><span class="line">    &#125;, ([newCount, newName], [oldCount, oldName]) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(newName); &#x2F;&#x2F; 李四</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      name,</span><br><span class="line">      changeName</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="与-watchEffect-共享的行为"><a href="#与-watchEffect-共享的行为" class="headerlink" title="与 watchEffect 共享的行为"></a>与 watchEffect 共享的行为</h3><p>watch 与 <a target="_blank" rel="noopener" href="https://v3.cn.vuejs.org/guide/reactivity-computed-watchers.html#watcheffect">watchEffect</a>共享<a target="_blank" rel="noopener" href="https://v3.cn.vuejs.org/guide/reactivity-computed-watchers.html#%E5%81%9C%E6%AD%A2%E4%BE%A6%E5%90%AC">停止侦听</a>，<a target="_blank" rel="noopener" href="https://v3.cn.vuejs.org/guide/reactivity-computed-watchers.html#%E6%B8%85%E9%99%A4%E5%89%AF%E4%BD%9C%E7%94%A8">清除副作用</a> (相应地 onInvalidate 会作为回调的第三个参数传入)、<a target="_blank" rel="noopener" href="https://v3.cn.vuejs.org/guide/reactivity-computed-watchers.html#%E5%89%AF%E4%BD%9C%E7%94%A8%E5%88%B7%E6%96%B0%E6%97%B6%E6%9C%BA">副作用刷新时机</a>和<a target="_blank" rel="noopener" href="https://v3.cn.vuejs.org/guide/reactivity-computed-watchers.html#%E4%BE%A6%E5%90%AC%E5%99%A8%E8%B0%83%E8%AF%95">侦听器调试</a>行为。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; name &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;changeName&quot;&gt;change&lt;&#x2F;button&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; onBeforeUpdate, ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line">    const name &#x3D; ref(&#39;张三&#39;);</span><br><span class="line"></span><br><span class="line">    const changeName &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;点击按钮后&#39;);</span><br><span class="line">      name.value &#x3D; &#39;李四&#39;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return [count.value, name.value];</span><br><span class="line">    &#125;, ([newCount, newName], [oldCount, oldName]) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(newName);</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      flush: &#39;post&#39;,</span><br><span class="line">      onTrack(e) &#123;</span><br><span class="line">        console.log(&#39;onTrack&#39;, e);</span><br><span class="line">      &#125;,</span><br><span class="line">      onTrigger(e) &#123;</span><br><span class="line">        console.log(&#39;onTrigger&#39;, e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    onBeforeUpdate(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;onBeforeUpdate&#39;);</span><br><span class="line">      &#x2F;&#x2F; 默认先 watch 后 onBeforeUpdate</span><br><span class="line">      &#x2F;&#x2F; flush: &#39;post&#39; 之后, 先 onBeforeUpdate 后 watch</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      name,</span><br><span class="line">      changeName</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647093533850-75c4d88c-e654-409d-be63-493e039cb73a.png" class="" title="100%">
+
+<ul>
+<li>onInvalidate 作为回调的第三个参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;changeCount&quot;&gt;change&lt;&#x2F;button&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line"></span><br><span class="line">    const changeCount &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;点击按钮后&#39;);</span><br><span class="line">      count.value++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return count.value;</span><br><span class="line">    &#125;, (newCount, oldCount, onInvalidate) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(newCount, oldCount);</span><br><span class="line">      onInvalidate(() &#x3D;&gt; &#123;</span><br><span class="line">        console.log(&#39;onInvalidate is triggered&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      changeCount</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注意下方第一次点击后并没有触发 onInvalidate</li>
+<li>说明第一次才注册，第二次追踪依赖变化，再变化前执行</li>
+</ul>
+<img src="/posts/6721/1647094035226-10558a09-1500-40f0-a5a5-87aaf23e8a37.png" class="" title="100%">
+
+<ul>
+<li>显示调用 stop 函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; count &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;changeCount&quot;&gt;change&lt;&#x2F;button&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref, watch &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const count &#x3D; ref(0);</span><br><span class="line"></span><br><span class="line">    const changeCount &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;点击按钮后&#39;);</span><br><span class="line">      count.value++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    const stop &#x3D; watch(() &#x3D;&gt; &#123;</span><br><span class="line">      return count.value;</span><br><span class="line">    &#125;, (newCount, oldCount) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(newCount, oldCount);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">      stop();</span><br><span class="line">    &#125;, 5000);</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      count,</span><br><span class="line">      changeCount</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647094146064-017510d8-071c-48da-ae9f-2224072627c3.png" class="" title="100%">
+
+<h2 id="isProxy"><a href="#isProxy" class="headerlink" title="isProxy"></a>isProxy</h2><ul>
+<li><p>检查一个对象是否是被 <strong>reactive 或者 readonly</strong> 代理的对象</p>
+</li>
+<li><ul>
+<li>普通对象为 false</li>
+<li><strong>自己 new 的 Proxy 对象为 false</strong></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  </span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, readonly, isProxy &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const state2 &#x3D; readonly(&#123;</span><br><span class="line">      name: &#39;GC&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const state3 &#x3D; &#123;</span><br><span class="line">      name: &#39;Sherry&#39;</span><br><span class="line">    &#125;;</span><br><span class="line">    const state4 &#x3D; new Proxy(&#123;</span><br><span class="line">      name: &#39;Summer&#39;</span><br><span class="line">    &#125;, &#123;&#125;);</span><br><span class="line">    console.log(&quot;reactive对象为:&quot;, isProxy(state));</span><br><span class="line">    console.log(&quot;readonly对象为:&quot;, isProxy(state2));</span><br><span class="line">    console.log(&quot;普通对象为:&quot;, isProxy(state3));</span><br><span class="line">    console.log(&quot;自己new的Proxy对象为:&quot;, isProxy(state4));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647135720121-3519692c-1980-4504-91fc-a1b651e2cafb.png" class="" title="100%">
+
+<h2 id="isReactive"><a href="#isReactive" class="headerlink" title="isReactive"></a>isReactive</h2><ul>
+<li>是否是通过 reactive 包装代理的对象</li>
+<li>注意<ul>
+<li>readonly 包裹的普通对象为 false</li>
+<li>readonly 包裹的 reactive 对象为 true</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, isReactive, readonly, isProxy, isReadonly &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; reactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const obj2 &#x3D; readonly(&#123;</span><br><span class="line">      name: &#39;GC&#39;</span><br><span class="line">    &#125;);</span><br><span class="line">    const obj3 &#x3D; readonly(obj);</span><br><span class="line">    const obj4 &#x3D; reactive(1);</span><br><span class="line">    console.log(isProxy(obj), isReactive(obj), isReadonly(obj));</span><br><span class="line">    console.log(isProxy(obj2), isReactive(obj2), isReadonly(obj2));</span><br><span class="line">    console.log(isProxy(obj3), isReactive(obj3), isReadonly(obj3));</span><br><span class="line">    console.log(isProxy(obj4), isReactive(obj4), isReadonly(obj4));</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647137350474-7b2fcf97-69ce-4938-aa26-3343c5ba771b.png" class="" title="100%">
+
+
+<h2 id="shallowReactive"><a href="#shallowReactive" class="headerlink" title="shallowReactive"></a>shallowReactive</h2><ul>
+<li>reactive 其实可以理解为 <code>deepReactive</code> ，即深度代理</li>
+<li>而 <code>shallowReactive</code> 只代理最外层，类似浅拷贝</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; name &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">    &lt;p&gt;&#123;&#123; info.grade &#125;&#125;&lt;&#x2F;p&gt; &lt;!-- 此处无法监听到 button 改变 grade 后的更新 --&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;change&quot;&gt;change&lt;&#x2F;button&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRefs, shallowReactive, watchEffect &#125; from &#39;vue&#39;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const state &#x3D; shallowReactive(&#123;</span><br><span class="line">      name: &#39;Lance&#39;, &#x2F;&#x2F; 这一层能够监听到</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100, &#x2F;&#x2F; 第二层开始就无法监听到了</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const change &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      state.info.grade +&#x3D; 10;</span><br><span class="line">    &#125;</span><br><span class="line">    watchEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      console.log(state.info.grade); &#x2F;&#x2F; 这里无法监听到</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#123;</span><br><span class="line">      ...toRefs(state),</span><br><span class="line">      change</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="shallowReadonly"><a href="#shallowReadonly" class="headerlink" title="shallowReadonly"></a>shallowReadonly</h2><ul>
+<li>区别于 readonly 的深度遍历，shallowReadonly 只会 readonly 对象的第一层属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; readonly, shallowReadonly, isReadonly &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; readonly(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    const shallowObj &#x3D; shallowReadonly(&#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    console.log(isReadonly(obj), isReadonly(shallowObj)); &#x2F;&#x2F; true true</span><br><span class="line">    console.log(isReadonly(obj.info), isReadonly(shallowObj.info)); &#x2F;&#x2F; true false</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="toRaw"><a href="#toRaw" class="headerlink" title="toRaw"></a>toRaw</h2><ul>
+<li>把 reactive 或者 readonly 变成最初的普通对象</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; reactive, toRaw &#125; from &#39;@vue&#x2F;reactivity&#39;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; &#123;</span><br><span class="line">      name: &#39;Lance&#39;</span><br><span class="line">    &#125;;</span><br><span class="line">    const reactiveObj &#x3D; reactive(obj);</span><br><span class="line">    const rawObj &#x3D; toRaw(reactiveObj);</span><br><span class="line">    console.log(rawObj);</span><br><span class="line">    console.log(rawObj &#x3D;&#x3D;&#x3D; obj); &#x2F;&#x2F; 和原对象是一个对象</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647140581392-6d78b44c-b12a-4cae-bbdf-b03d5efed7be.png" class="" title="100%">
+
+<h2 id="markRaw"><a href="#markRaw" class="headerlink" title="markRaw"></a>markRaw</h2><ul>
+<li>标记一个对象，使其永远不会转换为 proxy。返回对象本身。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; markRaw, reactive &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; &#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    const rawObj &#x3D; markRaw(obj);</span><br><span class="line">    console.log(obj, rawObj);</span><br><span class="line">    console.log(obj &#x3D;&#x3D;&#x3D; rawObj);</span><br><span class="line">    &#x2F;&#x2F; 等于原对象，且给原对象添加了一个 __v_skip: true 标识，用来标记无法被 reactive</span><br><span class="line"></span><br><span class="line">    const proxyObj &#x3D; reactive(rawObj);</span><br><span class="line">    console.log(proxyObj); &#x2F;&#x2F; 返回原对象</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647141911211-b3fe9c17-814d-41c8-aade-f2173bdc2552.png" class="" title="100%">
+
+
+<ul>
+<li>markRow 和 <code>shallowXXX</code> API 默认都只作用于对象的第一层对象，第二层就失效了<ul>
+<li>例如<ul>
+<li>markRow 只作用于目标对象的第一层</li>
+<li>shallowReactive 只对目标对象的第一层有响应式作用，深层就失去响应式了</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; markRaw, reactive &#125; from &#39;vue&#39;;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#39;App&#39;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const obj &#x3D; &#123;</span><br><span class="line">      name: &#39;Lance&#39;,</span><br><span class="line">      info: &#123;</span><br><span class="line">        grade: 100</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    const rawObj &#x3D; markRaw(obj);</span><br><span class="line"></span><br><span class="line">    const proxyObj &#x3D; reactive(&#123;</span><br><span class="line">      info: rawObj.info</span><br><span class="line">    &#125;);</span><br><span class="line">    console.log(proxyObj, rawObj);</span><br><span class="line">    &#x2F;&#x2F; rawObj 会被标记为 _v_skip: true</span><br><span class="line">    &#x2F;&#x2F; 但旗下 info 对象并没有被标记为 _v_skip: true</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    console.log(proxyObj.info &#x3D;&#x3D;&#x3D; obj.info); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6721/1647144014708-a83d5991-7580-42f9-be61-c1dde72c4a49.png" class="" title="100%">
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue3/" rel="tag"># Vue3</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/52230/" rel="prev" title="Vue3-setup">
+                  <i class="fa fa-chevron-left"></i> Vue3-setup
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/20538/" rel="next" title="Vue3生命周期">
+                  Vue3生命周期 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

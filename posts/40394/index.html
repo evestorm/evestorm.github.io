@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="购买进入阿里云下拉菜单选择 ecs ：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里云云服务器ECS购买与使用（笔记）">
+<meta property="og:url" content="https://evestorm.github.io/posts/40394/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="购买进入阿里云下拉菜单选择 ecs ：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/ecs_config.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/ecs_config.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/filezilla_site_manager_vsftpd_18_04.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/new-site.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/user-pass.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/filezilla_certificate_vsftpd_three.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ECS%E8%B4%AD%E4%B9%B0%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%88%E7%AC%94%E8%AE%B0%EF%BC%89/filezilla_file_test_vsftpd_18_04.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/filezilla_file_test_vsftpd_18_04.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/filezilla_file_upload_vsftpd_18_04.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/40394/wKiom1b6SWvwBjm7AAA9pZvVBTE386.png">
+<meta property="article:published_time" content="2019-06-12T07:54:50.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.247Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/40394/ecs_config.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/40394/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>阿里云云服务器ECS购买与使用（笔记） | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%AD%E4%B9%B0"><span class="nav-number">1.</span> <span class="nav-text">购买</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">如何安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">域名解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Github-Page-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D"><span class="nav-number">4.</span> <span class="nav-text">Github Page 自定义域名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ubuntu-%E5%AE%89%E8%A3%85-nodejs"><span class="nav-number">5.</span> <span class="nav-text">Ubuntu 安装 nodejs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ubuntu-%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E4%B8%8B%E6%97%A0%E6%B3%95%E7%94%A8-root-%E7%99%BB%E5%BD%95%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">ubuntu 图形界面下无法用 root 登录解决办法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-LAMP-%E7%8E%AF%E5%A2%83"><span class="nav-number">7.</span> <span class="nav-text">安装 LAMP 环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%BE%91%E6%96%87%E4%BB%B6"><span class="nav-number">7.1.</span> <span class="nav-text">编辑文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysql-%E6%93%8D%E4%BD%9C"><span class="nav-number">7.2.</span> <span class="nav-text">mysql 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA"><span class="nav-number">7.2.1.</span> <span class="nav-text">导入导出</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-%E5%9B%BE%E5%BD%A2%E5%8C%96-mysql-workbench"><span class="nav-number">8.</span> <span class="nav-text">安装 图形化 mysql-workbench</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E5%BC%80-mysql-%E5%9B%BE%E5%BD%A2%E5%8C%96%E5%90%8E%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">9.</span> <span class="nav-text">打开 mysql 图形化后无法连接数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8-ubuntu-%E4%B8%8B%E6%90%AD%E5%BB%BA-ftp-%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">10.</span> <span class="nav-text">在 ubuntu 下搭建 ftp 服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">10.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%88%E5%86%B3%E6%9D%A1%E4%BB%B6"><span class="nav-number">10.2.</span> <span class="nav-text">先决条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-1-%E6%AD%A5-%E5%AE%89%E8%A3%85-vsftpd"><span class="nav-number">10.3.</span> <span class="nav-text">第 1 步 - 安装 vsftpd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-2-%E6%AD%A5-%E6%89%93%E5%BC%80%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number">10.4.</span> <span class="nav-text">第 2 步 - 打开防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-3-%E6%AD%A5-%E5%87%86%E5%A4%87%E7%94%A8%E6%88%B7%E7%9B%AE%E5%BD%95"><span class="nav-number">10.5.</span> <span class="nav-text">第 3 步 - 准备用户目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-4-%E6%AD%A5-%E9%85%8D%E7%BD%AE-FTP-%E8%AE%BF%E9%97%AE"><span class="nav-number">10.6.</span> <span class="nav-text">第 4 步 - 配置 FTP 访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-5-%E6%AD%A5-%E6%B5%8B%E8%AF%95-FTP-%E8%AE%BF%E9%97%AE"><span class="nav-number">10.7.</span> <span class="nav-text">第 5 步 - 测试 FTP 访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-6-%E6%AD%A5-%E4%BF%9D%E6%8A%A4%E4%BA%A4%E6%98%93"><span class="nav-number">10.8.</span> <span class="nav-text">第 6 步 - 保护交易</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-7-%E6%AD%A5-%E4%BD%BF%E7%94%A8-FileZilla-%E6%B5%8B%E8%AF%95-TLS"><span class="nav-number">10.9.</span> <span class="nav-text">第 7 步 - 使用 FileZilla 测试 TLS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC-8-%E6%AD%A5-%E7%A6%81%E7%94%A8-Shell-%E8%AE%BF%E9%97%AE%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89"><span class="nav-number">10.10.</span> <span class="nav-text">第 8 步 - 禁用 Shell 访问（可选）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">10.11.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E5%AE%8C%E4%B8%8A%E9%9D%A2%E6%93%8D%E4%BD%9C%E5%90%8E%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">10.12.</span> <span class="nav-text">执行完上面操作后的问题解决</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-FileZilla-FTP-%E4%B8%8B%E8%BD%BD%E6%97%B6%E6%8F%90%E7%A4%BA%E2%80%9C%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8C%E4%B8%8D%E6%94%AF%E6%8C%81-FTPover-TLS%E2%80%9D-%E5%92%8C%E2%80%9C%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8D%E6%94%AF%E6%8C%81%E9%9D%9E-ASCII-%E5%AD%97%E7%AC%A6%E2%80%9D"><span class="nav-number">10.12.1.</span> <span class="nav-text">使用 FileZilla FTP 下载时提示“不安全的服务器，不支持 FTPover TLS”,和“服务器不支持非 ASCII 字符”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ftp-%E8%BF%9E%E6%8E%A5%E9%94%99%E8%AF%AF%E2%80%94%E2%80%94%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8F%91%E5%9B%9E%E4%BA%86%E4%B8%8D%E5%8F%AF%E8%B7%AF%E7%94%B1%E7%9A%84%E5%9C%B0%E5%9D%80%E3%80%82%E4%BD%BF%E7%94%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9C%B0%E5%9D%80%E4%BB%A3%E6%9B%BF%E3%80%82"><span class="nav-number">10.12.2.</span> <span class="nav-text">ftp 连接错误——服务器发回了不可路由的地址。使用服务器地址代替。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ubuntu-%E4%B8%8B-Apache-%E8%99%9A%E6%8B%9F%E7%AB%99%E7%82%B9%E9%85%8D%E7%BD%AE"><span class="nav-number">11.</span> <span class="nav-text">ubuntu 下 Apache 虚拟站点配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apache-%E9%85%8D%E7%BD%AE%E4%BA%8C%E7%BA%A7%E5%9F%9F%E5%90%8D"><span class="nav-number">12.</span> <span class="nav-text">apache 配置二级域名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90-1"><span class="nav-number">12.1.</span> <span class="nav-text">域名解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%AF%E6%8C%81-https"><span class="nav-number">12.2.</span> <span class="nav-text">支持 https</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/40394/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          阿里云云服务器ECS购买与使用（笔记）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-12 15:54:50" itemprop="dateCreated datePublished" datetime="2019-06-12T15:54:50+08:00">2019-06-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">服务器</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="购买"><a href="#购买" class="headerlink" title="购买"></a>购买</h2><p>进入阿里云下拉菜单选择 ecs ：</p>
+<a id="more"></a>
+
+<img src="/posts/40394/ecs_config.png" class="" title="ecs_config">
+
+<p>我购买的配置如下：</p>
+<img src="/posts/40394/ecs_config.png" class="" title="ecs_config">
+
+<p>购买后实例就运行了，远程连接后安装一系列包和软件：</p>
+<h2 id="如何安装"><a href="#如何安装" class="headerlink" title="如何安装"></a>如何安装</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/87hbteo/p/7802104.html">阿里云服务器 ECS LAMP 环境安装（Ubuntu）</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/KascLiyuan/article/details/73438093">阿里云 ECS 云服务器外网 IP 无法访问</a></p>
+<h2 id="域名解析"><a href="#域名解析" class="headerlink" title="域名解析"></a>域名解析</h2><p><a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/48b558e3f25e6d7f38c09aec.html">阿里云如何解析域名</a></p>
+<h2 id="Github-Page-自定义域名"><a href="#Github-Page-自定义域名" class="headerlink" title="Github Page 自定义域名"></a>Github Page 自定义域名</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/8ac6c7c037c5">创建 Github Page 并设置自定义域名</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.jikexueyuan.com/project/github-pages-basics/cname-file.html">添加 CNAME 文件到你的存储库中</a></li>
+</ul>
+<h2 id="Ubuntu-安装-nodejs"><a href="#Ubuntu-安装-nodejs" class="headerlink" title="Ubuntu 安装 nodejs"></a>Ubuntu 安装 nodejs</h2><ul>
+<li><a href="https://evestorm.github.io/posts/58410/%E9%98%BF%E9%87%8C%E4%BA%91Ubuntu%E6%90%AD%E5%BB%BANodeJs%E7%8E%AF%E5%A2%83">https://blog.5udou.cn/blog/A-Li-Yun-UbuntuDa-Jian-NodeJsHuan-Jing-75</a></li>
+</ul>
+<h2 id="ubuntu-图形界面下无法用-root-登录解决办法"><a href="#ubuntu-图形界面下无法用-root-登录解决办法" class="headerlink" title="ubuntu 图形界面下无法用 root 登录解决办法"></a>ubuntu 图形界面下无法用 root 登录解决办法</h2><p>先按照 <a target="_blank" rel="noopener" href="https://www.linuxidc.com/Linux/2017-01/139094.htm">这个教程</a> 走，但最后不重启。然后转到 <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39591507/article/details/81288644">这个教程</a>，执行第三步，也就是下面这段：</p>
+<blockquote>
+<p>进入/etc/pam.d 文件夹下，修改 gdm-autologin 和 gdm-passwd 文件内容(首先修改文件权限，参考步骤 2 的操作)</p>
+<p>gdm-autologin 文件注释掉 auth required pam_success_if.so user!=root quiet_success 这一行</p>
+<p>gdm-passwd 文件注释掉 auth required pam_success_if.so user!=root quiet_success 这一行</p>
+</blockquote>
+<p>做完后重启然后点击登录其他用户，输入 root 和密码 root（这个密码在上面第一个教程中已经自己设置了）就好。</p>
+<h2 id="安装-LAMP-环境"><a href="#安装-LAMP-环境" class="headerlink" title="安装 LAMP 环境"></a>安装 LAMP 环境</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_27366789/article/details/81990291">在 ubuntu16.04 中一键创建 LAMP 环境</a></p>
+<h3 id="编辑文件"><a href="#编辑文件" class="headerlink" title="编辑文件"></a>编辑文件</h3><ul>
+<li>退出 mysql 命令行：<code>exit</code></li>
+<li>vi 编辑文件 按下 i 表示编辑 按下 esc 退出编辑模式 按下 <code>:wq</code> 保存退出</li>
+</ul>
+<h3 id="mysql-操作"><a href="#mysql-操作" class="headerlink" title="mysql 操作"></a>mysql 操作</h3><p>登录 mysql -u root -p</p>
+<p>-u 表示选择登陆的用户名， -p 表示登陆的用户密码，现在是 mysql 数据库是没有密码的，Enter password:处直接回车，就能够进入 mysql 数据库。</p>
+<h4 id="导入导出"><a href="#导入导出" class="headerlink" title="导入导出"></a>导入导出</h4><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/hewenjing8168/article/details/80821447">ubuntu 下 mysql 数据库的导入导出</a></p>
+<h2 id="安装-图形化-mysql-workbench"><a href="#安装-图形化-mysql-workbench" class="headerlink" title="安装 图形化 mysql-workbench"></a>安装 图形化 mysql-workbench</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37638061/article/details/80246799">安装 mysql 服务，及安装图形化管理界面</a></p>
+<h2 id="打开-mysql-图形化后无法连接数据库"><a href="#打开-mysql-图形化后无法连接数据库" class="headerlink" title="打开 mysql 图形化后无法连接数据库"></a>打开 mysql 图形化后无法连接数据库</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chexiansheng/article/details/89193955">Unbuntu 下 Mysql 连接 MysqlWorkBench 出现错误</a></p>
+<h2 id="在-ubuntu-下搭建-ftp-服务器"><a href="#在-ubuntu-下搭建-ftp-服务器" class="headerlink" title="在 ubuntu 下搭建 ftp 服务器"></a>在 ubuntu 下搭建 ftp 服务器</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.howtoing.com/how-to-set-up-vsftpd-for-a-user-s-directory-on-ubuntu-18-04">如何在 Ubuntu 18.04 上为用户目录设置 vsftpd</a><br>执行完上面操作后，会发现下面两个问题，按方法调整就好：</li>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/zhkao/1758125">使用 FileZilla FTP 下载时提示“不安全的服务器，不支持 FTPover TLS”,和“服务器不支持非 ASCII 字符”</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/wbryfl/article/details/82729189">ftp 连接错误——服务器发回了不可路由的地址。使用服务器地址代替。</a></li>
+</ul>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>FTP 是文件传输协议的缩写，是一种曾经广泛用于在客户端和服务器之间移动文件的网络协议。 它已被更快，更安全，更方便的文件传输方式所取代。 许多休闲互联网用户希望通过<code>https</code>直接从他们的网络浏览器下载，命令行用户更有可能使用安全协议，如<code>scp</code>或<a target="_blank" rel="noopener" href="https://www.howtoing.com/how-to-use-sftp-to-securely-transfer-files-with-a-remote-server/">SFTP</a> 。</p>
+<p>FTP 仍然用于支持具有特定需求的遗留应用程序和工作流。 如果您可以选择使用哪种协议，请考虑探索更现代的选项。 但是，当您确实需要 FTP 时，vsftpd 是一个很好的选择。 vsftpd 针对安全性，性能和稳定性进行了优化，可以很好地防范其他 FTP 服务器中存在的许多安全问题，并且是许多 Linux 发行版的默认设置。</p>
+<p>在本教程中，您将配置 vsftpd 以允许用户使用具有 SSL / TLS 保护的登录凭据的 FTP 将文件上载到其主目录。</p>
+<h3 id="先决条件"><a href="#先决条件" class="headerlink" title="先决条件"></a>先决条件</h3><p>要学习本教程，您需要：</p>
+<ul>
+<li><strong>Ubuntu 18.04 服务器和具有 sudo 权限的非 root 用户</strong> ：您可以在<a target="_blank" rel="noopener" href="https://www.howtoing.com/initial-server-setup-with-ubuntu-18-04/">使用 Ubuntu 18.04</a>指南的<a target="_blank" rel="noopener" href="https://www.howtoing.com/initial-server-setup-with-ubuntu-18-04/">初始服务器设置中</a>了解有关如何使用这些权限设置用户的更多信息。</li>
+</ul>
+<h3 id="第-1-步-安装-vsftpd"><a href="#第-1-步-安装-vsftpd" class="headerlink" title="第 1 步 - 安装 vsftpd"></a>第 1 步 - 安装 vsftpd</h3><p>让我们首先更新我们的包列表并安装<code>vsftpd</code>守护进程：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install vsftpd</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，让我们复制配置文件，这样我们就可以从空白配置开始，将原件保存为备份：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig</span><br></pre></td></tr></table></figure>
+
+<p>通过备份配置，我们已准备好配置防火墙。</p>
+<h3 id="第-2-步-打开防火墙"><a href="#第-2-步-打开防火墙" class="headerlink" title="第 2 步 - 打开防火墙"></a>第 2 步 - 打开防火墙</h3><p><strong>注意：</strong> 最后我们还得打开 80 和 8080 端口！！！</p>
+<p>让我们检查防火墙状态以查看它是否已启用。 如果是，我们将确保允许 FTP 流量，因此防火墙规则不会阻止我们的测试。</p>
+<p>检查防火墙状态：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，只允许 SSH 通过：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">OutputStatus: active</span><br><span class="line"></span><br><span class="line">To                         Action      From</span><br><span class="line">--                         ------      ----</span><br><span class="line">OpenSSH                    ALLOW       Anywhere</span><br><span class="line">OpenSSH (v6)               ALLOW       Anywhere (v6)</span><br></pre></td></tr></table></figure>
+
+<p>您可能有其他规则或根本没有防火墙规则。 由于在这种情况下只允许 SSH 流量，因此我们需要为 FTP 流量添加规则。</p>
+<p>让我们打开端口<code>20</code>和<code>21</code>用于 FTP，端口<code>990</code>用于启用 TLS，端口<code>40000-50000</code>用于我们计划在配置文件中设置的被动端口范围：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo ufw allow 20/tcp</span><br><span class="line">sudo ufw allow 21/tcp</span><br><span class="line">sudo ufw allow 990/tcp</span><br><span class="line">sudo ufw allow 40000:50000/tcp</span><br><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
+
+<p>我们的防火墙规则现在应如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">OutputStatus: active</span><br><span class="line"></span><br><span class="line">To                         Action      From</span><br><span class="line">--                         ------      ----</span><br><span class="line">OpenSSH                    ALLOW       Anywhere</span><br><span class="line">990/tcp                    ALLOW       Anywhere</span><br><span class="line">20/tcp                     ALLOW       Anywhere</span><br><span class="line">21/tcp                     ALLOW       Anywhere</span><br><span class="line">40000:50000/tcp            ALLOW       Anywhere</span><br><span class="line">OpenSSH (v6)               ALLOW       Anywhere (v6)</span><br><span class="line">20/tcp (v6)                ALLOW       Anywhere (v6)</span><br><span class="line">21/tcp (v6)                ALLOW       Anywhere (v6)</span><br><span class="line">990/tcp (v6)               ALLOW       Anywhere (v6)</span><br><span class="line">40000:50000/tcp (v6)       ALLOW       Anywhere (v6)</span><br></pre></td></tr></table></figure>
+
+<p>p.s. 如何删除一个 rule：<code>sudo ufw delete allow 80/tcp</code></p>
+<p>安装了<code>vsftpd</code>并打开了必要的端口后，我们继续创建一个专用的 FTP 用户。</p>
+<h3 id="第-3-步-准备用户目录"><a href="#第-3-步-准备用户目录" class="headerlink" title="第 3 步 - 准备用户目录"></a>第 3 步 - 准备用户目录</h3><p>我们将创建一个专用的 FTP 用户，但您可能已经有一个需要 FTP 访问的用户。 我们将注意保留现有用户对以下说明中的数据的访问权限。 即便如此，我们建议您在配置和测试设置之前先与新用户联系。</p>
+<p>首先，添加一个测试用户：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo adduser sammy</span><br></pre></td></tr></table></figure>
+
+<p>出现提示时分配密码。 随意通过其他提示按<code>ENTER</code> 。</p>
+<p>当用户被限制在特定目录时，FTP 通常更安全。 <code>vsftpd</code>用<a target="_blank" rel="noopener" href="https://www.howtoing.com/how-to-configure-chroot-environments-for-testing-on-an-ubuntu-12-04-vps/#what-is-a-chroot-environment"><code>chroot</code></a> jails 完成了这个。 为本地用户启用<code>chroot</code> ，默认情况下它们仅限于其主目录。 但是，由于<code>vsftpd</code>保护目录的方式，用户不能写入。 这对于只应通过 FTP 连接的新用户来说很好，但如果现有用户也具有 shell 访问权限，则可能需要写入其主文件夹。</p>
+<p>在这个例子中，不是从主目录中删除写权限，而是创建一个<code>ftp</code>目录作为<code>chroot</code>和一个可写<code>files</code>目录来保存实际文件。</p>
+<p>创建<code>ftp</code>文件夹：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /home/sammy/ftp</span><br></pre></td></tr></table></figure>
+
+<p>设置所有权：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chown nobody:nogroup /home/sammy/ftp</span><br></pre></td></tr></table></figure>
+
+<p>删除写权限：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod a-w /home/sammy/ftp</span><br></pre></td></tr></table></figure>
+
+<p>验证权限：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo ls -la /home/sammy/ftp</span><br><span class="line">Outputtotal 8</span><br><span class="line">4 dr-xr-xr-x  2 nobody nogroup 4096 Aug 24 21:29 .</span><br><span class="line">4 drwxr-xr-x  3 sammy  sammy   4096 Aug 24 21:29 ..</span><br></pre></td></tr></table></figure>
+
+<p>接下来，让我们创建文件上传目录并为用户分配所有权：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /home/sammy/ftp/files</span><br><span class="line">sudo chown sammy:sammy /home/sammy/ftp/files</span><br></pre></td></tr></table></figure>
+
+<p>对<code>ftp</code>目录的权限检查应返回以下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo ls -la /home/sammy/ftp</span><br><span class="line">Outputtotal 12</span><br><span class="line">dr-xr-xr-x 3 nobody nogroup 4096 Aug 26 14:01 .</span><br><span class="line">drwxr-xr-x 3 sammy  sammy   4096 Aug 26 13:59 ..</span><br><span class="line">drwxr-xr-x 2 sammy  sammy   4096 Aug 26 14:01 files</span><br></pre></td></tr></table></figure>
+
+<p>最后，让我们添加一个<code>test.txt</code>文件，以便在测试时使用：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;vsftpd test file&quot; | sudo tee /home/sammy/ftp/files/test.txt</span><br></pre></td></tr></table></figure>
+
+<p>现在我们已经保护了<code>ftp</code>目录并允许用户访问<code>files</code>目录，让我们修改我们的配置。</p>
+<h3 id="第-4-步-配置-FTP-访问"><a href="#第-4-步-配置-FTP-访问" class="headerlink" title="第 4 步 - 配置 FTP 访问"></a>第 4 步 - 配置 FTP 访问</h3><p>我们计划允许具有本地 shell 帐户的单个用户与 FTP 连接。 这两个关键设置已在<code>vsftpd.conf</code>设置。 首先打开配置文件，验证配置中的设置是否与以下设置相匹配：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/vsftpd.conf</span><br></pre></td></tr></table></figure>
+
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line"><span class="meta">#</span><span class="bash"> Allow anonymous FTP? (Disabled by default).</span></span><br><span class="line">anonymous_enable=NO</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="bash"><span class="comment"># Uncomment this to allow local users to log in.</span></span></span><br><span class="line">local_enable=YES</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>接下来，让我们通过取消注释<code>write_enable</code>设置来允许用户上传文件：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">write_enable=YES</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>我们还将取消注释<code>chroot</code>以防止 FTP 连接的用户访问目录树之外的任何文件或命令：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">chroot_local_user=YES</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>我们还添加一个<code>user_sub_token</code>以在<code>local_root directory</code>路径中插入用户名，这样我们的配置将适用于此用户和任何其他未来用户。 在文件中的任何位置添加这些设置：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">user_sub_token=$USER</span><br><span class="line">local_root=/home/$USER/ftp</span><br></pre></td></tr></table></figure>
+
+<p>我们还限制了可用于被动 FTP 的端口范围，以确保有足够的连接可用：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">pasv_min_port=40000</span><br><span class="line">pasv_max_port=50000</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong>在第 2 步中，我们打开了我们在此处为被动端口范围设置的端口。 如果更改值，请务必更新防火墙设置。</p>
+<p>要根据具体情况允许 FTP 访问，让我们设置配置，以便用户只有在明确添加到列表时才能访问，而不是默认情况下：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">userlist_enable=YES</span><br><span class="line">userlist_file=/etc/vsftpd.userlist</span><br><span class="line">userlist_deny=NO</span><br></pre></td></tr></table></figure>
+
+<p><code>userlist_deny</code>切换逻辑：当它设置为<code>YES</code> ，列表中的用户被拒绝 FTP 访问。 当它设置为<code>NO</code> ，只允许列表中的用户访问。</p>
+<p>完成更改后，保存文件并退出编辑器。</p>
+<p>最后，让我们将用户添加到<code>/etc/vsftpd.userlist</code> 。 使用<code>-a</code>标志追加到文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;sammy&quot; | sudo tee -a /etc/vsftpd.userlist</span><br></pre></td></tr></table></figure>
+
+<p>检查它是否按预期添加：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/vsftpd.userlist</span><br><span class="line">Outputsammy</span><br></pre></td></tr></table></figure>
+
+<p>重新启动守护程序以加载配置更改：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart vsftpd</span><br></pre></td></tr></table></figure>
+
+<p>配置到位后，我们继续测试 FTP 访问。</p>
+<h3 id="第-5-步-测试-FTP-访问"><a href="#第-5-步-测试-FTP-访问" class="headerlink" title="第 5 步 - 测试 FTP 访问"></a>第 5 步 - 测试 FTP 访问</h3><p>我们已将服务器配置为仅允许用户<code>sammy</code>通过 FTP 连接。 让我们确保它按预期工作。</p>
+<p><strong>匿名用户应该无法连接</strong> ：我们已禁用匿名访问。 让我们通过尝试匿名连接来测试它。 如果我们的配置设置正确，则应拒绝匿名用户的权限。 请务必将<code>203.0.113.0</code>替换为服务器的公共 IP 地址：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ftp -p 203.0.113.0</span><br><span class="line">OutputConnected to 203.0.113.0.</span><br><span class="line">220 (vsFTPd 3.0.3)</span><br><span class="line">Name (203.0.113.0:default): anonymous</span><br><span class="line">530 Permission denied.</span><br><span class="line">ftp: Login failed.</span><br><span class="line"><span class="meta">ftp&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>关闭连接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bye</span><br></pre></td></tr></table></figure>
+
+<p><strong>除了 sammy 之外的用户应该无法连接</strong> ：接下来，让我们尝试连接我们的 sudo 用户。 他们也应该被拒绝访问，并且应该在他们被允许输入密码之前发生：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ftp -p 203.0.113.0</span><br><span class="line">OutputConnected to 203.0.113.0.</span><br><span class="line">220 (vsFTPd 3.0.3)</span><br><span class="line">Name (203.0.113.0:default): sudo_user</span><br><span class="line">530 Permission denied.</span><br><span class="line">ftp: Login failed.</span><br><span class="line"><span class="meta">ftp&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>关闭连接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bye</span><br></pre></td></tr></table></figure>
+
+<p><strong>用户 sammy 应该能够连接，读取和写入文件</strong> ：让我们确保我们的指定用户可以连接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ftp -p 203.0.113.0</span><br><span class="line">OutputConnected to 203.0.113.0.</span><br><span class="line">220 (vsFTPd 3.0.3)</span><br><span class="line">Name (203.0.113.0:default): sammy</span><br><span class="line">331 Please specify the password.</span><br><span class="line">Password: your_user&#x27;s_password</span><br><span class="line">230 Login successful.</span><br><span class="line">Remote system type is UNIX.</span><br><span class="line">Using binary mode to transfer files.</span><br><span class="line"><span class="meta">ftp&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>让我们切换到<code>files</code>目录并使用<code>get</code>命令将我们之前创建的测试文件传输到本地机器：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd files</span><br><span class="line">get test.txt</span><br><span class="line">Output227 Entering Passive Mode (203,0,113,0,169,12).</span><br><span class="line">150 Opening BINARY mode data connection for test.txt (16 bytes).</span><br><span class="line">226 Transfer complete.</span><br><span class="line">16 bytes received in 0.0101 seconds (1588 bytes/s)</span><br><span class="line"><span class="meta">ftp&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来，让我们使用新名称上传文件以测试写入权限：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">put test.txt upload.txt</span><br><span class="line">Output227 Entering Passive Mode (203,0,113,0,164,71).</span><br><span class="line">150 Ok to send data.</span><br><span class="line">226 Transfer complete.</span><br><span class="line">16 bytes sent in 0.000894 seconds (17897 bytes/s)</span><br></pre></td></tr></table></figure>
+
+<p>关闭连接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bye</span><br></pre></td></tr></table></figure>
+
+<p>现在我们已经测试了我们的配置，让我们采取措施进一步保护我们的服务器。</p>
+<h3 id="第-6-步-保护交易"><a href="#第-6-步-保护交易" class="headerlink" title="第 6 步 - 保护交易"></a>第 6 步 - 保护交易</h3><p>由于 FTP 不会加密传输中的任何数据，包括用户凭据，因此我们将启用 TLS / SSL 来提供加密。 第一步是创建用于<code>vsftpd</code>的 SSL 证书。</p>
+<p>让我们使用<code>openssl</code>创建一个新证书，并使用<code>-days</code>标志使其有效一年。 在同一个命令中，我们将添加一个私有的 2048 位 RSA 密钥。 通过将<code>-keyout</code>和<code>-out</code>标志都设置为相同的值，私钥和证书将位于同一文件中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem</span><br></pre></td></tr></table></figure>
+
+<p>系统将提示您提供证书的地址信息。 将您自己的信息替换为以下突出显示的值：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">OutputGenerating a 2048 bit RSA private key</span><br><span class="line">............................................................................+++</span><br><span class="line">...........+++</span><br><span class="line">writing new private key to &#x27;/etc/ssl/private/vsftpd.pem&#x27;</span><br><span class="line">-----</span><br><span class="line">You are about to be asked to enter information that will be incorporated</span><br><span class="line">into your certificate request.</span><br><span class="line">What you are about to enter is what is called a Distinguished Name or a DN.</span><br><span class="line">There are quite a few fields but you can leave some blank</span><br><span class="line">For some fields there will be a default value,</span><br><span class="line">If you enter &#x27;.&#x27;, the field will be left blank.</span><br><span class="line">-----</span><br><span class="line">Country Name (2 letter code) [AU]:US</span><br><span class="line">State or Province Name (full name) [Some-State]:NY</span><br><span class="line">Locality Name (eg, city) []:New York City</span><br><span class="line">Organization Name (eg, company) [Internet Widgits Pty Ltd]:DigitalOcean</span><br><span class="line">Organizational Unit Name (eg, section) []:</span><br><span class="line">Common Name (e.g. server FQDN or YOUR name) []: your_server_ip</span><br><span class="line">Email Address []:</span><br></pre></td></tr></table></figure>
+
+<p>有关证书标志的更多详细信息，请参阅<a target="_blank" rel="noopener" href="https://www.howtoing.com/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs/">OpenSSL Essentials：使用 SSL 证书，私钥和 CSR</a></p>
+<p>创建证书后，再次打开<code>vsftpd</code>配置文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/vsftpd.conf</span><br></pre></td></tr></table></figure>
+
+<p>在文件的底部，您将看到以<code>rsa_</code>开头的两行。 评论它们，看起来像这样：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line"><span class="meta">#</span><span class="bash"> rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key</span></span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>在它们下面，添加以下指向我们刚刚创建的证书和私钥的行：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">rsa_cert_file=/etc/ssl/private/vsftpd.pem</span><br><span class="line">rsa_private_key_file=/etc/ssl/private/vsftpd.pem</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>之后，我们将强制使用 SSL，这将阻止无法处理 TLS 的客户端连接。 这对于确保所有流量都已加密是必要的，但它可能会强制您的 FTP 用户更改客户端。 将<code>ssl_enable</code>更改为<code>YES</code> ：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">ssl_enable=YES</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>之后，添加以下行以显式拒绝 SSL 上的匿名连接，并要求 SSL 进行数据传输和登录：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">allow_anon_ssl=NO</span><br><span class="line">force_local_data_ssl=YES</span><br><span class="line">force_local_logins_ssl=YES</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>在此之后，通过添加以下行将服务器配置为使用 TLS（SSL 的首选后继者）：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">ssl_tlsv1=YES</span><br><span class="line">ssl_sslv2=NO</span><br><span class="line">ssl_sslv3=NO</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们将添加两个选项。 首先，我们不会要求重用 SSL，因为它可能会破坏许多 FTP 客户端。 我们将需要“高”加密密码套件，目前这意味着密钥长度等于或大于 128 位：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">require_ssl_reuse=NO</span><br><span class="line">ssl_ciphers=HIGH</span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+
+<p>完成的文件部分应如下所示：</p>
+<p>/etc/vsftpd.conf 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> This option specifies the location of the RSA certificate to use <span class="keyword">for</span> SSL</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> encrypted connections.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem</span></span><br><span class="line"><span class="meta">#</span><span class="bash">rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key</span></span><br><span class="line">rsa_cert_file=/etc/ssl/private/vsftpd.pem</span><br><span class="line">rsa_private_key_file=/etc/ssl/private/vsftpd.pem</span><br><span class="line">ssl_enable=YES</span><br><span class="line">allow_anon_ssl=NO</span><br><span class="line">force_local_data_ssl=YES</span><br><span class="line">force_local_logins_ssl=YES</span><br><span class="line">ssl_tlsv1=YES</span><br><span class="line">ssl_sslv2=NO</span><br><span class="line">ssl_sslv3=NO</span><br></pre></td></tr></table></figure>
+
+<p>完成后，保存并关闭文件。</p>
+<p>重新启动服务器以使更改生效：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart vsftpd</span><br></pre></td></tr></table></figure>
+
+<p>此时，我们将无法再使用不安全的命令行客户端进行连接。 如果我们尝试过，我们会看到类似的东西：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ftp -p 203.0.113.0</span><br><span class="line">Connected to 203.0.113.0.</span><br><span class="line">220 (vsFTPd 3.0.3)</span><br><span class="line">Name (203.0.113.0:default): sammy</span><br><span class="line">530 Non-anonymous sessions must use encryption.</span><br><span class="line">ftp: Login failed.</span><br><span class="line">421 Service not available, remote server has closed connection</span><br><span class="line"><span class="meta">ftp&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来，让我们验证我们是否可以使用支持 TLS 的客户端进行连接。</p>
+<h3 id="第-7-步-使用-FileZilla-测试-TLS"><a href="#第-7-步-使用-FileZilla-测试-TLS" class="headerlink" title="第 7 步 - 使用 FileZilla 测试 TLS"></a>第 7 步 - 使用 FileZilla 测试 TLS</h3><p>大多数现代 FTP 客户端都可以配置为使用 TLS 加密。 我们将演示如何与<a target="_blank" rel="noopener" href="https://filezilla-project.org/">FileZilla</a>连接，因为它支持跨平台。 请参阅其他客户的文档。</p>
+<p>首次打开 FileZilla 时，在主页上方找到站点管理器图标，这是最上一行最左侧的图标。 点击它：</p>
+<img src="/posts/40394/filezilla_site_manager_vsftpd_18_04.png" class="" title="filezilla_site_manager_vsftpd_18_04">
+
+<p>将打开一个新窗口。 单击右下角的“ <strong>新建站点”</strong>按钮：</p>
+<img src="/posts/40394/new-site.png" class="" title="new-site">
+
+<p>在“ <strong>我的网站”</strong>下，将出现一个带有“ <strong>新网站</strong> ”字样的新图标。 您可以立即命名或稍后返回并使用“ <strong>重命名”</strong>按钮。</p>
+<p>使用名称或 IP 地址填写<strong>主机</strong>字段。 在“ <strong>加密”</strong>下拉菜单下，选择“ <strong>要求显式 FTP over TLS”</strong> 。</p>
+<p>对于<strong>登录类型</strong> ，选择<strong>询问密码</strong> 。 在“ <strong>用户”</strong>字段中填写您的 FTP 用户：</p>
+
+
+<p>单击界面底部的“连接”。 系统将要求您输入用户密码：</p>
+<img src="/posts/40394/user-pass.png" class="" title="密码对话">
+
+<p>单击<strong>确定</strong>以进行连接。 您现在应该使用 TLS / SSL 加密与您的服务器连接。</p>
+<p>成功后，您将看到一个如下所示的服务器证书：</p>
+<img src="/posts/40394/filezilla_certificate_vsftpd_three.png" class="" title="filezilla_certificate_vsftpd_three">
+
+<p>当您接受证书后，双击<code>files</code>夹并将<code>upload.txt</code>拖到左侧以确认您能够下载文件：</p>
+<p><a target="_blank" rel="noopener" href="https://www.howtoing.com/wp-content/uploads/articles/vsftpd_18_04/vsftpd_images/filezilla_file_test_vsftpd_18_04.png"><img src="%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ECS%E8%B4%AD%E4%B9%B0%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%88%E7%AC%94%E8%AE%B0%EF%BC%89/filezilla_file_test_vsftpd_18_04.png" alt="下载test.txt"></a></p>
+<img src="/posts/40394/filezilla_file_test_vsftpd_18_04.png" class="" title="下载test.txt">
+
+<p>完成后，右键单击本地副本，将其重命名为<code>upload-tls.txt</code>并将其拖回服务器以确认您可以上传文件：</p>
+<img src="/posts/40394/filezilla_file_upload_vsftpd_18_04.png" class="" title="重命名和上传">
+
+<p>您现在已确认可以安全地成功传输启用了 SSL / TLS 的文件。</p>
+<h3 id="第-8-步-禁用-Shell-访问（可选）"><a href="#第-8-步-禁用-Shell-访问（可选）" class="headerlink" title="第 8 步 - 禁用 Shell 访问（可选）"></a>第 8 步 - 禁用 Shell 访问（可选）</h3><p>如果由于客户端要求而无法使用 TLS，则可以通过禁用 FTP 用户以任何其他方式登录的方式来获得一些安全性。 防止它的一种相对简单的方法是创建一个自定义 shell。 这不会提供任何加密，但会限制受感染帐户对 FTP 可访问的文件的访问。</p>
+<p>首先，在<code>bin</code>目录中打开一个名为<code>ftponly</code>的文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /bin/ftponly</span><br></pre></td></tr></table></figure>
+
+<p>添加一条消息，告诉用户他们无法登录的原因：</p>
+<p>/斌/ ftponly</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line">echo &quot;This account is limited to FTP access only.&quot;</span><br></pre></td></tr></table></figure>
+
+<p>保存文件并退出编辑器。</p>
+<p>更改权限以使文件可执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod a+x /bin/ftponly</span><br></pre></td></tr></table></figure>
+
+<p>打开有效 shell 列表：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/shells</span><br></pre></td></tr></table></figure>
+
+<p>在底部添加：</p>
+<p>/ etc / shells 中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line">/bin/ftponly</span><br></pre></td></tr></table></figure>
+
+<p>使用以下命令更新用户的 shell：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo usermod sammy -s /bin/ftponly</span><br></pre></td></tr></table></figure>
+
+<p>现在尝试以<code>sammy</code>身份登录您的服务器：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh sammy@your_server_ip</span><br></pre></td></tr></table></figure>
+
+<p>你应该看到类似的东西：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">OutputThis account is limited to FTP access only.</span><br><span class="line">Connection to 203.0.113.0 closed.</span><br></pre></td></tr></table></figure>
+
+<p>这确认用户不能再<code>ssh</code>到服务器并且仅限于 FTP 访问。</p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>在本教程中，我们介绍了为具有本地帐户的用户设置 FTP。 如果您需要使用外部身份验证源，您可能需要了解<code>vsftpd</code>对虚拟用户的支持。 这通过使用 PAM（可插入身份验证模块）提供了丰富的选项，如果您管理其他系统（如 LDAP 或 Kerberos）中的用户，这是一个不错的选择。</p>
+<h3 id="执行完上面操作后的问题解决"><a href="#执行完上面操作后的问题解决" class="headerlink" title="执行完上面操作后的问题解决"></a>执行完上面操作后的问题解决</h3><h4 id="使用-FileZilla-FTP-下载时提示“不安全的服务器，不支持-FTPover-TLS”-和“服务器不支持非-ASCII-字符”"><a href="#使用-FileZilla-FTP-下载时提示“不安全的服务器，不支持-FTPover-TLS”-和“服务器不支持非-ASCII-字符”" class="headerlink" title="使用 FileZilla FTP 下载时提示“不安全的服务器，不支持 FTPover TLS”,和“服务器不支持非 ASCII 字符”"></a>使用 FileZilla FTP 下载时提示“不安全的服务器，不支持 FTPover TLS”,和“服务器不支持非 ASCII 字符”</h4><p>1、提示“不安全的服务器，不支持 FTPover TLS</p>
+<p>解决方法：在站点管理器中，加密方式选择：</p>
+
+
+<p>2、提示“服务器不支持非 ASCII 字符”</p>
+<p>解决方法：在站点管理器中字符集选择：自定义字符集：GBK</p>
+<img src="/posts/40394/wKiom1b6SWvwBjm7AAA9pZvVBTE386.png" class="" title="wKiom1b6SWvwBjm7AAA9pZvVBTE386">
+
+<p>OK,正常了</p>
+<h4 id="ftp-连接错误——服务器发回了不可路由的地址。使用服务器地址代替。"><a href="#ftp-连接错误——服务器发回了不可路由的地址。使用服务器地址代替。" class="headerlink" title="ftp 连接错误——服务器发回了不可路由的地址。使用服务器地址代替。"></a>ftp 连接错误——服务器发回了不可路由的地址。使用服务器地址代替。</h4><p>设置 filezilla 客户端的连接参数</p>
+<ol>
+<li>选中某一连接项</li>
+<li>高级——加密——只使用普通 ftp</li>
+<li>传输设置——传输模式——主动</li>
+<li>重新连接</li>
+</ol>
+<h2 id="ubuntu-下-Apache-虚拟站点配置"><a href="#ubuntu-下-Apache-虚拟站点配置" class="headerlink" title="ubuntu 下 Apache 虚拟站点配置"></a>ubuntu 下 Apache 虚拟站点配置</h2><p><a target="_blank" rel="noopener" href="https://www.linuxidc.com/Linux/2017-05/143590.htm">https://www.linuxidc.com/Linux/2017-05/143590.htm</a></p>
+<h2 id="apache-配置二级域名"><a href="#apache-配置二级域名" class="headerlink" title="apache 配置二级域名"></a>apache 配置二级域名</h2><p>[apache2 服务器 mod_rewrite 模块 开启方法<a target="_blank" rel="noopener" href="https://www.cnblogs.com/wwufengg/articles/apache2-mod_rewrite.html">linux, ubuntu]</a></p>
+<p>开启重写，p.s. 上面教程中说要把 <code>/etc/apache2/sites-enabled/000-default</code> 中的 <code>AllowOverride None 修改为： AllowOverride All</code> ，然而我的 Apache2 是新版（2.4），所以得转到 <code>/etc/apache2/</code> 。将名为 <code>apache2.conf</code> 的文件中的 <a target="_blank" rel="noopener" href="http://www.kbase101.com/question/9571.html">下面代码从 NONE 改为 ALL</a> ：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Directory</span> /<span class="attr">var</span>/<span class="attr">www</span>/&gt;</span></span><br><span class="line">    Options Indexes FollowSymLinks</span><br><span class="line">    AllowOverride All</span><br><span class="line">    Require all granted</span><br><span class="line"><span class="tag">&lt;/<span class="name">Directory</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>目标二级域名：mall.evelance.cn</p>
+<p>阿里云控制台配置：在阿里云的控制台中找到域名管理，然后选择顶级域名 evelance.cn 后面的“解析”字样。在新打开的页面中我们可以看到一个提供域名解析的界面，选择解析类型为 A 类解析，然后输入 mall（我们想要的二级域名的头），然后在地址里面输入我们刚才查看到的 ECS 的公网 ip，然后点击确认，之后我们的解析就会生效了。</p>
+<p>ubuntu 服务器配置：</p>
+<p>进入 /etc/apache2/site-available/ ，复制默认的虚拟主机配置文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp 000-default.conf mall.evelance.cn.conf</span><br></pre></td></tr></table></figure>
+
+<p>修改配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">VirtualHost</span> *<span class="attr">:80</span>&gt;</span></span><br><span class="line">    ServerAdmin xxx@qq.com</span><br><span class="line">    ServerName mall.evelance.com</span><br><span class="line">    DocumentRoot /home/www/mall</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">Directory</span> &quot;/<span class="attr">home</span>/<span class="attr">www</span>/<span class="attr">mall</span>&quot;&gt;</span></span><br><span class="line">        Options FollowSymLinks</span><br><span class="line">        AllowOverride All</span><br><span class="line">        #Require all denied</span><br><span class="line">        Require all granted</span><br><span class="line">    <span class="tag">&lt;/<span class="name">Directory</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    ErrorLog $&#123;APACHE_LOG_DIR&#125;/error.log</span><br><span class="line">    CustomLog $&#123;APACHE_LOG_DIR&#125;/access.log combined</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">VirtualHost</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在 sites-enabled 目录下建立符号链接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/apache2/sites-enabled</span><br><span class="line"><span class="meta">#</span><span class="bash">建立对应的软链接</span></span><br><span class="line">sudo ln -s /etc/apache2/sites-available/mall.evelance.cn.conf /etc/apache2/sites-enabled/mall.evelance.cn.conf</span><br></pre></td></tr></table></figure>
+
+<p>在对应目录放入项目代码：</p>
+<p>把项目文件放进 /home/www/mall 中，并赋予文件夹权限：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod -R 777 /home/www/mall</span><br></pre></td></tr></table></figure>
+
+<p>激活配置，重启 apache：</p>
+<p>返回上级目录 <code>cd ../site-enable/</code>，输入 <code>cd sites-available/</code></p>
+<p>输入 <code>a2ensite mall.evelance.cn.conf</code> ，如果提示已经激活过了，输入下面代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a2dissite mall.evelance.cn.conf</span><br><span class="line">service apache2 reload</span><br><span class="line">a2ensite mall.evelance.cn.conf</span><br><span class="line">service apache2 reload</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/carolcoral/article/details/77857264">ECS 简单配置多个二级域名</a></li>
+</ul>
+<h3 id="域名解析-1"><a href="#域名解析-1" class="headerlink" title="域名解析"></a>域名解析</h3><p>登录阿里云，进入控制台，选择云解析 DNS。选择右侧的解析管理，进行二级域名的添加：</p>
+<ul>
+<li>记录类型：A</li>
+<li>主机记录：[mall].evelance.cn</li>
+<li>解析线路：默认</li>
+<li>记录值：你的公共 IP</li>
+<li>TTL：10 分钟</li>
+</ul>
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/wangjia55/article/details/81127647">阿里云添加二级域名的操作</a></p>
+<h3 id="支持-https"><a href="#支持-https" class="headerlink" title="支持 https"></a>支持 https</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lxf1117/p/6650647.html">在阿里云里申请免费 Https 证书 SSL</a></li>
+<li><a target="_blank" rel="noopener" href="https://yq.aliyun.com/articles/697838">ubuntu apache2 配置安装 ssl 证书</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wpl-php/p/10287125.html">阿里云 Ubuntu16.04 apache2 ssl 证书下载与安装（必须有域名）</a></li>
+<li>完成上述配置后，别忘了让防火墙允许 443 端口。<code>sudo ufw allow 443/tcp</code></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"># 阿里云</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/24235/" rel="prev" title="JS面试题（面试系列）">
+                  <i class="fa fa-chevron-left"></i> JS面试题（面试系列）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/36876/" rel="next" title="ubuntu下nginx基本使用">
+                  ubuntu下nginx基本使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

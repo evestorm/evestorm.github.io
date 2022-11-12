@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="转载自：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Wayou&#x2F;p&#x2F;css-currentColor.html CSS 中存在一个神秘的变量，少有人知自然也不怎么为人所用。它就是currentColor变量（或者说是 CSS 关键字，但我觉得称为变量好理解些）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-CSS-currentColor变量的使用">
+<meta property="og:url" content="https://evestorm.github.io/posts/30008/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Wayou&#x2F;p&#x2F;css-currentColor.html CSS 中存在一个神秘的变量，少有人知自然也不怎么为人所用。它就是currentColor变量（或者说是 CSS 关键字，但我觉得称为变量好理解些）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/30008/071703026553532.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/30008/071703151234623.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/30008/071703343112594.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/30008/071704166706318.gif">
+<meta property="article:published_time" content="2020-12-30T02:24:10.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.003Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="CSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/30008/071703026553532.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/30008/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-CSS-currentColor变量的使用 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">初识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E7%94%A8%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">如何用？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%A6%E4%BD%A0%E8%A3%85%E9%80%BC%E5%B8%A6%E4%BD%A0%E9%A3%9E"><span class="nav-number">3.</span> <span class="nav-text">带你装逼带你飞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E6%B8%90%E5%8F%98%E6%B7%B7%E6%90%AD"><span class="nav-number">3.1.</span> <span class="nav-text">与渐变混搭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E-CSS-%E5%8A%A8%E7%94%BB%E7%BB%93%E5%90%88"><span class="nav-number">3.2.</span> <span class="nav-text">与 CSS 动画结合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%8A%A0%E7%AE%80%E6%B4%81%E7%9A%84-CSS"><span class="nav-number">3.3.</span> <span class="nav-text">更加简洁的 CSS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A5%BD%E7%BB%B4%E6%8A%A4%E7%9A%84-CSS"><span class="nav-number">3.4.</span> <span class="nav-text">更好维护的 CSS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">浏览器兼容性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/30008/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-CSS-currentColor变量的使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-30 10:24:10" itemprop="dateCreated datePublished" datetime="2020-12-30T10:24:10+08:00">2020-12-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/Wayou/p/css-currentColor.html">https://www.cnblogs.com/Wayou/p/css-currentColor.html</a></p>
+<p>CSS 中存在一个神秘的变量，少有人知自然也不怎么为人所用。它就是<code>currentColor</code>变量（或者说是 CSS 关键字，但我觉得称为变量好理解些）。</p>
+<a id="more"></a>
+
+<h1 id="初识"><a href="#初识" class="headerlink" title="初识"></a>初识</h1><p>它是何物？具有怎样的功效？它从哪里来？带着这些疑问我们继续。</p>
+<p>下面是来自<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentColor_keyword">MDN 的解释</a>：</p>
+<blockquote>
+<p><code>currentColor</code>代表了当前元素被应用上的<code>color</code>颜色值。 使用它可以将当前这个颜色值应用到其他属性上，或者嵌套元素的其他属性上。</p>
+</blockquote>
+<p>你这可以这么理解，CSS 里你可以在任何需要写颜色的地方使用<code>currentColor</code>这个变量，这个变量的值是当前元素的<code>color</code>值。如果当前元素没有在 CSS 里显示地指定一个<code>color</code>值，那它的颜色值就遵从 CSS 规则，从父级元素继承而来。</p>
+<p>到此似乎解决了上面三个哲学式的提问，但依然有些模糊。程序员之间的交流，还是上码才好。</p>
+<ul>
+<li>场景 1</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>约么？<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">p&#123; color: red; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时，<code>&lt;p&gt;</code>标签<code>currentColor</code>的值为<code>red</code>。</p>
+<ul>
+<li>场景 2</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>约么？<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">.container&#123; color: #00ff00; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，我们没有给<code>&lt;p&gt;</code>标签指定颜色，它的<code>color</code>从父级容器也就是<code>class</code>为<code>container</code>的<code>div</code>继承而来，换句话说此时<code>p</code>标签的<code>color</code>为<code>#00ff00</code>，<code>currentColor</code>又是直接去取元素的<code>color</code>值，所以此时<code>p</code>标签的<code>currentColor</code>值也为<code>#00ff00</code>。</p>
+<img src="/posts/30008/071703026553532.png" class="" width="071703026553532">
+
+<ul>
+<li>场景 3</li>
+</ul>
+<p>如果父级元素也没有写<code>color</code>呢？其实这里都还是 CSS 规则的范畴，跟本文的主角关系不太大。但本着不啰嗦会死的原则，就展开了讲。</p>
+<p>如果父级元素也没有指定颜色，那它的父级元素就会从父级的父级去继承，直到文档的根结点<code>html</code>标签都还没显示指定一个颜色呢，就应用上浏览器默认的颜色呗~</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>我来组成头部<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>约么？<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">footer</span>&gt;</span>战神金钢，宇宙的保护神！<span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line">/** * 无CSS */</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/30008/071703151234623.png" class="" width="071703151234623">
+
+<p>那，这个时候的黑色其实是浏览器默认给的。此时<code>p</code>标签的<code>currentColor</code>自然也跟<code>color</code>值一样，为黑色，纯黑的<code>#000</code>。</p>
+<h1 id="如何用？"><a href="#如何用？" class="headerlink" title="如何用？"></a>如何用？</h1><p>了解它是怎样的物品后，下面问题来了，如何用？有额外的<code>buff</code>效果么，耗蓝多么，CD 时间长么。。。</p>
+<p>前面说道，它就是一个 CSS 变量，存储了颜色值，这个值来自当前元素的<code>color</code>CSS 属性。当你需要为该元素其他属性指定颜色的时候，它就可以登上舞台了。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span>好好说话，有话好好说<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">.container&#123; color: #3CAADB; border: 4px solid currentColor; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们第一次领略了<code>currentColor</code>的奇效。在指定边框颜色的时候，我们直接使用<code>currentColor</code>变量，而没有写一个传统的颜色值。</p>
+<p>你似乎也知道了该如何用了。不只是<code>border</code>，其他能够使用颜色的地方，比如<code>background</code>，<code>box-shadow</code>等等。</p>
+<h1 id="带你装逼带你飞"><a href="#带你装逼带你飞" class="headerlink" title="带你装逼带你飞"></a>带你装逼带你飞</h1><p>新技能就是如此炫酷。大开脑洞任性地去使用吧！</p>
+<h2 id="与渐变混搭"><a href="#与渐变混搭" class="headerlink" title="与渐变混搭"></a>与渐变混搭</h2><p>你可能无法想象到的是，除了可以将<code>currentColor</code>用到普通需要颜色的场景，它同样可以被用在渐变中。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">.container&#123; height:200px; color: #3CAADB; background-image: linear-gradient(to</span><br><span class="line">right, #fff, currentColor 100%); &#125;</span><br></pre></td></tr></table></figure>
+
+<p>甚至也可用于填充 svg，下面会有相应示例。</p>
+<h2 id="与-CSS-动画结合"><a href="#与-CSS-动画结合" class="headerlink" title="与 CSS 动画结合"></a>与 CSS 动画结合</h2><p>当与 CSS <code>animation</code>结合，可以得到更加有创意的效果，比如<a target="_blank" rel="noopener" href="http://codepen.io/scottkellum/pen/Fhxql">这个来自 codepen 的示例</a></p>
+<p>See the Pen <a target="_blank" rel="noopener" href="http://codepen.io/scottkellum/pen/Fhxql/">currentColor</a> by Scott Kellum (<a target="_blank" rel="noopener" href="http://codepen.io/scottkellum">@scottkellum</a>) on <a target="_blank" rel="noopener" href="http://codepen.io/">CodePen</a>.</p>
+<h2 id="更加简洁的-CSS"><a href="#更加简洁的-CSS" class="headerlink" title="更加简洁的 CSS"></a>更加简洁的 CSS</h2><p>其实，新技能不只是装逼那么单纯，合理的使用<code>currentColor</code> 变量会让你的 CSS 代码变得简洁。这才是我们想要达到的目的。以炫技为目的技能是没有生产意义的。</p>
+<p>看下面这个例子（这个示例灵感来自<a target="_blank" rel="noopener" href="http://osvaldas.info/keeping-css-short-with-currentcolor">这里</a>）</p>
+<img src="/posts/30008/071703343112594.png" class="" width="071703343112594">
+
+<p>我们在按钮中使用了一个 svg 图标。你是一个负责任的 FE，所以，对这个按钮的各种状态<code>:focus</code>，<code>:hover</code>，<code>:active</code>都作了样式上的处理。同时，为了让图标也跟着保持一致的姿态变更，需要把对<code>&lt;a&gt;</code>标签的样式处理同样就到到<code>&lt;svg&gt;</code>标签上。于是你的 CSS 代码看起来就是下面这样的了。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*a 标签*/</span></span><br><span class="line"><span class="selector-class">.button</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#117b6f</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">1.2em</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:hover</span>,</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:focus</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#01b19a</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:active</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#02d7bb</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*svg 标签*/</span></span><br><span class="line"><span class="selector-class">.button</span> <span class="selector-tag">svg</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">17px</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">17px</span>;</span><br><span class="line">  <span class="attribute">fill</span>: <span class="number">#117b6f</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:hover</span> <span class="selector-tag">svg</span>,</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:focus</span> <span class="selector-tag">svg</span> &#123;</span><br><span class="line">  <span class="attribute">fill</span>: <span class="number">#01b19a</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:active</span> <span class="selector-tag">svg</span> &#123;</span><br><span class="line">  <span class="attribute">fill</span>: <span class="number">#02d7bb</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你也发现了，代码有点冗余。接下来，我们用<code>currentColor</code>来将它简化一下。于是成了下面这样：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*a 标签*/</span></span><br><span class="line"><span class="selector-class">.button</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#117b6f</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">1.2em</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:hover</span>,</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:focus</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#01b19a</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:active</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#02d7bb</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*svg 标签*/</span></span><br><span class="line"><span class="selector-class">.button</span> <span class="selector-tag">svg</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">17px</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">17px</span>;</span><br><span class="line">  <span class="attribute">fill</span>: currentColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="更好维护的-CSS"><a href="#更好维护的-CSS" class="headerlink" title="更好维护的 CSS"></a>更好维护的 CSS</h2><p>仔细想想不难发现，当使用<code>currentColor</code>后，我们的 CSS 也变得更加好维护了。</p>
+<p>还拿上面的按钮示例来说，优化之前不但代码冗余，而且哪天 PM 来劲了说这颜色饱看，给换个其他色。于是你得把<code>&lt;a&gt;</code>标签和<code>&lt;svg&gt;</code>一起换了。</p>
+<p>但优化后就不一样了，因为<code>&lt;svg&gt;</code>使用的填充是<code>currentColor</code>，你只需要改变<code>&lt;a&gt;</code>标签的颜色，它也就跟着变了。真正做到了牵一发而不动全身。这不正是众码友们毕生所追求的理想编程境界么。</p>
+<h1 id="浏览器兼容性"><a href="#浏览器兼容性" class="headerlink" title="浏览器兼容性"></a>浏览器兼容性</h1><p>一提到浏览器兼容性，FE 同学们或许就不敢那么任性了。之前你可能是这样的：</p>
+
+
+<p>当听到 IE 传来的噩耗，你可能是这样的：</p>
+<img src="/posts/30008/071704166706318.gif" class="" width="071704166706318">
+
+<p>经查，<a target="_blank" rel="noopener" href="http://caniuse.com/#search=currentcolor">can i use</a> 没有关于它的数据。</p>
+<p>经测，</p>
+<ul>
+<li>本机 Win7 搭载的 IE8 不支持</li>
+<li>本机安装的火狐 31 发来战报表示支持</li>
+<li>Chrome，你猜？</li>
+<li>本机 Safari 5.1.7 也表示支持</li>
+<li>本机 Opera 26 同样表示支持</li>
+</ul>
+<p>根据<a target="_blank" rel="noopener" href="http://demosthenes.info/blog/908/The-First-CSS-Variable-currentColor">这篇文章</a>的描述，它是可以很好地工作在在所有现代浏览器和 IE9+上的，甚至是各浏览器对应的移动版本。所以，在 IE 不是主要客户对象的情况下，还是可以放心使用的。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="http://css-tricks.com/currentcolor/">css-tricks currentColor</a></li>
+<li><a target="_blank" rel="noopener" href="http://osvaldas.info/keeping-css-short-with-currentcolor">Keeping CSS short with currentColor</a></li>
+<li><a target="_blank" rel="noopener" href="http://demosthenes.info/blog/908/The-First-CSS-Variable-currentColor">The First CSS Variable: currentColor</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/36073/" rel="prev" title="vue-cli中sass全局变量配置">
+                  <i class="fa fa-chevron-left"></i> vue-cli中sass全局变量配置
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/18004/" rel="next" title="向强大的svg迈进">
+                  向强大的svg迈进 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

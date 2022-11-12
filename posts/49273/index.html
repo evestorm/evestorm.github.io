@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="认知不要因为 Vue 使用到了 Object.defineProperty() 数据劫持，就把它和 Proxy 混为一谈。它俩不是一个东西">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Proxy与ES-14种对象操作方法">
+<meta property="og:url" content="https://evestorm.github.io/posts/49273/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="认知不要因为 Vue 使用到了 Object.defineProperty() 数据劫持，就把它和 Proxy 混为一谈。它俩不是一个东西">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1644225900862-b41cc7ff-976a-4938-a12d-1080a8d2f734.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1644226160893-457cf553-9c5e-429d-961c-6934ce69db4f.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637889668829-553c175c-33be-4e82-8b00-3860f00c9a6e.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637890397084-f61c7caa-c98d-46b9-ac80-5b818afbd6a3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637891738804-7a224d81-a9b5-4b48-a975-651273661d2d.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637891772596-c931b06a-1e63-4a99-a90e-38098c403ee6.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637892635361-9745902f-a965-4e63-a319-6f4e7171ad8e.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637909569266-843f41fb-bc6b-4078-ac73-7af1a23af175.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49273/1637914208708-72ca2cda-3160-4f52-876c-9e5f910df51a.png">
+<meta property="article:published_time" content="2021-10-17T08:50:46.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.203Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="ECMAScript">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/49273/1644225900862-b41cc7ff-976a-4938-a12d-1080a8d2f734.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/49273/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Proxy与ES-14种对象操作方法 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A4%E7%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">认知</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD"><span class="nav-number">2.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%92%84%E7%94%A8%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">💄用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#getter%E3%80%81setter-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">getter、setter 基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%95%B0%E7%BB%84%E3%80%81%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">处理数组、函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#has"><span class="nav-number">3.2.1.</span> <span class="nav-text">has</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deleteProperty"><span class="nav-number">3.2.2.</span> <span class="nav-text">deleteProperty</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES-14%E7%A7%8D%E5%AF%B9%E8%B1%A1%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">ES - 14种对象操作方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%9E%8B-GetPrototypeOf"><span class="nav-number">4.1.</span> <span class="nav-text">获取原型 [[GetPrototypeOf]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B-SetPrototypeOf"><span class="nav-number">4.2.</span> <span class="nav-text">设置原型 [[SetPrototypeOf]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7-IsExtensible"><span class="nav-number">4.3.</span> <span class="nav-text">获取对象的可扩展性 [[IsExtensible]]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-seal"><span class="nav-number">4.3.1.</span> <span class="nav-text">Object.seal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-freeze"><span class="nav-number">4.3.2.</span> <span class="nav-text">Object.freeze</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%87%AA%E6%9C%89%E5%B1%9E%E6%80%A7-GetOwnProperty"><span class="nav-number">4.4.</span> <span class="nav-text">获取自有属性 [[GetOwnProperty]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%81%E6%AD%A2%E6%89%A9%E5%B1%95%E5%AF%B9%E8%B1%A1-PreventExtensions"><span class="nav-number">4.5.</span> <span class="nav-text">禁止扩展对象 [[PreventExtensions]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%AF%B9%E8%B1%A1%E6%93%8D%E4%BD%9C-DefineProperty"><span class="nav-number">4.6.</span> <span class="nav-text">拦截对象操作 [[DefineProperty]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%98%AF%E8%87%AA%E8%BA%AB%E5%B1%9E%E6%80%A7-HasOwnProperty"><span class="nav-number">4.7.</span> <span class="nav-text">判断是否是自身属性 [[HasOwnProperty]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-GET"><span class="nav-number">4.8.</span> <span class="nav-text">获取 [[GET]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE-SET"><span class="nav-number">4.9.</span> <span class="nav-text">设置 [[SET]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-Delete"><span class="nav-number">4.10.</span> <span class="nav-text">删除 [[Delete]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE-Enumerate"><span class="nav-number">4.11.</span> <span class="nav-text">枚举 [[Enumerate]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%94%AE%E9%9B%86%E5%90%88-OwnPropertyKeys"><span class="nav-number">4.12.</span> <span class="nav-text">获取键集合 [[OwnPropertyKeys]]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">4.13.</span> <span class="nav-text">调用函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.14.</span> <span class="nav-text">实例化对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-Proxy"><span class="nav-number">5.</span> <span class="nav-text">自定义 Proxy</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%92%84defineProperty-%E5%92%8C-Proxy-%E7%9A%84%E5%BC%82%E5%90%8C"><span class="nav-number">7.</span> <span class="nav-text">💄defineProperty 和 Proxy 的异同</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%90%8C"><span class="nav-number">7.1.</span> <span class="nav-text">相同</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C"><span class="nav-number">7.2.</span> <span class="nav-text">不同</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%92%84defineProperty-%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">7.3.</span> <span class="nav-text">💄defineProperty 存在的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E9%80%9A%E8%BF%87-%E7%B4%A2%E5%BC%95%E3%80%81%E4%BF%AE%E6%94%B9%E6%95%B0%E7%BB%84length%E3%80%81push%E3%80%81pop-%E7%AD%89%E4%B8%80%E7%B3%BB%E5%88%97%E6%96%B9%E5%BC%8F%E6%93%8D%E4%BD%9C%E6%95%B0%E7%BB%84%EF%BC%8C%E9%83%BD%E6%97%A0%E6%B3%95%E8%A7%A6%E5%8F%91-setter%EF%BC%8C%E8%80%8C-Proxy-%E5%8F%AF%E4%BB%A5%E8%A7%A6%E5%8F%91"><span class="nav-number">7.3.1.</span> <span class="nav-text">数组通过 索引、修改数组length、push、pop 等一系列方式操作数组，都无法触发 setter，而 Proxy 可以触发</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reflect-%E5%8F%8D%E5%B0%84"><span class="nav-number">8.</span> <span class="nav-text">Reflect 反射</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">8.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">8.2.</span> <span class="nav-text">存在的原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">8.3.</span> <span class="nav-text">使用</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/49273/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Proxy与ES-14种对象操作方法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-17 16:50:46" itemprop="dateCreated datePublished" datetime="2021-10-17T16:50:46+08:00">2021-10-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="认知"><a href="#认知" class="headerlink" title="认知"></a>认知</h1><p>不要因为 Vue 使用到了 <code>Object.defineProperty()</code> 数据劫持，就把它和 Proxy 混为一谈。它俩不是一个东西</p>
+<a id="more"></a>
+
+<ul>
+<li><code>Object.defineProperty(obj, prop, descriptor)</code> 是直接处理 obj，然后当操作 obj 时，会在 set、get 方法中进行拦截<ul>
+<li><strong>对 obj 本身操作</strong></li>
+<li>给 obj 上新增没有的属性</li>
+</ul>
+</li>
+<li>Proxy(target, handler) 是通过处理 obj 以后，是<strong>返回了一个代理对象</strong>，你是通过操作这个代理对象，来对数据做操作的<ul>
+<li>创建一个 obj 的代理，中间隔了一层交流</li>
+<li>相比 defineProperty 少了个 prop 参数，因为是对已有的 obj 操作、处理</li>
+</ul>
+</li>
+</ul>
+<h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><p>自定义对象属性的获取、赋值、枚举、函数调用等功能</p>
+<h1 id="💄用法"><a href="#💄用法" class="headerlink" title="💄用法"></a>💄用法</h1><h2 id="getter、setter-基本用法"><a href="#getter、setter-基本用法" class="headerlink" title="getter、setter 基本用法"></a>getter、setter 基本用法</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> target = &#123;</span><br><span class="line">  a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(target, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;This is property value &#x27;</span> + target[prop]);</span><br><span class="line">    <span class="keyword">return</span> target[prop];</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">target, prop, value</span>)</span> &#123;</span><br><span class="line">    target[prop] = value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;proxy.a&quot;</span>, proxy.a); <span class="comment">// 走了代理 This is ...</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;target.a&quot;</span>, target.a); <span class="comment">// 直接访问，没走代理。没显示 This is ...</span></span><br><span class="line">proxy.b = <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;target.b&quot;</span>, target.b); <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;proxy.b&quot;</span>, proxy.b); <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">console</span>.log(proxy); <span class="comment">// Proxy &#123;a: 1, b: 2&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="处理数组、函数"><a href="#处理数组、函数" class="headerlink" title="处理数组、函数"></a>处理数组、函数</h2><ul>
+<li>Object.defineProperty 没法直接处理数组</li>
+<li>Proxy 可以。函数对象和数组都行</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [</span><br><span class="line">  &#123; <span class="attr">name</span>: <span class="string">&#x27;Lance&#x27;</span>, <span class="attr">age</span>: <span class="number">27</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">name</span>: <span class="string">&#x27;GC&#x27;</span>, <span class="attr">age</span>: <span class="number">31</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">name</span>: <span class="string">&#x27;Jerry&#x27;</span>, <span class="attr">age</span>: <span class="number">29</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">name</span>: <span class="string">&#x27;Sherry&#x27;</span>, <span class="attr">age</span>: <span class="number">30</span> &#125;</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> persons = <span class="keyword">new</span> <span class="built_in">Proxy</span>(arr, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">arr, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> arr[prop];</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">arr, prop, value</span>)</span> &#123;</span><br><span class="line">    arr[prop] = value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">persons[<span class="number">0</span>] = &#123; <span class="attr">name</span>: <span class="string">&#x27;Xi&#x27;</span>, <span class="attr">age</span>: <span class="number">30</span> &#125;</span><br><span class="line"><span class="built_in">console</span>.log(arr, persons);</span><br><span class="line"><span class="comment">// [</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Xi&#x27;, age: 30 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;GC&#x27;, age: 31 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Jerry&#x27;, age: 29 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Sherry&#x27;, age: 30 &#125;</span></span><br><span class="line"><span class="comment">// ] [</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Xi&#x27;, age: 30 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;GC&#x27;, age: 31 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Jerry&#x27;, age: 29 &#125;,</span></span><br><span class="line"><span class="comment">//   &#123; name: &#x27;Sherry&#x27;, age: 30 &#125;</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> fn = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;I am a function. &#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.a = <span class="number">123</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> newFn = <span class="keyword">new</span> <span class="built_in">Proxy</span>(fn, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">fn, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> fn[prop] + <span class="string">&#x27; This is a Proxy return&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(newFn.a); <span class="comment">// 123 This is a Proxy return</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="has"><a href="#has" class="headerlink" title="has"></a>has</h3><ul>
+<li>a 不在 proxy 本身身上，是 proxy 从 target 代理来的</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> target = &#123;</span><br><span class="line">  a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(target, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;GET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + target[prop];</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">target, prop, value</span>)</span> &#123;</span><br><span class="line">    target[prop] = value;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;SET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + value);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">has</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Reflect</span>.has(target, prop);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;a&#x27;</span> <span class="keyword">in</span> proxy); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(proxy); <span class="comment">// a, b 在 Proxy 的 Target 下</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1644225900862-b41cc7ff-976a-4938-a12d-1080a8d2f734.png" class="" title="a不在proxy本身上而在target上">
+
+<h3 id="deleteProperty"><a href="#deleteProperty" class="headerlink" title="deleteProperty"></a>deleteProperty</h3><ul>
+<li>经过了代理 deleteProperty 删除了 target 中的 b</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> target = &#123;</span><br><span class="line">  a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(target, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;GET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + target[prop];</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">target, prop, value</span>)</span> &#123;</span><br><span class="line">    target[prop] = value;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;SET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + value);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">has</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Reflect</span>.has(target, prop);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">deleteProperty</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">  	<span class="keyword">delete</span> target[prop];</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> proxy.b;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;proxy&quot;</span>, proxy);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;target&quot;</span>, target);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1644226160893-457cf553-9c5e-429d-961c-6934ce69db4f.png" class="" title="delete代理上的属性删除target属性">
+
+<h1 id="ES-14种对象操作方法"><a href="#ES-14种对象操作方法" class="headerlink" title="ES - 14种对象操作方法"></a>ES - 14种对象操作方法</h1><h2 id="获取原型-GetPrototypeOf"><a href="#获取原型-GetPrototypeOf" class="headerlink" title="获取原型 [[GetPrototypeOf]]"></a>获取原型 [[GetPrototypeOf]]</h2><ul>
+<li>通过原型方法: Object.getPrototypeOf(obj)</li>
+<li>通过 <strong>proto</strong> : obj.<strong>proto</strong></li>
+<li>通过构造函数的原型属性: 构造函数.prototype</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="keyword">var</span> proto = <span class="built_in">Object</span>.getPrototypeOf(obj);</span><br><span class="line"><span class="built_in">console</span>.log(proto); <span class="comment">// Object.prototype</span></span><br><span class="line"><span class="built_in">console</span>.log(obj.__proto__);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637889668829-553c175c-33be-4e82-8b00-3860f00c9a6e.png" class="" title="getPrototypeOf">
+
+<h2 id="设置原型-SetPrototypeOf"><a href="#设置原型-SetPrototypeOf" class="headerlink" title="设置原型 [[SetPrototypeOf]]"></a>设置原型 [[SetPrototypeOf]]</h2><ul>
+<li>通过 Object.setPrototypeOf(obj, xxx)</li>
+<li>通过 obj.<strong>proto</strong> = xxx</li>
+<li>通过 Object.prototype = xxx</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.setPrototypeOf(obj, &#123; <span class="attr">c</span>: <span class="number">3</span>, <span class="attr">d</span>: <span class="number">4</span> &#125;);</span><br><span class="line"><span class="comment">// obj.__proto__ = &#123; c: 3, d: 4&#125;;</span></span><br><span class="line"><span class="comment">// Object.prototype = &#123; c: 3, d: 4 &#125;;</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637890397084-f61c7caa-c98d-46b9-ac80-5b818afbd6a3.png" class="" title="setPrototypeOf">
+
+<h2 id="获取对象的可扩展性-IsExtensible"><a href="#获取对象的可扩展性-IsExtensible" class="headerlink" title="获取对象的可扩展性 [[IsExtensible]]"></a>获取对象的可扩展性 [[IsExtensible]]</h2><p><strong>Object.isExtensible()</strong> 方法判断一个对象是否是可扩展的（是否可以在它上面添加新的属性）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> extensible = <span class="built_in">Object</span>.isExtensible(obj);</span><br><span class="line"><span class="built_in">console</span>.log(extensible); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">Object</span>.freeze(obj); <span class="comment">// 冻结</span></span><br><span class="line"><span class="keyword">var</span> extensible2 = <span class="built_in">Object</span>.isExtensible(obj);</span><br><span class="line"><span class="built_in">console</span>.log(extensible2); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-seal"><a href="#Object-seal" class="headerlink" title="Object.seal"></a>Object.seal</h3><ul>
+<li>不可新增删除，可修改可枚举</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.seal(obj); <span class="comment">// 封闭对象</span></span><br><span class="line">obj.c = <span class="number">3</span>; <span class="comment">// 不可新增</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"><span class="keyword">delete</span> obj.a; <span class="comment">// 不可删除</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line">obj.b = <span class="number">3</span>; <span class="comment">// 可修改原有属性</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`key: <span class="subst">$&#123;key&#125;</span> - val: <span class="subst">$&#123;obj[key]&#125;</span>`</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637891738804-7a224d81-a9b5-4b48-a975-651273661d2d.png" class="" title="Object.seal">
+
+<h3 id="Object-freeze"><a href="#Object-freeze" class="headerlink" title="Object.freeze"></a>Object.freeze</h3><ul>
+<li>不可新增删除修改，但可枚举</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.freeze(obj); <span class="comment">// 冻结对象</span></span><br><span class="line">obj.c = <span class="number">3</span>; <span class="comment">// 不可新增</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"><span class="keyword">delete</span> obj.a; <span class="comment">// 不可删除</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line">obj.b = <span class="number">3</span>; <span class="comment">// 不可修改</span></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`key: <span class="subst">$&#123;key&#125;</span> - val: <span class="subst">$&#123;obj[key]&#125;</span>`</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637891772596-c931b06a-1e63-4a99-a90e-38098c403ee6.png" class="" title="Object.freeze">
+
+<h2 id="获取自有属性-GetOwnProperty"><a href="#获取自有属性-GetOwnProperty" class="headerlink" title="获取自有属性 [[GetOwnProperty]]"></a>获取自有属性 [[GetOwnProperty]]</h2><ul>
+<li>获取自有属性，不返回原型上的属性</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.setPrototypeOf(obj, &#123; <span class="attr">c</span>: <span class="number">3</span>, <span class="attr">d</span>: <span class="number">4</span> &#125;);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.getOwnPropertyNames(obj)); <span class="comment">// [ &#x27;a&#x27;, &#x27;b&#x27; ]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="禁止扩展对象-PreventExtensions"><a href="#禁止扩展对象-PreventExtensions" class="headerlink" title="禁止扩展对象 [[PreventExtensions]]"></a>禁止扩展对象 [[PreventExtensions]]</h2><ul>
+<li>不可扩展</li>
+<li>可删除</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">Object</span>.preventExtensions(obj);</span><br><span class="line">obj.c = <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> obj.a;</span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637892635361-9745902f-a965-4e63-a319-6f4e7171ad8e.png" class="" title="Object.preventExtensions">
+
+<h2 id="拦截对象操作-DefineProperty"><a href="#拦截对象操作-DefineProperty" class="headerlink" title="拦截对象操作 [[DefineProperty]]"></a>拦截对象操作 [[DefineProperty]]</h2><ul>
+<li>Object.defineProperty()</li>
+</ul>
+<h2 id="判断是否是自身属性-HasOwnProperty"><a href="#判断是否是自身属性-HasOwnProperty" class="headerlink" title="判断是否是自身属性 [[HasOwnProperty]]"></a>判断是否是自身属性 [[HasOwnProperty]]</h2><ul>
+<li>obj.hasOwnProperty(key)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(obj.hasOwnProperty(<span class="string">&#x27;a&#x27;</span>)); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="获取-GET"><a href="#获取-GET" class="headerlink" title="获取 [[GET]]"></a>获取 [[GET]]</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;c&#x27;</span> <span class="keyword">in</span> obj); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;a&#x27;</span> <span class="keyword">in</span> obj); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(obj.a); <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="设置-SET"><a href="#设置-SET" class="headerlink" title="设置 [[SET]]"></a>设置 [[SET]]</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line">obj.a = <span class="number">3</span>;</span><br><span class="line">obj[<span class="string">&#x27;b&#x27;</span>] = <span class="number">4</span>;</span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123; a: 3, b: 4 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="删除-Delete"><a href="#删除-Delete" class="headerlink" title="删除 [[Delete]]"></a>删除 [[Delete]]</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="keyword">delete</span> obj.a;</span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123; b: 2 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="枚举-Enumerate"><a href="#枚举-Enumerate" class="headerlink" title="枚举 [[Enumerate]]"></a>枚举 [[Enumerate]]</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> k <span class="keyword">in</span> obj) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(obj[k]); <span class="comment">// 1,2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="获取键集合-OwnPropertyKeys"><a href="#获取键集合-OwnPropertyKeys" class="headerlink" title="获取键集合 [[OwnPropertyKeys]]"></a>获取键集合 [[OwnPropertyKeys]]</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.keys(obj)); <span class="comment">// [&#x27;a&#x27;, &#x27;b&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="调用函数"><a href="#调用函数" class="headerlink" title="调用函数"></a>调用函数</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">test();</span><br><span class="line"></span><br><span class="line">test.call/apply</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;;</span><br><span class="line">obj.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;;</span><br><span class="line">obj.test();</span><br></pre></td></tr></table></figure>
+
+<h2 id="实例化对象"><a href="#实例化对象" class="headerlink" title="实例化对象"></a>实例化对象</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Test</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">new</span> Test();</span><br></pre></td></tr></table></figure>
+
+<h1 id="自定义-Proxy"><a href="#自定义-Proxy" class="headerlink" title="自定义 Proxy"></a>自定义 Proxy</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">MyProxy</span>(<span class="params">target, handler</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> _target = deepClone(target);</span><br><span class="line">  <span class="built_in">Object</span>.keys(_target).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(_target, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> handler.get &amp;&amp; handler.get(target, key);</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">        handler.set &amp;&amp; handler.set(target, key, newVal);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> _target;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">deepClone</span>(<span class="params">org, tar</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> target = tar || &#123;&#125;,</span><br><span class="line">        toStr = <span class="built_in">Object</span>.prototype.toString,</span><br><span class="line">        arrType = <span class="string">&#x27;[object Array]&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> org) &#123;</span><br><span class="line">      <span class="keyword">if</span> (org.hasOwnProperty(key)) &#123;</span><br><span class="line">        <span class="keyword">let</span> value = org[key];</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> value === <span class="string">&#x27;object&#x27;</span> &amp;&amp; value !== <span class="literal">null</span>) &#123;</span><br><span class="line">          <span class="keyword">if</span> (toStr.call(value) === arrType) &#123;</span><br><span class="line">            target[key] = [];</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            target[key] = &#123;&#125;;</span><br><span class="line">          &#125;</span><br><span class="line">          deepClone(value, target[key]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          target[key] = value;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> target;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> obj = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> proxy = <span class="keyword">new</span> MyProxy(obj, &#123;</span><br><span class="line">  <span class="function"><span class="title">get</span>(<span class="params">obj, prop</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;GET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + obj[prop]);</span><br><span class="line">    <span class="keyword">return</span> obj[prop];</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">obj, prop, newVal</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;SET: &#x27;</span> + prop + <span class="string">&#x27; = &#x27;</span> + newVal);</span><br><span class="line">    obj[prop] = newVal;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">proxy.a = <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(proxy);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/49273/1637909569266-843f41fb-bc6b-4078-ac73-7af1a23af175.png" class="" title="自定义proxy">
+
+<ul>
+<li><p>打印的 proxy 是个空对象，是因为 new 出来的 MyProxy 中 return 的 _target ，经过 Object.defineProperty 设置属性后，在对象中不可见了（不可枚举），展开对象后可见</p>
+</li>
+<li><p>在构造函数中 return 一个复杂值，会覆盖默认 return 的 this。但 return 一个基本值，不会覆盖 this</p>
+</li>
+<li><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1></li>
+<li><p>通过重写 Proxy 的 handler 中相应的方法，来达到修改原对象的目的。</p>
+</li>
+<li><p>外界每次通过 Proxy 去访问操作 target 对象的属性的时候，会经过 handler 中的相应方法，然后通过在代理的这些方法中做处理，来达到更改 target 对象的目的</p>
+</li>
+<li><p>间接操作 target，此方式跟 defineProperty 的拦截方式，完全不同</p>
+</li>
+</ul>
+<h1 id="💄defineProperty-和-Proxy-的异同"><a href="#💄defineProperty-和-Proxy-的异同" class="headerlink" title="💄defineProperty 和 Proxy 的异同"></a>💄defineProperty 和 Proxy 的异同</h1><h2 id="相同"><a href="#相同" class="headerlink" title="相同"></a>相同</h2><p>都能对数据进行“拦截”</p>
+<h2 id="不同"><a href="#不同" class="headerlink" title="不同"></a>不同</h2><p>本质不同</p>
+<ul>
+<li>defineProperty 给对象增加属性用</li>
+<li>proxy 代理对象，通过重写 handler 方法，间接达到修改target的目的</li>
+</ul>
+<h2 id="💄defineProperty-存在的问题"><a href="#💄defineProperty-存在的问题" class="headerlink" title="💄defineProperty 存在的问题"></a>💄defineProperty 存在的问题</h2><h3 id="数组通过-索引、修改数组length、push、pop-等一系列方式操作数组，都无法触发-setter，而-Proxy-可以触发"><a href="#数组通过-索引、修改数组length、push、pop-等一系列方式操作数组，都无法触发-setter，而-Proxy-可以触发" class="headerlink" title="数组通过 索引、修改数组length、push、pop 等一系列方式操作数组，都无法触发 setter，而 Proxy 可以触发"></a>数组通过 索引、修改数组length、push、pop 等一系列方式操作数组，都无法触发 setter，而 Proxy 可以触发</h3><p>vue对 push、pop 等数组方法进行了重写</p>
+<h1 id="Reflect-反射"><a href="#Reflect-反射" class="headerlink" title="Reflect 反射"></a>Reflect 反射</h1><img src="/posts/49273/1637914208708-72ca2cda-3160-4f52-876c-9e5f910df51a.png" class="" title="Reflect">
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>ES6 中定义的一个内置对象，是方法集合的容器。全局下的一个对象，不能 new<br>上面讲的14种方法，这里边有13种，少了一个枚举</p>
+<h2 id="存在的原因"><a href="#存在的原因" class="headerlink" title="存在的原因"></a>存在的原因</h2><p>放在这上面的原因是：</p>
+<p>因为很多对象方法，以前都放在 Object 上在，但很多方法不是直接操作 Object，有可能是操作函数、或数组。<br>由于这样的不合理，所以专门用 Reflect 这样一个容器来装这些方法</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用 Reflect 更合理，因为是用方法返回值</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> target = &#123;</span><br><span class="line">	a: <span class="number">1</span>,</span><br><span class="line">  b: <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(target, &#123;</span><br><span class="line">	<span class="function"><span class="title">get</span>(<span class="params">target, prop</span>)</span> &#123;</span><br><span class="line">  	<span class="comment">// return target[prop];</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Reflect</span>.get(target, prop);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">set</span>(<span class="params">target, prop, value</span>)</span> &#123;</span><br><span class="line">  	<span class="keyword">const</span> isOk = <span class="built_in">Reflect</span>.set(target, prop, value);</span><br><span class="line">    <span class="keyword">if</span> (isOk) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;SET successfully&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">proxy.a = <span class="number">233</span>; <span class="comment">// SET successfully</span></span><br><span class="line"><span class="built_in">console</span>.log(proxy.b); <span class="comment">// 2</span></span><br><span class="line"><span class="built_in">console</span>.log(target.a); <span class="comment">// 233</span></span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/ECMAScript/" rel="tag"># ECMAScript</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/14594/" rel="prev" title="自定义checkbox">
+                  <i class="fa fa-chevron-left"></i> 自定义checkbox
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/62468/" rel="next" title="异步（iterator、generator、promise、await、async）">
+                  异步（iterator、generator、promise、await、async） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

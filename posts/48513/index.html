@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="显示&#x2F;隐式类型转换显示类型转换💄Number() 把值转为数字 如果参数无法被转为数字，则返回 NaN ‘’、’   ‘, ‘0’、false、null、[] 、 等返回 0 {}、undefined 被转为 NaN 数字打头，但包含其他字符的，也返回 NaN 特点： 相比 parseInt 更宽松，false,true能转 但类似 ‘1a’ 这种，会 NaN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="显式隐式类型转化">
+<meta property="og:url" content="https://evestorm.github.io/posts/48513/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="显示&#x2F;隐式类型转换显示类型转换💄Number() 把值转为数字 如果参数无法被转为数字，则返回 NaN ‘’、’   ‘, ‘0’、false、null、[] 、 等返回 0 {}、undefined 被转为 NaN 数字打头，但包含其他字符的，也返回 NaN 特点： 相比 parseInt 更宽松，false,true能转 但类似 ‘1a’ 这种，会 NaN">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/48513/charCodeAt.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/48513/charCodeAt2.png">
+<meta property="article:published_time" content="2021-08-07T12:30:09.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.828Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/48513/charCodeAt.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/48513/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>显式隐式类型转化 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA-%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.</span> <span class="nav-text">显示&#x2F;隐式类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text">显示类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%84Number-%E6%8A%8A%E5%80%BC%E8%BD%AC%E4%B8%BA%E6%95%B0%E5%AD%97"><span class="nav-number">1.1.1.</span> <span class="nav-text">💄Number() 把值转为数字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%84parseInt-%E6%8A%8A%E5%80%BC%E8%BD%AC%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%95%B4%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">💄parseInt 把值转为一个整数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parseFloat-%E6%8A%8A%E5%80%BC%E8%BD%AC%E4%B8%BA%E6%B5%AE%E7%82%B9%E6%95%B0"><span class="nav-number">1.1.3.</span> <span class="nav-text">parseFloat 把值转为浮点数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%84Boolean-%E8%BD%AC%E5%B8%83%E5%B0%94%E5%80%BC"><span class="nav-number">1.1.4.</span> <span class="nav-text">💄Boolean 转布尔值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#isNaN-%E6%98%AF%E5%90%A6%E4%B8%BANaN"><span class="nav-number">1.1.5.</span> <span class="nav-text">isNaN 是否为NaN</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.2.</span> <span class="nav-text">隐式类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84JS-8%E7%A7%8D%E5%86%85%E7%BD%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">💄JS 8种内置类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ToPrimitive-%E5%B0%86%E4%BB%BB%E6%84%8F%E5%80%BC%E8%BD%AC%E4%B8%BA%E5%8E%9F%E5%A7%8B%E5%80%BC"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">ToPrimitive - 将任意值转为原始值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%87%8F%E6%B3%95-%E3%80%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">加减法 +、-</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%81%87%E5%88%B0%E5%AF%B9%E8%B1%A1%E5%85%88%E6%89%A7%E8%A1%8CToPrimitive%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">遇到对象先执行ToPrimitive转换为基本类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2-%E4%BB%BB%E6%84%8F%E5%80%BC%EF%BC%88%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%EF%BC%89%EF%BC%8C%E4%BC%9A%E8%A2%AB%E5%A4%84%E7%90%86%E4%B8%BA%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E6%8B%BC%E6%8E%A5"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">字符串 + 任意值（基本类型），会被处理为字符串的拼接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9E%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%88%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%EF%BC%89-%E9%9D%9E%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%88%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%EF%BC%89%EF%BC%8C%E4%B8%A4%E8%BE%B9%E9%83%BD%E4%BC%9A%E5%85%88-ToNumber"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">非字符串（基本类型） + 非字符串（基本类型），两边都会先 ToNumber</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%BB%E6%84%8F%E5%80%BC-%E4%BB%BB%E6%84%8F%E5%80%BC%EF%BC%8C%E4%B8%80%E5%BE%8B%E6%89%A7%E8%A1%8C-ToNumber%EF%BC%8C%E8%BF%9B%E8%A1%8C%E6%95%B0%E5%AD%97%E8%BF%90%E7%AE%97"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">任意值 - 任意值，一律执行 ToNumber，进行数字运算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#x-%E5%92%8C-%E4%B8%80%E5%85%83%E8%BF%90%E7%AE%97-x-%E6%98%AF%E7%AD%89%E6%95%88%E7%9A%84%EF%BC%88%E4%BB%A5%E5%8F%8A-x%EF%BC%89%EF%BC%8C%E9%83%BD%E4%BC%9A%E5%BC%BA%E5%88%B6-ToNumber"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">+ x 和 一元运算 +x 是等效的（以及 -x），都会强制 ToNumber</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84%E7%BB%8F%E5%85%B8%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.2.6.</span> <span class="nav-text">💄经典问题 [] + {}</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E6%9C%80%E5%89%8D%E9%9D%A2%E6%97%B6%E5%8F%AF%E8%83%BD%E4%B8%8D%E5%86%8D%E6%98%AF%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.2.2.7.</span> <span class="nav-text">{} 在最前面时可能不再是对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#symbol%E4%B8%8D%E8%83%BD%E5%8A%A0%E5%87%8F"><span class="nav-number">1.2.2.8.</span> <span class="nav-text">symbol不能加减</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%84%E5%AE%BD%E6%9D%BE%E7%9B%B8%E7%AD%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">💄宽松相等</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1-%E5%AF%B9%E8%B1%A1%EF%BC%8C%E7%B1%BB%E5%9E%8B%E4%B8%80%E8%87%B4%E5%88%99%E4%B8%8D%E5%81%9A%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">对象 &#x3D;&#x3D; 对象，类型一致则不做转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1-%E5%9F%BA%E6%9C%AC%E5%80%BC%EF%BC%8C%E5%AF%B9%E8%B1%A1%E5%85%88%E6%89%A7%E8%A1%8CToPrimitive%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">对象 &#x3D;&#x3D; 基本值，对象先执行ToPrimitive转换为基本类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84%E5%B8%83%E5%B0%94%E5%80%BC-%E9%9D%9E%E5%B8%83%E5%B0%94%E5%80%BC%EF%BC%8C%E5%B8%83%E5%B0%94%E5%80%BC%E5%85%88%E8%BD%AC%E6%8D%A2%E6%88%90%E6%95%B0%E5%AD%97%EF%BC%8C%E5%86%8D%E6%8C%89%E6%95%B0%E5%AD%97%E8%A7%84%E5%88%99%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">💄布尔值 &#x3D;&#x3D; 非布尔值，布尔值先转换成数字，再按数字规则操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84%E6%95%B0%E5%AD%97-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%AD%97%E7%AC%A6%E4%B8%B2ToNumber%E8%BD%AC%E6%8D%A2%E6%88%90%E6%95%B0%E5%AD%97"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">💄数字 &#x3D;&#x3D; 字符串，字符串ToNumber转换成数字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84null%E3%80%81undefined%E3%80%81symbol"><span class="nav-number">1.2.3.5.</span> <span class="nav-text">💄null、undefined、symbol</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83-lt-gt"><span class="nav-number">1.2.4.</span> <span class="nav-text">比较 &lt; &gt;</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%80%BB%E6%98%AF%E5%85%88%E6%89%A7%E8%A1%8CToPrimitive%E4%B8%BA%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">对象总是先执行ToPrimitive为基本类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%92%84%E4%B8%A4%E8%BE%B9%E9%83%BD%E6%98%AF%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%97%B6%E6%89%8D%E6%AF%94%E8%BE%83UNICode%EF%BC%8C%E5%90%A6%E5%88%99%E4%B8%80%E5%BE%8B%E8%BD%AC%E6%8D%A2%E6%88%90%E6%95%B0%E5%AD%97%E5%81%9A%E5%AF%B9%E6%AF%94"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">💄两边都是字符串时才比较UNICode，否则一律转换成数字做对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%A4%E8%BE%B9%E9%83%BD%E6%98%AF%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E6%88%96%E4%B8%A4%E8%BE%B9%E9%83%BD%E6%9C%80%E7%BB%88%E8%BD%AC%E4%B8%BA%E4%BA%86%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">两边都是字符串，或两边都最终转为了字符串</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%84%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.5.</span> <span class="nav-text">💄总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">1.2.6.</span> <span class="nav-text">资源</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/48513/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          显式隐式类型转化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-07 20:30:09" itemprop="dateCreated datePublished" datetime="2021-08-07T20:30:09+08:00">2021-08-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="显示-隐式类型转换"><a href="#显示-隐式类型转换" class="headerlink" title="显示/隐式类型转换"></a>显示/隐式类型转换</h1><h2 id="显示类型转换"><a href="#显示类型转换" class="headerlink" title="显示类型转换"></a>显示类型转换</h2><h3 id="💄Number-把值转为数字"><a href="#💄Number-把值转为数字" class="headerlink" title="💄Number() 把值转为数字"></a>💄Number() 把值转为数字</h3><ul>
+<li>如果参数无法被转为数字，则返回 NaN</li>
+<li>‘’、’   ‘, ‘0’、false、null、[] 、 等返回 0</li>
+<li>{}、undefined 被转为 NaN</li>
+<li>数字打头，但包含其他字符的，也返回 NaN</li>
+<li>特点：<ul>
+<li>相比 parseInt 更宽松，false,true能转</li>
+<li>但类似 ‘1a’ 这种，会 NaN</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">Number</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">Number</span>(a)); <span class="comment">// number-123</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;3.14&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">Number</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">Number</span>(a)); <span class="comment">// number-3.14</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;true&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">Number</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">Number</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 非数</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">Number</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">Number</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 非数</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;1a&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">Number</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">Number</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 非数</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;0&quot;</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;&quot;</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;   &quot;</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="literal">null</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="literal">false</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>([]); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;\n&quot;</span>); <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;\t&quot;</span>); <span class="comment">// 0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Number</span>(<span class="literal">true</span>); <span class="comment">// 1</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&#x27;true&#x27;</span>); <span class="comment">// NaN</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Number</span>(<span class="literal">undefined</span>); <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">Number</span>(&#123;&#125;); <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">Number</span>(<span class="string">&quot;x&quot;</span>); <span class="comment">// NaN</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="💄parseInt-把值转为一个整数"><a href="#💄parseInt-把值转为一个整数" class="headerlink" title="💄parseInt 把值转为一个整数"></a>💄parseInt 把值转为一个整数</h3><ul>
+<li>string 要被解析的值。如果参数不是一个字符串，则将其转换为字符串(使用  <code>[ToString](https://www.ecma-international.org/ecma-262/6.0/#sec-tostring)</code> 抽象操作)。字符串开头的空白符将会被忽略。</li>
+<li>radix 从 <code>2</code> 到 <code>36</code>，表示字符串的基数。例如指定 16 表示被解析值是十六进制数。</li>
+<li>当radix不填写时默认当做十进制处理，但注意10并不是默认值，当字符串以0x开头是会直接处理为16进制<ul>
+<li><code>parseInt(&quot;123&quot;, 16) === parseInt(&quot;0x123&quot;)</code> </li>
+</ul>
+</li>
+<li>true、false、’’、null、undefined、NaN、[]、{} 都转为 NaN</li>
+<li>如果数字和字符串混合，字符串在前，转为NaN；数字在前，取数字，直到不是数字为止</li>
+<li>特点：<ul>
+<li>相比 Number，更严格，false, true都会 NaN</li>
+<li>但 ‘1a’ 这种却能处理，变成 1（也就是解析到不能解析为止）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-123</span></span><br><span class="line"></span><br><span class="line">a = <span class="literal">true</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 只管把数字转为整型，非数都是 NaN</span></span><br><span class="line"></span><br><span class="line">a = <span class="literal">null</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 同上</span></span><br><span class="line"></span><br><span class="line">a = <span class="literal">undefined</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"></span><br><span class="line">a = <span class="literal">NaN</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;3.14&#x27;</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-3</span></span><br><span class="line"><span class="comment">// hint: 直接把小数点扔掉</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;abc123&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-NaN</span></span><br><span class="line"><span class="comment">// hint: 非数</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;123abc&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-123</span></span><br><span class="line"><span class="comment">// hint: 如果数字和字符串混合，字符串在前，转为非数；数字在前，转到下一个不是数字为止的数字</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;123.22abc&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseInt</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseInt</span>(a)); <span class="comment">// number-123</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;10&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(a, <span class="number">16</span>)); <span class="comment">// 16</span></span><br><span class="line"><span class="comment">// hint: 第二个参数是基底，把xx进制的a转为10进制 xx范围 2~36</span></span><br><span class="line"><span class="comment">// 也就是按照数 16 次进 1 的说法，算成十进制的数 10 就应该是 16</span></span><br><span class="line"><span class="comment">// 也就是16进制的16才等于10进制的10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;b&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(a, <span class="number">16</span>));</span><br><span class="line"><span class="comment">// hint: 0123456789abcdef</span></span><br><span class="line"><span class="comment">// 第 0 位：b * 16 ^ 0 = 11 * 1 = 11</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">parseInt</span>(<span class="string">&#x27;123&#x27;</span>, <span class="number">5</span>); <span class="comment">// 把 &#x27;123&#x27; 看做5进制的数，返回十进制的数38</span></span><br><span class="line"><span class="comment">// =&gt; 1 * 5 ^ 2 + 2 * 5 ^ 1 + 3 * 5 ^ 0 = 25+10+3 = 38</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">parseInt</span>(<span class="number">123</span>)</span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="string">&quot;123&quot;</span>)</span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="string">&quot;12a&quot;</span>) <span class="comment">//a不能解析成整数了</span></span><br><span class="line"><span class="number">12</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="string">&quot;a12a&quot;</span>) <span class="comment">//第一个位置就不能解析了</span></span><br><span class="line"><span class="literal">NaN</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">parseInt</span>(<span class="number">12</span>,<span class="number">0</span>) <span class="comment">//12 10进制为12</span></span><br><span class="line"><span class="number">12</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">12</span>,<span class="number">5</span>) <span class="comment">//12 5进制为7</span></span><br><span class="line"><span class="number">7</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">12</span>,<span class="number">8</span>) <span class="comment">//12 8进制为10</span></span><br><span class="line"><span class="number">10</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">112</span>,<span class="number">2</span>) <span class="comment">//112 2进制，前两位是可以解析的，第三位不能解析，2进制只有0 1</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">112</span>,<span class="number">1</span>) <span class="comment">// 1进制只有0，第一位就不能解析</span></span><br><span class="line"><span class="literal">NaN</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">123</span>,<span class="number">3</span>) <span class="comment">// 123 中 12 可以解析，3进制为5</span></span><br><span class="line"><span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="parseFloat-把值转为浮点数"><a href="#parseFloat-把值转为浮点数" class="headerlink" title="parseFloat 把值转为浮点数"></a>parseFloat 把值转为浮点数</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;3.1415926&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseFloat</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseFloat</span>(a)); <span class="comment">// number-3.1415926</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;3&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseFloat</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseFloat</span>(a)); <span class="comment">// number-3</span></span><br><span class="line"></span><br><span class="line">a = <span class="string">&#x27;3.14aab&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(<span class="built_in">parseFloat</span>(a)) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">parseFloat</span>(a)); <span class="comment">// number-3.14</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> num = <span class="built_in">parseFloat</span>(<span class="string">&#x27;3.1415926&#x27;</span>); <span class="comment">// 3.1415926</span></span><br><span class="line"><span class="built_in">console</span>.log(num.toFixed(<span class="number">2</span>)) <span class="comment">// 3.14</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">3.14621</span>.toFixed(<span class="number">2</span>)) <span class="comment">// 3.15</span></span><br><span class="line"><span class="comment">// hint: 四舍五入</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="💄Boolean-转布尔值"><a href="#💄Boolean-转布尔值" class="headerlink" title="💄Boolean 转布尔值"></a>💄Boolean 转布尔值</h3><ul>
+<li>false、’’、0、undefined、null、NaN</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Boolean</span>(<span class="literal">null</span>) <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 0 &quot;&quot; undefined null NaN false 都转为 false</span></span><br><span class="line"><span class="comment">// 其余都是 true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="isNaN-是否为NaN"><a href="#isNaN-是否为NaN" class="headerlink" title="isNaN 是否为NaN"></a>isNaN 是否为NaN</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="literal">NaN</span>)); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="number">123</span>)); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="string">&#x27;a&#x27;</span>)); <span class="comment">// true</span></span><br><span class="line"><span class="comment">// hint: &#x27;a&#x27;是非数，转不了number，就是NaN</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="string">&#x27;NaN&#x27;</span>));</span><br><span class="line"><span class="comment">// true 全局isNaN 字符串非数就是NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>.isNaN(<span class="string">&quot;NaN&quot;</span>));</span><br><span class="line"><span class="comment">// false Number下的isNaN，不会隐式转化</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="literal">null</span>)); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: Number(null) -&gt; 0, 0是数字，不是NaN</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">isNaN</span>(<span class="literal">undefined</span>)); <span class="comment">// true</span></span><br><span class="line"><span class="comment">// hint: Number(undefined) -&gt; NaN</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="隐式类型转换"><a href="#隐式类型转换" class="headerlink" title="隐式类型转换"></a>隐式类型转换</h2><h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><h4 id="💄JS-8种内置类型"><a href="#💄JS-8种内置类型" class="headerlink" title="💄JS 8种内置类型"></a>💄JS 8种内置类型</h4><ul>
+<li>Number</li>
+<li>String</li>
+<li>Boolean</li>
+<li>Undefined</li>
+<li>null</li>
+<li><strong>Object</strong>（函数、数组都是Object的子类型）</li>
+<li>Symbol （ES2015）</li>
+<li>BigInt（ESNext stage 4）</li>
+</ul>
+<p>类型分为 基本类型 和 复合类型 ，除了对象，其他都是基本类型。</p>
+<h4 id="ToPrimitive-将任意值转为原始值"><a href="#ToPrimitive-将任意值转为原始值" class="headerlink" title="ToPrimitive - 将任意值转为原始值"></a>ToPrimitive - 将任意值转为原始值</h4><p>转换规则：</p>
+<ol>
+<li>如果是基本类型，则不处理</li>
+<li>调用 <code>valueOf()</code> ，并确保返回值是基本类型</li>
+<li>如果没有 <code>valueOf</code> 这个方法或者 <code>valueOf</code> 返回的类型不是基本类型，那么对象会继续调用 <code>toString()</code> 方法</li>
+<li>如果同时没有 <code>valueOf</code> 和 <code>toString()</code> 方法，或者返回的都不是基本类型，那么直接抛出 <code>TypeError</code> 异常</li>
+</ol>
+<blockquote>
+<p>注意： 如果 <strong>preferedType=string</strong>，那么 2，3 顺序调换</p>
+</blockquote>
+<p>转换实现：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>valueOf()</th>
+<th>toString()</th>
+<th>默认 preferedType</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Object</td>
+<td>原值</td>
+<td>“[object Object]”</td>
+<td>Number</td>
+</tr>
+<tr>
+<td>Function</td>
+<td>原值</td>
+<td>“function xyz() {…}”</td>
+<td>Number</td>
+</tr>
+<tr>
+<td>Array</td>
+<td>原值</td>
+<td>“x,y,z”</td>
+<td>Number</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>数字（</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>存储的时间是从 1970 年 1 月 1 日午夜开始计的毫秒数</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>）e.g.</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1628864272562</td>
+<td>“Sat May 22 2021…”</td>
+<td>String</td>
+<td></td>
+</tr>
+</tbody></table>
+<ol>
+<li>数组的 <code>toString()</code> 可以等效为 <code>join(&quot;,&quot;)</code> ，遇到 null、undefined 都被忽略，遇到 symbol 直接报错，遇到无法 ToPrimitive 的对象也报错</li>
+<li>使用 <code>模板字符串</code> 或者使用 <code>String(...)</code> 包装时，preferedType=string，即优先调用 <code>.toString()</code> </li>
+<li>使用 <code>减法</code> 或者 <code>Number(...)</code> 包装时，preferedType=number，即优先调用 <code>.valueOf()</code> </li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="literal">null</span>, <span class="literal">undefined</span>, <span class="number">2</span>].toString(); <span class="comment">// &quot;1,,,2&quot;</span></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>, <span class="built_in">Symbol</span>(<span class="string">&#x27;x&#x27;</span>)].toString(); <span class="comment">// TypeError: Cannot convert a Symbol value to a string</span></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>, <span class="built_in">Object</span>.create(<span class="literal">null</span>)].toString(); <span class="comment">// VM3251:1 Uncaught TypeError: Cannot convert object to primitive value</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="加减法-、"><a href="#加减法-、" class="headerlink" title="加减法 +、-"></a>加减法 +、-</h3><p>加减法运算中遵循了一些隐式转换规则：</p>
+<h4 id="遇到对象先执行ToPrimitive转换为基本类型"><a href="#遇到对象先执行ToPrimitive转换为基本类型" class="headerlink" title="遇到对象先执行ToPrimitive转换为基本类型"></a>遇到对象先执行ToPrimitive转换为基本类型</h4><ul>
+<li><strong>加法</strong>（+）运算，preferedType是默认值</li>
+<li><strong>减法</strong>（-）运算，preferedType是Number</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> + &#123;&#125;; <span class="comment">// 1 + (&#123;&#125;).toString() =&gt; 1 + &quot;[object Object]&quot; =&gt; &quot;1[object Object]&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + [<span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"><span class="comment">// 1 + ([2, 3]).toString(); =&gt; 1 + [2, 3].join(&quot;,&quot;) =&gt; 1 + &quot;2,3&quot; =&gt; &quot;12,3&quot;</span></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>] + [<span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"><span class="comment">// &quot;1&quot; + [2, 3].join(&quot;,&quot;) =&gt; &quot;1&quot; + &quot;2,3&quot; =&gt; &quot;12,3&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;&#125;;</span><br><span class="line"><span class="number">10</span> + test;</span><br><span class="line"><span class="comment">// 10 + (test).toString() =&gt; 10 + &quot;function test() &#123;&#125;&quot; =&gt; &quot;10function test() &#123;&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">10</span> - <span class="literal">undefined</span>;</span><br><span class="line"><span class="comment">// 10 - Number(undefined) =&gt; 10 - NaN =&gt; NaN</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="字符串-任意值（基本类型），会被处理为字符串的拼接"><a href="#字符串-任意值（基本类型），会被处理为字符串的拼接" class="headerlink" title="字符串 + 任意值（基本类型），会被处理为字符串的拼接"></a>字符串 + 任意值（基本类型），会被处理为字符串的拼接</h4><p>这里的任意值都是指基本类型，因为对象会先执行ToPrimitive变成基础类型</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> + <span class="string">&quot;1&quot;</span>; 																									<span class="comment">// (1).toString() + &quot;1&quot; =&gt; &quot;1&quot; + &quot;1&quot; =&gt; &quot;11&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="number">1</span>; 																										<span class="comment">// 2</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;1&quot;</span> + <span class="number">1</span>; 																									<span class="comment">// &quot;1&quot; + (1).toString() =&gt; &quot;1&quot; + &quot;1&quot; =&gt; &quot;11&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;1&quot;</span> + <span class="string">&quot;1&quot;</span>; 																								<span class="comment">// &quot;11&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="string">&quot;1&quot;</span> + <span class="number">1</span>;																							<span class="comment">// (1).toString() + &quot;1&quot; + (1).toString() =&gt; &quot;1&quot; + &quot;1&quot; + &quot;1&quot; =&gt; &quot;111&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;1&quot;</span> + <span class="literal">false</span>; 																							<span class="comment">// &quot;1&quot; + &quot;false&quot; =&gt; &quot;1false&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;1&quot;</span> + <span class="literal">null</span>; 																							<span class="comment">// &quot;1&quot; + &quot;null&quot; =&gt; &quot;1null&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;X&quot;</span> + <span class="literal">undefined</span> + <span class="literal">false</span>;																	<span class="comment">// &quot;X&quot; + &quot;undefined&quot; + &quot;false&quot; =&gt; &quot;Xundefinedfalse&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;X&quot;</span> + &#123;&#125;;																									<span class="comment">// &quot;X&quot; + (&#123;&#125;).toString() =&gt; &quot;X&quot; + &quot;[object Object]&quot; =&gt; &quot;X[object Object]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="非字符串（基本类型）-非字符串（基本类型），两边都会先-ToNumber"><a href="#非字符串（基本类型）-非字符串（基本类型），两边都会先-ToNumber" class="headerlink" title="非字符串（基本类型） + 非字符串（基本类型），两边都会先 ToNumber"></a>非字符串（基本类型） + 非字符串（基本类型），两边都会先 ToNumber</h4><p>这里的非字符串都是指基本类型，因为对象会先执行ToPrimitive变成基础类型</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> + <span class="literal">true</span>; 																<span class="comment">// 1 + Number(true) =&gt; 1 + 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="literal">false</span>; 																<span class="comment">// 1 + Number(false) =&gt; 1 + 0 =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="literal">null</span>; 																<span class="comment">// 1 + Number(null) =&gt; 1 + 0 = 1</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="literal">null</span> + <span class="literal">false</span> + <span class="number">1</span>; 										<span class="comment">// 1 + Number(null) + Number(false) =&gt; 1 + 0 + 0 + 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="literal">undefined</span>; 														<span class="comment">// 1 + Number(undefined) =&gt; NaN</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + <span class="literal">undefined</span> + <span class="literal">false</span>;										<span class="comment">// 1 + Number(undefined) + Number(false) =&gt; 1 + NaN + 0 =&gt; NaN</span></span><br><span class="line"></span><br><span class="line">🍒 <span class="number">1</span> + <span class="literal">undefined</span> + [<span class="number">1</span>];										<span class="comment">// 1 + Number(undefined) + ([1]).toString() =&gt; 1 + NaN + &quot;1&quot; =&gt; &quot;NaN1&quot;</span></span><br><span class="line"></span><br><span class="line">🍒 <span class="number">1</span> + <span class="literal">undefined</span> + <span class="string">&quot;1&quot;</span>;										<span class="comment">// 1 + Number(undefined) + &quot;1&quot; =&gt; 1 + NaN + &quot;1&quot; =&gt; &quot;NaN1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="literal">null</span> + <span class="literal">null</span>; 															<span class="comment">// Number(null) + Number(null) =&gt; 0 + 0 =&gt; 0</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + ![]; 																	<span class="comment">// 1 + Number(!Boolean([])) =&gt; 1 + Number(!true) =&gt; 1 + 0 =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + !&#123;&#125;; 																	<span class="comment">// 1 + Number(!Boolean(&#123;&#125;)) =&gt; 1 + Number(!true) =&gt; 1 + 0 =&gt; 1</span></span><br><span class="line"></span><br><span class="line">!&#123;&#125; + !&#123;&#125;;</span><br><span class="line">                                                            <span class="comment">// Number(!Boolean(&#123;&#125;)) =&gt; </span></span><br><span class="line">                                                            <span class="comment">// Number(!Boolean(&#123;&#125;)) =&gt; </span></span><br><span class="line">                                                            <span class="comment">// Number(!true) + Number(!true) =&gt;</span></span><br><span class="line">                                                            <span class="comment">// 0 + 0 =&gt; 0</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="任意值-任意值，一律执行-ToNumber，进行数字运算"><a href="#任意值-任意值，一律执行-ToNumber，进行数字运算" class="headerlink" title="任意值 - 任意值，一律执行 ToNumber，进行数字运算"></a>任意值 - 任意值，一律执行 ToNumber，进行数字运算</h4><p>此时的 preferedType === number</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">3</span> - <span class="number">1</span>; 																										<span class="comment">// 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">3</span> - <span class="string">&#x27;1&#x27;</span>; 																									<span class="comment">// 3 - Number(&#x27;1&#x27;) =&gt; 3 - 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;3&#x27;</span> - <span class="number">1</span>; 																									<span class="comment">// Number(&#x27;3&#x27;) - 1 =&gt; 3 - 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;3&#x27;</span> - <span class="string">&#x27;1&#x27;</span> - <span class="string">&#x27;2&#x27;</span>; 																					<span class="comment">// Number(&#x27;3&#x27;) - Number(&#x27;1&#x27;) - Number(&#x27;2&#x27;) =&gt; 0</span></span><br><span class="line"></span><br><span class="line"><span class="number">3</span> - []; 																									<span class="comment">// 3 - ([]).toString() =&gt; 3 - &quot;&quot; =&gt; 3 - Number(&quot;&quot;) =&gt; 3 - 0 =&gt; 3</span></span><br><span class="line"></span><br><span class="line"><span class="number">3</span> - &#123;&#125;; </span><br><span class="line">                                                          <span class="comment">// 3 - (&#123;&#125;).toString() =&gt; </span></span><br><span class="line">                                                          <span class="comment">// 3 - &quot;[object Object]&quot; =&gt; </span></span><br><span class="line">                                                          <span class="comment">// 3 - Number(&quot;[object Object]&quot;) =&gt;</span></span><br><span class="line">                                                          <span class="comment">// 3 - NaN =&gt; NaN</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">date.toString(); 																					<span class="comment">// &quot;Sun Aug 15 2021 16:05:17 GMT+0800 (China Standard Time)&quot;</span></span><br><span class="line">date.valueOf(); 																					<span class="comment">// 1629014717125</span></span><br><span class="line"></span><br><span class="line">date + <span class="number">1</span>; 																								<span class="comment">// &quot;Sun Aug 15 2021 16:05:17 GMT+0800 (China Standard Time)1&quot;</span></span><br><span class="line">date - <span class="number">1</span>; 																								<span class="comment">// 1629014717124</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="x-和-一元运算-x-是等效的（以及-x），都会强制-ToNumber"><a href="#x-和-一元运算-x-是等效的（以及-x），都会强制-ToNumber" class="headerlink" title="+ x 和 一元运算 +x 是等效的（以及 -x），都会强制 ToNumber"></a><code>+ x</code> 和 一元运算 <code>+x</code> 是等效的（以及 <code>-x</code>），都会强制 ToNumber</h4><ul>
+<li>+x，x在后面才Number，x在前面则不会强转Number</li>
+<li>a++，会当数字算</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="number">0</span>; <span class="comment">// 0</span></span><br><span class="line">- <span class="number">0</span>; <span class="comment">// 0</span></span><br><span class="line"></span><br><span class="line">+ <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line"><span class="comment">// Number(Sun Aug 15 2021 16:09:47 GMT+0800 (China Standard Time)) =&gt;</span></span><br><span class="line"><span class="comment">// 1629014965054</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + + <span class="string">&quot;1&quot;</span>; <span class="comment">// 1 + Number(&quot;1&quot;) =&gt; 1 + 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;1&quot;</span> + + <span class="string">&quot;1&quot;</span>; <span class="comment">// &quot;1&quot; + Number(&quot;1&quot;) =&gt; &quot;1&quot; + 1 =&gt; &quot;11&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + + + + [<span class="string">&quot;1&quot;</span>]; <span class="comment">// 1 + (+(+(+[&quot;1&quot;]))) =&gt; 1 + Number([&quot;1&quot;]) =&gt; 1 + 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + - + - [<span class="number">1</span>]; <span class="comment">// 1 + (-(+(-[1]))) =&gt; 1 + (-(+(-Number([1])))) =&gt; 1 + 1 =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> - + - + <span class="number">1</span>; <span class="comment">// 1 - (+(-(+1))) =&gt; 1 - (-1) =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> - + - + - <span class="number">1</span>; <span class="comment">// 1 - (+(-(+(-1)))) =&gt; 1 - (1) =&gt; 0</span></span><br><span class="line"></span><br><span class="line">💄<span class="number">1</span> + + [<span class="string">&quot;&quot;</span>]; <span class="comment">// 1 + Number([&quot;&quot;]) =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + + [<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>];</span><br><span class="line"><span class="comment">// 1 + Number(([&quot;1&quot;, &quot;2&quot;].toString())) =&gt; </span></span><br><span class="line"><span class="comment">// 1 + Number(&quot;1,2&quot;) =&gt; </span></span><br><span class="line"><span class="comment">// 1 + NaN =&gt;</span></span><br><span class="line"><span class="comment">// NaN</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">a++;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">a += <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// &#x27;11&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="💄经典问题"><a href="#💄经典问题" class="headerlink" title="💄经典问题 [] + {}"></a>💄经典问题 [] + {}</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[] + &#123;&#125;;</span><br><span class="line"><span class="comment">// ([]).toString() + (&#123;&#125;).toString() =&gt; &quot;&quot; + &quot;[object Object]&quot; =&gt; &quot;[object Object]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="在最前面时可能不再是对象"><a href="#在最前面时可能不再是对象" class="headerlink" title="{} 在最前面时可能不再是对象"></a>{} 在最前面时可能不再是对象</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#125; + []; <span class="comment">// 0</span></span><br><span class="line"></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span> &#125; + []; <span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个，这时 {} 其实代表的是代码块，最后就变成了 +[]，根据前面的原则，数组先被转换成字符串””，接着因为+x的运算，字符串被转成数字0。<br>第二个，此时a不是代表对象属性，而是被当成了标签（label），标签这东西IE6就已经有了。所以如果我们写成对象是会报错的，逗号要改成分号才能通过编译。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Uncaught SyntaxError: Unexpected token &#x27;:&#x27;</span></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span>, <span class="attr">b</span>: <span class="number">3</span> &#125; + []</span><br><span class="line"></span><br><span class="line"><span class="comment">// 分号OK</span></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span>; b: <span class="number">3</span> &#125; + [] === <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>⚠️注意：在 Node &gt;= 13.10.0 的版本，<code>&#123;&#125;</code>被优先解释为空对象，仅在非对象结构的情况才会被认为是代码块。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// nodeJs &gt;= 13.10.0 的运行结果</span></span><br><span class="line"></span><br><span class="line">&#123;&#125; + []; <span class="comment">// &quot;[object Object]&quot;;</span></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span> &#125; + []; <span class="comment">// &quot;[object Object]&quot;;</span></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span>, <span class="attr">b</span>: <span class="number">3</span> &#125; + []; <span class="comment">// &quot;[object Object]&quot;;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 注意是分号，当成代码块</span></span><br><span class="line">&#123; <span class="attr">a</span>: <span class="number">2</span>; b: <span class="number">3</span> &#125; + []; <span class="comment">// 0</span></span><br><span class="line"><span class="comment">// 有JS语句或者表达式，当成代码块</span></span><br><span class="line">&#123; <span class="keyword">var</span> a = <span class="number">1</span>; &#125; + []; <span class="comment">// 0</span></span><br><span class="line">&#123; ; &#125; + []; <span class="comment">// 0</span></span><br><span class="line">&#123; <span class="number">123</span> &#125; + []; <span class="comment">// 0</span></span><br><span class="line">&#123; <span class="number">1</span> + <span class="number">2</span> &#125; + []; <span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
+
+<p>定论还是下的太早了，我们还是有办法让引擎优先处理成代码块:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 所有node版本</span></span><br><span class="line"></span><br><span class="line">;&#123;&#125; + [] === <span class="number">0</span>;</span><br><span class="line">;&#123; <span class="attr">a</span>: <span class="number">2</span> &#125; + [] === <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Uncaught SyntaxError: Unexpected token &#x27;:&#x27;</span></span><br><span class="line">;&#123; <span class="attr">a</span>: <span class="number">2</span>, <span class="attr">b</span>: <span class="number">3</span> &#125; + [];</span><br></pre></td></tr></table></figure>
+
+<h4 id="symbol不能加减"><a href="#symbol不能加减" class="headerlink" title="symbol不能加减"></a>symbol不能加减</h4><p>如果在表达式中有symbol类型，那么就会直接报错。比如<code>1 + Symbol(&quot;x&quot;)</code>报错如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot convert a <span class="built_in">Symbol</span> value to a number</span><br></pre></td></tr></table></figure>
+
+<h3 id="💄宽松相等"><a href="#💄宽松相等" class="headerlink" title="💄宽松相等"></a>💄宽松相等</h3><p>相对于全等都需要对类型进行判断，当类型不一致时，宽松相等会触发隐式转换。下面介绍规则：</p>
+<h4 id="对象-对象，类型一致则不做转换"><a href="#对象-对象，类型一致则不做转换" class="headerlink" title="对象 == 对象，类型一致则不做转换"></a>对象 == 对象，类型一致则不做转换</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#125; != &#123;&#125; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">[] != &#123;&#125; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">[] != [] <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="对象-基本值，对象先执行ToPrimitive转换为基本类型"><a href="#对象-基本值，对象先执行ToPrimitive转换为基本类型" class="headerlink" title="对象 == 基本值，对象先执行ToPrimitive转换为基本类型"></a>对象 == 基本值，对象先执行ToPrimitive转换为基本类型</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 小心代码块</span></span><br><span class="line"><span class="string">&quot;[object Object]&quot;</span> == &#123;&#125;; <span class="comment">// (&#123;&#125;).toString() =&gt; &quot;[object Object]&quot;</span></span><br><span class="line">[] == <span class="string">&quot;&quot;</span>; <span class="comment">// ([]).toString() =&gt; &quot;&quot;</span></span><br><span class="line">[<span class="number">1</span>] == <span class="string">&quot;1&quot;</span>; <span class="comment">// ([1]).toString(); =&gt; &quot;1&quot;</span></span><br><span class="line">[<span class="number">1</span>,<span class="number">2</span>] == <span class="string">&quot;1,2&quot;</span>; <span class="comment">// ([1,2]).toString() =&gt; &quot;1,2&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="💄布尔值-非布尔值，布尔值先转换成数字，再按数字规则操作"><a href="#💄布尔值-非布尔值，布尔值先转换成数字，再按数字规则操作" class="headerlink" title="💄布尔值 == 非布尔值，布尔值先转换成数字，再按数字规则操作"></a>💄布尔值 == 非布尔值，布尔值先转换成数字，再按数字规则操作</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[] == <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// [] =&gt; ([]).toString() =&gt; &quot;&quot; =&gt; Number(&quot;&quot;) =&gt; 0</span></span><br><span class="line"><span class="comment">// false =&gt; Number(false) =&gt; 0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// [1] =&gt; &quot;1&quot; =&gt; 1</span></span><br><span class="line"><span class="comment">// true =&gt; 1</span></span><br><span class="line">[<span class="number">1</span>] == <span class="literal">true</span>;</span><br><span class="line"><span class="comment">// [1] =&gt; ([1]).toString() =&gt; &quot;1&quot; =&gt; Number(&quot;1&quot;) =&gt; 1</span></span><br><span class="line"><span class="comment">// true =&gt; Number(true) =&gt; 1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>,<span class="number">2</span>] != <span class="literal">true</span>;</span><br><span class="line"><span class="comment">// [1,2] =&gt; ([1,2]).toString() =&gt; &quot;1,2&quot; =&gt; Number(&quot;1,2&quot;) =&gt; NaN</span></span><br><span class="line"><span class="comment">// true =&gt; Number(true) =&gt; 1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;0&quot;</span> == <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// &quot;0&quot; =&gt; Number(&quot;0&quot;) =&gt; 0</span></span><br><span class="line"><span class="comment">// false =&gt; Number(false) =&gt; 0</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;</span> == <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// &quot;&quot; =&gt; Number(&quot;&quot;) =&gt; 0</span></span><br><span class="line"><span class="comment">// false =&gt; Number(false) =&gt; 0</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="💄数字-字符串，字符串ToNumber转换成数字"><a href="#💄数字-字符串，字符串ToNumber转换成数字" class="headerlink" title="💄数字 == 字符串，字符串ToNumber转换成数字"></a>💄数字 == 字符串，字符串ToNumber转换成数字</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;2&quot;</span> == <span class="number">2</span>;</span><br><span class="line"><span class="comment">// &quot;2&quot; =&gt; Number(&quot;2&quot;) =&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;</span> == <span class="number">0</span>;</span><br><span class="line"><span class="comment">// Number(&quot;&quot;) =&gt; 0</span></span><br><span class="line"></span><br><span class="line">[] == <span class="number">0</span>;</span><br><span class="line"><span class="comment">// [] =&gt; ([]).toStirng() =&gt; &quot;&quot; =&gt; Number(&quot;&quot;) =&gt; 0</span></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>] == <span class="number">1</span>;</span><br><span class="line"><span class="comment">// [1] =&gt; ([1]).toString() =&gt; &quot;1&quot; =&gt; Number(&quot;1&quot;) =&gt; 1</span></span><br><span class="line"></span><br><span class="line">[<span class="number">1</span>,<span class="number">2</span>] != <span class="number">1</span>;</span><br><span class="line"><span class="comment">// ([1,2]).toString() =&gt; &quot;1,2&quot; =&gt; Number(&quot;1,2&quot;) =&gt; NaN</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="💄null、undefined、symbol"><a href="#💄null、undefined、symbol" class="headerlink" title="💄null、undefined、symbol"></a>💄null、undefined、symbol</h4><p>null、undefined与任何非自身的值对比结果都是false，但是 <code>null == undefined</code> 是一个特例。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">null</span> == <span class="literal">null</span>;</span><br><span class="line"><span class="literal">undefined</span> == <span class="literal">undefined</span>;</span><br><span class="line"><span class="literal">null</span> == <span class="literal">undefined</span>;</span><br><span class="line"></span><br><span class="line"><span class="literal">null</span> != <span class="number">0</span>;</span><br><span class="line"><span class="literal">null</span> != <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="literal">undefined</span> != <span class="number">0</span>;</span><br><span class="line"><span class="literal">undefined</span> != <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Symbol</span>(<span class="string">&#x27;x&#x27;</span>) != <span class="built_in">Symbol</span>(<span class="string">&#x27;x&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="比较-lt-gt"><a href="#比较-lt-gt" class="headerlink" title="比较 &lt; &gt;"></a>比较 &lt; &gt;</h3><p>对比不像相等，可以严格相等（===）防止类型转换，对比一定会存在隐式类型转换。</p>
+<h4 id="对象总是先执行ToPrimitive为基本类型"><a href="#对象总是先执行ToPrimitive为基本类型" class="headerlink" title="对象总是先执行ToPrimitive为基本类型"></a>对象总是先执行ToPrimitive为基本类型</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[] &lt; []; <span class="comment">// false</span></span><br><span class="line">[] == []; <span class="comment">// false</span></span><br><span class="line">[] &lt;= []; <span class="comment">// true</span></span><br><span class="line">[] &gt;= []; <span class="comment">// true</span></span><br><span class="line"><span class="comment">// ([]).toString() =&gt; &quot;&quot;</span></span><br><span class="line"></span><br><span class="line">[] &lt;= &#123;&#125;; <span class="comment">// true</span></span><br><span class="line">[] &gt;= &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">[] == &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">[] &gt; &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">[] &lt; &#123;&#125;; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// [] =&gt; ([]).toString() =&gt; &quot;&quot;</span></span><br><span class="line"><span class="comment">// &#123;&#125; =&gt; (&#123;&#125;).toString() =&gt; &quot;[object Object]&quot;</span></span><br><span class="line"><span class="comment">// &quot;&quot; &lt;= &quot;[object Object]&quot;</span></span><br><span class="line"></span><br><span class="line">&#123;&#125; &lt; &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">&#123;&#125; == &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">&#123;&#125; &gt; &#123;&#125;; <span class="comment">// false</span></span><br><span class="line">&#123;&#125; &gt;= &#123;&#125;; <span class="comment">// true</span></span><br><span class="line">&#123;&#125; &lt;= &#123;&#125;; <span class="comment">// true</span></span><br><span class="line"><span class="comment">// &#123;&#125; =&gt; (&#123;&#125;).toString() =&gt; &quot;[object Object]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="💄两边都是字符串时才比较UNICode，否则一律转换成数字做对比"><a href="#💄两边都是字符串时才比较UNICode，否则一律转换成数字做对比" class="headerlink" title="💄两边都是字符串时才比较UNICode，否则一律转换成数字做对比"></a>💄两边都是字符串时才比较UNICode，否则一律转换成数字做对比</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// [&quot;06&quot;] =&gt; &quot;06&quot; =&gt; 6</span></span><br><span class="line">[<span class="string">&quot;06&quot;</span>] &lt; <span class="number">2</span>   <span class="comment">// false </span></span><br><span class="line"></span><br><span class="line">[<span class="string">&quot;06&quot;</span>] &lt; <span class="string">&quot;2&quot;</span> <span class="comment">// true</span></span><br><span class="line">[<span class="string">&quot;06&quot;</span>] &gt; <span class="number">2</span>   <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="number">5</span> &gt; <span class="literal">null</span>     <span class="comment">// true</span></span><br><span class="line">-<span class="number">1</span> &lt; <span class="literal">null</span>    <span class="comment">// true</span></span><br><span class="line"><span class="number">0</span> &lt;= <span class="literal">null</span>    <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="number">0</span> &lt;= <span class="literal">false</span>   <span class="comment">// true</span></span><br><span class="line"><span class="number">0</span> &lt; <span class="literal">false</span>    <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// undefined =&gt; Number(...) =&gt; NaN</span></span><br><span class="line"><span class="number">5</span> &gt; <span class="literal">undefined</span> <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="两边都是字符串，或两边都最终转为了字符串"><a href="#两边都是字符串，或两边都最终转为了字符串" class="headerlink" title="两边都是字符串，或两边都最终转为了字符串"></a>两边都是字符串，或两边都最终转为了字符串</h4><ul>
+<li>两边都是字符串，则比较字符串对应的 UNICode编码<ul>
+<li>charCodeAt(): 可以拿到字符的编码</li>
+<li>可以传入一个参数，来获取字符串的第n位的编码</li>
+<li><img src="/posts/48513/charCodeAt.png" class="" title="charCodeAt"></li>
+</ul>
+</li>
+<li>多个字符串的比较，从左到右依次比较<ul>
+<li>对应字符不相等，直接比较出结果</li>
+<li>对应字符相等，比较下一位</li>
+<li><img src="/posts/48513/charCodeAt2.png" class="" title="charCodeAt2">
+
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="💄总结"><a href="#💄总结" class="headerlink" title="💄总结"></a>💄总结</h3><p>对象都需要先ToPrimitive转成基本类型，除非是宽松相等（==）时两个对象做对比。</p>
+<ul>
+<li><ul>
+<li>没有字符串的时候，全转数字</li>
+</ul>
+</li>
+<li><ul>
+<li>全转数字，preferedType === Number</li>
+</ul>
+</li>
+<li>== 同类型不转，数字优先，布尔全转数字，null、undefined、symbol不转</li>
+<li>&lt; &gt; 除非两边都是字符串，否则全部转为数字再比较</li>
+<li>++/–自增自减，算术运算符(- * / %)中，字符串转number</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">123</span> + <span class="string">&#x27;123&#x27;</span>; <span class="comment">// &#x27;123123&#x27;</span></span><br><span class="line"><span class="number">123</span> + <span class="literal">null</span>; <span class="comment">// 123 + Number(null) =&gt; 123 + 0 =&gt; 123</span></span><br><span class="line"><span class="number">123</span> + <span class="literal">true</span>; <span class="comment">// 123 + Number(true) =&gt; 123 + 1 =&gt; 124</span></span><br><span class="line"><span class="number">1</span> + <span class="literal">NaN</span>; <span class="comment">// NaN, 只要有一个NaN就为NaN</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;你的岁数是：&#x27;</span>+<span class="number">10</span>+<span class="number">10</span>; <span class="comment">// &#x27;你的岁数是：1010&#x27;</span></span><br><span class="line"><span class="string">&#x27;你的岁数是&#x27;</span>+(<span class="number">10</span>+<span class="number">10</span>); <span class="comment">// &#x27;你的岁数是：20&#x27;</span></span><br><span class="line"><span class="number">10</span>+<span class="number">10</span>+<span class="string">&#x27;是你的岁数&#x27;</span>; <span class="comment">// 从左到右计算, &#x27;20是你的岁数&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="number">123</span> + &#123;&#125;; <span class="comment">// 对象先转基本类型</span></span><br><span class="line"><span class="comment">// 123 + (&#123;&#125;).toString() =&gt; 123 + &quot;[object Object]&quot; =&gt; &quot;123[object Object]&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line">a++;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 124</span></span><br><span class="line"><span class="comment">// a++ =&gt; </span></span><br><span class="line"><span class="comment">// a = a + 1; =&gt; </span></span><br><span class="line"><span class="comment">// a = &#x27;123&#x27; + 1; =&gt; </span></span><br><span class="line"><span class="comment">// a = Number(&#x27;123&#x27;) + 1 =&gt;</span></span><br><span class="line"><span class="comment">// a = 124</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">a++;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// NaN</span></span><br><span class="line"><span class="comment">// a = Number(&#x27;a&#x27;) + 1 =&gt; NaN + 1 =&gt; NaN</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;3&#x27;</span> * <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 6</span></span><br><span class="line"><span class="comment">// Number(&#x27;3&#x27;) * 2 =&gt; 6</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">&#x27;b&#x27;</span> * <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// NaN</span></span><br><span class="line"><span class="comment">// Number(&#x27;b&#x27;) * 2 =&gt; NaN</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;1&#x27;</span> &gt; <span class="number">2</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> &gt; <span class="string">&#x27;2&#x27;</span>); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: 都转为 number</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;a&#x27;</span> &gt; <span class="string">&#x27;b&#x27;</span>); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: 两个字符串比较，用ascii比较</span></span><br><span class="line"><span class="comment">// &gt; &lt; = &gt;= &lt;= 都要经过 number 转换，除了两个字符串</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> == <span class="string">&#x27;1&#x27;</span>) <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> != <span class="string">&#x27;2&#x27;</span>) <span class="comment">// true</span></span><br><span class="line"><span class="comment">// hint: 都得转为数字</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> === <span class="string">&#x27;1&#x27;</span>); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: 全等不转换，还得检查数据类型</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="literal">NaN</span> == <span class="literal">NaN</span>); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: NaN不等于任何东西</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">2</span> &gt; <span class="number">1</span> &gt; <span class="number">3</span>); <span class="comment">// false</span></span><br><span class="line"><span class="comment">// hint: 2 &gt; 1 -&gt; 返回 true -&gt; true &gt; 3 -&gt; false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">2</span> &gt; <span class="number">1</span> == <span class="number">1</span>); <span class="comment">// true</span></span><br><span class="line"><span class="comment">// hint: 2 &gt; 1 -&gt; 返回 true -&gt; true == 1 -&gt; 隐式转换 true = 1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> num = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(- num) + <span class="string">&#x27;:&#x27;</span> + - num); <span class="comment">// number:-123</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(+ num) + <span class="string">&#x27;:&#x27;</span> + + num); <span class="comment">// number:123</span></span><br><span class="line"></span><br><span class="line">num = <span class="string">&#x27;abc&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span>(+ num) + <span class="string">&#x27;:&#x27;</span> + + num); <span class="comment">// number:NaN</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000040048164">关于JS隐式类型转换的完整总结</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/49974/" rel="prev" title="Vue的v-if和v-show实现原理">
+                  <i class="fa fa-chevron-left"></i> Vue的v-if和v-show实现原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/53691/" rel="next" title="预编译">
+                  预编译 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

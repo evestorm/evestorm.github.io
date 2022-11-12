@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="如题，一旦设置 table 中的某些列为 fixed ，可能会导致数据更新后表格显示错位的 bug。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="element-ui的table设置fixed导致更新数据错位的解决方案">
+<meta property="og:url" content="https://evestorm.github.io/posts/53669/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="如题，一旦设置 table 中的某些列为 fixed ，可能会导致数据更新后表格显示错位的 bug。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-28T06:48:58.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.382Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="解决方案">
+<meta property="article:tag" content="element-ui">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/53669/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>element-ui的table设置fixed导致更新数据错位的解决方案 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80-%E7%9B%91%E5%90%AC-table-%E6%95%B0%E6%8D%AE%E6%AF%8F%E6%AC%A1%E6%95%B0%E6%8D%AE%E5%BE%97%E5%88%B0%E6%88%96%E6%94%B9%E5%8F%98%E6%97%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93"><span class="nav-number">1.1.</span> <span class="nav-text">方法一:监听 table 数据每次数据得到或改变时重新渲染</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C-%E7%9B%B4%E6%8E%A5%E7%9B%91%E5%90%AC-element-%E7%9A%84-table-%E6%89%80%E5%9C%A8%E6%BB%9A%E5%8A%A8%E6%9D%A1%E7%9A%84-div-%E8%AE%BE%E7%BD%AE%E6%BB%9A%E5%8A%A8%E6%9D%A1%E6%B0%B8%E8%BF%9C%E4%B8%8D%E8%B6%85%E5%87%BA%E5%BD%93%E5%89%8D-div-%E9%AB%98%E5%BA%A6"><span class="nav-number">1.2.</span> <span class="nav-text">方法二:直接监听 element 的 table 所在滚动条的 div 设置滚动条永远不超出当前 div 高度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%E7%9A%84%E4%BC%98%E5%8C%96-%E6%B7%BB%E5%8A%A0%E9%98%B2%E6%8A%96"><span class="nav-number">1.3.</span> <span class="nav-text">方法二的优化: 添加防抖</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/53669/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          element-ui的table设置fixed导致更新数据错位的解决方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-28 14:48:58" itemprop="dateCreated datePublished" datetime="2021-05-28T14:48:58+08:00">2021-05-28</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/" itemprop="url" rel="index"><span itemprop="name">UI</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/element-ui/" itemprop="url" rel="index"><span itemprop="name">element-ui</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>如题，一旦设置 table 中的某些列为 fixed ，可能会导致数据更新后表格显示错位的 bug。</p>
+<a id="more"></a>
+
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="方法一-监听-table-数据每次数据得到或改变时重新渲染"><a href="#方法一-监听-table-数据每次数据得到或改变时重新渲染" class="headerlink" title="方法一:监听 table 数据每次数据得到或改变时重新渲染"></a>方法一:监听 table 数据每次数据得到或改变时重新渲染</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/* 监听table数据对象 */</span></span><br><span class="line">watch: &#123;</span><br><span class="line">  <span class="function"><span class="title">tableData</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.doLayout();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">methods: &#123;</span><br><span class="line"> <span class="comment">/* 重新渲染table组件 */</span></span><br><span class="line"> <span class="function"><span class="title">doLayout</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">let</span> that = <span class="built_in">this</span></span><br><span class="line">     <span class="built_in">this</span>.$nextTick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">       that.$refs.table.doLayout()</span><br><span class="line">     &#125;)</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="方法二-直接监听-element-的-table-所在滚动条的-div-设置滚动条永远不超出当前-div-高度"><a href="#方法二-直接监听-element-的-table-所在滚动条的-div-设置滚动条永远不超出当前-div-高度" class="headerlink" title="方法二:直接监听 element 的 table 所在滚动条的 div 设置滚动条永远不超出当前 div 高度"></a>方法二:直接监听 element 的 table 所在滚动条的 div 设置滚动条永远不超出当前 div 高度</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> _this = <span class="built_in">this</span></span><br><span class="line">    <span class="built_in">this</span>.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).addEventListener(<span class="string">&quot;scroll&quot;</span>,<span class="function"><span class="keyword">function</span>(<span class="params">event</span>)</span>&#123;</span><br><span class="line">      <span class="keyword">let</span> scrollTop = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollTop</span><br><span class="line">      <span class="keyword">let</span> scrollHeight = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollHeight</span><br><span class="line">      <span class="keyword">let</span> height = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).offsetHeight</span><br><span class="line">      <span class="keyword">if</span>((scrollTop + height) &gt;= scrollHeight) &#123;</span><br><span class="line">        _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollTop = scrollHeight - height</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方法二的优化-添加防抖"><a href="#方法二的优化-添加防抖" class="headerlink" title="方法二的优化: 添加防抖"></a>方法二的优化: 添加防抖</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">let</span> _this = <span class="built_in">this</span></span><br><span class="line">    <span class="built_in">this</span>.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).addEventListener(<span class="string">&quot;scroll&quot;</span>,<span class="function"><span class="keyword">function</span>(<span class="params">event</span>)</span>&#123;</span><br><span class="line">        _this.debounce(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">            <span class="keyword">let</span> scrollTop = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollTop</span><br><span class="line">            <span class="keyword">let</span> scrollHeight = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollHeight</span><br><span class="line">            <span class="keyword">let</span> height = _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).offsetHeight</span><br><span class="line">            <span class="keyword">if</span>((scrollTop + height) &gt;= scrollHeight) &#123;</span><br><span class="line">            _this.$refs.table.$el.querySelector(<span class="string">&quot;.el-table__body-wrapper&quot;</span>).scrollTop = scrollHeight - height</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,<span class="number">500</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">methods:&#123;</span><br><span class="line"> <span class="function"><span class="title">debounce</span>(<span class="params">fn,delay</span>)</span>&#123;</span><br><span class="line">     <span class="keyword">let</span> timer = <span class="literal">null</span></span><br><span class="line">     <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">         <span class="keyword">if</span>(timer)&#123;</span><br><span class="line">             <span class="built_in">clearTimeout</span>(timer)</span><br><span class="line">         &#125;</span><br><span class="line">         timer = <span class="built_in">setTimeout</span>(fn,delay)</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+              <a href="/tags/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" rel="tag"># 解决方案</a>
+              <a href="/tags/element-ui/" rel="tag"># element-ui</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/37195/" rel="prev" title="总结This指向">
+                  <i class="fa fa-chevron-left"></i> 总结This指向
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/9959/" rel="next" title="定时器+echarts运行时间太长导致内存溢出页面崩溃">
+                  定时器+echarts运行时间太长导致内存溢出页面崩溃 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

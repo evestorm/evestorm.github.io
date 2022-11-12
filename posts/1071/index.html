@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="原文：https:&#x2F;&#x2F;juejin.cn&#x2F;post&#x2F;6844904066032599054">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-git配置ssh服务">
+<meta property="og:url" content="https://evestorm.github.io/posts/1071/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="原文：https:&#x2F;&#x2F;juejin.cn&#x2F;post&#x2F;6844904066032599054">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-01T06:22:35.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.075Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/1071/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-git配置ssh服务 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%9C%AC%E6%9C%BA-ssh"><span class="nav-number">2.1.</span> <span class="nav-text">配置本机 ssh</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%A1%AE%E5%AE%9A%E7%9A%84%E6%98%AF%E4%BD%A0%E7%9A%84%E7%94%B5%E8%84%91%E4%B8%8A%E6%98%AF%E5%AE%89%E8%A3%85%E8%BF%87-Git"><span class="nav-number">2.1.1.</span> <span class="nav-text">一、确定的是你的电脑上是安装过 Git</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%9F%A5%E7%9C%8B%E6%98%AF%E5%90%A6%E9%85%8D%E7%BD%AE%E4%BA%86-git-%E7%94%A8%E6%88%B7%E5%90%8D%E5%92%8C%E9%82%AE%E7%AE%B1"><span class="nav-number">2.1.2.</span> <span class="nav-text">二、查看是否配置了 git 用户名和邮箱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%9F%A5%E7%9C%8B%E6%98%AF%E5%90%A6%E9%85%8D%E7%BD%AE%E8%BF%87-SSH-Key-%E5%AF%86%E9%92%A5"><span class="nav-number">2.1.3.</span> <span class="nav-text">三、查看是否配置过 SSH Key(密钥)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%94%9F%E6%88%90-SSH-Key-%E5%AF%86%E9%92%A5"><span class="nav-number">2.1.4.</span> <span class="nav-text">四、生成 SSH Key(密钥)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%B7%BB%E5%8A%A0%E5%85%AC%E9%92%A5%E5%88%B0%E4%BD%A0%E7%9A%84%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%EF%BC%88github%EF%BC%89"><span class="nav-number">2.1.5.</span> <span class="nav-text">五、添加公钥到你的远程仓库（github）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E3%80%81%E6%9F%A5%E7%9C%8B%E4%BD%A0%E7%94%9F%E6%88%90%E7%9A%84%E5%85%AC%E9%92%A5%EF%BC%9A"><span class="nav-number">2.1.5.1.</span> <span class="nav-text">1 、查看你生成的公钥：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E6%B7%BB%E5%8A%A0%E5%85%AC%E9%92%A5%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">2.1.5.2.</span> <span class="nav-text">2、添加公钥到远程仓库:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E6%9F%A5%E7%9C%8B-ssh-%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E9%85%8D%E7%BD%AE%E6%88%90%E5%8A%9F"><span class="nav-number">2.1.5.3.</span> <span class="nav-text">2、查看 ssh 文件是否配置成功</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E4%BF%AE%E6%94%B9-git-%E7%9A%84-remote-url"><span class="nav-number">2.1.6.</span> <span class="nav-text">六、修改 git 的 remote url</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E7%9A%84-remote-url"><span class="nav-number">2.1.6.1.</span> <span class="nav-text">1、查看当前的 remote url</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E5%A4%8D%E5%88%B6%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E7%9A%84-ssh-%E9%93%BE%E6%8E%A5"><span class="nav-number">2.1.6.2.</span> <span class="nav-text">2、复制远程仓库的 ssh 链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E4%BF%AE%E6%94%B9-git-%E7%9A%84-remote-url"><span class="nav-number">2.1.6.3.</span> <span class="nav-text">2、修改 git 的 remote url</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81Sourcetree-%E9%85%8D%E7%BD%AE-ssh-%E5%AF%86%E9%92%A5"><span class="nav-number">2.1.7.</span> <span class="nav-text">七、Sourcetree 配置 ssh 密钥</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%BA%90"><span class="nav-number">4.</span> <span class="nav-text">相关资源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/1071/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-git配置ssh服务
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-03-01 14:22:35" itemprop="dateCreated datePublished" datetime="2020-03-01T14:22:35+08:00">2020-03-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E5%85%B7/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/" itemprop="url" rel="index"><span itemprop="name">版本控制</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文：<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904066032599054">https://juejin.cn/post/6844904066032599054</a></p>
+<a id="more"></a>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在管理 Git 项目上，很多时候都是直接使用<code>https url</code>克隆到本地，当然也有有些人使用<code>SSH url</code>克隆到本地。</p>
+<p>这两种方式的主要区别在于：</p>
+<ul>
+<li>使用<code>https url</code>克隆对初学者来说会比较方便，复制<code>https url</code>然后到 git Bash 里面直接用 clone 命令克隆到本地就好了，但是每次 fetch 和 push 代码都需要输入账号和密码，这也是 https 方式的麻烦之处。</li>
+<li>而使用<code>SSH url</code>克隆却需要在克隆之前先配置和添加好<code>SSH key</code>，因此，如果你想要使用<code>SSH url</code>克隆的话，你必须是这个项目的拥有者。否则你是无法添加<code>SSH key</code>的，另外 ssh 默认是每次 fetch 和 push 代码都不需要输入账号和密码，如果你想要每次都输入账号密码才能进行 fetch 和 push 也可以另外进行设置。</li>
+</ul>
+<p>下面主要是讲述如何配置使用 ssh 方式来提交和克隆代码。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="配置本机-ssh"><a href="#配置本机-ssh" class="headerlink" title="配置本机 ssh"></a>配置本机 ssh</h2><h3 id="一、确定的是你的电脑上是安装过-Git"><a href="#一、确定的是你的电脑上是安装过-Git" class="headerlink" title="一、确定的是你的电脑上是安装过 Git"></a>一、确定的是你的电脑上是安装过 Git</h3><p>打开<code>cmd</code>，查看 git 版本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：git --version</span><br><span class="line">显示：git version 2.20.1.windows.1</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果显示类似<code>git version 2.20.1.windows.1</code>的 Git 版本，说明你的电脑是安装过 Git 的；否则请左转<a target="_blank" rel="noopener" href="https://juejin.im/post/6844903749631098893#heading-4">打开 Git 的正确姿势</a>，把 Git 安装完了再来，不送。</p>
+<h3 id="二、查看是否配置了-git-用户名和邮箱"><a href="#二、查看是否配置了-git-用户名和邮箱" class="headerlink" title="二、查看是否配置了 git 用户名和邮箱"></a>二、查看是否配置了 git 用户名和邮箱</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：git config user.name</span><br><span class="line">显示：用户名</span><br><span class="line">输入：git config user.email</span><br><span class="line">显示用户邮箱</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果没有配置，那么需要配置用户名和邮箱：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：git config --global user.name &quot;xxx&quot;</span><br><span class="line"></span><br><span class="line">输入：git config --global user.email &quot;xxx&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、查看是否配置过-SSH-Key-密钥"><a href="#三、查看是否配置过-SSH-Key-密钥" class="headerlink" title="三、查看是否配置过 SSH Key(密钥)"></a>三、查看是否配置过 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：cd ~/.ssh</span><br><span class="line">输入：ls，</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>查看该文件下的文件，看是否存在 <code>id_isa</code> 和 <code>id_isa.pub</code> 文件（也可以是别的文件名，只要 <code>yourName</code> 和 <code>yourName.pub</code> 成对存在就可以），如果存在的话，证明已经存在 ssh key 了，可以直接跳过<code>4、生成SSH Key</code>这一步骤，</p>
+<h3 id="四、生成-SSH-Key-密钥"><a href="#四、生成-SSH-Key-密钥" class="headerlink" title="四、生成 SSH Key(密钥)"></a>四、生成 SSH Key(密钥)</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: ssh-keygen -t rsa -C &quot;你的邮箱&quot;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>此处会提示<code>Enter file in which to save the key (/Users/shutong/.ssh/id_rsa):</code>这样一段内容,让我们输入文件名，如果第 3 步的文件存在的话最好在这里修改一下文件名以防覆盖之前的内容；如果第 3 步的文件不存在的话则直接按<code>enter</code>键就好了。</p>
+<p>之后会有提示你是否需要设置密码，如果设置了每次使用 Git 都会用到密码，一般都是直接不写为空，直接<code>enter</code>就好了。</p>
+<p>上述操作执行完毕后，在<code>~/.ssh/</code>目录会生成<code>XXX-rsa</code>(私钥)和<code>XXX-rsa.pub</code>(公钥)，它们默认的存储路径是：</p>
+<blockquote>
+<p>C:\Users\Administrator.ssh</p>
+</blockquote>
+<p><strong>注意</strong></p>
+<blockquote>
+<p>个人建议生成的 rsa 最好单独命名不要使用默认名称，因为有可能 sshkey 可能会用在多个地方，一不小心就可能被覆盖然后导致 git 功能异常</p>
+</blockquote>
+<h3 id="五、添加公钥到你的远程仓库（github）"><a href="#五、添加公钥到你的远程仓库（github）" class="headerlink" title="五、添加公钥到你的远程仓库（github）"></a>五、添加公钥到你的远程仓库（github）</h3><h4 id="1-、查看你生成的公钥："><a href="#1-、查看你生成的公钥：" class="headerlink" title="1 、查看你生成的公钥："></a>1 、查看你生成的公钥：</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>这里会把公钥显示出来，我们把这段内容复制出来。</p>
+<h4 id="2、添加公钥到远程仓库"><a href="#2、添加公钥到远程仓库" class="headerlink" title="2、添加公钥到远程仓库:"></a>2、添加公钥到远程仓库:</h4><p>登陆你的 github 帐户 -&gt; 点击你的头像，然后点击 <code>Settings</code> -&gt; 左栏点击 <code>SSH and GPG keys</code> -&gt; 点击 <code>New SSH key</code></p>
+<p>然后将复制的公钥内容，粘贴进<code>Key</code>文本域内。 <code>title</code>域，自己随便起个名字。</p>
+<p>点击 <code>Add SSH key</code>。</p>
+<h4 id="2、查看-ssh-文件是否配置成功"><a href="#2、查看-ssh-文件是否配置成功" class="headerlink" title="2、查看 ssh 文件是否配置成功"></a>2、查看 ssh 文件是否配置成功</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入： ssh -T git@github.com</span><br><span class="line">输出： Hi danygitgit! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>恭喜你，你的设置已经成功了。</p>
+<h3 id="六、修改-git-的-remote-url"><a href="#六、修改-git-的-remote-url" class="headerlink" title="六、修改 git 的 remote url"></a>六、修改 git 的 remote url</h3><p>如果之前添加的是<code>HTTPS</code>协议的 github 仓库地址，那么每次 push 或者 pull 仍然需要密码，所以，我们需要将其修改为<code>ssh</code>协议的，这样，就不需要这么麻烦了。</p>
+<p>那么我们应该怎么办呢？</p>
+<h4 id="1、查看当前的-remote-url"><a href="#1、查看当前的-remote-url" class="headerlink" title="1、查看当前的 remote url"></a>1、查看当前的 remote url</h4><p>首先进入本地仓库，右键 -&gt; <code>Git Bash Here</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入： git remote -v</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (fetch)</span><br><span class="line">输出： origin https://github.com/danygitgit/document-library.git (push)</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>如果是以上的结果那么说明此项目是使用<code>https</code>协议进行访问的（如果地址是 git 开头则表示是<code>git</code>协议）</p>
+<h4 id="2、复制远程仓库的-ssh-链接"><a href="#2、复制远程仓库的-ssh-链接" class="headerlink" title="2、复制远程仓库的 ssh 链接"></a>2、复制远程仓库的 ssh 链接</h4><p>登陆你的远程仓库，在上面可以看到你的 ssh 协议相应的 url，类似：</p>
+<blockquote>
+<p><a href="mailto:&#x67;&#105;&#x74;&#x40;&#103;&#105;&#116;&#104;&#117;&#98;&#46;&#x63;&#111;&#109;">&#x67;&#105;&#x74;&#x40;&#103;&#105;&#116;&#104;&#117;&#98;&#46;&#x63;&#111;&#109;</a>:danygitgit/document-library.git</p>
+</blockquote>
+<p>复制此 ssh 链接。</p>
+<h4 id="2、修改-git-的-remote-url"><a href="#2、修改-git-的-remote-url" class="headerlink" title="2、修改 git 的 remote url"></a>2、修改 git 的 remote url</h4><p>方法有三种：</p>
+<ol>
+<li>修改命令</li>
+</ol>
+<blockquote>
+<p>git remote origin set-url [url]</p>
+</blockquote>
+<ol>
+<li>先删后加</li>
+</ol>
+<blockquote>
+<p>git remote rm origin git remote add origin [url]</p>
+</blockquote>
+<ol>
+<li>直接修改<code>config</code>文件</li>
+</ol>
+<p>找到仓库下 <code>.git</code> 文件夹下的<code>config</code>文件，打开，可以看到以下内容</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url =<a target="_blank" rel="noopener" href="https://github.com/danygitgit/document-library.git">https://github.com/danygitgit/document-library.git</a> fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>将文件中的 <code>url =https://github.com/danygitgit/document-library.git</code>更改为 <code>url = git@github.com:danygitgit/document-library.git</code> 即可。</p>
+<p>修改后的文件如下</p>
+<blockquote>
+<p>[core] repositoryformatversion = 0 filemode = false bare = false logallrefupdates = true symlinks = false ignorecase = true[remote “origin”] url = <a href="mailto:&#x67;&#x69;&#116;&#64;&#x67;&#105;&#116;&#x68;&#117;&#x62;&#46;&#99;&#111;&#109;">&#x67;&#x69;&#116;&#64;&#x67;&#105;&#116;&#x68;&#117;&#x62;&#46;&#99;&#111;&#109;</a>:danygitgit/document-library.git fetch = +refs/heads/<em>:refs/remotes/origin/</em>[branch “master”] remote = origin merge = refs/heads/master</p>
+</blockquote>
+<p>以后，不管是 push 还是 pull，你都不需要再提交密码了。</p>
+<h3 id="七、Sourcetree-配置-ssh-密钥"><a href="#七、Sourcetree-配置-ssh-密钥" class="headerlink" title="七、Sourcetree 配置 ssh 密钥"></a>七、Sourcetree 配置 ssh 密钥</h3><p><code>SourceTree</code>是一款 git 管理可视化工具，就不需要繁琐的敲打命令行了。个人比较推荐，无论在 windows 环境还是 mac 的 os 环境。<a target="_blank" rel="noopener" href="https://www.sourcetreeapp.com/">官网链接</a></p>
+<p>关于<code>SourceTree</code>的安装及配置就不赘述了，具体请参考</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/wangjiangrong/article/details/80287041">Git SourceTree 免登陆安装及配置 生成 ssh</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/liuxin-673855200/p/11151835.html">SOURCETREE 3.1.3 版本跳过 BITBUCKET 注册方法（亲测好用） | 淡忘&amp;天涯</a></li>
+<li><a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/9faa7231cdec65473d28cb11.html">Sourcetree 配置 ssh 密钥</a></li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>磨刀不误砍柴工。勇于尝试，善于总结。开启你的 Git 踩坑之旅吧！</p>
+<p>路漫漫其修远兮，希望 Git 可以帮我们记录每一个脚印，每一步成长。与诸君共勉。</p>
+<p>祝大家 2020 更上一层楼！</p>
+<h1 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000016365283">解决 sourceTree 的 git clone 报 SSH 密钥认证失败的问题</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/53020/" rel="prev" title="uni-app=>Class与Style绑定">
+                  <i class="fa fa-chevron-left"></i> uni-app=>Class与Style绑定
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/40550/" rel="next" title="CSS百分比实现高度自适应">
+                  CSS百分比实现高度自适应 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

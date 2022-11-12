@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="前言平常写前端项目时，为了更方便的获取“真实”的动态数据，也会新建几个数据库表来作支撑。但每每需要用Node搭建后端服务时，数据库的查询真的让人头疼，难倒不难，就是特别繁琐，即使封装了个查询sql用工具模块，在遇到稍复杂的查询语句时还是得写完整SQL。 我又是个比较懒的人，在经历了几次痛苦折磨后，我开始google有没有谁帮我们解决了数据库表字段与对象之间的关系映射。也就是我们通常所说的 ORM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sequelize框架入门">
+<meta property="og:url" content="https://evestorm.github.io/posts/1183/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="前言平常写前端项目时，为了更方便的获取“真实”的动态数据，也会新建几个数据库表来作支撑。但每每需要用Node搭建后端服务时，数据库的查询真的让人头疼，难倒不难，就是特别繁琐，即使封装了个查询sql用工具模块，在遇到稍复杂的查询语句时还是得写完整SQL。 我又是个比较懒的人，在经历了几次痛苦折磨后，我开始google有没有谁帮我们解决了数据库表字段与对象之间的关系映射。也就是我们通常所说的 ORM">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/1183/npminit-y.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/1183/error-mysql2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/1183/table-property.png">
+<meta property="article:published_time" content="2019-03-11T02:22:53.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.208Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Sequelize">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/1183/npminit-y.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/1183/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sequelize框架入门 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ORM"><span class="nav-number">2.1.</span> <span class="nav-text">ORM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sequelize"><span class="nav-number">2.2.</span> <span class="nav-text">Sequelize</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%B7%E6%AD%A5"><span class="nav-number">3.1.</span> <span class="nav-text">起步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.2.</span> <span class="nav-text">连接数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E6%A8%A1%E5%9E%8B%EF%BC%88Model%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">定义模型（Model）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.4.</span> <span class="nav-text">数据查询</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%89%80%E6%9C%89"><span class="nav-number">3.4.1.</span> <span class="nav-text">查询所有</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.4.2.</span> <span class="nav-text">条件查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.4.3.</span> <span class="nav-text">多条件查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E9%99%90%E5%88%B6-limit-offset"><span class="nav-number">3.4.4.</span> <span class="nav-text">查询限制 limit, offset</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%8E%92%E5%BA%8F"><span class="nav-number">3.4.5.</span> <span class="nav-text">查询排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%AE%B0%E5%BD%95"><span class="nav-number">3.4.6.</span> <span class="nav-text">查询记录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%8A%A0"><span class="nav-number">3.5.</span> <span class="nav-text">数据增加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BF%AE%E6%94%B9"><span class="nav-number">3.6.</span> <span class="nav-text">数据修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%88%A0%E9%99%A4"><span class="nav-number">3.7.</span> <span class="nav-text">数据删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">完整代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%88%E6%9C%AC"><span class="nav-number">5.</span> <span class="nav-text">版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">6.</span> <span class="nav-text">资源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/1183/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sequelize框架入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-11 10:22:53" itemprop="dateCreated datePublished" datetime="2019-03-11T10:22:53+08:00">2019-03-11</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>平常写前端项目时，为了更方便的获取“真实”的动态数据，也会新建几个数据库表来作支撑。但每每需要用Node搭建后端服务时，数据库的查询真的让人头疼，难倒不难，就是特别繁琐，即使封装了个查询sql用工具模块，在遇到稍复杂的查询语句时还是得写完整SQL。</p>
+<p>我又是个比较懒的人，在经历了几次痛苦折磨后，我开始google有没有谁帮我们解决了数据库表字段与对象之间的关系映射。也就是我们通常所说的 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/ORM/3583252?fr=aladdin">ORM</a> 。经过几番搜索，我找到了 <a target="_blank" rel="noopener" href="http://docs.sequelizejs.com/">Sequelize</a> 框架。在了解它之前，我们先简单介绍下什么是 <code>ORM</code> ：（我知道不少人是不会点击上面链接查看详情的 :)）</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="ORM"><a href="#ORM" class="headerlink" title="ORM"></a>ORM</h3><p>ORM 全称 Object Relational Mapping，翻译成中文就是 <code>对象关系映射</code> 。是对 SQL 查询语句的封装，让我们可以用面向对象的方式操作数据库，来更加优雅的生成安全、可维护的 SQL 代码。说白了，就是通过对象来映射和操作数据库。</p>
+<h3 id="Sequelize"><a href="#Sequelize" class="headerlink" title="Sequelize"></a>Sequelize</h3><p>而今天的主角 <code>Sequelize</code> 则是一个基于 promise 的 Node.js 异步ORM框架。它能够支持多种数据库，包含但不限于 PostgreSQL, MySQL 和 MSSQL 。</p>
+<blockquote>
+<p>官网地址：<a target="_blank" rel="noopener" href="http://docs.sequelizejs.com/">http://docs.sequelizejs.com/</a><br>github：<a target="_blank" rel="noopener" href="https://github.com/sequelize/sequelize">https://github.com/sequelize/sequelize</a></p>
+</blockquote>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="起步"><a href="#起步" class="headerlink" title="起步"></a>起步</h3><p>在本地新建文件夹，例如 <code>sequelize-demo</code> ，然后在项目根目录下运行命令行命名 <code>npm init -y</code>。运行完该命令后项目tree如下：</p>
+<img src="/posts/1183/npminit-y.png" class="" title="npminit-y">
+
+<p>接着使用 npm 安装 <code>sequelize</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i sequelize</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a>连接数据库</h3><p>完成上述步骤以后，我们在根目录下新建一个 <code>app.js</code> 文件来使用 <code>sequelize</code> ，代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 导入 sequelize</span></span><br><span class="line"><span class="keyword">const</span> Sequelize = <span class="built_in">require</span>(<span class="string">&#x27;sequelize&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新建 sequelize 实例</span></span><br><span class="line"><span class="keyword">const</span> sequelize = <span class="keyword">new</span> Sequelize(<span class="string">&#x27;数据库名称&#x27;</span>, <span class="string">&#x27;数据库用户名&#x27;</span>, <span class="string">&#x27;数据库密码&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 其他的数据库连接配置</span></span><br><span class="line">    host: <span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="comment">// 主机，默认 localhost</span></span><br><span class="line">    port: <span class="number">8889</span>,        <span class="comment">// 端口，默认 3306</span></span><br><span class="line">    dialect: <span class="string">&#x27;mysql&#x27;</span>,  <span class="comment">// 数据库类型， 默认 mysql 【必填】</span></span><br><span class="line">    timezone: <span class="string">&#x27;+08:00&#x27;</span> <span class="comment">// 时区，默认会根据系统当前所在时区进行设置，格式：&#x27;+08:00&#x27; 或字符串格式 &#x27;Asia/Shanghai&#x27; 参考：http://php.net/manual/zh/timezones.php 【使用场景：一般情况下默认配置就好，但如果服务器在美国，但想存储中国时区，就需要明确指定 &#x27;+08:00&#x27; 了】</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试数据库的连接（返回的是一个Promise，记得 catch 捕获错误）</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    sequelize.authenticate();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;数据库连接成功!&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;连接失败&#x27;</span>);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时你可以尝试运行 <code>app.js</code> 文件，即在根目录下运行 <code>node app.js</code> 命令。正常情况下你会收到报错信息，类似这样：</p>
+<img src="/posts/1183/error-mysql2.png" class="" title="mysql2">
+
+<p>意思是你需要安装 <code>mysql2</code> ，这是因为 <code>sequelize</code> 虽然依赖了 <code>mysql2</code> ，但却没有内置安装。所以接下来你得在项目根目录下运行如下代码来安装 <code>mysql2</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i mysql2</span><br></pre></td></tr></table></figure>
+
+
+
+<p>安装完毕后再次运行 <code>app.js</code> ，就能连接数据库成功了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">node app.js</span><br><span class="line">Executing (default): SELECT 1+1 AS result</span><br><span class="line">数据库连接成功!</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="定义模型（Model）"><a href="#定义模型（Model）" class="headerlink" title="定义模型（Model）"></a>定义模型（Model）</h3><blockquote>
+<p>所谓模型，就是用来描述数据库表字段信息的对象，每一个模型对象表示数据库中的一个表，后续对数据库的操作都是用过对应的模型对象来完成的。</p>
+</blockquote>
+<p>接下来我们就要定义数据的模型了。在此之前，你还需要做一些准备工作。以我为例，我在数据库中新建了一个 <code>users</code> 表，表字段和类型如下：</p>
+<img src="/posts/1183/table-property.png" class="" title="表字段">
+
+<p>然后定义出对应此表的数据模型：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义模型（用对象的方式来描述数据库中的表）</span></span><br><span class="line"><span class="keyword">const</span> UserModel = sequelize.define(<span class="string">&#x27;User&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 描述表中对应的字段信息</span></span><br><span class="line">    id: &#123; <span class="comment">// 每一个字段的信息</span></span><br><span class="line">        type: Sequelize.INTEGER(<span class="number">11</span>), <span class="comment">// 字段类型</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,            <span class="comment">// 不允许为空</span></span><br><span class="line">        autoIncrement: <span class="literal">true</span>,         <span class="comment">// id自增长</span></span><br><span class="line">        primaryKey: <span class="literal">true</span>,            <span class="comment">// 设为主键</span></span><br><span class="line">    &#125;,</span><br><span class="line">    username: &#123;</span><br><span class="line">        type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;&#x27;</span>,            <span class="comment">// 设置字段默认值</span></span><br><span class="line">    &#125;,</span><br><span class="line">    age: &#123;</span><br><span class="line">        type: Sequelize.TINYINT(<span class="number">3</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    gender: &#123;</span><br><span class="line">        type: Sequelize.ENUM([<span class="string">&#x27;men&#x27;</span>, <span class="string">&#x27;women&#x27;</span>, <span class="string">&#x27;other&#x27;</span>]), <span class="comment">// 这是个枚举类型字段，表示性别只能为“男”，“女”，“保密”中的其中一个，传入 ENUM 中的可以是逗号隔开的字符串，也可以是个数组：ENUM([&#x27;men&#x27;, &#x27;women&#x27;]) or ENUM(&#x27;men&#x27;, &#x27;women&#x27;, &#x27;other&#x27;)</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;men&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;, &#123; <span class="comment">// 用来设置字段以外的其他信息</span></span><br><span class="line">    timestamps: <span class="literal">false</span>, <span class="comment">// 是否给每条记录添加 createAt 和 updateAt 字段，并在添加新数据和更新数据的时候自动设置这两个字段的值，默认为 true</span></span><br><span class="line">    tableName: <span class="string">&#x27;users&#x27;</span>, <span class="comment">// 该模型映射的真实表名</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>注意：</strong>在定义模型时，字段名称可以和数据库表中的字段名称不相同，但如果你想另起一个别名，则需要在字段信息设置中加入 <code>field</code> 来关联真正的表字段名称。例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">userName: &#123; <span class="comment">// &lt;-- 你起的别名</span></span><br><span class="line">    type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">    allowNull: <span class="literal">false</span>,</span><br><span class="line">    field: <span class="string">&#x27;username&#x27;</span>, <span class="comment">// 关联数据库表中真正的字段名</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h3><h4 id="查询所有"><a href="#查询所有" class="headerlink" title="查询所有"></a>查询所有</h4><p>完成表模型的定义以后，我们就可以通过 <code>findAll</code> 来查询表数据了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查询 users 表中所有数据</span></span><br><span class="line">UserModel.findAll().then(<span class="function"><span class="params">users</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 返回的 users 是个数组</span></span><br><span class="line">    users.forEach(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 循环的每个 user 都是个 Model 实例</span></span><br><span class="line">        <span class="comment">// 该 Model 实例包含 get 方法，我们能通过它获取 username</span></span><br><span class="line">        <span class="built_in">console</span>.log(user.get(<span class="string">&#x27;username&#x27;</span>));</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(err);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>写完上面代码后，再次运行 <code>app.js</code> ，你就应该能够查询到数据了~<br>p.s. 查询之前别忘了在数据库中插入一些数据。</p>
+<h4 id="条件查询"><a href="#条件查询" class="headerlink" title="条件查询"></a>条件查询</h4><p>除了查询全部数据，我们还可以使用 <code>where</code> 查询指定的数据：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这次不用 .then 形式，而采用 async + await</span></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找 username 为 &#x27;李元芳&#x27; 的唯一数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findOne(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            username: <span class="string">&#x27;李元芳&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="built_in">console</span>.dir(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>而类似大于小于这样的查询会稍显麻烦一点。例如我们来编写查询 users 表中年龄大于某个值的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找满足 age &gt; 24 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            age: &#123;</span><br><span class="line">                [Sequelize.Op.gt]: <span class="number">24</span>,</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="多条件查询"><a href="#多条件查询" class="headerlink" title="多条件查询"></a>多条件查询</h4><p>除了单一条件查询，我们还可以通过嵌套 or 或 and 运算符的集合来生成复杂条件语句。例如我们来查询 <code>年龄小于25 或者 性别为男</code> 的所有数据：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; Op &#125; = Sequelize;</span><br><span class="line">    <span class="comment">// 查找满足 age &lt; 25 或 gender = &#x27;men&#x27; 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            [Op.or]: [</span><br><span class="line">                &#123;</span><br><span class="line">                    age: &#123;</span><br><span class="line">                        [Sequelize.Op.lt]: <span class="number">25</span>,</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>从上面几组查询语句我们可以看出，<code>where</code> 通常用 <code>attribute: value</code> 键值对获取一个对象，其中 <code>value</code> 可以是匹配等式的<strong>数据</strong>或其他运算符的<strong>键值对象</strong>。更多查询语法可在下方链接查询：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://docs.sequelizejs.com/manual/querying.html">Sequelize - Querying</a></li>
+<li><a target="_blank" rel="noopener" href="https://demopark.github.io/sequelize-docs-Zh-CN/querying.html">Sequelize - Querying（中文文档）</a></li>
+</ul>
+<h4 id="查询限制-limit-offset"><a href="#查询限制-limit-offset" class="headerlink" title="查询限制 limit, offset"></a>查询限制 limit, offset</h4><p>我们还能限制查询的数量：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 只从表中查询两条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>跳过前2条数据：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>跳过前2条数据并获取3条：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">        limit: <span class="number">3</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="查询排序"><a href="#查询排序" class="headerlink" title="查询排序"></a>查询排序</h4><p>我们还可以将查询数据进行排序：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        order: [</span><br><span class="line">            [<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;desc&#x27;</span>]</span><br><span class="line">        ]</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="查询记录"><a href="#查询记录" class="headerlink" title="查询记录"></a>查询记录</h4><p>有些时候我们可能只是想单纯的查询数据表中有多少条数据，这时可以用 <code>count()</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="comment">// 查询 users 表中有多少条数据</span></span><br><span class="line">  <span class="keyword">let</span> count = <span class="keyword">await</span> UserModel.count();</span><br><span class="line">  <span class="built_in">console</span>.log(count);</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者使用 `findAndCountAll()` 方法在数据库中搜索多条记录，它能返回给我们**数据和总计数**：</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中的前两条数据，并返回 users 表中总记录数</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAndCountAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>查询结果的格式如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123; </span><br><span class="line">    count: 总记录数,</span><br><span class="line">    rows: [ </span><br><span class="line">        &#123;第一条记录&#125;, &#123;第二条记录&#125;, ...</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这个方法对我们为前端提供分页功能很方便，count是符合条件的总记录数，而rows中可以是当前页数下的记录数。</p>
+<h3 id="数据增加"><a href="#数据增加" class="headerlink" title="数据增加"></a>数据增加</h3><p>既然能查，当然就能往数据库插入数据，在 <code>sequelize</code> 中，插入数据可以用 <code>build</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新建一条数据（除了build外，还可以通过 new UserModel(&#123;&#125;) 的形式创建一条记录）</span></span><br><span class="line"><span class="keyword">let</span> wangwu = UserModel.build(&#123;</span><br><span class="line">    username: <span class="string">&#x27;王五&#x27;</span>,</span><br><span class="line">    age: <span class="number">22</span>,</span><br><span class="line">    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// **注意：** 通过 new 或 build 出来的对象不会立即同步到数据库中，</span></span><br><span class="line"><span class="comment">// 需要使用后续的一些方法（例如 save ）来同步</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 你还可以修改这条数据</span></span><br><span class="line">wangwu.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最后别忘了保存才能成功插入数据</span></span><br><span class="line">wangwu.save();</span><br></pre></td></tr></table></figure>
+
+
+<p>如果运行后没报错，去数据库刷新表吧，数据已经成功的插入到 <code>users</code> 表了~</p>
+<h3 id="数据修改"><a href="#数据修改" class="headerlink" title="数据修改"></a>数据修改</h3><p>实际开发中修改数据是再平常不过的了，比如修改一篇博客，更新自己的个人信息… 在 <code>sequelize</code> 中，我们这样修改数据：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查询id为2的用户数据</span></span><br><span class="line">UserModel.findByPk(<span class="number">2</span>).then(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 查询到以后修改其 age 字段为 99</span></span><br><span class="line">    user.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">99</span>);</span><br><span class="line">    <span class="comment">// 修改后别忘了保存</span></span><br><span class="line">    user.save();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>注意：</strong> 在 Sequelize v5 版本以前，通过id查询数据的方法名为 <code>findById</code> ，从 v5 版本开始，更改为 <code>findByPk</code> 。其实想一下这样非常合理，以前的 <code>findById</code> 太主观了，要知道不一定每个表的主键都为 id ，所以更改为 <code>findByPk</code> 后，表示通过<strong>主键（Pk -&gt; PrimaryKey）</strong>查找，<code>sequelize</code> 会自动通过你在创建表模型时定义的主键字段查找。例如我们一开始在定义 <code>User</code> 模型时，就给 <code>id</code> 字段添加了 <code>primaryKey: true,</code> 属性。</p>
+<p>除了 set + update 来更新数据以外，还可以使用 <code>update()</code> 方法做相同的事情：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> xiaohong = <span class="keyword">await</span> UserModel.findByPk(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">// update方法相当于 set + save</span></span><br><span class="line">    <span class="keyword">await</span> xiaohong.update(&#123;</span><br><span class="line">        age: <span class="number">22</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数据删除"><a href="#数据删除" class="headerlink" title="数据删除"></a>数据删除</h3><p>如果想要删除一条数据，可以使用 <code>destroy</code> 方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> wangwu = <span class="keyword">await</span> UserModel.findByPk(<span class="number">4</span>);</span><br><span class="line">    <span class="comment">// 对查询到的数据进行删除</span></span><br><span class="line">    wangwu.destroy();</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Sequelize = <span class="built_in">require</span>(<span class="string">&#x27;sequelize&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> sequelize = <span class="keyword">new</span> Sequelize(<span class="string">&quot;miaov&quot;</span>, <span class="string">&quot;root&quot;</span>, <span class="string">&quot;root&quot;</span>, &#123;</span><br><span class="line">  <span class="comment">// 其他的数据库连接配置</span></span><br><span class="line">  host: <span class="string">&quot;127.0.0.1&quot;</span>, <span class="comment">// 主机</span></span><br><span class="line">  port: <span class="number">8889</span>, <span class="comment">// 端口</span></span><br><span class="line">  dialect: <span class="string">&quot;mysql&quot;</span> <span class="comment">// 数据库类型</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试连接</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    sequelize.authenticate();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;数据库连接成功!&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;连接失败&#x27;</span>);    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义模型（用对象的方式来描述数据库中的表）</span></span><br><span class="line"><span class="keyword">const</span> UserModel = sequelize.define(<span class="string">&#x27;User&#x27;</span>, &#123;</span><br><span class="line">    <span class="comment">// 定义字段</span></span><br><span class="line">    id: &#123; <span class="comment">// 对字段属性的定义</span></span><br><span class="line">        type: Sequelize.INTEGER(<span class="number">11</span>), <span class="comment">// 字段类型</span></span><br><span class="line">        allowNull: <span class="literal">false</span>,            <span class="comment">// 不允许为空</span></span><br><span class="line">        autoIncrement: <span class="literal">true</span>,         <span class="comment">// id自增长</span></span><br><span class="line">        primaryKey: <span class="literal">true</span>,            <span class="comment">// 设为主键</span></span><br><span class="line">    &#125;,</span><br><span class="line">    username: &#123;</span><br><span class="line">        type: Sequelize.STRING(<span class="number">50</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;&#x27;</span>,            <span class="comment">// 设置字段默认值</span></span><br><span class="line">    &#125;,</span><br><span class="line">    age: &#123;</span><br><span class="line">        type: Sequelize.TINYINT(<span class="number">3</span>),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    gender: &#123;</span><br><span class="line">        type: Sequelize.ENUM([<span class="string">&#x27;men&#x27;</span>, <span class="string">&#x27;women&#x27;</span>, <span class="string">&#x27;other&#x27;</span>]),</span><br><span class="line">        allowNull: <span class="literal">false</span>,</span><br><span class="line">        defaultValue: <span class="string">&#x27;men&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;, &#123; <span class="comment">// 用来设置字段以外的其他信息</span></span><br><span class="line">    timestamps: <span class="literal">false</span>,  <span class="comment">// 是否给每条记录添加 createAt 和 updateAt 字段，并在添加新数据和更新数据的时候自动设置这两个字段的值，默认为 true</span></span><br><span class="line">    tableName: <span class="string">&#x27;users&#x27;</span>, <span class="comment">// 该模型映射的真实表名</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 为了方便学习，使用一个函数包裹一组代码</span></span><br><span class="line"><span class="comment">// 这样代码就不会运行了，从而避免干扰其他代码的执行</span></span><br><span class="line"><span class="comment">// 如果想要此函数中代码执行，添加 `()` 就好</span></span><br><span class="line"><span class="comment">// (function()&#123;...&#125;)();  &lt;-- 加上括号</span></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中所有数据</span></span><br><span class="line">    UserModel.findAll().then(<span class="function"><span class="params">users</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 返回的 users 是个数组</span></span><br><span class="line">        users.forEach(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 循环的每个 user 都是个 Model 实例</span></span><br><span class="line">            <span class="comment">// 该 Model 实例包含 get 方法，我们能通过它获取 username</span></span><br><span class="line">            <span class="built_in">console</span>.log(user.get(<span class="string">&#x27;username&#x27;</span>));</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(err);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 新建一条数据（除了build外，还可以通过 new UserModel() 的形式创建一条记录）</span></span><br><span class="line">    <span class="keyword">let</span> liyuanfang = UserModel.build(&#123;</span><br><span class="line">        username: <span class="string">&#x27;李元芳&#x27;</span>,</span><br><span class="line">        age: <span class="number">09</span>,</span><br><span class="line">        gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 修改数据</span></span><br><span class="line">    liyuanfang.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">25</span>);</span><br><span class="line">    <span class="comment">// 别忘了保存</span></span><br><span class="line">    <span class="keyword">await</span> liyuanfang.save();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查询id为2的用户数据</span></span><br><span class="line">    UserModel.findByPk(<span class="number">2</span>).then(<span class="function"><span class="params">user</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 查询到以后修改其 age 字段为 99</span></span><br><span class="line">        user.set(<span class="string">&#x27;age&#x27;</span>, <span class="number">99</span>);</span><br><span class="line">        <span class="comment">// 修改后别忘了保存</span></span><br><span class="line">        user.save();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> xiaohong = <span class="keyword">await</span> UserModel.findByPk(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">// update方法相当于 set + save</span></span><br><span class="line">    <span class="keyword">await</span> xiaohong.update(&#123;</span><br><span class="line">        age: <span class="number">18</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 先查询</span></span><br><span class="line">    <span class="keyword">let</span> wangwu = <span class="keyword">await</span> UserModel.findByPk(<span class="number">4</span>);</span><br><span class="line">    <span class="comment">// 对查询到的数据进行删除</span></span><br><span class="line">    wangwu.destroy();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找 username 为 &#x27;李元芳&#x27; 的唯一数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findOne(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            username: <span class="string">&#x27;李元芳&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="built_in">console</span>.dir(res);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 查找满足 age &gt; 24 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            age: &#123;</span><br><span class="line">                [Sequelize.Op.gt]: <span class="number">24</span>,</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; Op &#125; = Sequelize;</span><br><span class="line">    <span class="comment">// 查找满足 age &lt; 25 或 gender = &#x27;men&#x27; 的所有数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        where: &#123;</span><br><span class="line">            [Op.or]: [</span><br><span class="line">                &#123;</span><br><span class="line">                    age: &#123;</span><br><span class="line">                        [Sequelize.Op.lt]: <span class="number">25</span>,</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    gender: <span class="string">&#x27;men&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 打印出符合条件的用户的 username</span></span><br><span class="line">    <span class="built_in">console</span>.dir(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 只从表中查询两条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 跳过前2条数据</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 跳过前2条数据并获取3条</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        offset: <span class="number">2</span>,</span><br><span class="line">        limit: <span class="number">3</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAll(&#123;</span><br><span class="line">        order: [</span><br><span class="line">            [<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;desc&#x27;</span>]</span><br><span class="line">        ]</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res.map(<span class="function"><span class="params">r</span> =&gt;</span> r.get(<span class="string">&#x27;username&#x27;</span>)));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询的结果按年龄高到低排序</span></span><br><span class="line">    <span class="keyword">let</span> count = <span class="keyword">await</span> UserModel.count();</span><br><span class="line">    <span class="built_in">console</span>.log(count);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 查询 users 表中的前两条数据，并返回 users 表中总记录数</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> UserModel.findAndCountAll(&#123;</span><br><span class="line">        limit: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><p>安装的 sequelize 和 mysql2 的版本为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;mysql2&quot;</span>: <span class="string">&quot;^1.6.5&quot;</span>,</span><br><span class="line">    <span class="string">&quot;sequelize&quot;</span>: <span class="string">&quot;^5.3.1&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://docs.sequelizejs.com/">Sequelize Docs</a></li>
+<li><a target="_blank" rel="noopener" href="https://demopark.github.io/sequelize-docs-Zh-CN/">Sequelize Docs 中文版</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Sequelize/" rel="tag"># Sequelize</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/20298/" rel="prev" title="animation动画（二）">
+                  <i class="fa fa-chevron-left"></i> animation动画（二）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/3278/" rel="next" title="Sequelize框架进阶">
+                  Sequelize框架进阶 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

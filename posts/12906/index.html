@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="为什么要清除浮动其实浮动（e.g. float: left;）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。 由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何清除浮动">
+<meta property="og:url" content="https://evestorm.github.io/posts/12906/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="为什么要清除浮动其实浮动（e.g. float: left;）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。 由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-12-03T15:27:56.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.753Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="布局">
+<meta property="article:tag" content="技巧">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/12906/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何清除浮动 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">为什么要清除浮动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#clear"><span class="nav-number">2.</span> <span class="nav-text">clear</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8%E5%B8%B8%E8%A7%81%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">清除浮动常见方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E6%A0%87%E8%AE%B0%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">额外标记法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%B6%E5%85%83%E7%B4%A0%E6%B7%BB%E5%8A%A0overflow"><span class="nav-number">3.2.</span> <span class="nav-text">父元素添加overflow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#before%E5%92%8Cafter%E5%8F%8C%E4%BC%AA%E5%85%83%E7%B4%A0%E6%96%B9%E6%A1%88"><span class="nav-number">3.3.</span> <span class="nav-text">before和after双伪元素方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8after%E4%BC%AA%E5%85%83%E7%B4%A0%EF%BC%88%E6%88%91%E5%B9%B3%E5%B8%B8%E4%BD%BF%E7%94%A8%E7%9A%84%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">使用after伪元素（我平常使用的）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#after-%E5%92%8C-after-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.</span> <span class="nav-text">:after 和 ::after 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%90%8C%E7%82%B9"><span class="nav-number">4.1.</span> <span class="nav-text">相同点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%82%B9"><span class="nav-number">4.2.</span> <span class="nav-text">不同点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.3.</span> <span class="nav-text">注意</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/12906/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何清除浮动
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-03 23:27:56" itemprop="dateCreated datePublished" datetime="2018-12-03T23:27:56+08:00">2018-12-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="为什么要清除浮动"><a href="#为什么要清除浮动" class="headerlink" title="为什么要清除浮动"></a>为什么要清除浮动</h2><p>其实浮动（e.g. <code>float: left;</code>）本质上是用来做文字混排的，但却被我们拿来做布局，这个时候虽然实现了某些效果，但也带来了不少副作用。</p>
+<p>由于浮动元素不再占有原文档流的位置，所以它会对后续元素的排版带来影响（无视浮动元素，就当它不存在过）。因此我们很多时候要做的，就是消除浮动元素造成的影响。清除浮动的本质主要是为了解决父元素因为子元素浮动造成的内部高度为0的问题。</p>
+<a id="more"></a>
+
+<h2 id="clear"><a href="#clear" class="headerlink" title="clear"></a>clear</h2><p>清除浮动的核心css属性是 clear ，基本语法如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">选择器: &#123;</span><br><span class="line">    <span class="attribute">clear</span>: 属性值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">属性值</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">left</td>
+<td align="left">不允许左侧有浮动元素（清除左侧浮动的影响）</td>
+</tr>
+<tr>
+<td align="left">right</td>
+<td align="left">不允许右侧有浮动元素（清除右侧浮动的影响）</td>
+</tr>
+<tr>
+<td align="left">both</td>
+<td align="left">同时清除左右两侧浮动的影响</td>
+</tr>
+</tbody></table>
+<h2 id="清除浮动常见方案"><a href="#清除浮动常见方案" class="headerlink" title="清除浮动常见方案"></a>清除浮动常见方案</h2><h3 id="额外标记法"><a href="#额外标记法" class="headerlink" title="额外标记法"></a>额外标记法</h3><p>在浮动元素后面添加一个空标签，例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;float: left;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;clear: both;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>优点：通俗易懂，书写方便<br>缺点：加入了过多的没有实际含义的额外标签，结构化差。</p>
+<h3 id="父元素添加overflow"><a href="#父元素添加overflow" class="headerlink" title="父元素添加overflow"></a>父元素添加overflow</h3><p>通过触发BFC达到清除浮动的效果。（p.s. 对bfc不了解可以看<a href="https://evestorm.github.io/posts/9722/">这篇</a>文章）</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.parent</span> &#123;</span><br><span class="line">    <span class="attribute">overflow</span>: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：代码简洁<br>缺点：超出的内容会被隐藏</p>
+<h3 id="before和after双伪元素方案"><a href="#before和after双伪元素方案" class="headerlink" title="before和after双伪元素方案"></a>before和after双伪元素方案</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:before</span>,</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123; </span><br><span class="line">    <span class="attribute">content</span>:<span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: table;  <span class="comment">/* 触发BFC清除浮动 */</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">:after</span> &#123;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：代码简洁<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code></p>
+<h3 id="使用after伪元素（我平常使用的）"><a href="#使用after伪元素（我平常使用的）" class="headerlink" title="使用after伪元素（我平常使用的）"></a>使用after伪元素（我平常使用的）</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;  </span><br><span class="line">    <span class="attribute">content</span>: <span class="string">&quot;.&quot;</span>;</span><br><span class="line">    <span class="attribute">display</span>: block;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">visibility</span>: hidden;</span><br><span class="line">    <span class="attribute">clear</span>: both;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.clearfix</span> &#123;</span><br><span class="line">    <span class="attribute">*zoom</span>: <span class="number">1</span>;</span><br><span class="line">&#125;   <span class="comment">/* IE6、7 专有 */</span></span><br></pre></td></tr></table></figure>
+
+<p>使用方式：给浮动元素的父元素添加一个class类：<code>clearfix</code><br>优点：一次书写多处使用，并且符合闭合浮动思想，结构语义化正确<br>缺点：IE6-7不支持:after，需要使用 <code>zoom: 1</code> 触发 <code>hasLayout</code><br>注意：<code>content:&quot;.&quot;</code> 内容尽量不为空，可以跟一个小点，否则在firefox 7.0前的版本会生成空格</p>
+<h2 id="after-和-after-的区别"><a href="#after-和-after-的区别" class="headerlink" title=":after 和 ::after 的区别"></a>:after 和 ::after 的区别</h2><p>:before、:after 在旧版本里是伪元素，CSS3的规范里 “:” 用来表示伪类，”::” 用来表示伪元素，但是在高版本浏览器下 :before、:after 会被自动识别为 ::before、::after ，这样做的目的是用来做兼容处理。</p>
+<h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><p>伪类对象，用来设置对象前的内容<br>:before 和 ::before 写法是等效的</p>
+<h3 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h3><p>:before 是 css2 的写法，::before 是 css3 的写法<br>:before 兼容性比 ::before要好</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>伪类元素必须要配合 content 属性一起使用，否则无效<br>伪类元素是css渲染层加入的，不能通过js来操作</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B8%83%E5%B1%80/" rel="tag"># 布局</a>
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/9722/" rel="prev" title="BFC的理解与应用">
+                  <i class="fa fa-chevron-left"></i> BFC的理解与应用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/31251/" rel="next" title="去除图片上下左右间隙">
+                  去除图片上下左右间隙 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

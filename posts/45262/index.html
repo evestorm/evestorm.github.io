@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="作用解决模板中复杂的逻辑运算以及复用的问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue计算属性实现原理">
+<meta property="og:url" content="https://evestorm.github.io/posts/45262/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="作用解决模板中复杂的逻辑运算以及复用的问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/45262/1638272012426-61b34c3e-eb27-422c-b3ca-408bfa4b2ca3.png">
+<meta property="article:published_time" content="2021-08-08T06:48:17.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.337Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/45262/1638272012426-61b34c3e-eb27-422c-b3ca-408bfa4b2ca3.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/45262/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue计算属性实现原理 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E6%A0%B7%E5%BC%8F%E5%B0%BD%E5%8F%AF%E8%83%BD%E7%9A%84%E7%BB%9D%E5%AF%B9%E5%88%86%E7%A6%BB"><span class="nav-number">1.1.</span> <span class="nav-text">逻辑样式尽可能的绝对分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E4%B8%AD%E5%A4%9A%E6%AC%A1%E4%BD%BF%E7%94%A8%E5%90%8C%E6%A0%B7%E7%9A%84%E6%8F%92%E5%80%BC%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">模板中多次使用同样的插值表达式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">4.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">4.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/45262/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue计算属性实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-08 14:48:17" itemprop="dateCreated datePublished" datetime="2021-08-08T14:48:17+08:00">2021-08-08</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">源码系列</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h1><p>解决模板中<strong>复杂的逻辑运算</strong>以及<strong>复用的问题</strong></p>
+<a id="more"></a>
+
+<h2 id="逻辑样式尽可能的绝对分离"><a href="#逻辑样式尽可能的绝对分离" class="headerlink" title="逻辑样式尽可能的绝对分离"></a>逻辑样式尽可能的绝对分离</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> App = &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      studentCount: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;h1&gt;&#123;&#123; studentCount &gt; 0 ? (&#x27;学生数：&#x27; + studentCount) : &#x27;暂无学生&#x27; &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">  `</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Vue.createApp(App).mount(<span class="string">&#x27;#app&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="模板中多次使用同样的插值表达式"><a href="#模板中多次使用同样的插值表达式" class="headerlink" title="模板中多次使用同样的插值表达式"></a>模板中多次使用同样的插值表达式</h2><p>避免多次计算，只要data下属性不改变，只会计算一次，也就是缓存</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> App = &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      studentCount: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;h1&gt;&#123;&#123; studentCountInfo &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">    &lt;h1&gt;&#123;&#123; studentCountInfo &#125;&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string">  `</span>,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="function"><span class="title">studentCountInfo</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;Invoked&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.studentCount &gt; <span class="number">0</span></span><br><span class="line">                            ? (<span class="string">&#x27;学生数：&#x27;</span> + <span class="built_in">this</span>.studentCount)</span><br><span class="line">                            : <span class="string">&#x27;暂无学生&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Vue.createApp(App).mount(<span class="string">&#x27;#app&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/45262/1638272012426-61b34c3e-eb27-422c-b3ca-408bfa4b2ca3.png" class="" title="100%">
+
+<h1 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h1><ul>
+<li>计算属性只在内部逻辑<strong>依赖的数据发生变化</strong>的时候才会被再次调用</li>
+<li><strong>计算属性会缓存</strong>其依赖的上一次计算出的数据结果</li>
+<li><strong>多次复用</strong>一个相同的数据，计算属性<strong>只会调用一次</strong></li>
+<li>计算属性直接挂载在实例上</li>
+</ul>
+<h1 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      name: <span class="string">&#x27;Lance&#x27;</span>,</span><br><span class="line">      age: <span class="number">28</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="comment">// 默认为 getter</span></span><br><span class="line">    <span class="function"><span class="title">getName</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.name;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// getter、setter 配合使用</span></span><br><span class="line">    ageData: &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.age;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.age = newVal;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><ul>
+<li>根据computed特性来思考</li>
+<li><ul>
+<li>数据得缓存</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>得有个地方保存每次计算后的结果</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li>get函数中的依赖发生变化后，就得重新计算</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>所以得把这些依赖收集起来</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li>监听到依赖变化后得更新</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>还得保存get函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>思路：</li>
+<li><ul>
+<li>computedPool</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>有一个 pool 存所有 computed</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>pool中每个 computed 都是个对象，包含</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>value：缓存计算结果</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>get：保存get函数</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>dep：收集函数中的依赖</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h2><ol>
+<li>收集 data 依赖，实现响应式</li>
+<li>setter触发时，调用 update 方法更新有关 data 绑定的视图</li>
+<li>setter触发时，调用 updateComputed 遍历 computedPool 每一项下的 dep 依赖，发现更新的 key 匹配上 dep 中的依赖，就重新算一遍 fn，再赋值给对应的 计算属性，实现更新数据<ol>
+<li>再调用 update 更新视图</li>
+<li>从 dataPool 中找到相应计算属性的dom更新值</li>
+</ol>
+</li>
+<li>收集 computed 依赖，遍历 computed 中每个 key</li>
+<li>存到 computedPool 中，每个key对应一项，包含<ol>
+<li>value：缓存计算结果</li>
+<li>get：getter 或者 函数本身</li>
+<li>dep：收集函数中存在的依赖的 data</li>
+</ol>
+</li>
+<li>遍历 computedPool ，把计算属性的值挂载到 vm 实例上</li>
+<li>render 渲染视图</li>
+<li>创建一个新div利用 innerHTML 包裹模板</li>
+<li>编译模板<ol>
+<li>遍历模板找到所有 <code>&#123;&#123;&#125;&#125;` 的 dom
+    2. 用 `&#123;&#123;&#125;&#125;</code> 中的 data 属性名做 key ，dom做 value 存到 dataPool 中去</li>
+</ol>
+</li>
+<li>挂载div到 $el</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  var vm = new Vue(&#123;</span></span><br><span class="line"><span class="comment">    el: &#x27;#app&#x27;,</span></span><br><span class="line"><span class="comment">    template: `</span></span><br><span class="line"><span class="comment">      &lt;span&gt;&#123;&#123; a &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="comment">      &lt;span&gt;+&lt;/span&gt;</span></span><br><span class="line"><span class="comment">      &lt;span&gt;&#123;&#123; b &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="comment">      &lt;span&gt;=&lt;/span&gt;</span></span><br><span class="line"><span class="comment">      &lt;span&gt;&#123;&#123; total &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="comment">    `,</span></span><br><span class="line"><span class="comment">    data() &#123;</span></span><br><span class="line"><span class="comment">      return &#123;</span></span><br><span class="line"><span class="comment">        a: 1,</span></span><br><span class="line"><span class="comment">        b: 2</span></span><br><span class="line"><span class="comment">      &#125;</span></span><br><span class="line"><span class="comment">    &#125;,</span></span><br><span class="line"><span class="comment">    computed: &#123;</span></span><br><span class="line"><span class="comment">      total() &#123;</span></span><br><span class="line"><span class="comment">        console.log(&#x27;computed total&#x27;);</span></span><br><span class="line"><span class="comment">        return this.a + this.b;</span></span><br><span class="line"><span class="comment">      &#125;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">  &#125;);</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">var</span> Vue = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> reg_var = <span class="regexp">/\&#123;\&#123;(.+?)\&#125;\&#125;/g</span>,</span><br><span class="line">      computedData = &#123;&#125;, <span class="comment">// 计算属性集合</span></span><br><span class="line">      dataPool = &#123;&#125;; <span class="comment">// 收集有 &#123;&#123; &#125;&#125; 需要响应式的dom</span></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * total: &#123;</span></span><br><span class="line"><span class="comment">   *  value: 函数执行返回的结果</span></span><br><span class="line"><span class="comment">   *  get: get</span></span><br><span class="line"><span class="comment">   *  dep: [&#x27;a&#x27;, &#x27;b&#x27;]</span></span><br><span class="line"><span class="comment">   * &#125;</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="keyword">var</span> Vue = <span class="function"><span class="keyword">function</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.$el = <span class="built_in">document</span>.querySelector(options.el);</span><br><span class="line">    <span class="built_in">this</span>.$data = options.data();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">this</span>._init(<span class="built_in">this</span>, options.computed, options.template);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Vue.prototype._init = <span class="function"><span class="keyword">function</span>(<span class="params">vm, computed, template</span>) </span>&#123;</span><br><span class="line">    dataReactive(vm); <span class="comment">// 数据响应式</span></span><br><span class="line">    computedReactive(vm, computed); <span class="comment">// 计算属性收集</span></span><br><span class="line">    render(vm, template); <span class="comment">// 渲染</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">vm, template</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> container = <span class="built_in">document</span>.createElement(<span class="string">&#x27;div&#x27;</span>),</span><br><span class="line">        _el = vm.$el;</span><br><span class="line"></span><br><span class="line">    container.innerHTML = template;</span><br><span class="line">    <span class="comment">// 编译模板</span></span><br><span class="line">    <span class="keyword">var</span> domTree = _compileTemplate(vm, container);</span><br><span class="line">    _el.appendChild(domTree);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 更新视图</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">update</span>(<span class="params">vm, key</span>) </span>&#123;</span><br><span class="line">    dataPool[key].textContent = vm[key];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">_compileTemplate</span>(<span class="params">vm, container</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 获取 template 下所有tag</span></span><br><span class="line">    <span class="keyword">var</span> allNodes = container.getElementsByTagName(<span class="string">&#x27;*&#x27;</span>),</span><br><span class="line">        nodeItem = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; allNodes.length; i++) &#123;</span><br><span class="line">      nodeItem = allNodes[i];</span><br><span class="line">      <span class="comment">// 匹配 &#123;&#123; &#125;&#125; 中的data和computed</span></span><br><span class="line">      <span class="keyword">var</span> matched = nodeItem.textContent.match(reg_var);</span><br><span class="line">      <span class="keyword">if</span> (matched) &#123;</span><br><span class="line">        nodeItem.textContent = nodeItem.textContent.replace(reg_var, <span class="function"><span class="keyword">function</span>(<span class="params">node, key</span>) </span>&#123;</span><br><span class="line">          <span class="comment">// 收集有 &#123;&#123; &#125;&#125; 需要响应式的dom</span></span><br><span class="line">          dataPool[key.trim()] = nodeItem;</span><br><span class="line">          <span class="keyword">return</span> vm[key.trim()];</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> container;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">dataReactive</span>(<span class="params">vm</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _data = vm.$data;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> _data) &#123;</span><br><span class="line">      (<span class="function"><span class="keyword">function</span>(<span class="params">key</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">          <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> _data[key];</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">            _data[key] = newVal;</span><br><span class="line">            update(vm, key);</span><br><span class="line">            _updateComputedData(vm, key, <span class="function"><span class="keyword">function</span>(<span class="params">key</span>) </span>&#123;</span><br><span class="line">              update(vm, key);</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;)(key);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">computedReactive</span>(<span class="params">vm, computed</span>) </span>&#123;</span><br><span class="line">    _initComputedData(vm, computed);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> computedData) &#123;</span><br><span class="line">      (<span class="function"><span class="keyword">function</span>(<span class="params">key</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">          <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> computedData[key].value;</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="function"><span class="title">set</span>(<span class="params">newVal</span>)</span> &#123;</span><br><span class="line">            computedData[key].value = newVal;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;)(key);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">_initComputedData</span>(<span class="params">vm, computed</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> computed) &#123;</span><br><span class="line">      <span class="comment">// console.log(Object.getOwnPropertyDescriptor(computed, key)); </span></span><br><span class="line">      <span class="comment">// configurable: true</span></span><br><span class="line">      <span class="comment">// enumerable: true</span></span><br><span class="line">      <span class="comment">// value: ƒ total()</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(computed, key),</span><br><span class="line">      <span class="comment">// computed有可能是对象，也有可能是getter</span></span><br><span class="line">          descriptorFn = descriptor.value.get</span><br><span class="line">                          ? descriptor.value.get</span><br><span class="line">                          : descriptor.value;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">       * total: &#123;</span></span><br><span class="line"><span class="comment">       *  value: 函数执行返回的结果</span></span><br><span class="line"><span class="comment">       *  get: get</span></span><br><span class="line"><span class="comment">       *  dep: [&#x27;a&#x27;, &#x27;b&#x27;]</span></span><br><span class="line"><span class="comment">       * &#125;</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      computedData[key] = &#123;&#125;;</span><br><span class="line">      computedData[key].value = descriptorFn.call(vm);</span><br><span class="line">      computedData[key].get = descriptorFn.bind(vm);</span><br><span class="line">      computedData[key].dep = _collectDep(descriptorFn);</span><br><span class="line">      <span class="built_in">console</span>.log(computedData);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">_collectDep</span>(<span class="params">fn</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _collection = fn.toString().match(<span class="regexp">/this.(.+?)/g</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(_collection);</span><br><span class="line">    <span class="keyword">if</span> (_collection.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; _collection.length; i++) &#123;</span><br><span class="line">        _collection[i] = _collection[i].split(<span class="string">&#x27;.&#x27;</span>)[<span class="number">1</span>];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _collection;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">_updateComputedData</span>(<span class="params">vm, key, update</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _dep = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 循环 computedData 中的计算属性们</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> _key <span class="keyword">in</span> computedData) &#123;</span><br><span class="line">      _dep = computedData[_key].dep;</span><br><span class="line">      <span class="comment">// 查看收集的当前计算属性的dep中的依赖data</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; _dep.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 如果对应上了当前变化的data属性</span></span><br><span class="line">        <span class="keyword">if</span> (_dep[i] === key) &#123;</span><br><span class="line">          <span class="comment">// 就重新执行一次computedData下对应方法，赋值给vm下对应计算属性</span></span><br><span class="line">          vm[_key] = computedData[_key].get();</span><br><span class="line">          update(_key);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> Vue;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 计算属性：解决模板中复杂的逻辑运算以及复用的问题</span></span><br><span class="line"><span class="comment"> * ● 计算属性只在内部逻辑依赖的数据发生变化的时候才会被再次调用</span></span><br><span class="line"><span class="comment"> * ● 计算属性会缓存其依赖的上一次计算出的数据结果</span></span><br><span class="line"><span class="comment"> * ● 多次复用一个相同的数据，计算属性只会调用一次</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;../module/Vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;span&gt;&#123;&#123; a &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="string">    &lt;span&gt;+&lt;/span&gt;</span></span><br><span class="line"><span class="string">    &lt;span&gt;&#123;&#123; b &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="string">    &lt;span&gt;=&lt;/span&gt;</span></span><br><span class="line"><span class="string">    &lt;span&gt;&#123;&#123; total &#125;&#125;&lt;/span&gt;</span></span><br><span class="line"><span class="string">  `</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;computed total&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// total: &#123;</span></span><br><span class="line">    <span class="comment">//   get() &#123;</span></span><br><span class="line">    <span class="comment">//     console.log(&#x27;computed total&#x27;);</span></span><br><span class="line">    <span class="comment">//     return this.a + this.b;</span></span><br><span class="line">    <span class="comment">//   &#125;</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">100</span>;</span><br><span class="line">vm.b = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/53691/" rel="prev" title="预编译">
+                  <i class="fa fa-chevron-left"></i> 预编译
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/13531/" rel="next" title="ul-li模拟table">
+                  ul-li模拟table <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

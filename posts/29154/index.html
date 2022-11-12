@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="作用域[[scope]]：  函数创建时，生成的一个JS内部的隐式属性 函数存储【作用域链】的容器 作用域链： AO - 函数的执行期上下文 GO - 全局的执行期上下文     函数执行完成以后，AO会被销毁，再执行会重新创建一个新的AO 全局执行的前一刻 GO -&gt; 函数声明已经定义">
+<meta property="og:type" content="article">
+<meta property="og:title" content="作用域和闭包">
+<meta property="og:url" content="https://evestorm.github.io/posts/29154/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="作用域[[scope]]：  函数创建时，生成的一个JS内部的隐式属性 函数存储【作用域链】的容器 作用域链： AO - 函数的执行期上下文 GO - 全局的执行期上下文     函数执行完成以后，AO会被销毁，再执行会重新创建一个新的AO 全局执行的前一刻 GO -&gt; 函数声明已经定义">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626863374245-86d2962e-6072-41cf-a1c0-d04ba9228683.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626863732791-c2620d54-60f4-4ee2-9357-f765b69f21b0.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626865299924-71670d80-bde3-4d24-805f-9f2eb2237330.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626865458805-ebf35b3f-4cc8-464a-b08f-67acacb31ef3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626865660193-901e8506-7373-45de-b44f-a82e7228e48e.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626865830851-e57a6ebe-d416-4095-9155-3eb8bdd2fc64.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626919388682-ec410e88-3969-4350-ab40-c2e982d75d15.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626919755152-b65f60b3-94df-420d-bc7d-10a49cce26b2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626920149765-d41c3ced-e099-4f39-9e98-6c7e2f9dd617.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626920744028-aea49aa5-7cd6-460f-a568-bad63d0404a1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/29154/1626922362347-e8c642b6-5eb8-4594-866b-17c273a0df3d.png">
+<meta property="article:published_time" content="2021-08-18T02:05:01.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.566Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="作用域">
+<meta property="article:tag" content="闭包">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/29154/1626863374245-86d2962e-6072-41cf-a1c0-d04ba9228683.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/29154/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>作用域和闭包 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="nav-number">1.</span> <span class="nav-text">作用域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E6%A1%88%E4%BE%8B"><span class="nav-number">1.1.</span> <span class="nav-text">🌈 案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE"><span class="nav-number">1.2.</span> <span class="nav-text">分析作用域链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E5%87%BD%E6%95%B0%E9%BB%98%E8%AE%A4%E5%80%BC%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.3.</span> <span class="nav-text">🌈 函数默认值带来的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AD%E5%8C%85"><span class="nav-number">2.</span> <span class="nav-text">闭包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">2.2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#for%E5%BE%AA%E7%8E%AF%E7%9A%84i%E5%80%BC%E6%89%93%E5%8D%B0"><span class="nav-number">2.3.</span> <span class="nav-text">for循环的i值打印</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%88%86%E6%9E%90"><span class="nav-number">2.3.1.</span> <span class="nav-text">🌈 分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%94%B9%E9%80%A0%E6%89%8D%E8%83%BD%E4%BD%BF%E5%85%B6%E6%89%93%E5%8D%B0-0-9"><span class="nav-number">2.3.2.</span> <span class="nav-text">如何改造才能使其打印 0 - 9</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9C%A8%E5%A4%96%E5%B1%82%E4%BD%BF%E7%94%A8%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E5%8C%85%E8%A3%B9"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">在外层使用立即执行函数包裹</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E5%87%BD%E6%95%B0%E5%B0%BE%E9%83%A8%E5%8A%A0%E6%8B%AC%E5%8F%B7%EF%BC%8C%E5%9B%A0%E4%B8%BA%E5%89%8D%E8%BE%B9%E6%9C%89-arr-i-%E6%98%AF%E4%B8%AA%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">直接函数尾部加括号，因为前边有 arr[i] &#x3D; ,是个表达式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0-%E6%8A%8A%E4%BC%A0%E5%8F%82%E4%BC%A0%E8%BF%9B%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0"><span class="nav-number">2.3.2.3.</span> <span class="nav-text">循环立即执行函数+把传参传进匿名函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#window-%E5%92%8C-return"><span class="nav-number">2.4.</span> <span class="nav-text">window 和 return</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#return-%E5%BD%A2%E6%88%90%E9%97%AD%E5%8C%85"><span class="nav-number">2.4.1.</span> <span class="nav-text">return 形成闭包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#window-%E5%BD%A2%E6%88%90%E9%97%AD%E5%8C%85"><span class="nav-number">2.4.2.</span> <span class="nav-text">window 形成闭包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JS-%E6%8F%92%E4%BB%B6%E5%86%99%E6%B3%95"><span class="nav-number">2.4.3.</span> <span class="nav-text">JS 插件写法</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/29154/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          作用域和闭包
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-18 10:05:01" itemprop="dateCreated datePublished" datetime="2021-08-18T10:05:01+08:00">2021-08-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h2><p>[[scope]]：</p>
+<ul>
+<li><strong>函数创建时</strong>，生成的一个JS内部的隐式属性</li>
+<li>函数存储【作用域链】的容器<ul>
+<li>作用域链：<ul>
+<li><strong>AO - 函数的执行期上下文</strong></li>
+<li><strong>GO - 全局的执行期上下文</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>函数执行完成以后，AO会被销毁，再执行会重新创建一个新的AO</li>
+<li>全局执行的前一刻 GO -&gt; 函数声明已经定义</li>
+</ul>
+<a id="more"></a>
+
+<h3 id="🌈-案例"><a href="#🌈-案例" class="headerlink" title="🌈 案例"></a>🌈 案例</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  b();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> c = <span class="number">3</span>;</span><br><span class="line">a();</span><br></pre></td></tr></table></figure>
+
+<p>当a函数被定义时（每一个函数被定义的时候【还没被执行】，[[scope]]就存在了，作用域链第一项此刻已经被保存了，是GO）：</p>
+<img src="/posts/29154/1626863374245-86d2962e-6072-41cf-a1c0-d04ba9228683.png" class="" title="100%">
+
+<p>当a函数被执行时（前一刻，也就是预编译阶段）（生成了自己的AO，并且把AO存在了作用域链的最顶端，把GO挤下去了）</p>
+<img src="/posts/29154/1626863732791-c2620d54-60f4-4ee2-9357-f765b69f21b0.png" class="" title="100%">
+
+<p>a函数执行，内部b函数立即被定义</p>
+<img src="/posts/29154/1626865299924-71670d80-bde3-4d24-805f-9f2eb2237330.png" class="" title="100%">
+
+<p>当b函数被执行时（前一刻，预编译），把自身AO排顶端，先前的被挤到下边</p>
+<img src="/posts/29154/1626865458805-ebf35b3f-4cc8-464a-b08f-67acacb31ef3.png" class="" title="100%">
+
+<p>b函数执行完毕以后，b的ao销毁；<strong>b的scope回归b被定义时的状态</strong></p>
+<img src="/posts/29154/1626865660193-901e8506-7373-45de-b44f-a82e7228e48e.png" class="" title="100%">
+
+<p>b函数执行完毕的同时，也代表a函数执行完毕。此时a的AO销毁，由于a的AO中包含b，而且被销毁，所以 b的[[scope]]也不存在了</p>
+<img src="/posts/29154/1626865830851-e57a6ebe-d416-4095-9155-3eb8bdd2fc64.png" class="" title="100%">
+
+<h3 id="分析作用域链"><a href="#分析作用域链" class="headerlink" title="分析作用域链"></a>分析作用域链</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  	<span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    c();</span><br><span class="line">  &#125;</span><br><span class="line">  b();</span><br><span class="line">&#125;</span><br><span class="line">a();</span><br><span class="line"></span><br><span class="line">a定义： a.[[scope]] -&gt; <span class="number">0</span>: GO</span><br><span class="line">a执行： a.[[scope]] -&gt; <span class="number">0</span>：a的AO</span><br><span class="line">   										<span class="number">1</span>：GO</span><br><span class="line">b定义： b.[[scope]] -&gt; <span class="number">0</span>：a的AO</span><br><span class="line">  										<span class="number">1</span>：GO</span><br><span class="line">b执行： b.[[scope]] -&gt; <span class="number">0</span>：b的AO</span><br><span class="line">                      <span class="number">1</span>：a的AO</span><br><span class="line">                      <span class="number">2</span>：GO</span><br><span class="line">c定义： c.[[scope]] -&gt;  <span class="number">0</span>：b的AO</span><br><span class="line">                       <span class="number">1</span>：a的AO</span><br><span class="line">                       <span class="number">2</span>：GO</span><br><span class="line">c执行： c.[[scope]] -&gt; <span class="number">0</span>: c的AO</span><br><span class="line">                      <span class="number">1</span>：b的AO</span><br><span class="line">                      <span class="number">2</span>：a的AO</span><br><span class="line">                      <span class="number">3</span>：GO</span><br><span class="line">c结束：c.[[scope]] -&gt; <span class="number">0</span>：b的AO</span><br><span class="line">                     <span class="number">1</span>：a的AO</span><br><span class="line">                     <span class="number">2</span>：GO</span><br><span class="line">b结束：b.[[scope]] -&gt; <span class="number">0</span>：a的AO</span><br><span class="line">   									 <span class="number">1</span>：GO</span><br><span class="line">     	</span><br><span class="line">      </span><br><span class="line">a结束：c.[[scope]] 销毁</span><br><span class="line">			b.[[scope]] 销毁</span><br><span class="line">			a.[[scope]] -&gt; <span class="number">0</span>: GO</span><br></pre></td></tr></table></figure>
+
+<h3 id="🌈-函数默认值带来的影响"><a href="#🌈-函数默认值带来的影响" class="headerlink" title="🌈 函数默认值带来的影响"></a>🌈 函数默认值带来的影响</h3><p>事实上，如果<strong>一些</strong>（至少有一个）参数具有默认值，ES6 会定义一个<strong>中间作用域</strong>用于存储参数，并且这个作用域与<strong>函数体</strong>的作用域<strong>不共享</strong>。这是与 ES5 存在主要区别的一个方面。我们用例子来证明：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x = <span class="number">1</span>;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">x, y = <span class="keyword">function</span>() &#123; x = <span class="number">2</span>; &#125;</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> x = <span class="number">3</span>;</span><br><span class="line">  y(); <span class="comment">// `x` 被共用了吗？</span></span><br><span class="line">  <span class="built_in">console</span>.log(x); <span class="comment">// 没有，依然是 3，不是 2</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">foo();</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 并且外部的 `x` 也不受影响</span></span><br><span class="line"><span class="built_in">console</span>.log(x); <span class="comment">// 1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们有三个作用域：全局环境，参数环境，以及函数环境：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">foo : -&gt; &#123; <span class="attr">x</span>: <span class="number">3</span> &#125;</span><br><span class="line">参数 : -&gt; &#123; <span class="attr">x</span>: <span class="literal">undefined</span>, <span class="attr">y</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; x = <span class="number">2</span>; &#125; &#125;</span><br><span class="line">全局 : -&gt; &#123; <span class="attr">x</span>: <span class="number">1</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，当函数 <code>y</code> 执行时，它在最近的环境（即参数环境）中解析 <code>x</code>，函数作用域对其并不可见。</p>
+<p>来源：<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903839280136205#heading-5">https://juejin.cn/post/6844903839280136205#heading-5</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>只要函数被定义，就生成作用域（scope）和相应的作用域链（scope chain），并把GO放进去</li>
+<li>只要函数被执行的那一刻（准确的说应该是执行前的预编译阶段），就生成AO，然后把自身的AO放进作用域链，并自身排首位，把之前的作用域们（其他AO和GO）依次往下挪</li>
+<li><strong>函数执行完毕，销毁自身AO；此时自身作用域回归被定义时的状态</strong></li>
+</ol>
+<h2 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h2><h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">test2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = <span class="number">2</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> test2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> c = <span class="number">3</span>;</span><br><span class="line"><span class="keyword">var</span> test3 = test1();</span><br><span class="line">test3();</span><br></pre></td></tr></table></figure>
+
+<p>当test1被定义时：（此时全局的test3是test1内部的test2）</p>
+<img src="/posts/29154/1626919388682-ec410e88-3969-4350-ab40-c2e982d75d15.png" class="" title="100%">
+
+<p>当test1被执行时，test2被定义，所以此刻他们俩的作用域相同</p>
+<img src="/posts/29154/1626919755152-b65f60b3-94df-420d-bc7d-10a49cce26b2.png" class="" title="100%">
+
+<p>当test1执行完毕时，本来要销毁自身的AO，但由于test1返回了test2，导致test2被全局GO引用，所以test2的作用域链中的test1的AO此刻还不能销毁，因此此AO仍然存在，没有被销毁，只是test1的作用域链中的自身AO连接切断了。<br>test1的AO不能被销毁的理由是，test2现在在全局函数，而且test2的作用域链中还攥着test1的ao，所以test1的ao不能被销毁。由于垃圾回收的标记清除，导致test2是全局的，还被引用着，不能被销毁。</p>
+<img src="/posts/29154/1626920149765-d41c3ced-e099-4f39-9e98-6c7e2f9dd617.png" class="" title="100%">
+
+<p>当test3执行时，</p>
+<img src="/posts/29154/1626920744028-aea49aa5-7cd6-460f-a568-bad63d0404a1.png" class="" title="100%">
+
+<p>当test3执行完毕后，</p>
+<img src="/posts/29154/1626922362347-e8c642b6-5eb8-4594-866b-17c273a0df3d.png" class="" title="100%">
+
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3><p>当内部函数被返回到外部<strong>并保存时</strong>，一定会产生闭包。闭包会导致<strong>原来的作用域链不释放</strong>。过度的闭包可能会导致<strong>内存泄漏（因为常驻内存），或加载过慢</strong>。</p>
+<h3 id="for循环的i值打印"><a href="#for循环的i值打印" class="headerlink" title="for循环的i值打印"></a>for循环的i值打印</h3><p>代码执行后的结果是什么，为什么?</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = [];</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    arr[i] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">document</span>.write(i + <span class="string">&#x27; &#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myArr = test();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">	myArr[j]();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印 10个10</span></span><br><span class="line"><span class="comment">// 首先最上边test函数可以改造为下面形式：</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> arr = [];</span><br><span class="line">  <span class="keyword">var</span> i = <span class="number">0</span>; <span class="comment">// 把for 循环的变量 i 声明提出来 </span></span><br><span class="line">  <span class="keyword">for</span>(;i &lt; <span class="number">10</span>;) &#123;</span><br><span class="line">    arr[i] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">document</span>.write(i + <span class="string">&#x27; &#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    i++; <span class="comment">// 每次循环完毕后i++，所以提下来</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="🌈-分析"><a href="#🌈-分析" class="headerlink" title="🌈 分析"></a>🌈 分析</h4><p>当此 for 循环执行完后，arr 中存储了 10 个匿名函数，这 10 个匿名函数还没执行，所以先不看匿名函数里边的内容。<br>由于 test 执行完毕后把 arr 返回了出去形成了闭包，所以每个匿名函数其实都保留了外层test函数的AO。<br>所以每个匿名函数就能拿到 test AO 中的变量 i ，而 i 在 for 循环结束后已经累加为了 10<br>所以最终在循环执行每个匿名函数时，都拿到的是最终的 i 的值，也就是 10</p>
+<h4 id="如何改造才能使其打印-0-9"><a href="#如何改造才能使其打印-0-9" class="headerlink" title="如何改造才能使其打印 0 - 9"></a>如何改造才能使其打印 0 - 9</h4><h5 id="在外层使用立即执行函数包裹"><a href="#在外层使用立即执行函数包裹" class="headerlink" title="在外层使用立即执行函数包裹"></a>在外层使用立即执行函数包裹</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">  	(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    	<span class="built_in">document</span>.write(i + <span class="string">&#x27; &#x27;</span>);</span><br><span class="line">    &#125;)();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">test(); </span><br></pre></td></tr></table></figure>
+
+<h5 id="直接函数尾部加括号，因为前边有-arr-i-是个表达式"><a href="#直接函数尾部加括号，因为前边有-arr-i-是个表达式" class="headerlink" title="直接函数尾部加括号，因为前边有 arr[i] = ,是个表达式"></a>直接函数尾部加括号，因为前边有 arr[i] = ,是个表达式</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = [];</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    arr[i] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(i + <span class="string">&#x27; &#x27;</span>); <span class="comment">// 0 - 9</span></span><br><span class="line">    &#125;();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(test()); <span class="comment">// [undefined, ...] 10 个 undefined</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="循环立即执行函数-把传参传进匿名函数"><a href="#循环立即执行函数-把传参传进匿名函数" class="headerlink" title="循环立即执行函数+把传参传进匿名函数"></a>循环立即执行函数+把传参传进匿名函数</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// or </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123; <span class="comment">// 最常用的方案</span></span><br><span class="line">  <span class="keyword">var</span> arr = [];</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params">j</span>) </span>&#123;</span><br><span class="line">    	arr[j] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">document</span>.write(j + <span class="string">&#x27; &#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)(i);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myArr = test();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">	myArr[j]();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// or 利用函数传参（耍赖）</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = [];</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    arr[i] = <span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">document</span>.write(num + <span class="string">&#x27; &#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myArr = test();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">	myArr[j](j);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="window-和-return"><a href="#window-和-return" class="headerlink" title="window 和 return"></a>window 和 return</h3><h4 id="return-形成闭包"><a href="#return-形成闭包" class="headerlink" title="return 形成闭包"></a>return 形成闭包</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">add1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	a++;</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> add1;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> add = test();</span><br><span class="line">add(); <span class="comment">// 2</span></span><br><span class="line">add(); <span class="comment">// 3</span></span><br><span class="line">add(); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="window-形成闭包"><a href="#window-形成闭包" class="headerlink" title="window 形成闭包"></a>window 形成闭包</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">add1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	a++;</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">window</span>.add = add1;</span><br><span class="line">&#125;</span><br><span class="line">test();</span><br><span class="line">add(); <span class="comment">// 2</span></span><br><span class="line">add(); <span class="comment">// 3</span></span><br><span class="line">add(); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>自执行函数</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> add = (<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	a++;</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> add;</span><br><span class="line">&#125;)();</span><br><span class="line">add();</span><br><span class="line">add();</span><br><span class="line">add();</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	a++;</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">window</span>.add = add;</span><br><span class="line">&#125;)();</span><br><span class="line">add();</span><br><span class="line">add();</span><br><span class="line">add();</span><br></pre></td></tr></table></figure>
+
+<h4 id="JS-插件写法"><a href="#JS-插件写法" class="headerlink" title="JS 插件写法"></a>JS 插件写法</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  </span><br><span class="line">  &#125;</span><br><span class="line">  Test.prototype = &#123;&#125;</span><br><span class="line">  <span class="built_in">window</span>.Test = Test;</span><br><span class="line">&#125;)();</span><br><span class="line"><span class="keyword">var</span> test = <span class="keyword">new</span> Test();</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/%E4%BD%9C%E7%94%A8%E5%9F%9F/" rel="tag"># 作用域</a>
+              <a href="/tags/%E9%97%AD%E5%8C%85/" rel="tag"># 闭包</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/36931/" rel="prev" title="Vue的watch实现原理">
+                  <i class="fa fa-chevron-left"></i> Vue的watch实现原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/13177/" rel="next" title="Vue组件库全局注册加载、按需注册加载的实现思路">
+                  Vue组件库全局注册加载、按需注册加载的实现思路 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

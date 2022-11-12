@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="转载自：https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdn_yudong&#x2F;article&#x2F;details&#x2F;79668655">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-axios发post请求-后端接收不到参数的解决方案">
+<meta property="og:url" content="https://evestorm.github.io/posts/32468/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdn_yudong&#x2F;article&#x2F;details&#x2F;79668655">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-25T08:15:57.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.055Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="axios">
+<meta property="article:tag" content="转载">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/32468/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-axios发post请求-后端接收不到参数的解决方案 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">问题场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">问题原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E7%82%B9%E4%B8%80"><span class="nav-number">2.1.</span> <span class="nav-text">要点一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E7%82%B9%E4%BA%8C"><span class="nav-number">2.2.</span> <span class="nav-text">要点二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Features"><span class="nav-number">3.</span> <span class="nav-text">Features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80"><span class="nav-number">5.1.</span> <span class="nav-text">方案一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C"><span class="nav-number">5.2.</span> <span class="nav-text">方案二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%89"><span class="nav-number">5.3.</span> <span class="nav-text">方案三</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%9B%9B"><span class="nav-number">5.4.</span> <span class="nav-text">方案四</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/32468/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-axios发post请求-后端接收不到参数的解决方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-25 16:15:57" itemprop="dateCreated datePublished" datetime="2020-04-25T16:15:57+08:00">2020-04-25</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://blog.csdn.net/csdn_yudong/article/details/79668655">https://blog.csdn.net/csdn_yudong/article/details/79668655</a></p>
+<a id="more"></a>
+
+<h2 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h2><p>下面一个正常的 axios post 请求，后端说没有接收到你的传参：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username,</span><br><span class="line">    pwd</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><h3 id="要点一"><a href="#要点一" class="headerlink" title="要点一"></a>要点一</h3><p>原因就是这次的接口使用 java spring mvc<br>并且在这个方法上使用了注解 @RequestParam</p>
+<p>那么这个是什么意思呢，这个是只能从请求的地址中取出参数，也就是只能从 username=admin&amp;password=admin 这种字符串中解析出参数。</p>
+<h3 id="要点二"><a href="#要点二" class="headerlink" title="要点二"></a>要点二</h3><p>我们还可以看到我们这次请求的 Content-Type：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">application/json;charset=UTF-8</span><br></pre></td></tr></table></figure>
+
+<p>axios 会帮我们 <strong>转换请求数据和响应数据</strong> 以及 <strong>自动转换 JSON 数据</strong></p>
+<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><ul>
+<li>Make <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequests</a> from the browser</li>
+<li>Make <a target="_blank" rel="noopener" href="http://nodejs.org/api/http.html">http</a> requests from node.js</li>
+<li>Supports the <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> API</li>
+<li>Intercept request and response</li>
+<li><mark>Transform request and response data</mark></li>
+<li>Cancel requests</li>
+<li>Automatic transforms for JSON data</li>
+<li>Client side support for protecting against <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">XSRF</a></li>
+</ul>
+<p>在 axios 源码中发现下面这段内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">transformRequest: [<span class="function"><span class="keyword">function</span> <span class="title">transformRequest</span>(<span class="params">data, headers</span>) </span>&#123;</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Accept&#x27;</span>);</span><br><span class="line">    normalizeHeaderName(headers, <span class="string">&#x27;Content-Type&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (utils.isFormData(data) ||</span><br><span class="line">      utils.isArrayBuffer(data) ||</span><br><span class="line">      utils.isBuffer(data) ||</span><br><span class="line">      utils.isStream(data) ||</span><br><span class="line">      utils.isFile(data) ||</span><br><span class="line">      utils.isBlob(data)</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isArrayBufferView(data)) &#123;</span><br><span class="line">      <span class="keyword">return</span> data.buffer;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (utils.isURLSearchParams(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/x-www-form-urlencoded;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> data.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ========= 如果data是object，就会转 ========</span></span><br><span class="line">    <span class="keyword">if</span> (utils.isObject(data)) &#123;</span><br><span class="line">      setContentTypeIfUnset(headers, <span class="string">&#x27;application/json;charset=utf-8&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">JSON</span>.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125;],</span><br></pre></td></tr></table></figure>
+
+<p>我们知道在做 post 请求的时候，我们的传参是 data: {…} 或者直接 {…} 的形式传递的，嗯，就是下面这两种形式：</p>
+<p>【第一种】</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">axios</span><br><span class="line">  .post(<span class="string">&#x27;/user&#x27;</span>, &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">() =&gt;</span> &#123;&#125;)</span><br><span class="line">  .catch(<span class="function">() =&gt;</span> &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>【第二种】</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/user/12345&#x27;</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    firstName: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    lastName: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>非常的刺激，这两种形式无一例外都触发了 axios 源码中【很关键】的那一段代码</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>也就是说，我们的 <code>Content-Type</code> 变成了 <code>application/json;charset=utf-8</code><br>然后，因为我们的参数是 JSON 对象，axios 帮我们做了一个 stringify 的处理。<br>而且查阅 axios 文档可以知道：axios 使用 post 发送数据时，默认是直接把 json 放到请求体中提交到后端的。</p>
+<p>那么，这就与我们服务端要求的 <code>&#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;</code> 以及 <code>@RequestParam</code> 不符合。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>【用 URLSearchParams 传递参数】</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> param = <span class="keyword">new</span> URLSearchParams();</span><br><span class="line">param.append(<span class="string">&#x27;username&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">param.append(<span class="string">&#x27;pwd&#x27;</span>, <span class="string">&#x27;admin&#x27;</span>);</span><br><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: param</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>需要注意的是： URLSearchParams 不支持所有的浏览器，但是总体的支持情况还是 OK 的，所以优先推荐这种简单直接的解决方案</p>
+</blockquote>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p><em>网上有很多方案说使用</em></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.headers.post[<span class="string">&#x27;Content-Type&#x27;</span>] =</span><br><span class="line">  <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;headers&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/x-www-form-urlencoded&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>我试了一下，其实这样还是不行的</em></p>
+<p>【还需要额外的操作，（我们要将参数转换为 query 参数）】</p>
+<p>引入 qs ，这个库是 axios 里面包含的，不需要再下载了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> data = &#123;</span><br><span class="line">  username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">  pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">axios(&#123;</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  data: Qs.stringify(data)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案三"><a href="#方案三" class="headerlink" title="方案三"></a>方案三</h3><p>在请求中添加 <code>transformRequest</code> :</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Qs <span class="keyword">from</span> <span class="string">&#x27;qs&#x27;</span>;</span><br><span class="line">axios(&#123;</span><br><span class="line">  url: <span class="string">&#x27;/api/lockServer/search&#x27;</span>,</span><br><span class="line">  method: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  transformRequest: [</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 对 data 进行任意转换处理</span></span><br><span class="line">      <span class="keyword">return</span> Qs.stringify(data);</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  headers: &#123;</span><br><span class="line">    deviceCode: <span class="string">&#x27;A95ZEF1-47B5-AC90BF3&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    username: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">    pwd: <span class="string">&#x27;admin&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案四"><a href="#方案四" class="headerlink" title="方案四"></a>方案四</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axios.post(<span class="string">&#x27;/api/lockServer/search&#x27;</span>, <span class="string">&quot;userName=&#x27;admin&#x27;&amp;pwd=&#x27;admin&#x27;&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/axios/" rel="tag"># axios</a>
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/63031/" rel="prev" title="转载-moment的高频用法总结">
+                  <i class="fa fa-chevron-left"></i> 转载-moment的高频用法总结
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/37082/" rel="next" title="转载-这一次，彻底弄懂JavaScript执行机制">
+                  转载-这一次，彻底弄懂JavaScript执行机制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

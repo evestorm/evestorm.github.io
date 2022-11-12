@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="组件化常用技术组件传值、通信父组件 &#x3D;&gt; 子组件 属性 props  1234567&#x2F;&#x2F; childprops: &amp;#123;  msg: String;&amp;#125;&#x2F;&#x2F; parent&lt;HelloWorld msg&#x3D;&quot;Welcome to Your Vue.js App&quot; &#x2F;&gt;;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue组件化常用技术总结(笔记)">
+<meta property="og:url" content="https://evestorm.github.io/posts/27829/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="组件化常用技术组件传值、通信父组件 &#x3D;&gt; 子组件 属性 props  1234567&#x2F;&#x2F; childprops: &amp;#123;  msg: String;&amp;#125;&#x2F;&#x2F; parent&lt;HelloWorld msg&#x3D;&quot;Welcome to Your Vue.js App&quot; &#x2F;&gt;;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-01-30T13:48:18.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.324Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/27829/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue组件化常用技术总结(笔记) | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E5%8C%96%E5%B8%B8%E7%94%A8%E6%8A%80%E6%9C%AF"><span class="nav-number">1.</span> <span class="nav-text">组件化常用技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E4%BC%A0%E5%80%BC%E3%80%81%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.</span> <span class="nav-text">组件传值、通信</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%B6%E7%BB%84%E4%BB%B6-gt-%E5%AD%90%E7%BB%84%E4%BB%B6"><span class="nav-number">1.1.1.</span> <span class="nav-text">父组件 &#x3D;&gt; 子组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E7%BB%84%E4%BB%B6-gt-%E7%88%B6%E7%BB%84%E4%BB%B6%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BA%8B%E4%BB%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">子组件 &#x3D;&gt; 父组件：自定义事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%84%E5%BC%9F%E7%BB%84%E4%BB%B6%EF%BC%9A%E9%80%9A%E8%BF%87%E5%85%B1%E5%90%8C%E7%A5%96%E8%BE%88%E7%BB%84%E4%BB%B6"><span class="nav-number">1.1.3.</span> <span class="nav-text">兄弟组件：通过共同祖辈组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%96%E5%85%88%E5%92%8C%E5%90%8E%E4%BB%A3%E4%B9%8B%E9%97%B4"><span class="nav-number">1.1.4.</span> <span class="nav-text">祖先和后代之间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E6%84%8F%E4%B8%A4%E4%B8%AA%E7%BB%84%E4%BB%B6%E4%B9%8B%E9%97%B4%EF%BC%9A%E4%BA%8B%E4%BB%B6%E6%80%BB%E7%BA%BF-%E6%88%96-vuex"><span class="nav-number">1.1.5.</span> <span class="nav-text">任意两个组件之间：事件总线 或 vuex</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E6%A7%BD"><span class="nav-number">1.2.</span> <span class="nav-text">插槽</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E6%8F%92%E6%A7%BD"><span class="nav-number">1.2.1.</span> <span class="nav-text">匿名插槽</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E5%90%8D%E6%8F%92%E6%A7%BD"><span class="nav-number">1.2.2.</span> <span class="nav-text">具名插槽</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8%E5%9F%9F%E6%8F%92%E6%A7%BD"><span class="nav-number">1.2.3.</span> <span class="nav-text">作用域插槽</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/27829/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue组件化常用技术总结(笔记)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-30 21:48:18" itemprop="dateCreated datePublished" datetime="2020-01-30T21:48:18+08:00">2020-01-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="组件化常用技术"><a href="#组件化常用技术" class="headerlink" title="组件化常用技术"></a>组件化常用技术</h1><h2 id="组件传值、通信"><a href="#组件传值、通信" class="headerlink" title="组件传值、通信"></a>组件传值、通信</h2><h3 id="父组件-gt-子组件"><a href="#父组件-gt-子组件" class="headerlink" title="父组件 =&gt; 子组件"></a>父组件 =&gt; 子组件</h3><ul>
+<li>属性 props</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123;</span><br><span class="line">  msg: <span class="built_in">String</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;HelloWorld msg=<span class="string">&quot;Welcome to Your Vue.js App&quot;</span> /&gt;;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<ul>
+<li>引用 refs</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">HelloWorld</span> <span class="attr">ref</span>=<span class="string">&quot;hw&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">this.$refs.hw.xx // P.S. • 如果ref放在了原生DOM元素上，获取的数据就是原生DOM对象</span><br><span class="line">- 可以直接操作 • 如果ref放在了组件对象上，获取的就是组件对象 -</span><br><span class="line">可以获取到组件内data、methods，通过 this.$refs.refName.data名称/method名称 -</span><br><span class="line">可以获取到DOM对象，通过 this.$refs.refName.$el进行操作</span><br></pre></td></tr></table></figure>
+
+<h3 id="子组件-gt-父组件：自定义事件"><a href="#子组件-gt-父组件：自定义事件" class="headerlink" title="子组件 =&gt; 父组件：自定义事件"></a>子组件 =&gt; 父组件：自定义事件</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// child</span></span><br><span class="line">props: &#123; <span class="attr">add</span>: <span class="built_in">Function</span> &#125;</span><br><span class="line"><span class="built_in">this</span>.$emit(<span class="string">&#x27;add&#x27;</span>, good)</span><br><span class="line"></span><br><span class="line"><span class="comment">// parent</span></span><br><span class="line">&lt;Cart @add=<span class="string">&quot;cartAdd($event)&quot;</span>&gt;&lt;/Cart&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="兄弟组件：通过共同祖辈组件"><a href="#兄弟组件：通过共同祖辈组件" class="headerlink" title="兄弟组件：通过共同祖辈组件"></a>兄弟组件：通过共同祖辈组件</h3><p>通过共同的祖辈组件搭桥，<code>$parent</code> 或 <code>$root</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// brother1</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$on(<span class="string">&#x27;foo&#x27;</span>, handle);</span><br><span class="line"></span><br><span class="line"><span class="comment">// brother2</span></span><br><span class="line"><span class="built_in">this</span>.$parent.$emit(<span class="string">&#x27;foo&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="祖先和后代之间"><a href="#祖先和后代之间" class="headerlink" title="祖先和后代之间"></a>祖先和后代之间</h3><ul>
+<li>provide/inject：能够实现祖先给后代传值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ancestor</span></span><br><span class="line"><span class="function"><span class="title">provide</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">   <span class="keyword">return</span> &#123;<span class="attr">foo</span>: <span class="string">&#x27;foo&#x27;</span>&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// descendant</span></span><br><span class="line">inject: [<span class="string">&#x27;foo&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>dispatch：后代给祖先传值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义一个dispatch方法，指定要派发事件名称和数据</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dispatch</span>(<span class="params">eventName, data</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> parent = <span class="built_in">this</span>.$parent</span><br><span class="line">  <span class="comment">// 只要还存在父元素就继续往上查找</span></span><br><span class="line">  <span class="keyword">while</span> (parent) &#123;</span><br><span class="line">    <span class="comment">// 父元素用$emit触发</span></span><br><span class="line">    parent.$emit(eventName,data)</span><br><span class="line">    <span class="comment">// 递归查找父元素</span></span><br><span class="line">    parent = parent.$parent</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用，HelloWorld.vue</span></span><br><span class="line">&lt;h1 @click=<span class="string">&quot;dispatch(&#x27;hello&#x27;, &#x27;hello,world&#x27;)&quot;</span>&gt;&#123;&#123; msg &#125;&#125;&lt;/h1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// App.vue</span></span><br><span class="line"><span class="built_in">this</span>.$on(<span class="string">&#x27;hello&#x27;</span>, <span class="built_in">this</span>.sayHello)</span><br></pre></td></tr></table></figure>
+
+<h3 id="任意两个组件之间：事件总线-或-vuex"><a href="#任意两个组件之间：事件总线-或-vuex" class="headerlink" title="任意两个组件之间：事件总线 或 vuex"></a>任意两个组件之间：事件总线 或 vuex</h3><ul>
+<li>事件总线：创建一个 Bus 类负责事件派发、监听和回调管理</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 自定义Bus：事件派发、监听和回调管理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bus</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   eventName1:[fn1,fn2],</span></span><br><span class="line">    <span class="comment">//   eventName2:[fn3,fn4],</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line">    <span class="built_in">this</span>.callbacks = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  $on(name, fn)&#123;</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name] = <span class="built_in">this</span>.callbacks[name] || []</span><br><span class="line">    <span class="built_in">this</span>.callbacks[name].push(fn)</span><br><span class="line">  &#125;</span><br><span class="line">  $emit(name, args)&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">this</span>.callbacks[name])&#123;</span><br><span class="line">      <span class="built_in">this</span>.callbacks[name].forEach(<span class="function"><span class="params">cb</span> =&gt;</span> cb(args))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.js</span></span><br><span class="line">Vue.prototype.$bus = <span class="keyword">new</span> Bus()</span><br><span class="line"><span class="comment">// child1</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$on(<span class="string">&#x27;foo&#x27;</span>, handle)</span><br><span class="line"><span class="comment">// child2</span></span><br><span class="line"><span class="built_in">this</span>.$bus.$emit(<span class="string">&#x27;foo&#x27;</span>)</span><br><span class="line">copy<span class="comment">// 封装 vueEvent.js</span></span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> VueEvent = <span class="keyword">new</span> Vue();</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> VueEvent;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line">methods: &#123;</span><br><span class="line">  <span class="function"><span class="title">emitNews</span>(<span class="params"></span>)</span> &#123; VueEvent.$emit(<span class="string">&#x27;to-news&#x27;</span>, <span class="built_in">this</span>.msg) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听者</span></span><br><span class="line"><span class="keyword">import</span> VueEvent <span class="keyword">from</span> <span class="string">&#x27;../model/VueEvent.js&#x27;</span>;</span><br><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  VueEvent.$on(<span class="string">&#x27;to-news&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;...接收到了data...&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Vuex：创建唯一的全局数据管理者 store，通过它管理数据并通知组件状态变更</li>
+</ul>
+<h2 id="插槽"><a href="#插槽" class="headerlink" title="插槽"></a>插槽</h2><blockquote>
+<p>Vue 2.6.0 之后采用全新 v-slot 语法取代之前的 slot、slot-scope</p>
+</blockquote>
+<h3 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// comp1</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">comp</span>&gt;</span>hello<span class="tag">&lt;/<span class="name">comp</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="具名插槽"><a href="#具名插槽" class="headerlink" title="具名插槽"></a>具名插槽</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// comp2</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">name</span>=<span class="string">&quot;content&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp2</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 默认插槽用default做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>&gt;</span>具名插槽<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 具名插槽用插槽名做参数 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:content</span>&gt;</span>内容...<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp2</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// comp3</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">slot</span> <span class="attr">:foo</span>=<span class="string">&quot;foo&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// parent</span><br><span class="line"><span class="tag">&lt;<span class="name">Comp3</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 把v-slot的值指定为作用域上下文对象(e.g. &#123;foo: foo&#125;) --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">v-slot:default</span>=<span class="string">&quot;ctx&quot;</span>&gt;</span>来自子组件数据：&#123;&#123;ctx.foo&#125;&#125;<span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Comp3</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/22606/" rel="prev" title="使用lorem在HTML中生成随机文本">
+                  <i class="fa fa-chevron-left"></i> 使用lorem在HTML中生成随机文本
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/21485/" rel="next" title="Vue自定义表单校验组件(仿element-ui)">
+                  Vue自定义表单校验组件(仿element-ui) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

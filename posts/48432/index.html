@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="macOS卸载之前安装的 node如果安装 nvm 之前本地已全局安装过 node，请在终端执行下面脚本删除 node：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用nvm管理node版本">
+<meta property="og:url" content="https://evestorm.github.io/posts/48432/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="macOS卸载之前安装的 node如果安装 nvm 之前本地已全局安装过 node，请在终端执行下面脚本删除 node：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-21T15:58:09.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.689Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Node">
+<meta property="article:tag" content="nvm">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/48432/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用nvm管理node版本 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#macOS"><span class="nav-number">1.</span> <span class="nav-text">macOS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD%E4%B9%8B%E5%89%8D%E5%AE%89%E8%A3%85%E7%9A%84-node"><span class="nav-number">1.1.</span> <span class="nav-text">卸载之前安装的 node</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-nvm"><span class="nav-number">1.2.</span> <span class="nav-text">安装 nvm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C-nvm-%E5%91%BD%E4%BB%A4%E6%8F%90%E7%A4%BA-Command-not-found"><span class="nav-number">1.3.</span> <span class="nav-text">执行 nvm 命令提示 Command not found</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-%E9%80%9A%E8%BF%87-source-%E8%AF%BB%E5%8F%96%E5%B9%B6%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4"><span class="nav-number">1.3.1.</span> <span class="nav-text">一. 通过 source 读取并执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-%E6%8B%B7%E8%B4%9D-bash-profile-%E4%B8%AD%E7%9A%84-nvm-%E7%9B%B8%E5%85%B3%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%88%B0-zshrc-%E4%B8%AD%E5%8E%BB"><span class="nav-number">1.3.2.</span> <span class="nav-text">二. 拷贝 .bash_profile 中的 nvm 相关环境配置到 .zshrc 中去</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Window-10-64bit"><span class="nav-number">2.</span> <span class="nav-text">Window 10 64bit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD%E7%B3%BB%E7%BB%9F%E4%B8%8A%E7%8E%B0%E6%9C%89-node%EF%BC%88%E5%A6%82%E6%9E%9C%E6%9C%89%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">卸载系统上现有 node（如果有）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-nvm"><span class="nav-number">2.2.</span> <span class="nav-text">下载 nvm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%8D%A2%E9%95%9C%E5%83%8F%E6%BA%90"><span class="nav-number">2.3.</span> <span class="nav-text">更换镜像源</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nvm-%E5%B8%B8%E8%A7%81%E5%91%BD%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">nvm 常见命令</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/48432/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用nvm管理node版本
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-21 23:58:09" itemprop="dateCreated datePublished" datetime="2020-10-21T23:58:09+08:00">2020-10-21</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/Node/" itemprop="url" rel="index"><span itemprop="name">Node</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="macOS"><a href="#macOS" class="headerlink" title="macOS"></a>macOS</h1><h2 id="卸载之前安装的-node"><a href="#卸载之前安装的-node" class="headerlink" title="卸载之前安装的 node"></a>卸载之前安装的 node</h2><p>如果安装 nvm 之前本地已全局安装过 node，请在终端执行下面脚本删除 node：</p>
+<a id="more"></a>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看已经安装在全局的模块</span></span><br><span class="line">npm ls -g --depth=0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除全局 node_modules 目录</span></span><br><span class="line">sudo rm -rf /usr/local/lib/node_modules</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除 node</span></span><br><span class="line">sudo rm /usr/local/bin/node</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除全局 node 模块注册的软链</span></span><br><span class="line">cd /usr/local/bin &amp;&amp; ls -l | grep &quot;../lib/node_modules/&quot; | awk &#x27;&#123;print $9&#125;&#x27;| xargs rm</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装-nvm"><a href="#安装-nvm" class="headerlink" title="安装 nvm"></a>安装 nvm</h2><p>打开终端，进入当前用户的 home 目录：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br></pre></td></tr></table></figure>
+
+<p>使用 ls -a 显示当前目录下的所有文件（夹）（包含隐藏文件及文件夹），查看有没有 .bash_profile 文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -a</span><br></pre></td></tr></table></figure>
+
+<p>如果没有就创建：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch ~/.bash_profile</span><br></pre></td></tr></table></figure>
+
+<p>然后执行 nvm 安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<p>or</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，终端输入 nvm 验证是否安装成功，终端可能出现 Command not found，这并非没有安装成功，试试重启终端再输入 nvm 。一般情况下此时已可用。</p>
+<h2 id="执行-nvm-命令提示-Command-not-found"><a href="#执行-nvm-命令提示-Command-not-found" class="headerlink" title="执行 nvm 命令提示 Command not found"></a>执行 nvm 命令提示 Command not found</h2><p>如果你的系统是最新更新的 macOS Catalina ，则重启终端也可能没用，因为默认的 shell 是 zsh，所以找不到配置文件。</p>
+<p>解决方案：</p>
+<h3 id="一-通过-source-读取并执行命令"><a href="#一-通过-source-读取并执行命令" class="headerlink" title="一. 通过 source 读取并执行命令"></a>一. 通过 source 读取并执行命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1.新建一个 .zshrc 文件（如果没有的话）</span></span><br><span class="line">touch ~/.zshrc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 2.在 ~/.zshrc文件最后，增加一行</span></span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure>
+
+<p>重启终端后就能使用 nvm 命令了。</p>
+<h3 id="二-拷贝-bash-profile-中的-nvm-相关环境配置到-zshrc-中去"><a href="#二-拷贝-bash-profile-中的-nvm-相关环境配置到-zshrc-中去" class="headerlink" title="二. 拷贝 .bash_profile 中的 nvm 相关环境配置到 .zshrc 中去"></a>二. 拷贝 .bash_profile 中的 nvm 相关环境配置到 .zshrc 中去</h3><p>我在执行完方法以后，发现 nvm 命令是有了，但是我的终端 zsh 文字出现了乱码。所以我采取了方法二。</p>
+<p>打开 .bash_profile 文件，将其中的 nvm 环境配置复制一份到 .zshrc 文件代码中的末尾去：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export NVM_DIR=&quot;$HOME/.nvm&quot;</span><br><span class="line">[ -s &quot;$NVM_DIR/nvm.sh&quot; ] &amp;&amp; \. &quot;$NVM_DIR/nvm.sh&quot;  # This loads nvm</span><br><span class="line">[ -s &quot;$NVM_DIR/bash_completion&quot; ] &amp;&amp; \. &quot;$NVM_DIR/bash_completion&quot;  # This loads nvm bash_completion</span><br></pre></td></tr></table></figure>
+
+<p>重启终端再次执行 nvm ，发现能够使用。</p>
+<h1 id="Window-10-64bit"><a href="#Window-10-64bit" class="headerlink" title="Window 10 64bit"></a>Window 10 64bit</h1><p>摘自：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/81801605">Windows nvm 的安装使用(及排坑)</a></p>
+<h2 id="卸载系统上现有-node（如果有）"><a href="#卸载系统上现有-node（如果有）" class="headerlink" title="卸载系统上现有 node（如果有）"></a>卸载系统上现有 node（如果有）</h2><blockquote>
+<p>此处基于<a href="https://link.zhihu.com/?target=https://www.bbsmax.com/A/1O5EPPR3J7/">windows 下 nvm 安装 node 之后 npm 命令找不到问题解决办法</a>，在此基础上简化和完善。</p>
+</blockquote>
+<ul>
+<li>在卸载程序中卸载 node</li>
+<li>在环境变量中删除所有与 node 相关的路径(无论是 user 级，还是 system 级)</li>
+<li>删除以下路径的文件(可能只有部分文件才有) C:\Program Files (x86)\nodejs</li>
+</ul>
+<blockquote>
+<p>C:\Program Files\nodejs<br>C:\Users{User}\AppData\Roaming\npm<br>C:\Users{User}\AppData\Roaming\npm-cache<br>C:\Users{User}\node_modules (在我电脑上的路径)</p>
+</blockquote>
+<h2 id="下载-nvm"><a href="#下载-nvm" class="headerlink" title="下载 nvm"></a>下载 nvm</h2><p>下载最新版 nvm 并安装<a href="https://link.zhihu.com/?target=https://github.com/coreybutler/nvm-windows/releases">nvm-setup.zip</a></p>
+<h2 id="更换镜像源"><a href="#更换镜像源" class="headerlink" title="更换镜像源"></a>更换镜像源</h2><p>在 <code>路径 C:\Users\&#123;User&#125;\AppData\Roaming\nvm\settings.txt</code> 下添加以下两条</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node_mirror: https:<span class="comment">//npm.taobao.org/mirrors/node/</span></span><br><span class="line">npm_mirror: https:<span class="comment">//npm.taobao.org/mirrors/npm/</span></span><br></pre></td></tr></table></figure>
+
+<p>此时如果你还仔细观察，会发现<code>C:\Program Files</code>下的 nodejs 问家家其实是一个快捷方式，指向的是 nvm 的安装路径<code>C:\Users\i353667\AppData\Roaming\nvm</code>下对应的 node 版本。</p>
+<h1 id="nvm-常见命令"><a href="#nvm-常见命令" class="headerlink" title="nvm 常见命令"></a>nvm 常见命令</h1><ul>
+<li>nvm ls 列出安装 node 的所有版本</li>
+<li>nvm current 显示当前使用的版本</li>
+<li>nvm install 安装指定的版本，如 nvm install v8.13.0</li>
+<li>nvm uninstall 卸载指定的版本</li>
+<li>nvm use node-version 切换使用指定的版本</li>
+<li>nvm alias default v12.18.4 设置默认 node 版本</li>
+<li>nvm deactivate 解除当前版本绑定</li>
+<li>nvm ls-remote 获取远程可用版本</li>
+<li>nvm list available 获取可用的 node 版本列表</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node/" rel="tag"># Node</a>
+              <a href="/tags/nvm/" rel="tag"># nvm</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/24685/" rel="prev" title="mac安装homebrew出错-Failed to connect to raw.githubusercontent.com port 443/Connection refused error">
+                  <i class="fa fa-chevron-left"></i> mac安装homebrew出错-Failed to connect to raw.githubusercontent.com port 443/Connection refused error
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/62601/" rel="next" title="苹果app如何在其他人电脑上发版">
+                  苹果app如何在其他人电脑上发版 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

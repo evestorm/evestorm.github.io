@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift记录通话时间">
+<meta property="og:url" content="https://evestorm.github.io/posts/32380/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T12:01:57.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.211Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/32380/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Swift记录通话时间 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/32380/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Swift记录通话时间
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 20:01:57" itemprop="dateCreated datePublished" datetime="2020-08-20T20:01:57+08:00">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">移动端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>公司 App 项目需要记录用户拨打电话的通话时间，查了下文档，发现 CallKit 提供的接口可以完成此功能。</p>
+<a id="more"></a>
+
+<p>代码如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> CallKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span>, <span class="title">WKScriptMessageHandler</span>, <span class="title">WKUIDelegate</span>, <span class="title">WKNavigationDelegate</span>, <span class="title">MFMessageComposeViewControllerDelegate</span>, <span class="title">CXCallObserverDelegate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> callObserver = <span class="type">CXCallObserver</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> beforeDate: <span class="type">Date!</span> <span class="comment">// 注意：这里必须是全局属性，不能定义局部变量</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// ----------- 打电话 --------------</span></span><br><span class="line">  <span class="comment">// 参考: https://stackoverflow.com/questions/13743344/how-can-i-find-out-whether-the-user-pressed-the-call-or-the-cancel-button-when-m</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">callPhone</span><span class="params">(phoneStr: String)</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> phone = <span class="string">&quot;telprompt://&quot;</span> + phoneStr</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">NSURL</span>(string: phone.replacingOccurrences(of: <span class="string">&quot; &quot;</span>, with: <span class="string">&quot;&quot;</span>, options: .literal, range: <span class="literal">nil</span>)), <span class="type">UIApplication</span>.shared.canOpenURL(url <span class="keyword">as</span> <span class="type">URL</span>) &#123;</span><br><span class="line">            callObserver.setDelegate(<span class="keyword">self</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">            didDetectOutgoingCall = <span class="literal">false</span></span><br><span class="line">            <span class="comment">// we only want to add the observer after the alert is displayed,</span></span><br><span class="line">            <span class="comment">// that&#x27;s why we&#x27;re using asyncAfter(deadline:)</span></span><br><span class="line">            <span class="type">UIApplication</span>.shared.<span class="keyword">open</span>(url <span class="keyword">as</span> <span class="type">URL</span>, options: [:]) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] success <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> success &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123;</span><br><span class="line">                        <span class="keyword">self</span>?.addNotifObserver()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addNotifObserver</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">let</span> selector = <span class="keyword">#selector</span>(appDidBecomeActive)</span><br><span class="line">        <span class="keyword">let</span> notifName = <span class="type">UIApplication</span>.didBecomeActiveNotification</span><br><span class="line">        <span class="type">NotificationCenter</span>.<span class="keyword">default</span>.addObserver(<span class="keyword">self</span>, selector: selector, name: notifName, object: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户取消了打电话</span></span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">appDidBecomeActive</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// if callObserver(_:callChanged:) doesn&#x27;t get called after a certain time,</span></span><br><span class="line">        <span class="comment">// the call dialog was not shown - so the Cancel button was pressed</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() + <span class="number">0.3</span>) &#123; [<span class="keyword">weak</span> <span class="keyword">self</span>] <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> !(<span class="keyword">self</span>?.didDetectOutgoingCall ?? <span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Cancel button pressed&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    用户点击了呼叫</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callObserver</span><span class="params">(<span class="keyword">_</span>: CXCallObserver, callChanged call: CXCall)</span></span> &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         拨通:  outgoing :1  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         拒绝:  outgoing :1  onHold :0   hasConnected :0   hasEnded :1</span></span><br><span class="line"><span class="comment">         链接:  outgoing :1  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         挂断:  outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         新来电话:    outgoing :0  onHold :0   hasConnected :0   hasEnded :0</span></span><br><span class="line"><span class="comment">         保留并接听:  outgoing :1  onHold :1   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         另一个挂掉:  outgoing :0  onHold :0   hasConnected :1   hasEnded :0</span></span><br><span class="line"><span class="comment">         保持链接:    outgoing :1  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         对方挂掉:    outgoing :0  onHold :0   hasConnected :1   hasEnded :1</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 接通</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, !call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 记录当前时间</span></span><br><span class="line">            setBeginDate()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 挂断</span></span><br><span class="line">        <span class="keyword">if</span> call.isOutgoing, call.hasConnected, call.hasEnded &#123;</span><br><span class="line">            <span class="comment">// 计算通话时长</span></span><br><span class="line">            <span class="keyword">let</span> seconds = getCallPhoneTime()</span><br><span class="line"></span><br><span class="line">            webView.evaluateJavaScript(<span class="string">&quot;callPhone(\(seconds))&quot;</span>) &#123; <span class="keyword">_</span>, error <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;Error : \(String(describing: error))&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录当前时间</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">setBeginDate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        beforeDate = <span class="type">Date</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算通话时长</span></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">getCallPhoneTime</span><span class="params">()</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> dat = <span class="type">Date</span>(timeInterval: <span class="number">0</span>, since: beforeDate)</span><br><span class="line">        <span class="keyword">let</span> a = dat.timeIntervalSinceNow</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> timeString = <span class="type">String</span>(format: <span class="string">&quot;%0.f&quot;</span>, fabs(a)) <span class="comment">// 转为字符型</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\(timeString)秒&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> timeString</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/53837/" rel="prev" title="在VueCli3项目中使用Bootstrap">
+                  <i class="fa fa-chevron-left"></i> 在VueCli3项目中使用Bootstrap
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/38408/" rel="next" title="cnchar.js获取汉字的拼音">
+                  cnchar.js获取汉字的拼音 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

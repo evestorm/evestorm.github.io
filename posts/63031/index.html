@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="转载自：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;113350786">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-moment的高频用法总结">
+<meta property="og:url" content="https://evestorm.github.io/posts/63031/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;113350786">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-14T08:30:23.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.089Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="技巧">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="momentjs">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/63031/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-moment的高频用法总结 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E8%AF%AD%E8%A8%80%EF%BC%9B%E4%B8%8D%E7%84%B6%E5%8F%AF%E8%83%BD%E5%BC%95%E8%B5%B7%E4%B8%80%E4%BA%9B%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84-bug%E3%80%82"><span class="nav-number">1.</span> <span class="nav-text">指定语言；不然可能引起一些不必要的 bug。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%97%B6%E9%97%B4%E6%88%B3"><span class="nav-number">2.</span> <span class="nav-text">获取时间戳</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%8C%87%E5%AE%9A%E6%97%B6%E9%97%B4%E7%9A%84-moment"><span class="nav-number">3.</span> <span class="nav-text">生成指定时间的 moment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.</span> <span class="nav-text">获取对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">格式化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%97%B6%E9%97%B4"><span class="nav-number">6.</span> <span class="nav-text">获取时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%BD%93%E6%9C%88%E7%AC%AC%E4%B8%80%E5%A4%A9%E6%98%AF%E6%98%9F%E6%9C%9F%E5%87%A0"><span class="nav-number">7.</span> <span class="nav-text">获取当月第一天是星期几</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%89%8D-n-%E5%A4%A9-%E5%90%8E-n-%E5%A4%A9"><span class="nav-number">8.</span> <span class="nav-text">获取前 n 天 &#x2F; 后 n 天</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E4%B8%A4%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">9.</span> <span class="nav-text">比较两个时间的大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B8%E5%B7%AE%E5%87%A0%E5%A4%A9"><span class="nav-number">10.</span> <span class="nav-text">两个时间的相差几天</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%AF%E5%90%A6%E6%98%AF%E9%97%B0%E5%B9%B4"><span class="nav-number">11.</span> <span class="nav-text">是否是闰年</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-%E6%9C%88%E4%BB%BD%E5%92%8C%E6%98%9F%E6%9C%9F-%E6%9E%9A%E4%B8%BE%E5%88%97%E8%A1%A8"><span class="nav-number">12.</span> <span class="nav-text">获取 月份和星期 枚举列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%8B%E9%9A%86"><span class="nav-number">13.</span> <span class="nav-text">克隆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%BD%93%E6%9C%88%E6%80%BB%E5%A4%A9%E6%95%B0"><span class="nav-number">14.</span> <span class="nav-text">获取当月总天数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">15.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/63031/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-moment的高频用法总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-14 16:30:23" itemprop="dateCreated datePublished" datetime="2020-04-14T16:30:23+08:00">2020-04-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/113350786">https://zhuanlan.zhihu.com/p/113350786</a></p>
+<a id="more"></a>
+
+<h3 id="指定语言；不然可能引起一些不必要的-bug。"><a href="#指定语言；不然可能引起一些不必要的-bug。" class="headerlink" title="指定语言；不然可能引起一些不必要的 bug。"></a><strong>指定语言；不然可能引起一些不必要的 bug。</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 记得指定为对应的语言；</span><br><span class="line"> moment.locale(<span class="string">&#x27;zh-cn&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取时间戳"><a href="#获取时间戳" class="headerlink" title="获取时间戳"></a><strong>获取时间戳</strong></h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 精确到毫秒</span><br><span class="line"></span><br><span class="line">moment().valueOf()</span><br><span class="line">## 1584182611042 ；返回值为数值类型</span><br><span class="line">moment().format(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">## 返回值为字符串类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 精确到秒</span><br><span class="line">moment().unix()</span><br><span class="line">##  1584182618 精确到秒  返回值为数值类型</span><br><span class="line">moment().format(<span class="string">&#x27;X&#x27;</span>)</span><br><span class="line">##  返回值为字符串类型</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成指定时间的-moment"><a href="#生成指定时间的-moment" class="headerlink" title="生成指定时间的 moment"></a><strong>生成指定时间的 moment</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">moment(<span class="string">&quot;1995-12-25&quot;</span>);</span><br><span class="line"></span><br><span class="line"># 带格式</span><br><span class="line"># 解析器会忽略非字母和数字的字符，因此以下两个都将会返回相同的东西。</span><br><span class="line">moment(<span class="string">&quot;12-25-1995&quot;</span>, <span class="string">&quot;MM-DD-YYYY&quot;</span>);</span><br><span class="line">moment(<span class="string">&quot;12/25/1995&quot;</span>, <span class="string">&quot;MM-DD-YYYY&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取对象"><a href="#获取对象" class="headerlink" title="获取对象"></a><strong>获取对象</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">moment().toObject();</span><br><span class="line"># 返回一个包括：年、月、日、时、分、秒、毫秒的对象</span><br><span class="line"># &#123;</span><br><span class="line">    years: <span class="number">2020</span></span><br><span class="line">    months: <span class="number">2</span></span><br><span class="line">    date: <span class="number">14</span></span><br><span class="line">    hours: <span class="number">18</span></span><br><span class="line">    minutes: <span class="number">47</span></span><br><span class="line">    seconds: <span class="number">56</span></span><br><span class="line">    milliseconds: <span class="number">526</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a><strong>格式化</strong></h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">moment().format();</span><br><span class="line"># 2020-03-14T19:14:05+08:00</span><br><span class="line"></span><br><span class="line">moment().format(<span class="string">&#x27;YYYY-MM-DD HH:mm:ss&#x27;</span>);</span><br><span class="line"># 2020-03-14 19:23:29</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取时间"><a href="#获取时间" class="headerlink" title="获取时间"></a><strong>获取时间</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 获取今天0时0分0秒</span><br><span class="line">moment().startOf(<span class="string">&#x27;day&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取本周第一天(周日)0时0分0秒</span><br><span class="line">moment().startOf(<span class="string">&#x27;week&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取本周周一0时0分0秒</span><br><span class="line">moment().startOf(<span class="string">&#x27;isoWeek&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取当前月第一天0时0分0秒</span><br><span class="line">moment().startOf(<span class="string">&#x27;month&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取指定日期的0时0分0秒</span><br><span class="line">moment(<span class="string">&#x27;2019-10-20&#x27;</span>).startOf(<span class="string">&#x27;day&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取今天23时59分59秒</span><br><span class="line">moment().endOf(<span class="string">&#x27;day&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取本周最后一天(周六)23时59分59秒</span><br><span class="line">moment().endOf(<span class="string">&#x27;week&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取本周周日23时59分59秒</span><br><span class="line">moment().endOf(<span class="string">&#x27;isoWeek&#x27;</span>)</span><br><span class="line"></span><br><span class="line"># 获取当前月最后一天23时59分59秒</span><br><span class="line">moment().endOf(<span class="string">&#x27;month&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取当月第一天是星期几"><a href="#获取当月第一天是星期几" class="headerlink" title="获取当月第一天是星期几"></a><strong>获取当月第一天是星期几</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 用于设置星期几，其中星期日为 0、星期六为 6</span><br><span class="line">moment().startOf(<span class="string">&#x27;month&#x27;</span>).day()</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取前-n-天-后-n-天"><a href="#获取前-n-天-后-n-天" class="headerlink" title="获取前 n 天 / 后 n 天"></a><strong>获取前 n 天 / 后 n 天</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">moment().add(<span class="number">7</span>, <span class="string">&#x27;days&#x27;</span>);</span><br><span class="line">moment().subtract(<span class="number">7</span>, <span class="string">&#x27;days&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="比较两个时间的大小"><a href="#比较两个时间的大小" class="headerlink" title="比较两个时间的大小"></a><strong>比较两个时间的大小</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 第二个参数用于确定精度，且不仅仅是要检查的单个值，因此使用 day 将会检查年份、月份、日期。</span><br><span class="line"></span><br><span class="line">moment(<span class="string">&#x27;2010-10-31&#x27;</span>).isBefore(<span class="string">&#x27;2010-12-31&#x27;</span>, <span class="string">&#x27;day&#x27;</span>);</span><br><span class="line"># true</span><br><span class="line"></span><br><span class="line">moment(<span class="string">&#x27;2010-10-20&#x27;</span>).isBefore(<span class="string">&#x27;2010-12-31&#x27;</span>, <span class="string">&#x27;year&#x27;</span>);</span><br><span class="line"># false</span><br><span class="line"></span><br><span class="line">moment(<span class="string">&#x27;2010-10-20&#x27;</span>).isAfter(<span class="string">&#x27;2009-12-31&#x27;</span>, <span class="string">&#x27;year&#x27;</span>);</span><br><span class="line"># true</span><br><span class="line"></span><br><span class="line">moment(<span class="string">&#x27;2010-10-20&#x27;</span>).isSame(<span class="string">&#x27;2009-12-31&#x27;</span>, <span class="string">&#x27;year&#x27;</span>);</span><br><span class="line"># 判断两个时间是否相等</span><br><span class="line"></span><br><span class="line"># 需要注意的是， isBefore与isAfter 都是开区间，如果想使用闭区间，应使用</span><br><span class="line">isSameOrBefore</span><br><span class="line">isSameOrAfter</span><br></pre></td></tr></table></figure>
+
+<h3 id="两个时间的相差几天"><a href="#两个时间的相差几天" class="headerlink" title="两个时间的相差几天"></a><strong>两个时间的相差几天</strong></h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">moment([<span class="number">2008</span>, <span class="number">2</span>, <span class="number">27</span>]).diff([<span class="number">2007</span>, <span class="number">0</span>, <span class="number">28</span>], <span class="string">&#x27;day&#x27;</span>);</span><br><span class="line"># 424</span><br></pre></td></tr></table></figure>
+
+<h3 id="是否是闰年"><a href="#是否是闰年" class="headerlink" title="是否是闰年"></a><strong>是否是闰年</strong></h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">moment().isLeapYear();</span><br><span class="line"># true</span><br><span class="line"></span><br><span class="line">moment([<span class="number">2001</span>]).isLeapYear()</span><br><span class="line"># false</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取-月份和星期-枚举列表"><a href="#获取-月份和星期-枚举列表" class="headerlink" title="获取 月份和星期 枚举列表"></a><strong>获取 月份和星期 枚举列表</strong></h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">moment.months()</span><br><span class="line"></span><br><span class="line"># [&quot;January&quot;, &quot;February&quot;, &quot;March&quot;, &quot;April&quot;, &quot;May&quot;, &quot;June&quot;, &quot;July&quot;, &quot;August&quot;, &quot;September&quot;, &quot;October&quot;, &quot;November&quot;, &quot;December&quot;]</span><br><span class="line"></span><br><span class="line">moment.monthsShort()</span><br><span class="line"># [&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;]</span><br><span class="line"></span><br><span class="line">moment.weekdays()</span><br><span class="line"># [&quot;Sunday&quot;, &quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;, &quot;Saturday&quot;]</span><br><span class="line"></span><br><span class="line">moment.weekdaysMin()</span><br><span class="line"># [&quot;Su&quot;, &quot;Mo&quot;, &quot;Tu&quot;, &quot;We&quot;, &quot;Th&quot;, &quot;Fr&quot;, &quot;Sa&quot;]</span><br></pre></td></tr></table></figure>
+
+<h3 id="克隆"><a href="#克隆" class="headerlink" title="克隆"></a><strong>克隆</strong></h3><p>所有的 <code>moment</code> 都是可变的。 调用任何一种操作方法都会改变原始的 <code>moment</code>。 如果要创建副本并对其进行操作，则应在操作 <code>moment</code> 之前使用 <code>moment#clone</code>。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 在 moment 上调用 moment() 将会克隆它。</span><br><span class="line">var a = moment([2012]);</span><br><span class="line">var b = moment(a);</span><br><span class="line">a.year(2000);</span><br><span class="line">b.year(); // 2012</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 此外，也可以调用 moment#clone 克隆 moment。</span><br><span class="line">var a = moment([2012]);</span><br><span class="line">var b = a.clone();</span><br><span class="line">a.year(2000);</span><br><span class="line">b.year(); // 2012</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取当月总天数"><a href="#获取当月总天数" class="headerlink" title="获取当月总天数"></a><strong>获取当月总天数</strong></h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">moment().daysInMonth();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a><strong>参考链接</strong></h3><p><a href="https://link.zhihu.com/?target=http://momentjs.cn/">Moment.js 中文网 momentjs.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/momentjs/" rel="tag"># momentjs</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/10518/" rel="prev" title="转载-高性能前端架构解决方案">
+                  <i class="fa fa-chevron-left"></i> 转载-高性能前端架构解决方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/32468/" rel="next" title="转载-axios发post请求-后端接收不到参数的解决方案">
+                  转载-axios发post请求-后端接收不到参数的解决方案 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

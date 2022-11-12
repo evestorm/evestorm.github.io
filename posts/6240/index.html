@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="原型 prototype🌈 prototype是 func 的属性，其值是个对象12function Handphone() &amp;#123;&amp;#125;console.log(Handphone.prototype);">
+<meta property="og:type" content="article">
+<meta property="og:title" content="原型与原型链以及继承">
+<meta property="og:url" content="https://evestorm.github.io/posts/6240/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="原型 prototype🌈 prototype是 func 的属性，其值是个对象12function Handphone() &amp;#123;&amp;#125;console.log(Handphone.prototype);">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629297997929-a463ea99-2a25-477c-b05a-5111d5e7af73.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298114840-51eba9bd-1bcb-4731-a8ab-8cffd487a3d0.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298193747-dc80ab42-c298-42ed-9a4f-5c826deec6bd.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298245111-538acda9-95db-424d-b68d-882a442b02d2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298300156-c2636466-a1dc-4828-9f0f-909ce3d92623.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298374656-773e389a-5c23-45e4-825e-e498e6c76be4.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629299742226-3c8cbf61-9816-476c-9e83-f6dba3c4bc37.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629298433205-e8f5bdf3-f9a9-40dc-ae57-90348c0337e8.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1631175027959-92426dd1-14d0-43c4-bae4-329122de7cd2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629888579596-509a97a0-83a5-4f46-a0dd-806dd20cf4f3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629888867471-1224ce43-50f5-4873-95d7-f00f396d8634.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629889874555-64c29aea-21ea-42e7-868d-96d50c559d83.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629890113977-a029c36d-c40d-4e5b-9e11-a38f80a68b04.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629890656491-fc35d864-43e8-40ea-b83a-054b387c3178.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629891057285-dea5483c-742a-4f6c-afdd-ac7d90c05ebe.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629891105460-39bb7dbb-d1ed-4287-beb5-95e5be4f374b.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629967595153-c47c71f9-2ef8-4788-9195-b733ce13c652.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629967814849-d45921e2-08d9-4225-9424-f910ab907047.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629968259162-ffa2e2d8-03df-49bf-bf58-2963f42f18b3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629969154512-3056ad9c-792e-4e49-8a7f-cf53ad7a1283.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629969244842-25dcd1a4-81f9-41bd-bb72-015f6401fc6b.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/6240/1629969604329-657e6152-56c7-48ee-a091-cfcb913e5497.png">
+<meta property="article:published_time" content="2021-07-21T03:21:22.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.711Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="继承">
+<meta property="article:tag" content="原型">
+<meta property="article:tag" content="原型链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/6240/1629297997929-a463ea99-2a25-477c-b05a-5111d5e7af73.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/6240/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>原型与原型链以及继承 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9E%8B-prototype"><span class="nav-number">1.</span> <span class="nav-text">原型 prototype</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-prototype%E6%98%AF-func-%E7%9A%84%E5%B1%9E%E6%80%A7%EF%BC%8C%E5%85%B6%E5%80%BC%E6%98%AF%E4%B8%AA%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.1.</span> <span class="nav-text">🌈 prototype是 func 的属性，其值是个对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prototype-%E6%98%AF%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%AD%E7%9A%84%EF%BC%8C%E6%9E%84%E9%80%A0%E5%87%BA%E7%9A%84%E6%AF%8F%E4%B8%AA%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88"><span class="nav-number">1.2.</span> <span class="nav-text">prototype 是构造函数中的，构造出的每个实例对象的公共祖先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%80%E6%9C%89%E8%A2%AB%E8%AF%A5%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E6%9E%84%E9%80%A0%E5%87%BA%E6%9D%A5%E7%9A%84%E5%AF%B9%E8%B1%A1%EF%BC%8C%E9%83%BD%E5%8F%AF%E4%BB%A5%E7%BB%A7%E6%89%BF%E5%8E%9F%E5%9E%8B%E4%B8%8A%E7%9A%84%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">所有被该构造函数构造出来的对象，都可以继承原型上的属性和方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-constructor-%E6%8C%87%E5%90%91%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E6%9C%AC%E8%BA%AB"><span class="nav-number">1.4.</span> <span class="nav-text">🌈 constructor 指向构造函数本身</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constructor-%E5%8F%AF%E4%BB%A5%E8%A2%AB%E4%BF%AE%E6%94%B9"><span class="nav-number">1.5.</span> <span class="nav-text">constructor 可以被修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-proto-%E6%98%AF%E5%AE%9E%E4%BE%8B%E5%8C%96%E4%BB%A5%E5%90%8E%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="nav-number">1.6.</span> <span class="nav-text">🌈 proto 是实例化以后的结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88%F0%9F%8C%88%F0%9F%8C%88-%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%AF%B9%E8%B1%A1%E4%BB%A5%E5%90%8E%E5%86%8D%E6%9D%A5%E4%BF%AE%E6%94%B9%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E7%9A%84prototype%EF%BC%8C%E4%B8%8D%E5%BD%B1%E5%93%8D%E8%AF%A5%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%8E%9F%E5%9E%8B%E5%B1%9E%E6%80%A7-%EF%BC%8C%E5%9B%A0%E4%B8%BA%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84-prototype-%E6%8C%87%E5%90%91%E4%BA%86%E6%96%B0%E7%9A%84%E5%AF%B9%E8%B1%A1%EF%BC%8C%E4%B8%8D%E5%BD%B1%E5%93%8D%E5%8E%9F%E6%9D%A5%E7%9A%84prototype%EF%BC%8C%E4%BD%86%E5%BD%B1%E5%93%8D%E5%8E%9F%E6%9D%A5-prototype-%E4%B8%8B%E7%9A%84-constructor"><span class="nav-number">1.7.</span> <span class="nav-text">🌈🌈🌈 实例化对象以后再来修改构造函数的prototype，不影响该对象的原型属性 ，因为修改后的 prototype 指向了新的对象，不影响原来的prototype，但影响原来 prototype 下的 constructor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9E%8B%E9%93%BE"><span class="nav-number">2.</span> <span class="nav-text">原型链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E5%8E%9F%E5%9E%8B%E9%93%BE%E7%9A%84%E9%A1%B6%E7%AB%AF%E6%98%AF-Object-prototype"><span class="nav-number">2.1.</span> <span class="nav-text">🌈 原型链的顶端是 Object.prototype</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%8E%9F%E5%9E%8B%E4%B8%8A%E7%9A%84%E5%80%BC"><span class="nav-number">2.2.</span> <span class="nav-text">修改原型上的值</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%8E%9F%E5%9E%8B%E7%9A%84%E5%BC%95%E7%94%A8%E5%80%BC%E7%9A%84%E5%B1%9E%E6%80%A7%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9"><span class="nav-number">2.2.1.</span> <span class="nav-text">🌈 原型的引用值的属性可以修改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E4%BF%AE%E6%94%B9%E5%9F%BA%E6%9C%AC%E5%80%BC%EF%BC%8C%E4%B8%8D%E5%BD%B1%E5%93%8D%E5%8E%9F%E5%9E%8B%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.2.</span> <span class="nav-text">🌈 修改基本值，不影响原型属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E4%B8%80%E4%B8%AA%E5%8E%9F%E5%9E%8B%E4%B8%8A%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E5%BC%95%E7%94%A8%E5%80%BC%EF%BC%8C%E6%8A%A5%E9%94%99"><span class="nav-number">2.2.3.</span> <span class="nav-text">修改一个原型上不存在的引用值，报错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%8E%9F%E5%A7%8B%E5%80%BC%E8%87%AA%E5%A2%9E"><span class="nav-number">2.2.4.</span> <span class="nav-text">🌈 原始值自增</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%81%E8%B0%83%E7%94%A8%EF%BC%8Cthis%E6%8C%87%E5%90%91%E8%B0%81"><span class="nav-number">2.3.</span> <span class="nav-text">谁调用，this指向谁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8C%88-%E7%BB%A7%E6%89%BF"><span class="nav-number">3.</span> <span class="nav-text">🌈 继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%AF%B9%E8%B1%A1%E7%BB%A7%E6%89%BF"><span class="nav-number">3.1.</span> <span class="nav-text">实例化对象继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-call-apply-%E5%80%9F%E7%94%A8%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">利用 call&#x2F;apply 借用构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Student-prototype-Teacher-prototype"><span class="nav-number">3.3.</span> <span class="nav-text">Student.prototype &#x3D; Teacher.prototype</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8C%88-%E5%9C%A3%E6%9D%AF%E6%A8%A1%E5%BC%8F%E7%BB%A7%E6%89%BF%EF%BC%88%E5%9C%A3%E6%9D%AF%E4%B8%AD%E9%97%B4%E7%9A%84%E9%83%A8%E4%BD%8D%E5%B0%B1%E6%98%AF%E8%BF%9E%E6%8E%A5%E4%B8%A4%E5%A4%B4%E7%9A%84%E4%B8%AD%E9%97%B4%E4%BB%B6%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">🌈 圣杯模式继承（圣杯中间的部位就是连接两头的中间件）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E6%96%B9%E6%B3%95"><span class="nav-number">3.4.1.</span> <span class="nav-text">封装继承方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A3%E6%9D%AF%E6%A8%A1%E5%BC%8F-IIFE-%E9%97%AD%E5%8C%85"><span class="nav-number">3.4.2.</span> <span class="nav-text">圣杯模式+IIFE+闭包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%F0%9F%8C%88-%E5%9C%A3%E6%9D%AF%E6%A8%A1%E5%BC%8F-call-apply-%E7%BB%84%E5%90%88%E7%BB%A7%E6%89%BF"><span class="nav-number">3.4.3.</span> <span class="nav-text">🌈 圣杯模式 + call&#x2F;apply 组合继承</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/6240/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          原型与原型链以及继承
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-21 11:21:22" itemprop="dateCreated datePublished" datetime="2021-07-21T11:21:22+08:00">2021-07-21</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/ECMAScript/" itemprop="url" rel="index"><span itemprop="name">ECMAScript</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="原型-prototype"><a href="#原型-prototype" class="headerlink" title="原型 prototype"></a>原型 prototype</h2><h3 id="🌈-prototype是-func-的属性，其值是个对象"><a href="#🌈-prototype是-func-的属性，其值是个对象" class="headerlink" title="🌈 prototype是 func 的属性，其值是个对象"></a>🌈 prototype是 func 的属性，其值是个对象</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Handphone</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="built_in">console</span>.log(Handphone.prototype);</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<img src="/posts/6240/1629297997929-a463ea99-2a25-477c-b05a-5111d5e7af73.png" class="" title="100%">
+
+<!-- more -->
+
+<h3 id="prototype-是构造函数中的，构造出的每个实例对象的公共祖先"><a href="#prototype-是构造函数中的，构造出的每个实例对象的公共祖先" class="headerlink" title="prototype 是构造函数中的，构造出的每个实例对象的公共祖先"></a>prototype 是构造函数中的，构造出的每个实例对象的公共祖先</h3><h3 id="所有被该构造函数构造出来的对象，都可以继承原型上的属性和方法"><a href="#所有被该构造函数构造出来的对象，都可以继承原型上的属性和方法" class="headerlink" title="所有被该构造函数构造出来的对象，都可以继承原型上的属性和方法"></a>所有被该构造函数构造出来的对象，都可以继承原型上的属性和方法</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Handphone</span>(<span class="params">color, brand</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.color = color;</span><br><span class="line">  <span class="built_in">this</span>.brand = brand;</span><br><span class="line">&#125;</span><br><span class="line">Handphone.prototype.rom = <span class="string">&#x27;64G&#x27;</span>;</span><br><span class="line">Handphone.prototype.ram = <span class="string">&#x27;6G&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> hp1 = <span class="keyword">new</span> Handphone(<span class="string">&#x27;red&#x27;</span>, <span class="string">&#x27;小米&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> hp2 = <span class="keyword">new</span> Handphone(<span class="string">&#x27;black&#x27;</span>, <span class="string">&#x27;huawei&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(hp1.rom);</span><br><span class="line"><span class="built_in">console</span>.log(hp2.ram);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298114840-51eba9bd-1bcb-4731-a8ab-8cffd487a3d0.png" class="" title="100%">
+
+<h3 id="🌈-constructor-指向构造函数本身"><a href="#🌈-constructor-指向构造函数本身" class="headerlink" title="🌈 constructor 指向构造函数本身"></a>🌈 constructor 指向构造函数本身</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Handphone</span>(<span class="params">color, brand</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.color = color;</span><br><span class="line">  <span class="built_in">this</span>.brand = brand;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.dir(Handphone);</span><br><span class="line"><span class="built_in">console</span>.dir(Handphone.prototype.constructor);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298193747-dc80ab42-c298-42ed-9a4f-5c826deec6bd.png" class="" title="100%">
+
+
+<h3 id="constructor-可以被修改"><a href="#constructor-可以被修改" class="headerlink" title="constructor 可以被修改"></a>constructor 可以被修改</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Telephone</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Handphone</span>(<span class="params">color, brand</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.color = color;</span><br><span class="line">  <span class="built_in">this</span>.brand = brand;</span><br><span class="line">&#125;</span><br><span class="line">Handphone.prototype = &#123;</span><br><span class="line">	<span class="title">constructor</span>: <span class="title">Telephone</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="title">console</span>.<span class="title">log</span>(<span class="params">Handphone.prototype</span>)</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298245111-538acda9-95db-424d-b68d-882a442b02d2.png" class="" title="100%">
+
+
+<h3 id="🌈-proto-是实例化以后的结果"><a href="#🌈-proto-是实例化以后的结果" class="headerlink" title="🌈 proto 是实例化以后的结果"></a>🌈 <strong>proto</strong> 是实例化以后的结果</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Car</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> <span class="built_in">this</span> = &#123;</span><br><span class="line">  	__proto__: Car.prototype</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Car.prototype.name = <span class="string">&#x27;Benz&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> car = <span class="keyword">new</span> Car();</span><br><span class="line"><span class="built_in">console</span>.log(car);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298300156-c2636466-a1dc-4828-9f0f-909ce3d92623.png" class="" title="100%">
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">Person.prototype.name = <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p1 = &#123;</span><br><span class="line">	name: <span class="string">&#x27;lance&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> Person();</span><br><span class="line"><span class="built_in">console</span>.log(person.name);</span><br><span class="line">person.__proto__ = p1;</span><br><span class="line"><span class="built_in">console</span>.log(person.name);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298374656-773e389a-5c23-45e4-825e-e498e6c76be4.png" class="" title="100%">
+
+<h3 id="🌈🌈🌈-实例化对象以后再来修改构造函数的prototype，不影响该对象的原型属性-，因为修改后的-prototype-指向了新的对象，不影响原来的prototype，但影响原来-prototype-下的-constructor"><a href="#🌈🌈🌈-实例化对象以后再来修改构造函数的prototype，不影响该对象的原型属性-，因为修改后的-prototype-指向了新的对象，不影响原来的prototype，但影响原来-prototype-下的-constructor" class="headerlink" title="🌈🌈🌈 实例化对象以后再来修改构造函数的prototype，不影响该对象的原型属性 ，因为修改后的 prototype 指向了新的对象，不影响原来的prototype，但影响原来 prototype 下的 constructor"></a>🌈🌈🌈 实例化对象以后再来修改构造函数的prototype，不影响该对象的原型属性 ，因为修改后的 prototype 指向了新的对象，不影响原来的prototype，但影响原来 prototype 下的 constructor</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Car.prototype.name = <span class="string">&#x27;Benz&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Car</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> car = <span class="keyword">new</span> Car();</span><br><span class="line">Car.prototype = &#123; <span class="comment">// 实例化之后赋值，car还是原来的</span></span><br><span class="line">	name: <span class="string">&#x27;Mazda&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(car.name); <span class="comment">//答案：																										 Benz</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.dir(Car);</span><br><span class="line"><span class="built_in">console</span>.dir(car);</span><br><span class="line"><span class="built_in">console</span>.log(car.__proto__.constructor === Car); <span class="comment">//答案：               true</span></span><br><span class="line"><span class="built_in">console</span>.log(Car.prototype.constructor === <span class="built_in">Object</span>.prototype.constructor); <span class="comment">//                 true</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629299742226-3c8cbf61-9816-476c-9e83-f6dba3c4bc37.png" class="" title="100%">
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Car.prototype.name = <span class="string">&#x27;Benz&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Car</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> car = <span class="keyword">new</span> Car();</span><br><span class="line">Car.prototype.name = <span class="string">&#x27;hhhh&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(car.name); <span class="comment">// 																													hhhh</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629298433205-e8f5bdf3-f9a9-40dc-ae57-90348c0337e8.png" class="" title="100%">
+
+
+<p><strong>↑注意是直接替换</strong> <code>**Car.prototype**</code> <strong>还是改</strong> <code>**Car.prototype**</code> <strong>对象下边的属性↑</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Car.prototype.name = <span class="string">&#x27;GC&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Car</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> car = <span class="keyword">new</span> Car();</span><br><span class="line">Car.prototype = &#123; <span class="comment">// 																									实例化之后赋值，car还是原来的</span></span><br><span class="line">	name: <span class="string">&#x27;Lance&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(car.name); <span class="comment">//																										 GC</span></span><br><span class="line"><span class="keyword">var</span> car2 = <span class="keyword">new</span> Car();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(Car);</span><br><span class="line"><span class="built_in">console</span>.log(car);</span><br><span class="line"><span class="built_in">console</span>.log(car2);</span><br><span class="line"><span class="built_in">console</span>.log(car.__proto__.constructor === Car); <span class="comment">//																			 true</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1631175027959-92426dd1-14d0-43c4-bae4-329122de7cd2.png" class="" title="100%">
+
+
+<h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><p>沿着<strong>原型</strong><code>**__proto__**</code><strong>往上</strong>不断找属性的这条链条叫做原型链</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br><span class="line"></span><br><span class="line"><span class="comment">// student: &#123;</span></span><br><span class="line"><span class="comment">//   pSkill: &#x27;HTML/CSS&#x27;,</span></span><br><span class="line"><span class="comment">//   __proto__: &#123; // teacher</span></span><br><span class="line"><span class="comment">//   	mSkill: &#x27;JS/JQ&#x27;,</span></span><br><span class="line"><span class="comment">//     __proto__: &#123; // professor</span></span><br><span class="line"><span class="comment">//       __proto__: &#123; // Professor.prototype</span></span><br><span class="line"><span class="comment">//         tSkill: &#x27;Java&#x27;,</span></span><br><span class="line"><span class="comment">//       	constructor: Professor,</span></span><br><span class="line"><span class="comment">//         __proto__: Object.prototype</span></span><br><span class="line"><span class="comment">//       &#125;</span></span><br><span class="line"><span class="comment">//     &#125;</span></span><br><span class="line"><span class="comment">//   &#125;</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line">student.__proto__.__proto__.__proto__ === Professor.prototype; <span class="comment">// true</span></span><br><span class="line">student.__proto__.__proto__.__proto__.__proto__ === <span class="built_in">Object</span>.prototype; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629888579596-509a97a0-83a5-4f46-a0dd-806dd20cf4f3.png" class="" title="100%">
+
+
+<h3 id="🌈-原型链的顶端是-Object-prototype"><a href="#🌈-原型链的顶端是-Object-prototype" class="headerlink" title="🌈 原型链的顶端是 Object.prototype"></a>🌈 原型链的顶端是 Object.prototype</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(professor, <span class="built_in">Object</span>.prototype);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629888867471-1224ce43-50f5-4873-95d7-f00f396d8634.png" class="" title="100%">
+
+
+<h3 id="修改原型上的值"><a href="#修改原型上的值" class="headerlink" title="修改原型上的值"></a>修改原型上的值</h3><h4 id="🌈-原型的引用值的属性可以修改"><a href="#🌈-原型的引用值的属性可以修改" class="headerlink" title="🌈 原型的引用值的属性可以修改"></a>🌈 原型的引用值的属性可以修改</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.success = &#123;</span><br><span class="line">  	alibaba: <span class="string">&#x27;28&#x27;</span>,</span><br><span class="line">    tencent: <span class="string">&#x27;20&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="built_in">console</span>.log(&#123; <span class="string">&quot;修改student引用值之前的success&quot;</span>: student.success &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 🌰 此处chrome控制台先打印，再执行下边语句</span></span><br><span class="line"><span class="comment">// 修改引用值</span></span><br><span class="line">student.success.baidu = <span class="string">&#x27;100&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(&#123; <span class="string">&quot;修改student引用值之后的student&quot;</span>: student &#125;);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629889874555-64c29aea-21ea-42e7-868d-96d50c559d83.png" class="" title="100%">
+
+
+<h4 id="🌈-修改基本值，不影响原型属性"><a href="#🌈-修改基本值，不影响原型属性" class="headerlink" title="🌈 修改基本值，不影响原型属性"></a>🌈 修改基本值，不影响原型属性</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.success = &#123;</span><br><span class="line">  	alibaba: <span class="string">&#x27;28&#x27;</span>,</span><br><span class="line">    tencent: <span class="string">&#x27;20&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 修改基本类型</span></span><br><span class="line"><span class="built_in">console</span>.log(&#123; <span class="string">&quot;修改student基本类型之前的success&quot;</span>: student.success &#125;);</span><br><span class="line">student.success = <span class="number">666</span>;</span><br><span class="line"><span class="built_in">console</span>.log(&#123; <span class="string">&quot;修改student基本类型之后的student&quot;</span>: student &#125;);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629890113977-a029c36d-c40d-4e5b-9e11-a38f80a68b04.png" class="" title="100%">
+
+
+<h4 id="修改一个原型上不存在的引用值，报错"><a href="#修改一个原型上不存在的引用值，报错" class="headerlink" title="修改一个原型上不存在的引用值，报错"></a>修改一个原型上不存在的引用值，报错</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.success = &#123;</span><br><span class="line">  	alibaba: <span class="string">&#x27;28&#x27;</span>,</span><br><span class="line">    tencent: <span class="string">&#x27;20&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 修改不存在的引用类型</span></span><br><span class="line">student.profile.name = <span class="string">&#x27;lance&#x27;</span>;</span><br><span class="line"><span class="comment">// 报错: Cannot set property &#x27;name&#x27; of undefined</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="🌈-原始值自增"><a href="#🌈-原始值自增" class="headerlink" title="🌈 原始值自增"></a>🌈 原始值自增</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype.tSkill = <span class="string">&#x27;Java&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS/JQ&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.students = <span class="number">500</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML/CSS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="built_in">console</span>.log(student.students);</span><br><span class="line">student.students++;</span><br><span class="line"><span class="built_in">console</span>.log(teacher);</span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629890656491-fc35d864-43e8-40ea-b83a-054b387c3178.png" class="" title="100%">
+
+
+<p>分析：学生的students值变了，professor的students值没变。过程是：</p>
+<ol>
+<li><p><code>student.students++;</code> =&gt; <code>student.students = student.students + 1</code></p>
+</li>
+<li><p>=赋值右边 student 自身没有 students，在原型上读取 students 值，再 + 1 计算</p>
+</li>
+<li><p>=赋值左边 student.students 是个原始值，则在自身上添加 students 属性</p>
+</li>
+<li><p>最后赋值</p>
+</li>
+</ol>
+<h3 id="谁调用，this指向谁"><a href="#谁调用，this指向谁" class="headerlink" title="谁调用，this指向谁"></a>谁调用，this指向谁</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Car</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.brand = <span class="string">&#x27;Benz&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line">Car.prototype = &#123;</span><br><span class="line">	brand: <span class="string">&#x27;Mazda&#x27;</span>,</span><br><span class="line">  intro: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="built_in">console</span>.log(<span class="string">&#x27;我是&#x27;</span> + <span class="built_in">this</span>.brand + <span class="string">&#x27;车&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> car = <span class="keyword">new</span> Car();</span><br><span class="line">car.intro();</span><br><span class="line"><span class="built_in">console</span>.log(car);</span><br><span class="line">Car.prototype.intro();</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629891057285-dea5483c-742a-4f6c-afdd-ac7d90c05ebe.png" class="" title="100%">
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.smoke = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  	<span class="built_in">this</span>.weight--;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype = &#123;</span><br><span class="line">	weight: <span class="number">130</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> Person();</span><br><span class="line">person.smoke();</span><br><span class="line">person.weight;</span><br><span class="line"><span class="built_in">console</span>.log(person);</span><br><span class="line"><span class="built_in">console</span>.log(Person.prototype);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629891105460-39bb7dbb-d1ed-4287-beb5-95e5be4f374b.png" class="" title="100%">
+
+
+<h2 id="🌈-继承"><a href="#🌈-继承" class="headerlink" title="🌈 继承"></a>🌈 继承</h2><h3 id="实例化对象继承"><a href="#实例化对象继承" class="headerlink" title="实例化对象继承"></a>实例化对象继承</h3><ul>
+<li>特点：继承了原型链上的所有属性</li>
+<li>缺点：<strong>继承了一些没必要继承的属性</strong>，例如 name</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Professor.prototype = &#123;</span><br><span class="line">	name: <span class="string">&#x27;Mr.Zhang&#x27;</span>,</span><br><span class="line">  tSkill: <span class="string">&#x27;Java&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Professor</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> professor = <span class="keyword">new</span> Professor();</span><br><span class="line"></span><br><span class="line">Teacher.prototype = professor;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Wang&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = teacher;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Li&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.pSkill = <span class="string">&#x27;HTML&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629967595153-c47c71f9-2ef8-4788-9195-b733ce13c652.png" class="" title="100%">
+
+
+<h3 id="利用-call-apply-借用构造函数"><a href="#利用-call-apply-借用构造函数" class="headerlink" title="利用 call/apply 借用构造函数"></a>利用 call/apply 借用构造函数</h3><ul>
+<li>本质：call/apply 是通过改变 this 指向，来借用构造函数的属性和方法</li>
+<li>此方法实例化的 student <strong>无法继承 Teacher.prototype 原型上的属性</strong></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Teacher.prototype.wife = <span class="string">&#x27;Ms.Liu&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params">name, mSkill</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.mSkill = mSkill;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, mSkill, age, major</span>) </span>&#123;</span><br><span class="line">	Teacher.apply(<span class="built_in">this</span>, [name, mSkill]);</span><br><span class="line">  <span class="built_in">this</span>.age = age;</span><br><span class="line">  <span class="built_in">this</span>.major = major;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student(<span class="string">&#x27;Mr.B&#x27;</span>, <span class="string">&#x27;JS&#x27;</span>, <span class="number">18</span>, <span class="string">&#x27;Computer&#x27;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629967814849-d45921e2-08d9-4225-9424-f910ab907047.png" class="" title="100%">
+
+
+<h3 id="Student-prototype-Teacher-prototype"><a href="#Student-prototype-Teacher-prototype" class="headerlink" title="Student.prototype = Teacher.prototype"></a>Student.prototype = Teacher.prototype</h3><ul>
+<li>特点：能够继承 Teacher 原型</li>
+<li>缺点：Student 和 Teacher <strong>共用原型</strong>，修改 Student.prototype 会导致 Teacher.prototype 改变</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Wang&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line">Teacher.prototype = &#123;</span><br><span class="line">	pSkill: <span class="string">&#x27;JQ&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line">Student.prototype = Teacher.prototype;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Li&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line">Student.prototype.name = <span class="string">&#x27;student&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br><span class="line"><span class="built_in">console</span>.log(Teacher.prototype);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629968259162-ffa2e2d8-03df-49bf-bf58-2963f42f18b3.png" class="" title="100%">
+
+
+<h3 id="🌈-圣杯模式继承（圣杯中间的部位就是连接两头的中间件）"><a href="#🌈-圣杯模式继承（圣杯中间的部位就是连接两头的中间件）" class="headerlink" title="🌈 圣杯模式继承（圣杯中间的部位就是连接两头的中间件）"></a>🌈 圣杯模式继承（圣杯中间的部位就是连接两头的中间件）</h3><p>方案：</p>
+<ol>
+<li><p>创建一个空的构造函数</p>
+</li>
+<li><p>使其继承父类构造函数的原型</p>
+</li>
+<li><p>由此构造函数实例化出一个对象</p>
+</li>
+<li><p>把此对象赋值给子类构造函数的 prototype 原型</p>
+</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Wang&#x27;</span>;</span><br><span class="line">  <span class="built_in">this</span>.mSkill = <span class="string">&#x27;JS&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line">Teacher.prototype = &#123;</span><br><span class="line">	pSkill: <span class="string">&#x27;JQ&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> teacher = <span class="keyword">new</span> Teacher();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">this</span>.name = <span class="string">&#x27;Mr.Li&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Buffer</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">Buffer.prototype = Teacher.prototype;</span><br><span class="line"><span class="keyword">var</span> buffer = <span class="keyword">new</span> Buffer();</span><br><span class="line"></span><br><span class="line">Student.prototype = buffer;</span><br><span class="line">Student.prototype.age = <span class="number">18</span>;</span><br><span class="line"><span class="keyword">var</span> student = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="built_in">console</span>.log(teacher);</span><br><span class="line"><span class="built_in">console</span>.log(buffer);</span><br><span class="line"><span class="built_in">console</span>.log(student);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629969154512-3056ad9c-792e-4e49-8a7f-cf53ad7a1283.png" class="" title="100%">
+
+<h4 id="封装继承方法"><a href="#封装继承方法" class="headerlink" title="封装继承方法"></a>封装继承方法</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Teacher.prototype.name = <span class="string">&#x27;Mr.Wang&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">inherit(Student, Teacher);</span><br><span class="line"><span class="keyword">var</span> s = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="keyword">var</span> t = <span class="keyword">new</span> Teacher();</span><br><span class="line"><span class="built_in">console</span>.log(t);</span><br><span class="line"><span class="built_in">console</span>.log(s);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inherit</span>(<span class="params">Target, Origin</span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Buffer</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  Buffer.prototype = Origin.prototype;</span><br><span class="line">  Target.prototype = <span class="keyword">new</span> Buffer();</span><br><span class="line">	<span class="comment">// 还原构造器</span></span><br><span class="line">  Target.prototype.constructor = Target;</span><br><span class="line">  <span class="comment">// 指定继承源</span></span><br><span class="line">  Target.prototype.super_class = Origin;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629969244842-25dcd1a4-81f9-41bd-bb72-015f6401fc6b.png" class="" title="100%">
+
+
+<h4 id="圣杯模式-IIFE-闭包"><a href="#圣杯模式-IIFE-闭包" class="headerlink" title="圣杯模式+IIFE+闭包"></a>圣杯模式+IIFE+闭包</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Teacher.prototype.name = <span class="string">&#x27;Mr.Wang&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Teacher</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">inherit(Student, Teacher);</span><br><span class="line"><span class="keyword">var</span> s = <span class="keyword">new</span> Student();</span><br><span class="line"><span class="keyword">var</span> t = <span class="keyword">new</span> Teacher();</span><br><span class="line"><span class="built_in">console</span>.log(t);</span><br><span class="line"><span class="built_in">console</span>.log(s);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inherit = (<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Buffer</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">Target, Origin</span>) </span>&#123;</span><br><span class="line">    Buffer.prototype = Origin.prototype;</span><br><span class="line">    Target.prototype = <span class="keyword">new</span> Buffer();</span><br><span class="line">    <span class="comment">// 还原构造器</span></span><br><span class="line">    Target.prototype.constructor = Target;</span><br><span class="line">    <span class="comment">// 指定继承源</span></span><br><span class="line">    Target.prototype.super_class = Origin;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<h4 id="🌈-圣杯模式-call-apply-组合继承"><a href="#🌈-圣杯模式-call-apply-组合继承" class="headerlink" title="🌈 圣杯模式 + call/apply 组合继承"></a>🌈 圣杯模式 + call/apply 组合继承</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">    <span class="built_in">this</span>.age = age;</span><br><span class="line">    <span class="built_in">this</span>.sayHi = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;sayHi&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.eat = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;eat&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, age, score</span>) </span>&#123;</span><br><span class="line">    Person.call(<span class="built_in">this</span>, name, age);</span><br><span class="line">    <span class="built_in">this</span>.score = score;</span><br><span class="line">    <span class="built_in">this</span>.study = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;study&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inherit = (<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Buffer</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">Target, Origin</span>) </span>&#123;</span><br><span class="line">    Buffer.prototype = Origin.prototype;</span><br><span class="line">    Target.prototype = <span class="keyword">new</span> Buffer();</span><br><span class="line">    <span class="comment">// 还原构造器</span></span><br><span class="line">    Target.prototype.constructor = Target;</span><br><span class="line">    <span class="comment">// 指定继承源</span></span><br><span class="line">    Target.prototype.super_class = Origin;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">inherit(Student, Person);</span><br><span class="line"><span class="keyword">var</span> stu1 = <span class="keyword">new</span> Student(<span class="string">&quot;Lance&quot;</span>, <span class="number">19</span>, <span class="number">100</span>);</span><br><span class="line"><span class="built_in">console</span>.dir(stu1);</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/6240/1629969604329-657e6152-56c7-48ee-a091-cfcb913e5497.png" class="" title="100%">
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag"># 继承</a>
+              <a href="/tags/%E5%8E%9F%E5%9E%8B/" rel="tag"># 原型</a>
+              <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag"># 原型链</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/11378/" rel="prev" title="CSS中给背景色添加杂色(噪点)">
+                  <i class="fa fa-chevron-left"></i> CSS中给背景色添加杂色(噪点)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/32560/" rel="next" title="转载-Vuetify与Vue-i18n整合踩坑指南">
+                  转载-Vuetify与Vue-i18n整合踩坑指南 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

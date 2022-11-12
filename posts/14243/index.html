@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="在我当初了解到 transform 后的一段时间，其实是不知道它能够让元素实现 3d 转换的。直到有一天在逛 codepen 时，我发现了下面这个 demo：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="transform3D转换（二）">
+<meta property="og:url" content="https://evestorm.github.io/posts/14243/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="在我当初了解到 transform 后的一段时间，其实是不知道它能够让元素实现 3d 转换的。直到有一天在逛 codepen 时，我发现了下面这个 demo：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/14243/3dzuobiaoxi.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/14243/perspective-distance.png">
+<meta property="article:published_time" content="2019-04-10T12:03:06.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.462Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="CSS3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/14243/3dzuobiaoxi.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/14243/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>transform3D转换（二） | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rotateX-rotateY-rotateZ"><span class="nav-number">1.</span> <span class="nav-text">rotateX, rotateY, rotateZ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateX"><span class="nav-number">1.1.</span> <span class="nav-text">rotateX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateY"><span class="nav-number">1.2.</span> <span class="nav-text">rotateY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rotateZ"><span class="nav-number">1.3.</span> <span class="nav-text">rotateZ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-%E9%80%8F%E8%A7%86"><span class="nav-number">2.</span> <span class="nav-text">perspective 透视</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-VS-perspective"><span class="nav-number">3.</span> <span class="nav-text">perspective VS perspective()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perspective-origin"><span class="nav-number">4.</span> <span class="nav-text">perspective-origin</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/14243/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          transform3D转换（二）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-10 20:03:06" itemprop="dateCreated datePublished" datetime="2019-04-10T20:03:06+08:00">2019-04-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>在我当初了解到 transform 后的一段时间，其实是不知道它能够让元素实现 3d 转换的。直到有一天在逛 codepen 时，我发现了下面这个 demo：</p>
+<iframe height="393" scrolling="no" title="CSS3 Transforms 3D Perspective Carousel" src="https://codepen.io/JingW/embed/qwrbxK/?height=393&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<a id="more"></a>
+
+<p>p.s. 原作者地址在这儿：<a target="_blank" rel="noopener" href="https://codepen.io/Hubson/pen/XmrEGX">https://codepen.io/Hubson/pen/XmrEGX</a></p>
+<p>OS：我靠，还能这样玩儿？赶紧查查如何实现的。（<a target="_blank" rel="noopener" href="http://bfy.tw/N9fx">点我重现查找过程</a>）</p>
+<p>然后就发现了张鑫旭老师的 <a target="_blank" rel="noopener" href="https://www.zhangxinxu.com/wordpress/2012/09/css3-3d-transform-perspective-animate-transition/">这篇文章</a> 。算是给我打开了新世界的大门~ 原来现在的 CSS 都这么强大了，要知道几年前我在学 <code>.NET</code> 时就接触过 HTML 和 CSS，那个时候不还是满屏 div，没啥特效的时代嘛。</p>
+<p>扯远了，言归正传。首先来看下面这个图（copy 上面文章来的~）：</p>
+<img src="/posts/14243/3dzuobiaoxi.png" class="" title="3d">
+
+<p>这个图就是咱们 3d 变形所依赖的坐标系。要想理解这张图，需要一点空间想象力。我们人在看这个坐标系时，是从左下角的眼睛处从 <code>+Z</code> 往 <code>-Z</code> 里面看的。可以把这个眼睛简单的想象成你自己，由网格组成的正方形平面相当于你在屏幕上创建的一个正方形 div 元素。那么当你设置 <code>transform: translate(200px, 0)</code> 时，你的元素将会向 <code>+X</code> 方向前进，也就是平常在 2d 变换中的向右移动。现在应该理解了吧~</p>
+<h2 id="rotateX-rotateY-rotateZ"><a href="#rotateX-rotateY-rotateZ" class="headerlink" title="rotateX, rotateY, rotateZ"></a>rotateX, rotateY, rotateZ</h2><h3 id="rotateX"><a href="#rotateX" class="headerlink" title="rotateX"></a>rotateX</h3><p>rotateX 就是沿着 x 轴进行 3d 旋转。</p>
+<p>在下面示例中，我们实现让一个元素沿着它的 x 轴旋转 180°。为了让效果看起来更加明显，我把该元素分成了上下两个部分，并在中间留出了缝隙，以便当做 X 轴看待，当鼠标移入该元素后，它便“沿着” x 轴旋转 180°：</p>
+<iframe height="323" scrolling="no" title="transform3d-rotateX" src="https://codepen.io/JingW/embed/EJWKJq/?height=323&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="rotateY"><a href="#rotateY" class="headerlink" title="rotateY"></a>rotateY</h3><p>用和上面类似的方式，我们实现 rotateY 的 3d 旋转效果，让元素沿着 y 轴进行 3d 旋转：</p>
+<iframe height="265" scrolling="no" title="transform3d-rotateY" src="https://codepen.io/JingW/embed/JVWbgo/?height=265&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h3 id="rotateZ"><a href="#rotateZ" class="headerlink" title="rotateZ"></a>rotateZ</h3><p>还记得那根 z 轴嘛，当我们垂直于屏幕看向元素时，z 轴在我们眼里就是一个“点”。所以当我们使用 rotateZ 来旋转元素时，元素会沿着 z 轴进行旋转，就是下方元素中间的“点”：</p>
+<iframe height="378" scrolling="no" title="transform3d-rotateZ" src="https://codepen.io/JingW/embed/GLWrRE/?height=378&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="perspective-透视"><a href="#perspective-透视" class="headerlink" title="perspective 透视"></a>perspective 透视</h2><p>这个属性英文直译过来就是 透视、视角的意思。</p>
+<p>电脑显示屏是个 2d 平面，要想让元素在一个 2d 平面上有立体感（3d 效果），就得利用这个 <code>perspective</code> 透视属性。<code>perspective</code> 可以让一个 2d 平面在转换过程中呈现出 3d 效果。</p>
+<p>不知道大家有没有注意到上面有关 rotateY 下的 demo，虽说是沿着元素 y 轴进行旋转，但一点 3d 立体效果都没有，要知道在现实生活中，如果一张卡片沿着它宽度一半儿的 y 轴进行旋转，肯定有近大远小的透视效果，即离我们近的一面越来越大，离我们远的一面越来越小。如果还没有明白，看了下面的示例就知道了（鼠标移入 body 就能触发旋转~）：</p>
+<iframe height="583" scrolling="no" title="transform3d-perspective" src="https://codepen.io/JingW/embed/pBewZM/?height=583&amp;theme-id=0&amp;default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>这下是不是明显多啦？其实这都全靠了 <code>perspective</code> 透视，它允许我们为场景添加深度感，原理就是<strong>使 z 轴在靠近观察者的元素看起来更大，而更远的元素看起来更小</strong>。也就是上面提到的“近大远小”。</p>
+<p>我们来看看下面这张图：</p>
+<img src="/posts/14243/perspective-distance.png" class="" title="perspective-distance">
+
+<p>上图中蓝色圆圈表示三维空间中的元素，字母 d 表示透视的值，即观看者的眼睛和<strong>屏幕</strong>之间的距离。字母 Z 表示元素在 z 轴上的位置。元素在 z 轴上越远，相对于观察者的外观越小，它越接近，就看起来越大。这就是三维空间中透视的效果。</p>
+<h2 id="perspective-VS-perspective"><a href="#perspective-VS-perspective" class="headerlink" title="perspective VS perspective()"></a>perspective VS perspective()</h2><p>perspective 有两种写法，一种是直接写在要使用 3d 转换的父元素身上（如上一个 demo）：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 父容器 */</span></span><br><span class="line"><span class="selector-class">.contaienr</span> &#123;</span><br><span class="line">  <span class="comment">/* 将透视属性写在父容器 */</span></span><br><span class="line">  <span class="attribute">perspective</span>: <span class="number">1000px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 需要3d转换的子元素 */</span></span><br><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="attribute">transition</span>: transform <span class="number">1s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 触发转换 */</span></span><br><span class="line"><span class="selector-class">.container</span><span class="selector-pseudo">:hover</span> <span class="selector-tag">box</span> &#123;</span><br><span class="line">  <span class="attribute">transform</span>: <span class="built_in">rotateY</span>(<span class="number">180deg</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这种写法下，一旦“舞台（浏览器显示区域）”上有多个元素都进行了 3d 转换，可能效果就与你的预想不太一样，靠近“舞台”两边的元素会“歪着”进行旋转：</p>
+<iframe height="367" scrolling="no" title="transform3d-perspective2" src="https://codepen.io/JingW/embed/KYWedq/?height=367&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<p>这是为什么呢？答案是因为默认我们观察者的“眼睛”是处于“舞台”正中央的前方的（这个前方是以“舞台”的视角），所以靠近我们观察者左前方的（观察者视角）卡片，在沿着 x 轴做旋转时，就是“歪着”的；同理观察者右前方卡片也是如此。</p>
+<p>那么如果你想让它们都与正中央的卡片一样效果的旋转呢？这就引出了第二种写法：<code>perspective()</code> 。该属性写在 3d 转换元素本身上，而不是在其父元素上了：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="attribute">transition</span>: transform <span class="number">1s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.container</span><span class="selector-pseudo">:hover</span> <span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="comment">/* 1. 沿着x轴旋转180° */</span></span><br><span class="line">  <span class="comment">/* 2. 给3d旋转元素本身添加 perspective 透视 */</span></span><br><span class="line">  <span class="attribute">transform</span>: <span class="built_in">perspective</span>(<span class="number">500px</span>) <span class="built_in">rotateX</span>(<span class="number">180deg</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<iframe height="365" scrolling="no" title="transform3d-perspective3" src="https://codepen.io/JingW/embed/EJWpaq/?height=265&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+<h2 id="perspective-origin"><a href="#perspective-origin" class="headerlink" title="perspective-origin"></a>perspective-origin</h2><p>语法：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">perspective-origin</span>: 50% 50%; <span class="comment">/* 默认值，表示观察者在“舞台”正中央的上方 */</span></span><br><span class="line"><span class="selector-tag">perspective-origin</span>: <span class="selector-tag">left</span> <span class="selector-tag">center</span>; <span class="comment">/* 表示观察者在“舞台”最左边且垂直居中的上方 */</span></span><br></pre></td></tr></table></figure>
+
+<p>该属性用于定义观察者观看三维空间时的位置所在。默认情况下为 x 轴 50%、y 轴 50%。也就是“舞台（屏幕）”正中央的上方。</p>
+<p>读者可以尝试用鼠标拖动下方 demo 中的按钮“camera”到“舞台”的各个位置，然后看看三张卡片的 3d 转换效果。当你在拖动“camera”改变它的位置时，也就等同于改变了 <code>perspective-origin</code> 的位置。例如当你把按钮“camera”拖动到左上角，就相当于设置了 <code>perspective-origin: left top</code>。</p>
+<iframe height="360" scrolling="no" title="transform3d-perspective-origin" src="https://codepen.io/JingW/embed/vMmNpm/?height=360&amp;theme-id=0&amp;default-tab=result" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 997.594px;"></iframe>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS3/" rel="tag"># CSS3</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/45420/" rel="prev" title="transform转换（一）">
+                  <i class="fa fa-chevron-left"></i> transform转换（一）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/27648/" rel="next" title="转载-JavaScript坑之一map参数传递">
+                  转载-JavaScript坑之一map参数传递 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

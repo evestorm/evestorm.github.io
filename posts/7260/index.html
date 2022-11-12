@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="什么是骨架屏骨架屏就是在页面尚未加载之前先给用户展示出页面的大致结构，直到页面请求数据后渲染页面。骨架屏和 loading 相比较还是骨架屏用户体验感更好。原理其实非常简单，就是在页面还没加载完成时展示一张图片（一般是 Base64 编码），类似下方效果：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue骨架屏">
+<meta property="og:url" content="https://evestorm.github.io/posts/7260/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="什么是骨架屏骨架屏就是在页面尚未加载之前先给用户展示出页面的大致结构，直到页面请求数据后渲染页面。骨架屏和 loading 相比较还是骨架屏用户体验感更好。原理其实非常简单，就是在页面还没加载完成时展示一张图片（一般是 Base64 编码），类似下方效果：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/7260/skeleton-1.png">
+<meta property="article:published_time" content="2019-08-03T14:06:56.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.478Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="用户体验">
+<meta property="article:tag" content="骨架屏">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/7260/skeleton-1.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/7260/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>vue骨架屏 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%AA%A8%E6%9E%B6%E5%B1%8F"><span class="nav-number">1.</span> <span class="nav-text">什么是骨架屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%AA%A8%E6%9E%B6%E5%B1%8F%E6%8F%92%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">安装骨架屏插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Skeleton-%E7%BB%84%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">Skeleton 组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BC%E5%87%BA-js"><span class="nav-number">4.</span> <span class="nav-text">导出 js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E9%A1%B5%E9%AA%A8%E6%9E%B6%E5%B1%8F"><span class="nav-number">5.</span> <span class="nav-text">单页骨架屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%A1%B5%E9%AA%A8%E6%9E%B6%E5%B1%8F"><span class="nav-number">6.</span> <span class="nav-text">多页骨架屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%A8%E6%9E%B6%E5%B1%8F%E6%8F%92%E4%BB%B6%E5%8E%9F%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">骨架屏插件原理</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/7260/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vue骨架屏
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-03 22:06:56" itemprop="dateCreated datePublished" datetime="2019-08-03T22:06:56+08:00">2019-08-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="什么是骨架屏"><a href="#什么是骨架屏" class="headerlink" title="什么是骨架屏"></a>什么是骨架屏</h2><p>骨架屏就是在页面尚未加载之前先给用户展示出页面的大致结构，直到页面请求数据后渲染页面。<br>骨架屏和 loading 相比较还是骨架屏用户体验感更好。<br>原理其实非常简单，就是在页面还没加载完成时展示一张图片（一般是 Base64 编码），类似下方效果：</p>
+<a id="more"></a>
+
+<img src="/posts/7260/skeleton-1.png" class="" title="骨架屏效果">
+
+
+<h2 id="安装骨架屏插件"><a href="#安装骨架屏插件" class="headerlink" title="安装骨架屏插件"></a>安装骨架屏插件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install vue-skeleton-webpack-plugin</span><br></pre></td></tr></table></figure>
+
+<h2 id="Skeleton-组件"><a href="#Skeleton-组件" class="headerlink" title="Skeleton 组件"></a>Skeleton 组件</h2><p>在 <code>src/components</code> 下新建 <code>Skeleton.vue</code> 组件：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;skeleton&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 我是首页骨架屏图片 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;home-skeleton&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;../assets/skeleton.jpg&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;skeleton&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;css&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.home-skeleton</span> &#123;</span></span><br><span class="line">    width: 100%;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="导出-js"><a href="#导出-js" class="headerlink" title="导出 js"></a>导出 js</h2><p>根目录下新建 <code>skeleton.js</code> 文件用来导出骨架组件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Skeleton <span class="keyword">from</span> <span class="string">&#x27;./components/Skeleton.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Skeleton</span><br><span class="line">  &#125;,</span><br><span class="line">  template: <span class="string">`&lt;Skeleton&gt;&lt;/Skeleton&gt;`</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="单页骨架屏"><a href="#单页骨架屏" class="headerlink" title="单页骨架屏"></a>单页骨架屏</h2><p>在根目录下新建 <code>vue.config.js</code> 配置骨架屏插件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SkeletonWebpackPlugin = <span class="built_in">require</span>(<span class="string">&#x27;vue-skeleton-webpack-plugin&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> SkeletonWebpackPlugin(&#123;</span><br><span class="line">        webpackConfig: &#123;</span><br><span class="line">          entry: &#123;</span><br><span class="line">            app: path.resolve(__dirname, <span class="string">&#x27;src/skeleton.js&#x27;</span>)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>搞定 OK~</p>
+<h2 id="多页骨架屏"><a href="#多页骨架屏" class="headerlink" title="多页骨架屏"></a>多页骨架屏</h2><p>假如现在我们希望首页加载时出现骨架屏（上面单页的例子），还要在切换到 about 页面后也有个骨架屏。就需要再新建一个 <code>Skeleton</code> 组件了。</p>
+<p>在 <code>src/components/</code> 下新建 <code>SkeletonAbout.vue</code> 组件：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;skeleton-wrapper&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">header</span> <span class="attr">class</span>=<span class="string">&quot;skeleton-header&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">header</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">section</span> <span class="attr">class</span>=<span class="string">&quot;skeleton-block&quot;</span>&gt;</span></span><br><span class="line">      &lt;img</span><br><span class="line">        src=&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTA4MCAyNjEiPjxkZWZzPjxwYXRoIGlkPSJiIiBkPSJNMCAwaDEwODB2MjYwSDB6Ii8+PGZpbHRlciBpZD0iYSIgd2lkdGg9IjIwMCUiIGhlaWdodD0iMjAwJSIgeD0iLTUwJSIgeT0iLTUwJSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94Ij48ZmVPZmZzZXQgZHk9Ii0xIiBpbj0iU291cmNlQWxwaGEiIHJlc3VsdD0ic2hhZG93T2Zmc2V0T3V0ZXIxIi8+PGZlQ29sb3JNYXRyaXggaW49InNoYWRvd09mZnNldE91dGVyMSIgdmFsdWVzPSIwIDAgMCAwIDAuOTMzMzMzMzMzIDAgMCAwIDAgMC45MzMzMzMzMzMgMCAwIDAgMCAwLjkzMzMzMzMzMyAwIDAgMCAxIDAiLz48L2ZpbHRlcj48L2RlZnM+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEpIj48dXNlIGZpbGw9IiMwMDAiIGZpbHRlcj0idXJsKCNhKSIgeGxpbms6aHJlZj0iI2IiLz48dXNlIGZpbGw9IiNGRkYiIHhsaW5rOmhyZWY9IiNiIi8+PHBhdGggZmlsbD0iI0Y2RjZGNiIgZD0iTTIzMCA0NGg1MzN2NDZIMjMweiIvPjxyZWN0IHdpZHRoPSIxNzIiIGhlaWdodD0iMTcyIiB4PSIzMCIgeT0iNDQiIGZpbGw9IiNGNkY2RjYiIHJ4PSI0Ii8+PHBhdGggZmlsbD0iI0Y2RjZGNiIgZD0iTTIzMCAxMThoMzY5djMwSDIzMHpNMjMwIDE4MmgzMjN2MzBIMjMwek04MTIgMTE1aDIzOHYzOUg4MTJ6TTgwOCAxODRoMjQydjMwSDgwOHpNOTE3IDQ4aDEzM3YzN0g5MTd6Ii8+PC9nPjwvc3ZnPg==&quot;</span><br><span class="line">      /&gt;</span><br><span class="line">      &lt;img</span><br><span class="line">        src=&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTA4MCAyNjEiPjxkZWZzPjxwYXRoIGlkPSJiIiBkPSJNMCAwaDEwODB2MjYwSDB6Ii8+PGZpbHRlciBpZD0iYSIgd2lkdGg9IjIwMCUiIGhlaWdodD0iMjAwJSIgeD0iLTUwJSIgeT0iLTUwJSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94Ij48ZmVPZmZzZXQgZHk9Ii0xIiBpbj0iU291cmNlQWxwaGEiIHJlc3VsdD0ic2hhZG93T2Zmc2V0T3V0ZXIxIi8+PGZlQ29sb3JNYXRyaXggaW49InNoYWRvd09mZnNldE91dGVyMSIgdmFsdWVzPSIwIDAgMCAwIDAuOTMzMzMzMzMzIDAgMCAwIDAgMC45MzMzMzMzMzMgMCAwIDAgMCAwLjkzMzMzMzMzMyAwIDAgMCAxIDAiLz48L2ZpbHRlcj48L2RlZnM+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEpIj48dXNlIGZpbGw9IiMwMDAiIGZpbHRlcj0idXJsKCNhKSIgeGxpbms6aHJlZj0iI2IiLz48dXNlIGZpbGw9IiNGRkYiIHhsaW5rOmhyZWY9IiNiIi8+PHBhdGggZmlsbD0iI0Y2RjZGNiIgZD0iTTIzMCA0NGg1MzN2NDZIMjMweiIvPjxyZWN0IHdpZHRoPSIxNzIiIGhlaWdodD0iMTcyIiB4PSIzMCIgeT0iNDQiIGZpbGw9IiNGNkY2RjYiIHJ4PSI0Ii8+PHBhdGggZmlsbD0iI0Y2RjZGNiIgZD0iTTIzMCAxMThoMzY5djMwSDIzMHpNMjMwIDE4MmgzMjN2MzBIMjMwek04MTIgMTE1aDIzOHYzOUg4MTJ6TTgwOCAxODRoMjQydjMwSDgwOHpNOTE3IDQ4aDEzM3YzN0g5MTd6Ii8+PC9nPjwvc3ZnPg==&quot;</span><br><span class="line">      /&gt;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;&#125;;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;css&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.skeleton-header</span> &#123;</span></span><br><span class="line">    height: 40px;</span><br><span class="line"><span class="css">    <span class="selector-tag">background</span>: <span class="selector-id">#1976d2</span>;</span></span><br><span class="line">    padding: 0;</span><br><span class="line">    margin: 0;</span><br><span class="line">    width: 100%;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="css">  <span class="selector-class">.skeleton-block</span> &#123;</span></span><br><span class="line">    display: flex;</span><br><span class="line">    flex-direction: column;</span><br><span class="line">    padding-top: 8px;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后回到 <code>src/skeleton.js</code> 中进行改造：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Skeleton <span class="keyword">from</span> <span class="string">&#x27;./components/Skeleton.vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> SkeletonAbout <span class="keyword">from</span> <span class="string">&#x27;./components/SkeletonAbout.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Skeleton,</span><br><span class="line">    SkeletonAbout</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 默认都隐藏，通过在 vue.config.js 中的插件配置中根据id进行判断</span></span><br><span class="line">  template: <span class="string">`&lt;div&gt;</span></span><br><span class="line"><span class="string">      &lt;Skeleton style=&quot;display: none;&quot; id=&quot;skeleton-home&quot;&gt;&lt;/Skeleton&gt;</span></span><br><span class="line"><span class="string">      &lt;SkeletonAbout style=&quot;display: none;&quot; id = &quot;skeleton-about&quot;&gt;&lt;/SkeletonAbout&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    `</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>vue.config.js</code> 中骨架屏配置：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SkeletonWebpackPlugin = <span class="built_in">require</span>(<span class="string">&#x27;vue-skeleton-webpack-plugin&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    <span class="comment">// 给webpack新增配置</span></span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="keyword">new</span> SkeletonWebpackPlugin(&#123;</span><br><span class="line">        webpackConfig: &#123;</span><br><span class="line">          entry: &#123;</span><br><span class="line">            app: path.resolve(__dirname, <span class="string">&#x27;src/skeleton.js&#x27;</span>)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        router: &#123;</span><br><span class="line">          mode: <span class="string">&#x27;history&#x27;</span>,</span><br><span class="line">          routes: [</span><br><span class="line">            &#123;</span><br><span class="line">              path: <span class="string">&#x27;/&#x27;</span>,</span><br><span class="line">              skeletonId: <span class="string">&#x27;skeleton-home&#x27;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">              path: <span class="string">&#x27;/about&#x27;</span>,</span><br><span class="line">              skeletonId: <span class="string">&#x27;skeleton-about&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">          ]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>现在刷新首页，就会先显示首页骨架屏，切换到 about 页面刷新，会首先显示 about 页面的骨架屏。</p>
+<h2 id="骨架屏插件原理"><a href="#骨架屏插件原理" class="headerlink" title="骨架屏插件原理"></a>骨架屏插件原理</h2><p>骨架屏插件的原理也非常简单，我们只要在 webpack 的 <code>html-webpack-plugin</code> 插件处理 html 之前对 app 根节点下的内容进行替换就 OK 了，下面是一个简化版插件写法：</p>
+<blockquote>
+<p>vue.config.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SkeletonWebpackPlugin = <span class="built_in">require</span>(<span class="string">&#x27;vue-skeleton-webpack-plugin&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 骨架屏插件原理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyPlugin</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">apply</span>(<span class="params">compiler</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// compiler 表示当前整个webpack对象</span></span><br><span class="line">    compiler.plugin(<span class="string">&#x27;compilation&#x27;</span>, <span class="function"><span class="params">compilation</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// compilation 表示当前这次webpack打包的对象（也就是说多次打包会产生多个）</span></span><br><span class="line">      compilation.plugin(</span><br><span class="line">        <span class="comment">// 当前webpack插件在html处理之前，把html替换</span></span><br><span class="line">        <span class="string">&#x27;html-webpack-plugin-before-html-processing&#x27;</span>,</span><br><span class="line">        data =&gt; &#123;</span><br><span class="line">          data.html = data.html.replace(</span><br><span class="line">            <span class="string">`&lt;div id=&quot;app&quot;&gt;&lt;/div&gt;`</span>,</span><br><span class="line">            <span class="string">`</span></span><br><span class="line"><span class="string">              &lt;div id=&quot;app&quot;&gt;</span></span><br><span class="line"><span class="string">                  &lt;div id=&quot;home&quot; style=&quot;display:none&quot;&gt;首页骨架屏&lt;/div&gt;</span></span><br><span class="line"><span class="string">                  &lt;div id=&quot;about&quot; style=&quot;display:none&quot;&gt;about页骨架屏&lt;/div&gt;</span></span><br><span class="line"><span class="string">              &lt;/div&gt;</span></span><br><span class="line"><span class="string">              &lt;script&gt;</span></span><br><span class="line"><span class="string">                  if(window.hash == &#x27;#/about&#x27; ||  location.pathname==&#x27;/about&#x27;)&#123;</span></span><br><span class="line"><span class="string">                      document.getElementById(&#x27;about&#x27;).style.display=&quot;block&quot;</span></span><br><span class="line"><span class="string">                  &#125;else&#123;</span></span><br><span class="line"><span class="string">                      document.getElementById(&#x27;home&#x27;).style.display=&quot;block&quot;</span></span><br><span class="line"><span class="string">                  &#125;</span></span><br><span class="line"><span class="string">              &lt;/script&gt;</span></span><br><span class="line"><span class="string">          `</span></span><br><span class="line">          );</span><br><span class="line">          <span class="keyword">return</span> data;</span><br><span class="line">        &#125;</span><br><span class="line">      );</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    <span class="comment">// 给webpack新增配置</span></span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="comment">// 使用自己的插件</span></span><br><span class="line">      <span class="keyword">new</span> MyPlugin()</span><br><span class="line">      <span class="comment">// new SkeletonWebpackPlugin(&#123;</span></span><br><span class="line">      <span class="comment">//   webpackConfig: &#123;</span></span><br><span class="line">      <span class="comment">//     entry: &#123;</span></span><br><span class="line">      <span class="comment">//       app: path.resolve(__dirname, &#x27;src/skeleton.js&#x27;)</span></span><br><span class="line">      <span class="comment">//     &#125;</span></span><br><span class="line">      <span class="comment">//   &#125;,</span></span><br><span class="line">      <span class="comment">//   router: &#123;</span></span><br><span class="line">      <span class="comment">//     mode: &#x27;history&#x27;,</span></span><br><span class="line">      <span class="comment">//     routes: [&#123;</span></span><br><span class="line">      <span class="comment">//         path: &#x27;/&#x27;,</span></span><br><span class="line">      <span class="comment">//         skeletonId: &#x27;skeleton-home&#x27;</span></span><br><span class="line">      <span class="comment">//       &#125;,</span></span><br><span class="line">      <span class="comment">//       &#123;</span></span><br><span class="line">      <span class="comment">//         path: &#x27;/about&#x27;,</span></span><br><span class="line">      <span class="comment">//         skeletonId: &#x27;skeleton-about&#x27;</span></span><br><span class="line">      <span class="comment">//       &#125;,</span></span><br><span class="line">      <span class="comment">//     ]</span></span><br><span class="line">      <span class="comment">//   &#125;,</span></span><br><span class="line">      <span class="comment">// &#125;)</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%94%A8%E6%88%B7%E4%BD%93%E9%AA%8C/" rel="tag"># 用户体验</a>
+              <a href="/tags/%E9%AA%A8%E6%9E%B6%E5%B1%8F/" rel="tag"># 骨架屏</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/47143/" rel="prev" title="转载-web性能优化-实践">
+                  <i class="fa fa-chevron-left"></i> 转载-web性能优化-实践
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/57665/" rel="next" title="vue利用provide+inject实现页面重新渲染">
+                  vue利用provide+inject实现页面重新渲染 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

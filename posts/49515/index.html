@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="转载自：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;60538328">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-javascript常见的内存泄漏">
+<meta property="og:url" content="https://evestorm.github.io/posts/49515/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="转载自：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;60538328">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-30d427e76136cb3a00fb3741e5e67ea9_1440w.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-4dd6412a0709f2b8c3b4459822bcbe4d_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-fdfbb55765dfd9903112dcd07e67f458_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-d7fd1ce7d3c182e5d3453687caf6bb70_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-c19f16fd9dd14b524b662bdda5c9f801_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-93b7bf44f276d65d4b0ce36b112992c4_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-bc8df32201ffcd87f484ad38f25c3594_1440w.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-a20afd5ec4a39a8d29a87ec00d435170_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-226f838e867305dcb4d6732cd1f80729_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-8a49bb24948303ea408ca4e9b0ac1c77_1440w.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-ea579ffa5c787eac1754f412d6f93c33_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-b97706533695b48b76160a4800e544d9_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-883b1e5d3f91284e15148f120fa58aba_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-84ca3fecbb8b853d91e79b7476b03d1c_b.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-06dab0a332d9d4b7e838b2ada7d0bca4_1440w.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-f0453225e353bb5bac8cee300d8bc90d_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-25250ce8b5de2d39a6acb8b11b41b150_1440w.jpg">
+<meta property="og:image" content="https://evestorm.github.io/posts/49515/v2-91d6e6f31622c18e518b0e1f444235ad_1440w.jpg">
+<meta property="article:published_time" content="2021-07-07T10:00:01.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:41.076Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="闭包">
+<meta property="article:tag" content="内存泄漏">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/49515/v2-30d427e76136cb3a00fb3741e5e67ea9_1440w.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/49515/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-javascript常见的内存泄漏 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2"><span class="nav-number">1.</span> <span class="nav-text">什么是内存泄露</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%84%8F%E5%A4%96%E7%9A%84%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">2.</span> <span class="nav-text">意外的全局变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">解决方法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#console-log"><span class="nav-number">3.</span> <span class="nav-text">console.log</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E2%80%94%E2%80%94-gt-demos-log-html"><span class="nav-number">3.1.</span> <span class="nav-text">实例——&gt;demos&#x2F;log.html</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#closures-%E9%97%AD%E5%8C%85"><span class="nav-number">4.</span> <span class="nav-text">closures(闭包)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E2%80%94%E2%80%94-gt-demos-closures-html"><span class="nav-number">4.1.</span> <span class="nav-text">实例——&gt;demos&#x2F;closures.html</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM%E6%B3%84%E9%9C%B2"><span class="nav-number">5.</span> <span class="nav-text">DOM泄露</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E2%80%94%E2%80%94-gt-demos-dom-html"><span class="nav-number">5.1.</span> <span class="nav-text">实例——&gt;demos&#x2F;dom.html</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%E2%80%94%E2%80%94-gt-demos-dom-practice-html"><span class="nav-number">5.2.</span> <span class="nav-text">小试牛刀——&gt;demos&#x2F;dom_practice.html</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timers"><span class="nav-number">6.</span> <span class="nav-text">timers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E2%80%94%E2%80%94-gt-demos-timers-html"><span class="nav-number">6.1.</span> <span class="nav-text">实例——&gt;demos&#x2F;timers.html</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventListener"><span class="nav-number">7.</span> <span class="nav-text">EventListener</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E2%80%94%E2%80%94-gt-demos-callbacks-html"><span class="nav-number">7.1.</span> <span class="nav-text">实例——&gt;demos&#x2F;callbacks.html</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/49515/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-javascript常见的内存泄漏
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-07 18:00:01" itemprop="dateCreated datePublished" datetime="2021-07-07T18:00:01+08:00">2021-07-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:41" itemprop="dateModified" datetime="2022-11-12T14:41:41+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/JS/" itemprop="url" rel="index"><span itemprop="name">JS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>转载自：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/60538328">https://zhuanlan.zhihu.com/p/60538328</a></p>
+<a id="more"></a>
+
+<h2 id="什么是内存泄露"><a href="#什么是内存泄露" class="headerlink" title="什么是内存泄露"></a><strong>什么是内存泄露</strong></h2><blockquote>
+<p><strong>内存泄漏</strong>指由于疏忽或错误造成程序未能释放已经不再使用的内存。内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，导致在释放该段内存之前就失去了对该段内存的控制，从而造成了内存的浪费。内存泄漏通常情况下只能由获得程序源代码的程序员才能分析出来。然而，有不少人习惯于把任何不需要的内存使用的增加描述为内存泄漏，即使严格意义上来说这是不准确的。————<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F">wikipedia</a></p>
+</blockquote>
+<p><strong>⚠️注：下文中标注的CG是Chrome浏览器中Devtools的【Collect garbage】按钮缩写，表示回收垃圾操作。</strong></p>
+<img src="/posts/49515/v2-30d427e76136cb3a00fb3741e5e67ea9_1440w.png" class="" title="v2-30d427e76136cb3a00fb3741e5e67ea9_1440w">
+
+<h2 id="意外的全局变量"><a href="#意外的全局变量" class="headerlink" title="意外的全局变量"></a><strong>意外的全局变量</strong></h2><p>JavaScript对未声明变量的处理方式：在全局对象上创建该变量的引用(即全局对象上的属性，不是变量，因为它能通过<code>delete</code>删除)。如果在浏览器中，全局对象就是<strong>window</strong>对象。</p>
+<p>如果未声明的变量缓存大量的数据，会导致这些数据只有在窗口关闭或重新刷新页面时才能被释放。这样会造成意外的内存泄漏。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">    bar = <span class="string">&quot;this is a hidden global variable with a large of data&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>等同于：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.bar = <span class="string">&quot;this is an explicit global variable with a large of data&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，通过<strong>this</strong>创建意外的全局变量：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.variable = <span class="string">&quot;potential accidental global&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当在全局作用域中调用foo函数，此时this指向的是全局对象(window)，而不是&#x27;undefined&#x27;</span></span><br><span class="line">foo();</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a><strong>解决方法：</strong></h3><p>在JavaScript文件中添加<code>&#39;use strict&#39;</code>，开启严格模式，可以有效地避免上述问题。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line"><span class="meta">    &quot;use strict&quot;</span> <span class="comment">// 在foo函数作用域内开启严格模式</span></span><br><span class="line">    bar = <span class="string">&quot;this is an explicit global variable with a large of data&quot;</span>;<span class="comment">// 报错：因为bar还没有被声明</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果需要在一个函数中使用全局变量，可以像如下代码所示，在<strong>window</strong>上明确声明：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.bar = <span class="string">&quot;this is a explicit global variable with a large of data&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样不仅可读性高，而且后期维护也方便</p>
+<blockquote>
+<p>谈到全局变量，需要注意那些用来临时存储大量数据的全局变量，确保在处理完这些数据后将其设置为null或重新赋值。全局变量也常用来做cache，一般cache都是为了性能优化才用到的，为了性能，最好对cache的大小做个上限限制。因为cache是不能被回收的，越高cache会导致越高的内存消耗。</p>
+</blockquote>
+<h2 id="console-log"><a href="#console-log" class="headerlink" title="console.log"></a><strong>console.log</strong></h2><p><code>console.log</code>：向web开发控制台打印一条消息，常用来在开发时调试分析。有时在开发时，需要打印一些对象信息，但发布时却忘记去掉<code>console.log</code>语句，这可能造成内存泄露。</p>
+<p>在传递给<code>console.log</code>的对象是不能被垃圾回收 ♻️，因为在代码运行之后需要在开发工具能查看对象信息。所以最好不要在生产环境中<code>console.log</code>任何对象。</p>
+<h3 id="实例——-gt-demos-log-html"><a href="#实例——-gt-demos-log-html" class="headerlink" title="实例——&gt;demos/log.html"></a><strong>实例——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/log.html">demos/log.html</a></strong></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Leaker<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">value</span>=<span class="string">&quot;click&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    !<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="function"><span class="keyword">function</span> <span class="title">Leaker</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">this</span>.init();</span></span><br><span class="line">      &#125;;</span><br><span class="line">      Leaker.prototype = &#123;</span><br><span class="line"><span class="javascript">        init: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">          <span class="built_in">this</span>.name = (<span class="built_in">Array</span>(<span class="number">100000</span>)).join(<span class="string">&#x27;*&#x27;</span>);</span></span><br><span class="line"><span class="javascript">          <span class="built_in">console</span>.log(<span class="string">&quot;Leaking an object %o: %o&quot;</span>, (<span class="keyword">new</span> <span class="built_in">Date</span>()), <span class="built_in">this</span>);<span class="comment">// this对象不能被回收</span></span></span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line"><span class="javascript">        destroy: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">          <span class="comment">// do something....</span></span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;;</span><br><span class="line"><span class="javascript">      <span class="built_in">document</span>.querySelector(<span class="string">&#x27;input&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">new</span> Leaker();</span></span><br><span class="line"><span class="javascript">      &#125;, <span class="literal">false</span>);</span></span><br><span class="line">    &#125;()</span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里结合Chrome的Devtools–&gt;Performance做一些分析，操作步骤如下：</p>
+<p><strong>⚠️注：最好在隐藏窗口中进行分析工作，避免浏览器插件影响分析结果</strong></p>
+<ol>
+<li>开启【Performance】项的记录</li>
+<li>执行一次CG，创建基准参考线</li>
+<li>连续单击【click】按钮三次，新建三个Leaker对象</li>
+<li>执行一次CG</li>
+<li>停止记录</li>
+</ol>
+<img src="/posts/49515/v2-4dd6412a0709f2b8c3b4459822bcbe4d_1440w.jpg" class="" title="v2-4dd6412a0709f2b8c3b4459822bcbe4d_1440w">
+
+<p>可以看出【JS Heap】线最后没有降回到基准参考线的位置，显然存在没有被回收的内存。如果将代码修改为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">!<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="title">Leaker</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.init();</span><br><span class="line">      &#125;;</span><br><span class="line">      Leaker.prototype = &#123;</span><br><span class="line">        init: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="built_in">this</span>.name = (<span class="built_in">Array</span>(<span class="number">100000</span>)).join(<span class="string">&#x27;*&#x27;</span>);</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        destroy: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="comment">// do something....</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;;</span><br><span class="line">      <span class="built_in">document</span>.querySelector(<span class="string">&#x27;input&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Leaker();</span><br><span class="line">      &#125;, <span class="literal">false</span>);</span><br><span class="line">    &#125;()</span><br></pre></td></tr></table></figure>
+
+<p>去掉<code>console.log(&quot;Leaking an object %o: %o&quot;, (new Date()), this);</code>语句。重复上述的操作步骤，分析结果如下：</p>
+<img src="/posts/49515/v2-fdfbb55765dfd9903112dcd07e67f458_1440w.jpg" class="" title="v2-fdfbb55765dfd9903112dcd07e67f458_1440w.jpg">
+
+<p>从对比分析结果可知，<code>console.log</code>打印的对象是不会被垃圾回收器回收的。因此最好不要在页面中<code>console.log</code>任何大对象，这样可能会影响页面的整体性能，特别在生产环境中。除了<code>console.log</code>外，另外还有<code>console.dir</code>、<code>console.error</code>、<code>console.warn</code>等都存在类似的问题，这些细节需要特别的关注。</p>
+<h2 id="closures-闭包"><a href="#closures-闭包" class="headerlink" title="closures(闭包)"></a><strong>closures(闭包)</strong></h2><p>当一个函数A返回一个内联函数B，即使函数A执行完，函数B也能访问函数A作用域内的变量，这就是一个闭包——————本质上闭包是将函数内部和外部连接起来的一座桥梁。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">message</span>) </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">closure</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(message)</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> closure;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">var</span> bar = foo(<span class="string">&quot;hello closure!&quot;</span>);</span><br><span class="line">bar()<span class="comment">// 返回 &#x27;hello closure!&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>在函数foo内创建的函数closure对象是不能被回收掉的，因为它被全局变量bar引用，处于一直可访问状态。通过执行<code>bar()</code>可以打印出<code>hello closure!</code>。如果想释放掉可以将<code>bar = null</code>即可。</p>
+<p><strong>由于闭包会携带包含它的函数的作用域，因此会比其他函数占用更多的内存。过度使用闭包可能会导致内存占用过多。</strong></p>
+<h3 id="实例——-gt-demos-closures-html"><a href="#实例——-gt-demos-closures-html" class="headerlink" title="实例——&gt;demos/closures.html"></a><strong>实例——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/closures.html">demos/closures.html</a></strong></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Closure<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>不断单击【click】按钮<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">&quot;click_button&quot;</span>&gt;</span>Click<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> str = <span class="built_in">Array</span>(<span class="number">10000</span>).join(<span class="string">&#x27;#&#x27;</span>);</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> foo = &#123;</span></span><br><span class="line"><span class="javascript">        name: <span class="string">&#x27;foo&#x27;</span></span></span><br><span class="line">      &#125;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="keyword">function</span> <span class="title">unused</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> message = <span class="string">&#x27;it is only a test message&#x27;</span>;</span></span><br><span class="line"><span class="javascript">        str = <span class="string">&#x27;unused: &#x27;</span> + str;</span></span><br><span class="line">      &#125;</span><br><span class="line"><span class="javascript">      <span class="function"><span class="keyword">function</span> <span class="title">getData</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> <span class="string">&#x27;data&#x27;</span>;</span></span><br><span class="line">      &#125;</span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> getData;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> list = [];</span></span><br><span class="line">    </span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.querySelector(<span class="string">&#x27;#click_button&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line">      list.push(f());</span><br><span class="line"><span class="javascript">    &#125;, <span class="literal">false</span>);</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里结合Chrome的Devtools-&gt;Memory工具进行分析，操作步骤如下：</p>
+<p><strong>⚠️注：最好在隐藏窗口中进行分析工作，避免浏览器插件影响分析结果</strong></p>
+<ol>
+<li>选中【Record allocation timeline】选项</li>
+<li>执行一次CG</li>
+<li>单击【start】按钮开始记录堆分析</li>
+<li>连续单击【click】按钮十多次</li>
+<li>停止记录堆分析</li>
+</ol>
+<img src="/posts/49515/v2-d7fd1ce7d3c182e5d3453687caf6bb70_1440w.jpg" class="" title="v2-d7fd1ce7d3c182e5d3453687caf6bb70_1440w.jpg">
+
+<p>上图中蓝色柱形条表示随着时间新分配的内存。选中其中某条蓝色柱形条，过滤出对应新分配的对象：</p>
+<img src="/posts/49515/v2-c19f16fd9dd14b524b662bdda5c9f801_1440w.jpg" class="" title="v2-c19f16fd9dd14b524b662bdda5c9f801_1440w.jpg">
+
+<p>查看对象的详细信息：</p>
+<img src="/posts/49515/v2-93b7bf44f276d65d4b0ce36b112992c4_1440w.jpg" class="" title="v2-93b7bf44f276d65d4b0ce36b112992c4_1440w.jpg">
+
+<p>从图可知，在返回的闭包作用链(Scopes)中携带有它所在函数的作用域，作用域中还包含一个str字段。而str字段并没有在返回getData()中使用过。为什么会存在在作用域中，按理应该被GC回收掉， why</p>
+<img src="/posts/49515/v2-bc8df32201ffcd87f484ad38f25c3594_1440w.png" class="" title="v2-bc8df32201ffcd87f484ad38f25c3594_1440w.png">
+
+<p>原因是在相同作用域内创建的多个内部函数对象是共享同一个<a target="_blank" rel="noopener" href="http://dmitrysoshnikov.com/ecmascript/chapter-2-variable-object/">变量对象（variable object）</a>。如果创建的内部函数没有被其他对象引用，不管内部函数是否引用外部函数的变量和函数，在外部函数执行完，对应变量对象便会被销毁。反之，如果内部函数中存在有对外部函数变量或函数的访问（可以不是被引用的内部函数），并且存在某个或多个内部函数被其他对象引用，那么就会形成闭包，外部函数的变量对象就会存在于闭包函数的作用域链中。这样确保了闭包函数有权访问外部函数的所有变量和函数。了解了问题产生的原因，便可以对症下药了。对代码做如下修改：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> str = <span class="built_in">Array</span>(<span class="number">10000</span>).join(<span class="string">&#x27;#&#x27;</span>);</span><br><span class="line">      <span class="keyword">var</span> foo = &#123;</span><br><span class="line">        name: <span class="string">&#x27;foo&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="title">unused</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> message = <span class="string">&#x27;it is only a test message&#x27;</span>;</span><br><span class="line">        <span class="comment">// str = &#x27;unused: &#x27; + str; //删除该条语句</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="title">getData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;data&#x27;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> getData;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> list = [];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">document</span>.querySelector(<span class="string">&#x27;#click_button&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      list.push(f());</span><br><span class="line">    &#125;, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>getData()和unused()内部函数共享f函数对应的变量对象，因为unused()内部函数访问了f作用域内str变量，所以str字段存在于f变量对象中。加上getData()内部函数被返回，被其他对象引用，形成了闭包，因此对应的f变量对象存在于闭包函数的作用域链中。这里只要将函数unused中<code>str = &#39;unused: &#39; + str;</code>语句删除便可解决问题。</p>
+<img src="/posts/49515/v2-a20afd5ec4a39a8d29a87ec00d435170_1440w.jpg" class="" title="v2-a20afd5ec4a39a8d29a87ec00d435170_1440w.jpg">
+
+<p>查看一下闭包信息：</p>
+<img src="/posts/49515/v2-226f838e867305dcb4d6732cd1f80729_1440w.jpg" class="" title="v2-226f838e867305dcb4d6732cd1f80729_1440w.jpg">
+
+<h2 id="DOM泄露"><a href="#DOM泄露" class="headerlink" title="DOM泄露"></a><strong>DOM泄露</strong></h2><p>在JavaScript中，DOM操作是非常耗时的。因为JavaScript/ECMAScript引擎独立于渲染引擎，而DOM是位于渲染引擎，相互访问需要消耗一定的资源。如Chrome浏览器中DOM位于WebCore，而JavaScript/ECMAScript位于V8中。假如将JavaScript/ECMAScript、DOM分别想象成两座孤岛，两岛之间通过一座收费桥连接，过桥需要交纳一定“过桥费”。JavaScript/ECMAScript每次访问DOM时，都需要交纳“过桥费”。因此访问DOM次数越多，费用越高，页面性能就会受到很大影响。<a href="https://link.zhihu.com/?target=http://www.phpied.com/dom-access-optimization/">了解更多ℹ️</a></p>
+<img src="/posts/49515/v2-8a49bb24948303ea408ca4e9b0ac1c77_1440w.png" class="" title="v2-8a49bb24948303ea408ca4e9b0ac1c77_1440w.png">
+
+<p>为了减少DOM访问次数，一般情况下，当需要多次访问同一个DOM方法或属性时，会将DOM引用缓存到一个局部变量中。<strong>但如果在执行某些删除、更新操作后，可能会忘记释放掉代码中对应的DOM引用，这样会造成DOM内存泄露。</strong></p>
+<h3 id="实例——-gt-demos-dom-html"><a href="#实例——-gt-demos-dom-html" class="headerlink" title="实例——&gt;demos/dom.html"></a><strong>实例——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/dom.html">demos/dom.html</a></strong></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Dom-Leakage<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">value</span>=<span class="string">&quot;add&quot;</span> <span class="attr">class</span>=<span class="string">&quot;add&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">value</span>=<span class="string">&quot;remove&quot;</span> <span class="attr">class</span>=<span class="string">&quot;remove&quot;</span> <span class="attr">style</span>=<span class="string">&quot;display:none;&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">pre</span> <span class="attr">class</span>=<span class="string">&quot;wrapper&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">pre</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 因为要多次用到pre.wrapper、div.container、input.remove、input.add节点，将其缓存到本地变量中</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> wrapper = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.wrapper&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> container = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.container&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> removeBtn = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.remove&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> addBtn = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.add&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> counter = <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> once = <span class="literal">true</span>;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 方法</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> hide = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      target.style.display = <span class="string">&#x27;none&#x27;</span>;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> show = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      target.style.display = <span class="string">&#x27;inline-block&#x27;</span>;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 回调函数</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> removeCallback = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      removeBtn.removeEventListener(<span class="string">&#x27;click&#x27;</span>, removeCallback, <span class="literal">false</span>);</span></span><br><span class="line"><span class="javascript">      addBtn.removeEventListener(<span class="string">&#x27;click&#x27;</span>, addCallback, <span class="literal">false</span>);</span></span><br><span class="line">      hide(addBtn);</span><br><span class="line">      hide(removeBtn);</span><br><span class="line">      container.removeChild(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> addCallback = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      wrapper.appendChild(<span class="built_in">document</span>.createTextNode(<span class="string">&#x27;\t&#x27;</span> + ++counter + <span class="string">&#x27;：a new line text\n&#x27;</span>));</span></span><br><span class="line"><span class="javascript">      <span class="comment">// 显示删除操作按钮</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">if</span>(once)&#123;</span></span><br><span class="line">        show(removeBtn);</span><br><span class="line"><span class="javascript">        once = <span class="literal">false</span>;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="comment">// 绑定事件</span></span></span><br><span class="line"><span class="javascript">    removeBtn.addEventListener(<span class="string">&#x27;click&#x27;</span>, removeCallback, <span class="literal">false</span>);</span></span><br><span class="line"><span class="javascript">    addBtn.addEventListener(<span class="string">&#x27;click&#x27;</span>, addCallback, <span class="literal">false</span>);</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里结合Chrome浏览器的Devtools–&gt;Performance做一些分析，操作步骤如下：</p>
+<p><strong>⚠️注：最好在隐藏窗口中进行分析工作，避免浏览器插件影响分析结果</strong></p>
+<ol>
+<li>开启【Performance】项的记录</li>
+<li>执行一次CG，创建基准参考线</li>
+<li>连续单击【add】按钮6次，增加6个文本节点到pre元素中</li>
+<li>单击【remove】按钮，删除刚增加6个文本节点和pre元元素</li>
+<li>执行一次CG</li>
+<li>停止记录堆分析</li>
+</ol>
+<img src="/posts/49515/v2-ea579ffa5c787eac1754f412d6f93c33_1440w.jpg" class="" title="v2-ea579ffa5c787eac1754f412d6f93c33_1440w.jpg">
+
+<p>从分析结果图可知，虽然6次add操作增加6个Node，但是remove操作并没有让Nodes节点数下降，即remove操作失败。尽管还主动执行了一次CG操作，Nodes曲线也没有下降。因此可以断定内存泄露了！那问题来了，如何去查找问题的原因呢？这里可以通过Chrome浏览器的Devtools–&gt;Memory进行诊断分析，执行如下操作步骤：</p>
+<p><strong>⚠️注：最好在隐藏窗口中进行分析工作，避免浏览器插件影响分析结果</strong></p>
+<ol>
+<li>选中【Take heap snapshot】选项</li>
+<li>连续单击【add】按钮6次，增加6个文本节点到pre元素中</li>
+<li>单击【Take snapshot】按钮，执行一次堆快照</li>
+<li>单击【remove】按钮，删除刚增加6个文本节点和pre元元素</li>
+<li>单击【Take snapshot】按钮，执行一次堆快照</li>
+<li>选中生成的第二个快照报告，并将视图由”Summary”切换到”Comparison”对比模式，在[class filter]过滤输入框中输入关键字：<strong>Detached</strong></li>
+</ol>
+<img src="/posts/49515/v2-b97706533695b48b76160a4800e544d9_1440w.jpg" class="" title="v2-b97706533695b48b76160a4800e544d9_1440w.jpg">
+
+<p>从分析结果图可知，导致整个pre元素和6个文本节点无法别回收的原因是：代码中存在全局变量<code>wrapper</code>对pre元素的引用。知道了产生的问题原因，便可对症下药了。对代码做如下就修改：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 因为要多次用到pre.wrapper、div.container、input.remove、input.add节点，将其缓存到本地变量中</span></span><br><span class="line">    <span class="keyword">var</span> wrapper = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.wrapper&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> container = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.container&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> removeBtn = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.remove&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> addBtn = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.add&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">var</span> once = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">// 方法</span></span><br><span class="line">    <span class="keyword">var</span> hide = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>)</span>&#123;</span><br><span class="line">      target.style.display = <span class="string">&#x27;none&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> show = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>)</span>&#123;</span><br><span class="line">      target.style.display = <span class="string">&#x27;inline-block&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 回调函数</span></span><br><span class="line">    <span class="keyword">var</span> removeCallback = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      removeBtn.removeEventListener(<span class="string">&#x27;click&#x27;</span>, removeCallback, <span class="literal">false</span>);</span><br><span class="line">      addBtn.removeEventListener(<span class="string">&#x27;click&#x27;</span>, addCallback, <span class="literal">false</span>);</span><br><span class="line">      hide(addBtn);</span><br><span class="line">      hide(removeBtn);</span><br><span class="line">      container.removeChild(wrapper);</span><br><span class="line">     </span><br><span class="line">      wrapper = <span class="literal">null</span>;<span class="comment">//在执行删除操作时，将wrapper对pre节点的引用释放掉</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> addCallback = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      wrapper.appendChild(<span class="built_in">document</span>.createTextNode(<span class="string">&#x27;\t&#x27;</span> + ++counter + <span class="string">&#x27;：a new line text\n&#x27;</span>));</span><br><span class="line">      <span class="comment">// 显示删除操作按钮</span></span><br><span class="line">      <span class="keyword">if</span>(once)&#123;</span><br><span class="line">        show(removeBtn);</span><br><span class="line">        once = <span class="literal">false</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 绑定事件</span></span><br><span class="line">    removeBtn.addEventListener(<span class="string">&#x27;click&#x27;</span>, removeCallback, <span class="literal">false</span>);</span><br><span class="line">    addBtn.addEventListener(<span class="string">&#x27;click&#x27;</span>, addCallback, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在执行删除操作时，将wrapper对pre节点的引用释放掉，即在删除逻辑中增加<code>wrapper = null;</code>语句。再次在Devtools–&gt;Performance中重复上述操作：</p>
+<img src="/posts/49515/v2-883b1e5d3f91284e15148f120fa58aba_1440w.jpg" class="" title="v2-883b1e5d3f91284e15148f120fa58aba_1440w.jpg">
+
+<h3 id="小试牛刀——-gt-demos-dom-practice-html"><a href="#小试牛刀——-gt-demos-dom-practice-html" class="headerlink" title="小试牛刀——&gt;demos/dom_practice.html"></a><strong>小试牛刀——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/dom_practice.html">demos/dom_practice.html</a></strong></h3><p>再来看看网上的一个实例，代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Practice<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;refA&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">ul</span>&gt;</span><span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> <span class="attr">id</span>=<span class="string">&quot;refB&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span><span class="tag">&lt;/<span class="name">ul</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> refA = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;refA&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> refB = <span class="built_in">document</span>.getElementById(<span class="string">&#x27;refB&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.body.removeChild(refA);</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">    <span class="comment">// #refA不能GC回收，因为存在变量refA对它的引用。将其对#refA引用释放，但还是无法回收#refA。</span></span></span><br><span class="line"><span class="javascript">    refA = <span class="literal">null</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">    <span class="comment">// 还存在变量refB对#refA的间接引用(refB引用了#refB，而#refB属于#refA)。将变量refB对#refB的引用释放，#refA就可以被GC回收。</span></span></span><br><span class="line"><span class="javascript">    refB = <span class="literal">null</span>;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>整个过程如下图所演示：</p>
+<img src="/posts/49515/v2-84ca3fecbb8b853d91e79b7476b03d1c_b.jpg" class="" title="v2-84ca3fecbb8b853d91e79b7476b03d1c_b.jpg">
+
+<p>有兴趣的同学可以使用Chrome的Devtools工具，验证一下分析结果，实践很重要~~~</p>
+<img src="/posts/49515/v2-06dab0a332d9d4b7e838b2ada7d0bca4_1440w.png" class="" title="v2-06dab0a332d9d4b7e838b2ada7d0bca4_1440w.png">
+
+<h2 id="timers"><a href="#timers" class="headerlink" title="timers"></a><strong>timers</strong></h2><p>在JavaScript常用<code>setInterval()</code>来实现一些动画效果。当然也可以使用链式<code>setTimeout()</code>调用模式来实现：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do something. . . .</span></span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="built_in">arguments</span>.callee, interval);</span><br><span class="line">&#125;, interval);</span><br></pre></td></tr></table></figure>
+
+<p>如果在不需要<code>setInterval()</code>时，没有通过<code>clearInterval()</code>方法移除，那么<code>setInterval()</code>会不停地调用函数，直到调用<code>clearInterval()</code>或窗口关闭。如果链式<code>setTimeout()</code>调用模式没有给出终止逻辑，也会一直运行下去。因此再不需要重复定时器时，确保对定时器进行清除，避免占用系统资源。另外，在使用<code>setInterval()</code>和<code>setTimeout()</code>来实现动画时，无法确保定时器按照指定的时间间隔来执行动画。为了能在JavaScript中创建出平滑流畅的动画，浏览器为JavaScript动画添加了一个新API-requestAnimationFrame()。<a href="https://link.zhihu.com/?target=https://github.com/zhansingsong/js-leakage-patterns/blob/master/requestAnimationFrame/requestAnimationFrame.md">关于setInterval、setTimeout与requestAnimationFrame实现动画上的区别➹猛击</a></p>
+<h3 id="实例——-gt-demos-timers-html"><a href="#实例——-gt-demos-timers-html" class="headerlink" title="实例——&gt;demos/timers.html"></a><strong>实例——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/timers.html">demos/timers.html</a></strong></h3><p>如下通过<code>setInterval()</code>实现一个clock的小实例，不过代码存在问题的，有兴趣的同学可以先尝试找一下问题的所在~<br>操作：</p>
+<ul>
+<li>单击【start】按钮开始clock，同时web开发控制台会打印实时信息</li>
+<li>单击【stop】按钮停止clock，同时web开发控制台会输出停止信息</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>setInterval<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">value</span>=<span class="string">&quot;start&quot;</span> <span class="attr">class</span>=<span class="string">&quot;start&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">value</span>=<span class="string">&quot;stop&quot;</span> <span class="attr">class</span>=<span class="string">&quot;stop&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> counter = <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> clock = &#123;</span></span><br><span class="line"><span class="javascript">      start: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">setInterval</span>(<span class="built_in">this</span>.step.bind(<span class="literal">null</span>, ++counter), <span class="number">1000</span>);</span></span><br><span class="line">      &#125;,</span><br><span class="line"><span class="javascript">      step: <span class="function"><span class="keyword">function</span> (<span class="params">flag</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>();</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> h = date.getHours();</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> m = date.getMinutes();</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> s = date.getSeconds();</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(<span class="string">&quot;%d-----&gt; %d:%d:%d&quot;</span>, flag, h, m, s);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.start&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, clock.start.bind(clock), <span class="literal">false</span>);</span></span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.stop&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="built_in">console</span>.log(<span class="string">&#x27;----&gt; stop &lt;----&#x27;</span>);</span></span><br><span class="line"><span class="javascript">      clock = <span class="literal">null</span>;</span></span><br><span class="line"><span class="javascript">    &#125;, <span class="literal">false</span>);</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述代码存在两个问题：</p>
+<ol>
+<li>如果不断的单击【start】按钮，会断生成新的clock。</li>
+<li>单击【stop】按钮不能停止clock。</li>
+</ol>
+<p>输出结果:</p>
+<img src="/posts/49515/v2-f0453225e353bb5bac8cee300d8bc90d_1440w.jpg" class="" title="v2-f0453225e353bb5bac8cee300d8bc90d_1440w.jpg">
+
+<p>针对暴露出的问题，对代码做如下修改：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> counter = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">var</span> clock = &#123;</span><br><span class="line">  timer: <span class="literal">null</span>,</span><br><span class="line">  start: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 解决第一个问题</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.timer) &#123;</span><br><span class="line">      <span class="built_in">clearInterval</span>(<span class="built_in">this</span>.timer);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">this</span>.timer = <span class="built_in">setInterval</span>(<span class="built_in">this</span>.step.bind(<span class="literal">null</span>, ++counter), <span class="number">1000</span>);</span><br><span class="line">  &#125;,</span><br><span class="line">  step: <span class="function"><span class="keyword">function</span> (<span class="params">flag</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">    <span class="keyword">var</span> h = date.getHours();</span><br><span class="line">    <span class="keyword">var</span> m = date.getMinutes();</span><br><span class="line">    <span class="keyword">var</span> s = date.getSeconds();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;%d-----&gt; %d:%d:%d&quot;</span>, flag, h, m, s);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 解决第二个问题</span></span><br><span class="line">  destroy: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;----&gt; stop &lt;----&#x27;</span>);</span><br><span class="line">    <span class="built_in">clearInterval</span>(<span class="built_in">this</span>.timer);</span><br><span class="line">    node = <span class="literal">null</span>;</span><br><span class="line">    counter = <span class="keyword">void</span>(<span class="number">0</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">document</span>.querySelector(<span class="string">&#x27;.start&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, clock.start.bind(clock), <span class="literal">false</span>);</span><br><span class="line"><span class="built_in">document</span>.querySelector(<span class="string">&#x27;.stop&#x27;</span>).addEventListener(<span class="string">&#x27;click&#x27;</span>, clock.destroy.bind(clock), <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="EventListener"><a href="#EventListener" class="headerlink" title="EventListener"></a><strong>EventListener</strong></h2><p>做移动开发时，需要对不同设备尺寸做适配。如在开发组件时，有时需要考虑处理横竖屏适配问题。一般做法，在横竖屏发生变化时，需要将组件销毁后再重新生成。而在组件中会对其进行相关事件绑定，如果在销毁组件时，没有将组件的事件解绑，在横竖屏发生变化时，就会不断地对组件进行事件绑定。这样会导致一些异常，甚至可能会导致页面崩掉。</p>
+<h3 id="实例——-gt-demos-callbacks-html"><a href="#实例——-gt-demos-callbacks-html" class="headerlink" title="实例——&gt;demos/callbacks.html"></a><strong>实例——&gt;<a target="_blank" rel="noopener" href="https://github.com/zhansingsong/js-leakage-patterns/blob/master/demos/callbacks.html">demos/callbacks.html</a></strong></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>callbacks<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> container = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.container&#x27;</span>);</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> counter = <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> createHtml = <span class="function"><span class="keyword">function</span> (<span class="params">n, counter</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> template = <span class="string">`<span class="subst">$&#123;(<span class="keyword">new</span> <span class="built_in">Array</span>(n)).join(<span class="string">`&lt;div&gt;<span class="subst">$&#123;counter&#125;</span>: this is a new data &lt;input type=&quot;button&quot; value=&quot;remove&quot;&gt;&lt;/div&gt;`</span>)&#125;</span>`</span></span></span><br><span class="line">      container.innerHTML = template;</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> resizeCallback = <span class="function"><span class="keyword">function</span> (<span class="params">init</span>) </span>&#123;</span></span><br><span class="line">      createHtml(10, ++counter);</span><br><span class="line"><span class="javascript">      <span class="comment">// 事件委托</span></span></span><br><span class="line"><span class="javascript">      container.addEventListener(<span class="string">&#x27;click&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">event</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> target = event.target;</span></span><br><span class="line"><span class="javascript">          <span class="keyword">if</span>(target.tagName === <span class="string">&#x27;INPUT&#x27;</span>)&#123;</span></span><br><span class="line">              container.removeChild(target.parentElement)</span><br><span class="line">          &#125;</span><br><span class="line"><span class="javascript">      &#125;, <span class="literal">false</span>);   </span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.addEventListener(<span class="string">&#x27;resize&#x27;</span>, resizeCallback, <span class="literal">false</span>);</span></span><br><span class="line"><span class="javascript">    resizeCallback(<span class="literal">true</span>);</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>页面是存在问题的，这里结合Devtools–&gt;Performance分析一下问题所在，操作步骤如下：</p>
+<p><strong>⚠️注：最好在隐藏窗口中进行分析工作，避免浏览器插件影响分析结果</strong></p>
+<ol>
+<li>开启Performance项的记录</li>
+<li>执行一次CG，创建基准参考线</li>
+<li>对窗口大小进行调整</li>
+<li>执行一次CG</li>
+<li>停止记录</li>
+</ol>
+<img src="/posts/49515/v2-25250ce8b5de2d39a6acb8b11b41b150_1440w.jpg" class="" title="v2-25250ce8b5de2d39a6acb8b11b41b150_1440w.jpg">
+
+<p>如分析结果所示，在窗口大小变化时，会不断地对<code>container</code>添加代理事件。</p>
+<p>同一个元素节点注册了多个相同的EventListener，那么重复的实例会被抛弃。这么做不会让得EventListener被重复调用，也不需要用removeEventListener手动清除多余的EventListener，因为重复的都被自动抛弃了。而这条规则只是针对于命名函数。<a href="https://link.zhihu.com/?target=https://triangle717.wordpress.com/2015/12/14/js-avoid-duplicate-listeners/">对于匿名函数，浏览器会将其看做不同的EventListener</a>，所以只要将匿名的EventListener，命名一下就可以解决问题：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> container = <span class="built_in">document</span>.querySelector(<span class="string">&#x27;.container&#x27;</span>);</span><br><span class="line">    <span class="keyword">var</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">var</span> createHtml = <span class="function"><span class="keyword">function</span> (<span class="params">n, counter</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> template = <span class="string">`<span class="subst">$&#123;(<span class="keyword">new</span> <span class="built_in">Array</span>(n)).join(<span class="string">`&lt;div&gt;<span class="subst">$&#123;counter&#125;</span>: this is a new data &lt;input type=&quot;button&quot; value=&quot;remove&quot;&gt;&lt;/div&gt;`</span>)&#125;</span>`</span></span><br><span class="line">      container.innerHTML = template;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    <span class="keyword">var</span> clickCallback = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> target = event.target;</span><br><span class="line">      <span class="keyword">if</span> (target.tagName === <span class="string">&#x27;INPUT&#x27;</span>) &#123;</span><br><span class="line">        container.removeChild(target.parentElement)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> resizeCallback = <span class="function"><span class="keyword">function</span> (<span class="params">init</span>) </span>&#123;</span><br><span class="line">      createHtml(<span class="number">10</span>, ++counter);</span><br><span class="line">      <span class="comment">// 事件委托</span></span><br><span class="line">      container.addEventListener(<span class="string">&#x27;click&#x27;</span>, clickCallback, <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">window</span>.addEventListener(<span class="string">&#x27;resize&#x27;</span>, resizeCallback, <span class="literal">false</span>);</span><br><span class="line">    resizeCallback(<span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在Devtools–&gt;Performance中再重复上述操作，分析结果如下：</p>
+<img src="/posts/49515/v2-91d6e6f31622c18e518b0e1f444235ad_1440w.jpg" class="" title="v2-91d6e6f31622c18e518b0e1f444235ad_1440w.jpg">
+
+<p>在开发中，开发者很少关注事件解绑，因为浏览器已经为我们处理得很好了。不过在使用第三方库时，需要特别注意，因为一般第三方库都实现了自己的事件绑定，如果在使用过程中，在需要销毁事件绑定时，没有调用所解绑方法，就可能造成事件绑定数量的不断增加。如下链接是我在项目中使用jquery，遇见到类似问题：<a href="https://link.zhihu.com/?target=https://github.com/zhansingsong/js-leakage-patterns/blob/master/%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E4%B9%8BListeners/%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E4%B9%8BListeners.md">jQuery中忘记解绑注册的事件，造成内存泄露➹猛击</a></p>
+<p>原文：[<a target="_blank" rel="noopener" href="https://www.cnblogs.com/woniubushinide/p/8024051.html">转]常见的JavaScript内存泄露 - super_素素 - 博客园</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%97%AD%E5%8C%85/" rel="tag"># 闭包</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" rel="tag"># 内存泄漏</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/13548/" rel="prev" title="单行文本截断和显示省略号的三大件">
+                  <i class="fa fa-chevron-left"></i> 单行文本截断和显示省略号的三大件
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/49215/" rel="next" title="Vue数据响应式">
+                  Vue数据响应式 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

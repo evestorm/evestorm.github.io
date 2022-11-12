@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="译者按： Chrome DevTools 很强大，甚至可以替代 IDE 了！  原文: Art of debugging with Chrome DevTools 译者: Fundebug">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-20个ChromeDevTools调试技巧">
+<meta property="og:url" content="https://evestorm.github.io/posts/709/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="译者按： Chrome DevTools 很强大，甚至可以替代 IDE 了！  原文: Art of debugging with Chrome DevTools 译者: Fundebug">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/Experiments.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/log.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/superlog.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/logtable.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/logcolor.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/getEventListeners.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/EagerEvaluation.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/copy.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/await.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/autopre.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/insertlog.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/insertlog.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/tooltips.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/tooltips.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/ide.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/networkoverrides.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/node-debuger.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/node-debuger.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/methodtools.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/709/methodtools.gif">
+<meta property="article:published_time" content="2019-11-17T07:38:03.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.983Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="转载">
+<meta property="article:tag" content="技巧">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/709/Experiments.gif">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/709/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>转载-20个ChromeDevTools调试技巧 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%87%91%E4%B8%9D%E9%9B%80%E7%89%88"><span class="nav-number">1.</span> <span class="nav-text">使用金丝雀版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Console"><span class="nav-number">2.</span> <span class="nav-text">Console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Debugging-in-the-Sources-panel"><span class="nav-number">3.</span> <span class="nav-text">Debugging in the Sources panel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#19-Nodejs-debugging"><span class="nav-number">4.</span> <span class="nav-text">19. Nodejs debugging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-Fundebug"><span class="nav-number">5.</span> <span class="nav-text">关于 Fundebug</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/709/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          转载-20个ChromeDevTools调试技巧
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-17 15:38:03" itemprop="dateCreated datePublished" datetime="2019-11-17T15:38:03+08:00">2019-11-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%B5%8F%E8%A7%88%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">浏览器</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><strong>译者按：</strong> Chrome DevTools 很强大，甚至可以替代 IDE 了！</p>
+<ul>
+<li>原文: <a target="_blank" rel="noopener" href="https://medium.com/frontmen/art-of-debugging-with-chrome-devtools-ab7b5fd8e0b4">Art of debugging with Chrome DevTools</a></li>
+<li>译者: <a target="_blank" rel="noopener" href="https://www.fundebug.com/">Fundebug</a></li>
+</ul>
+<a id="more"></a>
+
+<p><strong>为了保证可读性，本文采用意译而非直译。另外，本文版权归原作者所有，翻译仅用于学习。</strong></p>
+<p><strong>小编推荐：<a target="_blank" rel="noopener" href="https://www.fundebug.com/">Fundebug</a>专注于 JavaScript、微信小程序、微信小游戏，Node.js 和 Java 线上 bug 实时监控。真的是一个很好用的 bug 监控服务，众多大佬公司都在使用。</strong></p>
+<p>谷歌开发者工具提供了一系列的功能来帮助开发者高效 Debug 网页应用，让他们可以更快地查找和修复 bug。在谷歌的开发者工具中，有非常多有用的小工具，但是很多开发者并不知道。通过这篇文章，我把我常用的那些高效 Debug 的 Chrome 开发者工具的功能分享给大家。</p>
+<p>_简洁起见，接下来我会使用<code>开发者工具</code>来指代<code>谷歌开发者工具</code>_。</p>
+<p>在我们开始之前，你需要做一些准备工作。</p>
+<h3 id="使用金丝雀版"><a href="#使用金丝雀版" class="headerlink" title="使用金丝雀版"></a><strong>使用金丝雀版</strong></h3><p>如果你想使用谷歌最新的版本和开发者工具，你可以下载<a target="_blank" rel="noopener" href="https://www.google.com/chrome/canary/">金丝雀版本</a>，甚至把它设置为开发默认打开的浏览器。金丝雀版本旨在为早期接受者提供最新的更新。它可能不稳定，但是大多数时候是没问题的。你要习惯去使用最新最强的谷歌浏览器。</p>
+<p><strong>1. 开启开发者工具的实验性功能</strong></p>
+<p>你可以到<code>chrome://flags</code>页面，然后开启<code>Developer Tools experiments</code>选项。</p>
+<p>当开启后，在开发者工具的设置页面，可以发现多了一个<code>Experiments</code>选项。如果我使用的一些功能你没有看到，那么请到<code>Experiments</code>窗口打开。</p>
+<p><strong>2.超级实验性功能</strong></p>
+<p>如果我使用到的功能在<code>Experiments</code>列表没有，那么它可能是一个 WIP 功能(WIP 指 working in progress)。你可以这样开启：页面处在<code>Experiments</code>界面，连续敲击<code>shift</code>键 6 次来开启 WIP 功能。</p>
+<img src="/posts/709/Experiments.gif" class="" title="Experiments">
+
+<h3 id="Console"><a href="#Console" class="headerlink" title="Console"></a><strong>Console</strong></h3><p>当 Debug 的时候，我们绝大部分时间是在和 Console 打交道。我们往往在代码中插入很多 Console logs，通过打印变量值来 debug。鉴于 Console 对于我们这么重要，很有必要了解所有开发者工具提供的相关的 APIs 和快捷键。</p>
+<p><strong>3. 总是打印对象</strong></p>
+<p>我的第一个建议其实和开发者工具没有关系，而是我一直使用的一个技巧。在使用<code>console.log();</code>的时候，不仅仅打印变量，而是要打印对象，用大括号(<code>&#123;&#125;</code>)将变量包围起来。这样的优点是不仅会把变量的值打印，同时还会将变量名打印出来。</p>
+<img src="/posts/709/log.png" class="" title="log">
+<img src="/posts/709/superlog.png" class="" title="superlog">
+
+<p><strong>4. 使用 console.table 来打印多条目数据</strong></p>
+<p>如果你要打印的变量是一个数组，每一个元素都是一个对象。我建议你使用<code>console.table</code>来打印，其表格化的呈现更加美观易读。</p>
+<img src="/posts/709/logtable.png" class="" title="logtable">
+
+<p><strong>5. 给 log 加点颜色</strong></p>
+<p>log 有时候变得非常多，包含你自己的、一些第三方扩展或者浏览器的 logs。除了使用过滤器(filter)以外，你还可以使用颜色来更好地区分。</p>
+<img src="/posts/709/logcolor.png" class="" title="logcolor">
+
+<p><strong>6. $ 和 $$</strong></p>
+<p>如果你在 console 下没有任何库使用<code>$</code>和<code>$$</code>，那么你可以使用它们分别作为<code>document.querySelector()</code> 和 <code>document.querySelectorAll()</code>的快捷键。</p>
+<p>除了提供了一个更加快捷的方式外，还有一个好处，<code>$$</code>返回一个数组，而不是<a target="_blank" rel="noopener" href="http://2ality.com/2013/05/quirk-array-like-objects.html">array-like</a>的<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/NodeList">NodeList</a>. 所以你可以直接使用<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map</a>, <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce">reduce</a>和<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">filter</a> 函数。</p>
+<p>你可以使用<code>$$</code>检查页面中的无效链接：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all(</span><br><span class="line">  $$(<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">    .map(<span class="function"><span class="params">link</span> =&gt;</span> link.href)</span><br><span class="line">    .map(<span class="function"><span class="params">href</span> =&gt;</span> fetch(href))</span><br><span class="line">)</span><br><span class="line">  .then(<span class="function">() =&gt;</span> <span class="built_in">console</span>.log(<span class="string">&#x27;All links working&#x27;</span>))</span><br><span class="line">  .catch(<span class="function">() =&gt;</span> <span class="built_in">console</span>.error(<span class="string">&#x27;Some links are broken&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>7. $0</strong></p>
+<p>如果你想引用某个 DOM 元素，使用<code>$0</code>。<code>$0</code>指向你当前在 Element 中选中的元素。如果指定了<code>$0</code>，<code>$1</code>指向之前选中的元素。以此类推，直到<code>$4</code>都可以使用。</p>
+<p><strong>8. $_</strong></p>
+<p><code>$_</code>记录了最后一次在 Console 计算的表达式。</p>
+<p><strong>9. getEventListeners()</strong></p>
+<p><code>getEventListeners(domElement)</code> 返回在 DOM 元素上注册的所有的事件。请看下面的例子：</p>
+<img src="/posts/709/getEventListeners.gif" class="" title="getEventListeners">
+
+<p>你也许注意到了，当我在 console 里输入表达式的时候，其结果立即被计算出来了。你可以看到我并没有敲击 Enter 键，而结果已经显示出来。这个是金丝雀版本的一个新功能，叫做”Eager Evaluation”。</p>
+<img src="/posts/709/EagerEvaluation.png" class="" title="EagerEvaluation">
+
+<p><strong>10. debug(fn)</strong></p>
+<p>在上面的例子中，如果你想在点击按钮后的执行过程中暂停，你可以使用<code>debug</code>函数。<code>debug(fn)</code>接收一个函数作为参数，当每次该函数被调用时，Debugger 就会在该函数的第一行中断执行。</p>
+<p>想象一下你要 debug 一个按钮的问题，但是你不知道这个按钮对应的事件函数在代码中什么位置。除了去大量的源代码中慢慢寻找之外，还有一个巧妙的方法。使用<code>getEventListeners</code>函数，然后将<code>debug</code>方法注入进去。这样，当你点击按钮的时候，就会在该函数的第一行停下来。</p>
+<p><strong>11. copy(obj)</strong></p>
+<p><code>copy(anything)</code> 是一个很有用的工具函数方便你将任何东西拷贝到系统的粘贴板暂存。</p>
+<p>给<code>copy</code>函数传入一个没有格式的 JSON，会返回格式化的结果：</p>
+<img src="/posts/709/copy.gif" class="" title="copy">
+
+<p><strong>12. Top-level await</strong></p>
+<p><code>async/await</code> 使得异步操作变得更加容易和可读。唯一的问题在于<code>await</code>需要在 async 函数中使用。如果我们要在 DevTools 的控制台使用，需要一些特殊的处理，使用<strong>I</strong>mmediately <strong>I</strong>nvoked <strong>A</strong>sync <strong>F</strong>unction <strong>E</strong>xpression (IIAFE). 一点都不方便。好在 DevTools 已经支持直接使用 await 了。</p>
+<img src="/posts/709/await.png" class="" title="await">
+
+<h3 id="Debugging-in-the-Sources-panel"><a href="#Debugging-in-the-Sources-panel" class="headerlink" title="Debugging in the Sources panel"></a>Debugging in the Sources panel</h3><p>在 source 面板，使用 breakpoints，stepping-into, stepping-over 等方式，你可以很好地掌控程序的执行状态，来发现代码问题。接下里我不会介绍大家都知道的基础内容，而是一些我经常使用的建议和技巧。</p>
+<p><strong>13. 开启 auto-pretty print</strong></p>
+<p>在金丝雀版本的实验模式下，你可以开启自动美化代码模式。</p>
+<img src="/posts/709/autopre.png" class="" title="autopre">
+
+<p><strong>14. 使用条件断点在生产环境中注入 console logs</strong></p>
+<p>断点是一个很棒的功能。但还有一个更棒的：条件断点。只有当设定的条件满足的时候，中断才会执行。也就是说 DevTools 并不会每次都中断程序的执行，而只是在你想要它中断的时候才中断。想了解更多：查看<a target="_blank" rel="noopener" href="https://developers.google.com/web/updates/2015/07/set-a-breakpoint-based-on-a-certain-condition">这里</a>.</p>
+<p>在生产环境下，因为不能修改源代码，我喜欢使用条件断点来注入 console.log。如果我的断点仅仅是一个 console.log，DevTools 不会中断，因为 console.log 返回 undefined,，是一个 false 的值。但是它会执行我注入的表达式，可以看到输出结果。</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/tools/insertlog.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/insertlog.gif" alt="img"></a></p>
+<img src="/posts/709/insertlog.gif" class="" title="insertlog">
+
+<p>为什么不直接使用普通的断点，并且查看变量呢？有时候我并不想这样做。比如，当我在分析那些频繁执行的操作，例如触摸或则滑动。我并不想每一次都导致 Debugger 触发程序中断，但是我想看到程序输出的结果。</p>
+<p><strong>15. 暂停 UI 在 Hover 状态下的展示结果</strong></p>
+<p>我们很难去检查一个只有在 Hover 状态下展示的元素。比如，如何去检查一个 tooltip？如果你右键并选择检查，元素已经消失了。那么有办法吗？</p>
+<p>我是这么操作的：</p>
+<ol>
+<li>打开 sources 面板</li>
+<li>显示 tooltip</li>
+<li>使用快捷键来暂停脚本执行(将鼠标停留在暂停的图标上查看快捷键)</li>
+<li>回到 Elements 面板，然后像通常一样去检查元素</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/tools/tooltips.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/tooltips.gif" alt="img"></a></p>
+<img src="/posts/709/tooltips.gif" class="" title="tooltips">
+
+<p><strong>16. XHR breakpoints</strong></p>
+<p>如果想要理解一个请求是如何执行的，可以使用 sources 面板的 XHR breakpoints。</p>
+<p><strong>17. 使用 DevTools 作为 IDE</strong></p>
+<p>DevTools 的 source 面板可以说相当强大。你可以快速查找，跳转到某一行，某个函数，执行一段代码，使用多行光标等等。这些功能在<a target="_blank" rel="noopener" href="https://medium.com/google-developers/devtools-tips-for-sublime-text-users-cdd559ee80f8">这篇 medium 文章中有详细描述</a>。</p>
+<p>既然如此，为啥不把整个开发都搬到这里呢。这样就不需要浪费时间切换 IDE 和浏览器了。</p>
+<p>如果你有一个使用<a target="_blank" rel="noopener" href="https://github.com/facebook/create-react-app">create-react-app</a>或则<a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-cli">vue-cli</a>构建的项目，你可以直接把整个文件夹拖到 Sources 面板下。DevTools 会自动对所有文件做映射。所以，你可以在 DevTools 下修改文件并立即查看。这样，整个开发效率，特别是 Debugging 效率绝对提高了。</p>
+<img src="/posts/709/ide.gif" class="" title="ide">
+
+<p><strong>18. 使用 network overrides 来简单调试生产代码</strong></p>
+<p>如果你正在 Debugging 一个生产环境下面的 bug，你可以使用<code>network overrides</code>来调试，而不用在本地搭建整个配置。</p>
+<p>你可以很容易将任何远程的资源下载一份本地的版本，然后可以在 DevTools 下编辑，并且 DevTools 会更新展示你编辑后的文件。</p>
+<img src="/posts/709/networkoverrides.gif" class="" title="networkoverrides">
+
+<p>在生产环境下，也可以很容易 Debugging，并且做一些性能上的测试也变得容易。</p>
+<h3 id="19-Nodejs-debugging"><a href="#19-Nodejs-debugging" class="headerlink" title="19. Nodejs debugging"></a><strong>19. Nodejs debugging</strong></h3><p>如果你想使用 DevTools 的 Debugger 来 debug Node.js 应用，你可以使用<code>--inspect-brk</code> flag 来开启：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node --inspect-brk script.js</span><br></pre></td></tr></table></figure>
+
+<p>跳转到<code>chrome://inspect</code>页面，在<code>Remote Target</code>选项，可以看到 Node 程序。</p>
+<p>并且，在 DevTools 中你会看到一个绿色的 Node 图标，点击图标会打开针对 Node 的 Chrome Debugger。</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/tools/node-debuger.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/node-debuger.gif" alt="img"></a></p>
+<img src="/posts/709/node-debuger.gif" class="" title="node-debuger">
+
+<p>如果你想要用 DevTools Debugger 来 debug 你的单元测试，你需要这样调用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copynode --inspect-brk .&#x2F;node_modules&#x2F;.bin&#x2F;jest</span><br></pre></td></tr></table></figure>
+
+<p>不过这样做其实很麻烦，我们需要自己找到相应的路径。 GoogleChromeLabs 最近发布了一个新的工具非常好用，叫做：<a target="_blank" rel="noopener" href="https://github.com/GoogleChromeLabs/ndb">ndb</a>。使用 ndb，你只需要：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb npx jest</span><br></pre></td></tr></table></figure>
+
+<p>如果你有一个自定义的脚本，你可以这样调用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb npm run unit</span><br></pre></td></tr></table></figure>
+
+<p>更妙的是，如果你在一个有配置<code>package.json</code>的项目下调用<code>ndb</code>，他甚至会自动分析 package.json 中的脚本，方便你直接使用 DevTools。</p>
+<p><strong>20. 使用 Snippets 来辅助 Debugging</strong></p>
+<p>DevTools 提供了一个可以创建和保存小段代码的工具，我很喜欢用它们来加速我的工作。比如 lodashify —  可以快速给任何应用添加 lodash。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">  &#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> element = <span class="built_in">document</span>.createElement(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line">  element.src =</span><br><span class="line">    <span class="string">&#x27;https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js&#x27;</span>;</span><br><span class="line">  element.type = <span class="string">&#x27;text/javascript&#x27;</span>;</span><br><span class="line">  <span class="built_in">document</span>.head.appendChild(element);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<p>另一个小的工具函数式用来增强对象的属性，每次被访问或则修改，它都会提供给我充分的信息，比如谁访问了，谁更改了它。在 Debugging 的时候，非常有用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> traceProperty = <span class="function">(<span class="params">object, property</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> value = object[property];</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(object, property, &#123;</span><br><span class="line">    <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.trace(<span class="string">`<span class="subst">$&#123;property&#125;</span> requested`</span>);</span><br><span class="line">      <span class="keyword">return</span> value;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.trace(<span class="string">`setting <span class="subst">$&#123;property&#125;</span> to `</span>, newValue);</span><br><span class="line">      value = newValue;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://gitee.com/evestorm/various_resources/raw/master/tools/methodtools.gif"><img src="%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%9120%E4%B8%AAChromeDevTools%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/methodtools.gif" alt="img"></a></p>
+<img src="/posts/709/methodtools.gif" class="" title="methodtools">
+
+<p>还有很多非常有用的<a target="_blank" rel="noopener" href="http://bgrins.github.io/devtools-snippets/">devtools 代码片段</a>，你可以直接拿去使用。</p>
+<h3 id="关于-Fundebug"><a href="#关于-Fundebug" class="headerlink" title="关于 Fundebug"></a>关于 Fundebug</h3><p><a target="_blank" rel="noopener" href="https://www.fundebug.com/">Fundebug</a>专注于 JavaScript、微信小程序、微信小游戏、支付宝小程序、React Native、Node.js 和 Java 实时 BUG 监控。 自从 2016 年双十一正式上线，Fundebug 累计处理了 6 亿+错误事件，得到了 Google、360、金山软件等众多知名用户的认可。欢迎免费试用！</p>
+<p>版权声明:<br>转载时请注明作者 Fundebug 以及本文地址：<br><a target="_blank" rel="noopener" href="https://blog.fundebug.com/2018/08/22/art-of-debugging-with-chrome-devtools/">https://blog.fundebug.com/2018/08/22/art-of-debugging-with-chrome-devtools/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+              <a href="/tags/%E6%8A%80%E5%B7%A7/" rel="tag"># 技巧</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/32435/" rel="prev" title="input效果汇总">
+                  <i class="fa fa-chevron-left"></i> input效果汇总
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/62808/" rel="next" title="转载-chrome调试技巧-汇总">
+                  转载-chrome调试技巧-汇总 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

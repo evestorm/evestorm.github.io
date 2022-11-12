@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="watch 与 computed 区别 watch 侦听器 关注点在数据更新：给数据增加侦听器，当数据更新时，侦听器函数执行 特点：数据更新时，需要完成什么样的逻辑 何时使用： 监听一个数据的变化，变化后要干什么，用watch     computed 计算属性 关注点在模板：抽离复用模板中的复杂的逻辑运算 特点：当函数内的依赖更新后，重新调用 何时使用： 专注视图部分的复杂的逻辑运算，用comp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue的watch实现原理">
+<meta property="og:url" content="https://evestorm.github.io/posts/36931/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="watch 与 computed 区别 watch 侦听器 关注点在数据更新：给数据增加侦听器，当数据更新时，侦听器函数执行 特点：数据更新时，需要完成什么样的逻辑 何时使用： 监听一个数据的变化，变化后要干什么，用watch     computed 计算属性 关注点在模板：抽离复用模板中的复杂的逻辑运算 特点：当函数内的依赖更新后，重新调用 何时使用： 专注视图部分的复杂的逻辑运算，用comp">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-12T01:55:26.000Z">
+<meta property="article:modified_time" content="2022-11-12T06:41:40.323Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/36931/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue的watch实现原理 | EVE | 暴风雨前夕</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#watch-%E4%B8%8E-computed-%E5%8C%BA%E5%88%AB"><span class="nav-number">1.</span> <span class="nav-text">watch 与 computed 区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#watch%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">watch实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">实现代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E5%BC%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">实现数据响应式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#src-main-js"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">src&#x2F;main.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-index-js"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">module&#x2F;Vue&#x2F;index.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-reactive-js"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">module&#x2F;Vue&#x2F;reactive.js</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E7%89%B9%E6%80%A7"><span class="nav-number">2.2.2.</span> <span class="nav-text">实现计算属性特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#src-main-js-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">src&#x2F;main.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-Computed-js"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">module&#x2F;Vue&#x2F;Computed.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-index-js-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">module&#x2F;Vue&#x2F;index.js</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BE%A6%E5%90%AC%E5%99%A8%E7%89%B9%E6%80%A7"><span class="nav-number">2.2.3.</span> <span class="nav-text">实现侦听器特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#src-main-js-2"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">src&#x2F;main.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-Watcher-js"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">module&#x2F;Vue&#x2F;Watcher.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-Computed-js-1"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">module&#x2F;Vue&#x2F;Computed.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module-Vue-index-js-2"><span class="nav-number">2.2.3.4.</span> <span class="nav-text">module&#x2F;Vue&#x2F;index.js</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">305</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">103</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/36931/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue的watch实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-12 09:55:26" itemprop="dateCreated datePublished" datetime="2021-08-12T09:55:26+08:00">2021-08-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-11-12 14:41:40" itemprop="dateModified" datetime="2022-11-12T14:41:40+08:00">2022-11-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%A1%86%E6%9E%B6/Vue/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">源码系列</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="watch-与-computed-区别"><a href="#watch-与-computed-区别" class="headerlink" title="watch 与 computed 区别"></a>watch 与 computed 区别</h1><ul>
+<li>watch 侦听器<ul>
+<li>关注点在<strong>数据更新</strong>：给数据增加侦听器，<strong>当数据更新时，侦听器函数执行</strong></li>
+<li>特点：数据更新时，需要完成什么样的逻辑</li>
+<li>何时使用：<ul>
+<li><strong>监听一个数据的变化</strong>，变化后要干什么，用watch</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>computed 计算属性<ul>
+<li><strong>关注点在模板</strong>：抽离复用模板中的<strong>复杂的逻辑运算</strong></li>
+<li>特点：当函数内的<strong>依赖更新后，重新调用</strong></li>
+<li>何时使用：<ul>
+<li>专注<strong>视图</strong>部分的<strong>复杂的逻辑运算</strong>，用computed</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="watch实现"><a href="#watch实现" class="headerlink" title="watch实现"></a>watch实现</h1><h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><ul>
+<li>constructor 接收 options<ul>
+<li>从 options 解构出 <code>data、computed、watch</code></li>
+<li>调用 <code>init()</code> 函数初始化</li>
+</ul>
+</li>
+<li><code>init()</code>函数<ul>
+<li><code>initData</code> 实现 data 数据响应式</li>
+<li><code>initComputed</code> ，获取 computed 实例<ul>
+<li>computed 实例需要有 <code>update</code> 方法用来更新 计算属性新值</li>
+</ul>
+</li>
+<li><code>initWatch</code> ，获取 watch 实例<ul>
+<li>watch 实例需要有 <code>invoke</code> 方法用来重新执行 watch 回调函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>initData</code> 数据劫持<ul>
+<li><code>reactive(vm, __get__, __set__)</code></li>
+</ul>
+</li>
+<li><code>initComputed</code><ul>
+<li>遍历 computed 对象，存进 computedPool 数组中<ul>
+<li>成员对象<ul>
+<li>key: 计算属性名称</li>
+<li>value: 计算值</li>
+<li>get: 函数</li>
+<li>dep: [ 依赖 ]</li>
+</ul>
+</li>
+<li>存完以后还得把 computed 全部挂载到vm上边</li>
+</ul>
+</li>
+<li><code>update(key, watch)</code> <ul>
+<li>setter触发后，用 update 函数更新 computedPool 中对应值</li>
+<li>因为有可能 watch 监听了 computed ，所以再执行下 watcher 中的 invoke 函数，看看有没有必要更新 watch</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>initWatch</code><ul>
+<li>遍历 watch 对象，存进 watchPool 数组中<ul>
+<li>成员对象<ul>
+<li>key: 方法名</li>
+<li>value: fn 函数（记得绑定this为vm）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>invoke(key, newVal, oldVal)</code> <ul>
+<li>遍历 watchPool 找到对应 key 的成员，调用 fn 函数</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h2><h3 id="实现数据响应式"><a href="#实现数据响应式" class="headerlink" title="实现数据响应式"></a>实现数据响应式</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">module</span><br><span class="line">└── Vue</span><br><span class="line">    ├── Computed.js</span><br><span class="line">    ├── Watcher.js</span><br><span class="line">    ├── index.js</span><br><span class="line">    └── reactive.js</span><br><span class="line">src</span><br><span class="line">└── main.js</span><br></pre></td></tr></table></figure>
+
+<h4 id="src-main-js"><a href="#src-main-js" class="headerlink" title="src/main.js"></a>src/main.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;../module/Vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;computed total&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  watch: &#123;</span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch total&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">a</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch a&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">b</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch b&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.b = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-index-js"><a href="#module-Vue-index-js" class="headerlink" title="module/Vue/index.js"></a>module/Vue/index.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; reactive &#125; <span class="keyword">from</span> <span class="string">&#x27;./reactive&#x27;</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vue</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">options</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; data, computed, watch &#125; = options;</span><br><span class="line">    <span class="built_in">this</span>.$data = data();</span><br><span class="line">    <span class="built_in">this</span>.init(<span class="built_in">this</span>, computed, watch);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">init</span>(<span class="params">vm, computed, watch</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.initData(vm);</span><br><span class="line">    <span class="keyword">const</span> computedIns = <span class="built_in">this</span>.initComputed(vm, computed);</span><br><span class="line">    <span class="keyword">const</span> watcherIns = <span class="built_in">this</span>.initWatcher(vm, watch);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="title">initData</span>(<span class="params">vm</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 数据响应式</span></span><br><span class="line">    reactive(vm, <span class="function">(<span class="params">key, value</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(key, value);</span><br><span class="line">    &#125;, <span class="function">(<span class="params">key, newValue, oldValue</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(key, newValue, oldValue);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// computed没暴露在实例上，需要通过传参</span></span><br><span class="line">  <span class="function"><span class="title">initComputed</span>(<span class="params">vm, computed</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 computed ，存到 computedData 中去</span></span><br><span class="line">    <span class="comment">// 返回computed实例 -&gt; 实例里有update -&gt; 更新 computedData 的 value</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">initWatcher</span>(<span class="params">vm, watch</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 watcher -&gt; 增加侦听器</span></span><br><span class="line">    <span class="comment">// 返回watcher实例 -&gt; 实例里有调用 watch 的方法 -&gt; 执行侦听器</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Vue</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * data -&gt; 是个函数得执行 -&gt; data() -&gt;</span></span><br><span class="line"><span class="comment"> * 得挂载到 vm.$data 上 -&gt; 得实现响应式 reactive -&gt; </span></span><br><span class="line"><span class="comment"> * 利用 Object.defineProperty -&gt; 挂载到vm上:vm.xxx</span></span><br><span class="line"><span class="comment"> *    get vm[key] -&gt; 获取的是 vm.$data[key]</span></span><br><span class="line"><span class="comment"> *    set vm[key] -&gt; 设置的是 vm.$data[key] = newVal</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateComputedProp -&gt; value更新</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateWatchProp -&gt; watch函数callback执行</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * computed -&gt; computedData = &#123;</span></span><br><span class="line"><span class="comment"> *    value -&gt; 通过 get 计算而来</span></span><br><span class="line"><span class="comment"> *    get   -&gt; method</span></span><br><span class="line"><span class="comment"> *    deps  -&gt; [a, b] method中当前computed属性的依赖</span></span><br><span class="line"><span class="comment"> *            根据 setter 触发后的 key ，</span></span><br><span class="line"><span class="comment"> *            对比下依赖里边有没有，有就重新执行get</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * watch -&gt; watchPool -&gt; 存的fn -&gt;</span></span><br><span class="line"><span class="comment"> *          $data下的setter触发 -&gt; 执行 callback</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-reactive-js"><a href="#module-Vue-reactive-js" class="headerlink" title="module/Vue/reactive.js"></a>module/Vue/reactive.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">reactive</span>(<span class="params">vm, __get__, __set__</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 因为在 getter、setter 中要做很多事情，例如update</span></span><br><span class="line">  <span class="comment">// 所以声明两个回调， __get__、__set__</span></span><br><span class="line">  <span class="keyword">const</span> _data = vm.$data;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> _data) &#123;</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        __get__(key, _data[key]);</span><br><span class="line">        <span class="keyword">return</span> _data[key];</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">        <span class="comment">// 由于 watch 函数有 newVal 和 oldVal ，</span></span><br><span class="line">        <span class="comment">// 所以得保存一份修改之前的数据</span></span><br><span class="line">        <span class="keyword">const</span> oldValue = _data[key];</span><br><span class="line">        _data[key] = newValue;</span><br><span class="line">        __set__(key, newValue, oldValue);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现计算属性特性"><a href="#实现计算属性特性" class="headerlink" title="实现计算属性特性"></a>实现计算属性特性</h3><ul>
+<li><p>写成一个类</p>
+</li>
+<li><p>方法</p>
+</li>
+<li><ul>
+<li>addComputed</li>
+<li>update</li>
+</ul>
+</li>
+<li><p>类似发布订阅模式</p>
+</li>
+</ul>
+<h4 id="src-main-js-1"><a href="#src-main-js-1" class="headerlink" title="src/main.js"></a>src/main.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;../module/Vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="comment">// descriptor.value</span></span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;computed total&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// descriptor.value.get</span></span><br><span class="line">    total2: &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;computed total2&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  watch: &#123;</span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch total&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">a</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch a&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">b</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch b&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.b = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-Computed-js"><a href="#module-Vue-Computed-js" class="headerlink" title="module/Vue/Computed.js"></a>module/Vue/Computed.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Computed</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * // descriptor.value</span></span><br><span class="line"><span class="comment">     * total() &#123;</span></span><br><span class="line"><span class="comment">     *   console.log(&#x27;computed total&#x27;);</span></span><br><span class="line"><span class="comment">     *   return this.a + this.b;</span></span><br><span class="line"><span class="comment">     * &#125;,</span></span><br><span class="line"><span class="comment">     * // descriptor.value.get</span></span><br><span class="line"><span class="comment">     * total2: &#123;</span></span><br><span class="line"><span class="comment">     *   get() &#123;</span></span><br><span class="line"><span class="comment">     *     console.log(&#x27;computed total2&#x27;);</span></span><br><span class="line"><span class="comment">     *     return this.a + this.b;</span></span><br><span class="line"><span class="comment">     *   &#125;</span></span><br><span class="line"><span class="comment">     * &#125;</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * &#123;</span></span><br><span class="line"><span class="comment">     *  key: total,</span></span><br><span class="line"><span class="comment">     *  value: 3</span></span><br><span class="line"><span class="comment">     *  get: total fn</span></span><br><span class="line"><span class="comment">     *  dep: [a, b]</span></span><br><span class="line"><span class="comment">     * &#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">this</span>.computedData = [];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">addComputed</span>(<span class="params">vm, computed, key</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(computed, key),</span><br><span class="line">          descriptorFn = descriptor.value.get</span><br><span class="line">                          ? descriptor.value.get</span><br><span class="line">                          : descriptor.value,</span><br><span class="line">          value = descriptorFn.call(vm),</span><br><span class="line">          get = descriptorFn.bind(vm), <span class="comment">// 保证正确的 this 指向</span></span><br><span class="line">          dep = <span class="built_in">this</span>._collectDep(descriptorFn);</span><br><span class="line">    <span class="built_in">this</span>._addComputedProp(&#123;</span><br><span class="line">      key,</span><br><span class="line">      value,</span><br><span class="line">      get,</span><br><span class="line">      dep</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>.computedData);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> computedItem = <span class="built_in">this</span>.computedData.find(<span class="function"><span class="params">item</span> =&gt;</span> item.key === key);</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> computedItem.value;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">// this.total = 500 不生效，还是自身get计算过来的值</span></span><br><span class="line">      <span class="comment">// 保证计算属性是正确的</span></span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">        computedItem.value = computedItem.get()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">update</span>(<span class="params">key, cb</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 遍历 computed 池，</span></span><br><span class="line">    <span class="comment">// 找有没有哪个 computed 的 dep 依赖中有此 key</span></span><br><span class="line">    <span class="comment">// 如果依赖(key)值变更了，</span></span><br><span class="line">    <span class="comment">// 就重新执行相应 computed 的 value（利用get()）</span></span><br><span class="line">    <span class="built_in">this</span>.computedData.map(<span class="function"><span class="params">computed</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> dep = computed.dep;</span><br><span class="line">      <span class="keyword">const</span> find = dep.find(<span class="function"><span class="params">v</span> =&gt;</span> v === key);</span><br><span class="line">      <span class="keyword">if</span> (find) &#123;</span><br><span class="line">        computed.value = computed.get();</span><br><span class="line">        cb &amp;&amp; cb(computed.key, computed.value);</span><br><span class="line">        <span class="comment">// update值之后，可能还有事儿要干，所以</span></span><br><span class="line">        <span class="comment">// 留一个cb，使其更新后调用</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">_addComputedProp</span>(<span class="params">computedProp</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.computedData.push(computedProp);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">_collectDep</span>(<span class="params">fn</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> matched = fn.toString().match(<span class="regexp">/this\.(.+?)/g</span>);</span><br><span class="line">    <span class="comment">// console.log(matched); </span></span><br><span class="line">    <span class="comment">// matched : [&#x27;this.a&#x27;, &#x27;this.b&#x27;]</span></span><br><span class="line">    <span class="keyword">return</span> matched.map(<span class="function"><span class="params">item</span> =&gt;</span> item.split(<span class="string">&#x27;.&#x27;</span>)[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Computed;</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-index-js-1"><a href="#module-Vue-index-js-1" class="headerlink" title="module/Vue/index.js"></a>module/Vue/index.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; reactive &#125; <span class="keyword">from</span> <span class="string">&#x27;./reactive&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Computed <span class="keyword">from</span> <span class="string">&#x27;./Computed&#x27;</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vue</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">options</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; data, computed, watch &#125; = options;</span><br><span class="line">    <span class="built_in">this</span>.$data = data();</span><br><span class="line">    <span class="built_in">this</span>.init(<span class="built_in">this</span>, computed, watch);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">init</span>(<span class="params">vm, computed, watch</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.initData(vm);</span><br><span class="line">    <span class="keyword">const</span> computedIns = <span class="built_in">this</span>.initComputed(vm, computed);</span><br><span class="line">    <span class="keyword">const</span> watcherIns = <span class="built_in">this</span>.initWatcher(vm, watch);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">this</span>.$computed = computedIns.update.bind(computedIns); <span class="comment">// 保证 update 的 this 指向 computedIns 实例</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="title">initData</span>(<span class="params">vm</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 数据响应式</span></span><br><span class="line">    reactive(vm, <span class="function">(<span class="params">key, value</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// console.log(key, value);</span></span><br><span class="line">    &#125;, <span class="function">(<span class="params">key, newValue, oldValue</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// console.log(key, newValue, oldValue);</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// 更新依赖key的computed</span></span><br><span class="line">      <span class="built_in">this</span>.$computed(key);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// computed没暴露在实例上，需要通过传参</span></span><br><span class="line">  <span class="function"><span class="title">initComputed</span>(<span class="params">vm, computed</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 computed ，存到 computedData 中去</span></span><br><span class="line">    <span class="comment">// 返回实例 -&gt; 实例里有update -&gt; 更新 computedData 的 value</span></span><br><span class="line">    <span class="keyword">const</span> computedIns = <span class="keyword">new</span> Computed();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> computed) &#123;</span><br><span class="line">      computedIns.addComputed(vm, computed, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> computedIns;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">initWatcher</span>(<span class="params">vm, watch</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 watcher -&gt; 增加侦听器</span></span><br><span class="line">    <span class="comment">// 返回实例 -&gt; 实例里有调用 watch 的方法 -&gt; 执行侦听器</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Vue</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * data -&gt; 是个函数得执行 -&gt; data() -&gt;</span></span><br><span class="line"><span class="comment"> * 得挂载到 vm.$data 上 -&gt; 得实现响应式 reactive -&gt; </span></span><br><span class="line"><span class="comment"> * 利用 Object.defineProperty -&gt; 挂载到vm上:vm.xxx</span></span><br><span class="line"><span class="comment"> *    get vm[key] -&gt; 获取的是 vm.$data[key]</span></span><br><span class="line"><span class="comment"> *    set vm[key] -&gt; 设置的是 vm.$data[key] = newVal</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateComputedProp -&gt; value更新</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateWatchProp -&gt; watch函数callback执行</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * computed -&gt; computedData = &#123;</span></span><br><span class="line"><span class="comment"> *    value -&gt; 通过 get 计算而来</span></span><br><span class="line"><span class="comment"> *    get   -&gt; method</span></span><br><span class="line"><span class="comment"> *    deps  -&gt; [a, b] method中当前computed属性的依赖</span></span><br><span class="line"><span class="comment"> *            根据 setter 触发后的 key ，</span></span><br><span class="line"><span class="comment"> *            对比下依赖里边有没有，有就重新执行get</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * watch -&gt; watchPool -&gt; 存的fn -&gt;</span></span><br><span class="line"><span class="comment"> *          $data下的setter触发 -&gt; 执行 callback</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现侦听器特性"><a href="#实现侦听器特性" class="headerlink" title="实现侦听器特性"></a>实现侦听器特性</h3><h4 id="src-main-js-2"><a href="#src-main-js-2" class="headerlink" title="src/main.js"></a>src/main.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">&#x27;../module/Vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">&#x27;#app&#x27;</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      a: <span class="number">1</span>,</span><br><span class="line">      b: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    <span class="comment">// descriptor.value</span></span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;computed total&#x27;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// descriptor.value.get</span></span><br><span class="line">    total2: &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;computed total2&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.a + <span class="built_in">this</span>.b;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  watch: &#123;</span><br><span class="line">    <span class="function"><span class="title">total</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch total&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">a</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch a&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">b</span>(<span class="params">newVal, oldVal</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;watch b&#x27;</span>, newVal, oldVal);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.a = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br><span class="line"></span><br><span class="line">vm.b = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(vm.total);</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-Watcher-js"><a href="#module-Vue-Watcher-js" class="headerlink" title="module/Vue/Watcher.js"></a>module/Vue/Watcher.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Watcher</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * addWatcher(vm, watcher, key)</span></span><br><span class="line"><span class="comment">   * </span></span><br><span class="line"><span class="comment">   * this.watchers -&gt; watch</span></span><br><span class="line"><span class="comment">   * </span></span><br><span class="line"><span class="comment">   * </span></span><br><span class="line"><span class="comment">   * total(newVal, oldVal) &#123;</span></span><br><span class="line"><span class="comment">   *   console.log(&#x27;watch total&#x27;, newVal, oldVal);</span></span><br><span class="line"><span class="comment">   * &#125;</span></span><br><span class="line"><span class="comment">   * </span></span><br><span class="line"><span class="comment">   * </span></span><br><span class="line"><span class="comment">   * &#123;</span></span><br><span class="line"><span class="comment">   *  key,</span></span><br><span class="line"><span class="comment">   *  fn</span></span><br><span class="line"><span class="comment">   * &#125;</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.watchers = [];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">addWatcher</span>(<span class="params">vm, watcher, key</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>._addWatchProp(&#123;</span><br><span class="line">      key,</span><br><span class="line">      fn: watcher[key].bind(vm)</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// console.log(this.watchers);</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 调用 watcher</span></span><br><span class="line">  <span class="function"><span class="title">invoke</span>(<span class="params">key, newValue, oldValue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.watchers.map(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (item.key === key) &#123;</span><br><span class="line">        item.fn(newValue, oldValue);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">_addWatchProp</span>(<span class="params">watchProp</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.watchers.push(watchProp);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Watcher;</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-Computed-js-1"><a href="#module-Vue-Computed-js-1" class="headerlink" title="module/Vue/Computed.js"></a>module/Vue/Computed.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Computed</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * // descriptor.value</span></span><br><span class="line"><span class="comment">     * total() &#123;</span></span><br><span class="line"><span class="comment">     *   console.log(&#x27;computed total&#x27;);</span></span><br><span class="line"><span class="comment">     *   return this.a + this.b;</span></span><br><span class="line"><span class="comment">     * &#125;,</span></span><br><span class="line"><span class="comment">     * // descriptor.value.get</span></span><br><span class="line"><span class="comment">     * total2: &#123;</span></span><br><span class="line"><span class="comment">     *   get() &#123;</span></span><br><span class="line"><span class="comment">     *     console.log(&#x27;computed total2&#x27;);</span></span><br><span class="line"><span class="comment">     *     return this.a + this.b;</span></span><br><span class="line"><span class="comment">     *   &#125;</span></span><br><span class="line"><span class="comment">     * &#125;</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * &#123;</span></span><br><span class="line"><span class="comment">     *  key: total,</span></span><br><span class="line"><span class="comment">     *  value: 3</span></span><br><span class="line"><span class="comment">     *  get: total fn</span></span><br><span class="line"><span class="comment">     *  dep: [a, b]</span></span><br><span class="line"><span class="comment">     * &#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">this</span>.computedData = [];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">addComputed</span>(<span class="params">vm, computed, key</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(computed, key),</span><br><span class="line">          descriptorFn = descriptor.value.get</span><br><span class="line">                          ? descriptor.value.get</span><br><span class="line">                          : descriptor.value,</span><br><span class="line">          value = descriptorFn.call(vm),</span><br><span class="line">          get = descriptorFn.bind(vm), <span class="comment">// 保证正确的 this 指向</span></span><br><span class="line">          dep = <span class="built_in">this</span>._collectDep(descriptorFn);</span><br><span class="line">    <span class="built_in">this</span>._addComputedProp(&#123;</span><br><span class="line">      key,</span><br><span class="line">      value,</span><br><span class="line">      get,</span><br><span class="line">      dep</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>.computedData);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> computedItem = <span class="built_in">this</span>.computedData.find(<span class="function"><span class="params">item</span> =&gt;</span> item.key === key);</span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(vm, key, &#123;</span><br><span class="line">      <span class="function"><span class="title">get</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> computedItem.value;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">// this.total = 500 不生效，还是自身get计算过来的值</span></span><br><span class="line">      <span class="comment">// 保证计算属性是正确的</span></span><br><span class="line">      <span class="function"><span class="title">set</span>(<span class="params">newValue</span>)</span> &#123;</span><br><span class="line">        computedItem.value = computedItem.get()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">update</span>(<span class="params">key, watch</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 遍历 computed 池，</span></span><br><span class="line">    <span class="comment">// 找有没有哪个 computed 的 dep 依赖中有此 key</span></span><br><span class="line">    <span class="comment">// 如果依赖(key)值变更了，</span></span><br><span class="line">    <span class="comment">// 就重新执行相应 computed 的 value（利用get()）</span></span><br><span class="line">    <span class="built_in">this</span>.computedData.map(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> dep = item.dep;</span><br><span class="line">      <span class="keyword">const</span> _key = dep.find(<span class="function"><span class="params">v</span> =&gt;</span> v === key);</span><br><span class="line">      <span class="keyword">if</span> (_key) &#123;</span><br><span class="line">        <span class="keyword">const</span> oldValue = item.value;</span><br><span class="line">        item.value = item.get();</span><br><span class="line">        <span class="comment">// cb &amp;&amp; cb(computed.key, computed.value);</span></span><br><span class="line">        <span class="comment">// update值之后，可能还有事儿要干，所以</span></span><br><span class="line">        <span class="comment">// 留一个cb，使其更新后调用</span></span><br><span class="line">        <span class="comment">// 其实cb就是watch，需要在computed变更后，</span></span><br><span class="line">        <span class="comment">//看看watcher里有没有监听computed的更新</span></span><br><span class="line">        <span class="comment">// 所以把 cb 改成 watch</span></span><br><span class="line">        watch(item.key, item.value, oldValue);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">_addComputedProp</span>(<span class="params">computedProp</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.computedData.push(computedProp);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">_collectDep</span>(<span class="params">fn</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> matched = fn.toString().match(<span class="regexp">/this\.(.+?)/g</span>);</span><br><span class="line">    <span class="comment">// console.log(matched); </span></span><br><span class="line">    <span class="comment">// matched : [&#x27;this.a&#x27;, &#x27;this.b&#x27;]</span></span><br><span class="line">    <span class="keyword">return</span> matched.map(<span class="function"><span class="params">item</span> =&gt;</span> item.split(<span class="string">&#x27;.&#x27;</span>)[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Computed;</span><br></pre></td></tr></table></figure>
+
+<h4 id="module-Vue-index-js-2"><a href="#module-Vue-index-js-2" class="headerlink" title="module/Vue/index.js"></a>module/Vue/index.js</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; reactive &#125; <span class="keyword">from</span> <span class="string">&#x27;./reactive&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Computed <span class="keyword">from</span> <span class="string">&#x27;./Computed&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> Watcher <span class="keyword">from</span> <span class="string">&#x27;./Watcher&#x27;</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vue</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">options</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; data, computed, watch &#125; = options;</span><br><span class="line">    <span class="built_in">this</span>.$data = data();</span><br><span class="line">    <span class="built_in">this</span>.init(<span class="built_in">this</span>, computed, watch);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">init</span>(<span class="params">vm, computed, watch</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.initData(vm);</span><br><span class="line">    <span class="keyword">const</span> computedIns = <span class="built_in">this</span>.initComputed(vm, computed);</span><br><span class="line">    <span class="keyword">const</span> watcherIns = <span class="built_in">this</span>.initWatcher(vm, watch);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">this</span>.$computed = computedIns.update.bind(computedIns); <span class="comment">// 保证 update 的 this 指向 computedIns 实例</span></span><br><span class="line">    <span class="built_in">this</span>.$watch = watcherIns.invoke.bind(watcherIns);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="title">initData</span>(<span class="params">vm</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 数据响应式</span></span><br><span class="line">    reactive(vm, <span class="function">(<span class="params">key, value</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// console.log(key, value);</span></span><br><span class="line">    &#125;, <span class="function">(<span class="params">key, newValue, oldValue</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// console.log(key, newValue, oldValue);</span></span><br><span class="line">      <span class="keyword">if</span> (newValue === oldValue) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 更新依赖key的computed</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// 还需要监听 computed 中的 值 的变化，所以把 $watch 也传进去</span></span><br><span class="line">      <span class="built_in">this</span>.$computed(key, <span class="built_in">this</span>.$watch);</span><br><span class="line">      <span class="built_in">this</span>.$watch(key, newValue, oldValue);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// computed没暴露在实例上，需要通过传参</span></span><br><span class="line">  <span class="function"><span class="title">initComputed</span>(<span class="params">vm, computed</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 computed ，存到 computedData 中去</span></span><br><span class="line">    <span class="comment">// 返回实例 -&gt; 实例里有update -&gt; 更新 computedData 的 value</span></span><br><span class="line">    <span class="keyword">const</span> computedIns = <span class="keyword">new</span> Computed();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> computed) &#123;</span><br><span class="line">      computedIns.addComputed(vm, computed, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> computedIns;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">initWatcher</span>(<span class="params">vm, watch</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 枚举 watcher -&gt; 增加侦听器</span></span><br><span class="line">    <span class="comment">// 返回实例 -&gt; 实例里有调用 watch 的方法 -&gt; 执行侦听器</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> watcherIns = <span class="keyword">new</span> Watcher();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> watch) &#123;</span><br><span class="line">      watcherIns.addWatcher(vm, watch, key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> watcherIns;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Vue;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Vue</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * data -&gt; 是个函数得执行 -&gt; data() -&gt;</span></span><br><span class="line"><span class="comment"> * 得挂载到 vm.$data 上 -&gt; 得实现响应式 reactive -&gt; </span></span><br><span class="line"><span class="comment"> * 利用 Object.defineProperty -&gt; 挂载到vm上:vm.xxx</span></span><br><span class="line"><span class="comment"> *    get vm[key] -&gt; 获取的是 vm.$data[key]</span></span><br><span class="line"><span class="comment"> *    set vm[key] -&gt; 设置的是 vm.$data[key] = newVal</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateComputedProp -&gt; value更新</span></span><br><span class="line"><span class="comment"> *        触发后 -&gt; updateWatchProp -&gt; watch函数callback执行</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * computed -&gt; computedData = &#123;</span></span><br><span class="line"><span class="comment"> *    value -&gt; 通过 get 计算而来</span></span><br><span class="line"><span class="comment"> *    get   -&gt; method</span></span><br><span class="line"><span class="comment"> *    deps  -&gt; [a, b] method中当前computed属性的依赖</span></span><br><span class="line"><span class="comment"> *            根据 setter 触发后的 key ，</span></span><br><span class="line"><span class="comment"> *            对比下依赖里边有没有，有就重新执行get</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * watch -&gt; watchPool -&gt; 存的fn -&gt;</span></span><br><span class="line"><span class="comment"> *          $data下的setter触发 -&gt; 执行 callback</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/13531/" rel="prev" title="ul-li模拟table">
+                  <i class="fa fa-chevron-left"></i> ul-li模拟table
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/29154/" rel="next" title="作用域和闭包">
+                  作用域和闭包 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
