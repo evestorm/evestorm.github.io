@@ -220,20 +220,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">318</span>
+          <span class="site-state-item-count">319</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-count">70</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">109</span>
+        <span class="site-state-item-count">110</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -498,6 +498,113 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/44625/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/44625/" class="post-title-link" itemprop="url">MYSQLin子句效率低下优化</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-01-03 17:02:15" itemprop="dateCreated datePublished" datetime="2023-01-03T17:02:15+08:00">2023-01-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%90%8E%E7%AB%AF/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/" itemprop="url" rel="index"><span itemprop="name">MYSQL</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/44625/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://evestorm.github.io/posts/44625/" class="cy_cmt_count" data-xid="posts/44625/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>连表查询遇到个问题：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">  t2.id <span class="keyword">AS</span> videoId,</span><br><span class="line">  t2.title <span class="keyword">AS</span> videoName,</span><br><span class="line">  uId <span class="keyword">AS</span> upName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">  t_xinwu_comment_video t1</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">  t._xinwu_video t2</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">  t2.id = t1.bId</span><br><span class="line"><span class="keyword">WHERE</span> t1.uId <span class="keyword">IN</span> (<span class="string">&#x27;up0196956&#x27;</span>, <span class="string">&#x27;up0196956&#x27;</span>, <span class="string">&#x27;up0197018&#x27;</span>, <span class="string">&#x27;upo197299&#x27;</span>,  <span class="string">&#x27;upo197268&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>表数据才1000多条，但是查询耗时接近5s，肯定哪儿出了问题，开始以为是没索引的问题，后边发现两张表都有索引。最后查资料有人说可以在 in 外边包一层，当临时表处理，能够提高查询效率：</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/44625/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/23570/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -570,12 +677,14 @@
     <div class="post-body" itemprop="articleBody">
           <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>MacOS Ventura 13.0.1<br>MySQL 8.0.31<br>Navicat Premium 12.0.22</p>
 <h2 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息"></a>错误信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Authentication plugin &#x27;caching_sha2_password&#x27; cannot be loaded: dlopen(/usr/local/mysql/lib/plugin/caching_sha2_password.so, 2): ...</span><br></pre></td></tr></table></figure>
-
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>不是客户端 Navicat 的原因，是 MySQL 兼容问题，需要修改数据库的认证方式<br>MySQL8.0 版本默认的认证方式是 caching_sha2_password<br>MySQL5.7 版本则为 mysql_native_password。</p>
-<p>官方文档：<br><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password">https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password</a></p>
-<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>用终端连接MySQL,然后执行以下命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ALTER USER &#x27;root&#x27;@&#x27;localhost&#x27; IDENTIFIED WITH mysql_native_password BY &#x27;yourpassword&#x27;;</span><br></pre></td></tr></table></figure>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/23570/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1199,110 +1308,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/12531/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
-      <meta itemprop="name" content="Lance">
-      <meta itemprop="description" content="Front-end developer and iOS developer">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="EVE | 暴风雨前夕">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/12531/" class="post-title-link" itemprop="url">ECharts坐标轴标签文本过长的处理方案</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-01 21:31:31" itemprop="dateCreated datePublished" datetime="2022-12-01T21:31:31+08:00">2022-12-01</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          /
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/" itemprop="url" rel="index"><span itemprop="name">UI</span></a>
-        </span>
-          /
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/UI/ECharts/" itemprop="url" rel="index"><span itemprop="name">ECharts</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/posts/12531/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://evestorm.github.io/posts/12531/" class="cy_cmt_count" data-xid="posts/12531/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>实现 ECharts Y轴文本过长，设置超出隐藏，然后显示省略号，并且鼠标悬浮上之后显示全部</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/12531/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
@@ -1338,7 +1343,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
