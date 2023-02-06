@@ -963,15 +963,42 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>来源：<a target="_blank" rel="noopener" href="https://github.com/jawil/notes/issues/2">https://github.com/jawil/notes/issues/2</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/50710/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <h1 id="本地生成-rsa"><a href="#本地生成-rsa" class="headerlink" title="本地生成 rsa"></a>本地生成 rsa</h1><p>终端输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br><span class="line"><span class="comment"># 输入文件路径+文件名</span></span><br><span class="line">/Users/yangliang/.ssh/github_lance_rsa <span class="comment"># 默认不输入 路径+文件名就是: ~/.ssh/id_rsa</span></span><br></pre></td></tr></table></figure>
+
+<p>输入完路径+文件名后一路回车：</p>
+<img src="/posts/50710/keygen.png" class="" title="keygen">
+
+<p>打印或复制公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub      <span class="comment"># 控制台上输出内容</span></span><br><span class="line">pbcopy &lt; ~/.ssh/id_rsa.pub <span class="comment"># 自动拷贝到粘贴板</span></span><br></pre></td></tr></table></figure>
+
+<img src="/posts/50710/cat_ssh.png" class="" title="cat_ssh">
+
+<img src="/posts/50710/find_tree.png" class="" title="find_tree">
+
+<h1 id="github-添加-ssh"><a href="#github-添加-ssh" class="headerlink" title="github 添加 ssh"></a>github 添加 ssh</h1><p>前往 GitHub 网站的 <code>&quot;account settings&quot;</code></p>
+<p>依次点击 <code>&quot;Setting -&gt; SSH Keys&quot;-&gt;&quot;New SSH key&quot;</code></p>
+<p>Title 处填写 “id_rsa.pub” 或其他任意信息（上图我的命名为 <code>github_lance_rsa</code>）。 key处原样拷贝上边复制的公钥信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pbcopy &lt; ~/.ssh/id_rsa.pub <span class="comment"># 自动拷贝到粘贴板</span></span><br></pre></td></tr></table></figure>
+
+<p>最后，输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 对于我的账号，则是：</span></span><br><span class="line">ssh -T evestorm@github.com</span><br></pre></td></tr></table></figure>
+
+<p>如果报错</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Permission denied (publickey)</span><br></pre></td></tr></table></figure>
+
+<p>则输入如下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add -k ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置-git-config"><a href="#配置-git-config" class="headerlink" title="配置 git config"></a>配置 git config</h1><p>终端输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.ssh/config</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/50710/find_config.png" class="" title="find_config">
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># gitlab 公司gitlab</span></span><br><span class="line">Host gitlab</span><br><span class="line">    User git</span><br><span class="line">    HostName gitlab.company.com</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    IdentityFile ~/.ssh/gitlab_rsa</span><br><span class="line">    ServerAliveInterval 300</span><br><span class="line">    ServerAliveCountMax 10</span><br><span class="line"><span class="comment"># github 个人github</span></span><br><span class="line">Host github</span><br><span class="line">    User git</span><br><span class="line">    HostName github.com</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    IdentityFile ~/.ssh/github_rsa</span><br><span class="line">    ServerAliveInterval 300</span><br><span class="line">    ServerAliveCountMax 10</span><br></pre></td></tr></table></figure>
+
+<h1 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h1><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21402411/answer/95945718">https://www.zhihu.com/question/21402411/answer/95945718</a></p>
+
       
     </div>
 

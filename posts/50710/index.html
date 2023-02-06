@@ -23,20 +23,23 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="来源：https:&#x2F;&#x2F;github.com&#x2F;jawil&#x2F;notes&#x2F;issues&#x2F;2">
+<meta name="description" content="本地生成 rsa终端输入： 123ssh-keygen -t rsa# 输入文件路径+文件名&#x2F;Users&#x2F;yangliang&#x2F;.ssh&#x2F;github_lance_rsa # 默认不输入 路径+文件名就是: ~&#x2F;.ssh&#x2F;id_rsa  输入完路径+文件名后一路回车：   打印或复制公钥： 12cat ~&#x2F;.ssh&#x2F;id_rsa.pub      # 控制台上输出内容pbcopy &lt; ~&#x2F;.s">
 <meta property="og:type" content="article">
 <meta property="og:title" content="同一台电脑配置多个git账号">
 <meta property="og:url" content="https://evestorm.github.io/posts/50710/index.html">
 <meta property="og:site_name" content="EVE | 暴风雨前夕">
-<meta property="og:description" content="来源：https:&#x2F;&#x2F;github.com&#x2F;jawil&#x2F;notes&#x2F;issues&#x2F;2">
+<meta property="og:description" content="本地生成 rsa终端输入： 123ssh-keygen -t rsa# 输入文件路径+文件名&#x2F;Users&#x2F;yangliang&#x2F;.ssh&#x2F;github_lance_rsa # 默认不输入 路径+文件名就是: ~&#x2F;.ssh&#x2F;id_rsa  输入完路径+文件名后一路回车：   打印或复制公钥： 12cat ~&#x2F;.ssh&#x2F;id_rsa.pub      # 控制台上输出内容pbcopy &lt; ~&#x2F;.s">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://evestorm.github.io/posts/50710/ssh-keys.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/50710/keygen.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/50710/cat_ssh.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/50710/find_tree.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/50710/find_config.png">
 <meta property="article:published_time" content="2022-11-12T07:30:58.000Z">
-<meta property="article:modified_time" content="2022-11-12T07:38:24.928Z">
+<meta property="article:modified_time" content="2023-02-06T06:55:56.386Z">
 <meta property="article:author" content="Lance">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://evestorm.github.io/posts/50710/ssh-keys.png">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/50710/keygen.png">
 
 
 <link rel="canonical" href="https://evestorm.github.io/posts/50710/">
@@ -209,7 +212,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH-Key-%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">SSH Key 的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gitlab-%E5%92%8C-github-%E4%B8%8D%E5%90%8C%E8%B4%A6%E5%8F%B7%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">gitlab 和 github 不同账号配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B8%85%E9%99%A4-git-%E7%9A%84%E5%85%A8%E5%B1%80%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.1.</span> <span class="nav-text">清除 git 的全局设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%8F%A6%E5%A4%96%E4%B8%80%E4%B8%AA%E8%B4%A6%E5%8F%B7%E6%96%B0%E7%9A%84SSH-keys"><span class="nav-number">3.2.</span> <span class="nav-text">生成另外一个账号新的SSH keys</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E4%B8%AA%E7%94%B5%E8%84%91-%E4%B8%A4%E4%B8%AA-github-%E8%B4%A6%E5%8F%B7%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">同一个电脑 两个 github 账号配置</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%94%9F%E6%88%90-rsa"><span class="nav-number">1.</span> <span class="nav-text">本地生成 rsa</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#github-%E6%B7%BB%E5%8A%A0-ssh"><span class="nav-number">2.</span> <span class="nav-text">github 添加 ssh</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-git-config"><span class="nav-number">3.</span> <span class="nav-text">配置 git config</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%A5%E6%BA%90"><span class="nav-number">4.</span> <span class="nav-text">来源</span></a></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -358,70 +361,41 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>来源：<a target="_blank" rel="noopener" href="https://github.com/jawil/notes/issues/2">https://github.com/jawil/notes/issues/2</a></p>
-<a id="more"></a>
+        <h1 id="本地生成-rsa"><a href="#本地生成-rsa" class="headerlink" title="本地生成 rsa"></a>本地生成 rsa</h1><p>终端输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br><span class="line"><span class="comment"># 输入文件路径+文件名</span></span><br><span class="line">/Users/yangliang/.ssh/github_lance_rsa <span class="comment"># 默认不输入 路径+文件名就是: ~/.ssh/id_rsa</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>在日常使用 <code>git</code> 作为仓库使用的时候，有时可能会遇到这样的一些情况：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 有两个 `github` 账号，一台电脑怎么同时连接这两个账号进行维护呢？</span><br><span class="line">2. 自己用一个 `github` 账号，平时用来更新自己的一些资料；公司使用的 `gitlab`（也是 `git` 的衍生产品）</span><br></pre></td></tr></table></figure>
+<p>输入完路径+文件名后一路回车：</p>
+<img src="/posts/50710/keygen.png" class="" title="keygen">
 
-<h3 id="SSH-Key-的配置"><a href="#SSH-Key-的配置" class="headerlink" title="SSH Key 的配置"></a><code>SSH Key</code> 的配置</h3><p>1.<code>Windows</code> 下打开 <code>Git Bash</code>，创建 <code>SSH Key</code>，按提示输入密码，可以不填密码一路回车</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh-keygen -t rsa -C <span class="string">&quot;注册邮箱&quot;</span></span></span><br></pre></td></tr></table></figure>
+<p>打印或复制公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub      <span class="comment"># 控制台上输出内容</span></span><br><span class="line">pbcopy &lt; ~/.ssh/id_rsa.pub <span class="comment"># 自动拷贝到粘贴板</span></span><br></pre></td></tr></table></figure>
 
-<p>然后用户主目录 <code>/.ssh/</code> 下有两个文件，<code>id_rsa</code> 是私钥，<code>id_rsa.pub</code> 是公钥</p>
-<p>2.获取 <code>key</code>，打开 <code>.ssh</code> 下的 <code>id_rsa.pub</code> 文件，里面的内容就是 <code>key</code> 的内容</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> start ~/.ssh/id_rsa.pub</span></span><br></pre></td></tr></table></figure>
+<img src="/posts/50710/cat_ssh.png" class="" title="cat_ssh">
 
-<p>3.登录 <code>GitHub</code>，打开<code>SSH Keys</code> 页面，<a target="_blank" rel="noopener" href="https://github.com/settings/ssh">快捷地址</a></p>
-<img src="/posts/50710/ssh-keys.png" class="" title="100%">
+<img src="/posts/50710/find_tree.png" class="" title="find_tree">
 
-<p>4.测试 <code>ssh key</code> 是否成功，使用命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh -T git@github.com</span></span><br></pre></td></tr></table></figure>
+<h1 id="github-添加-ssh"><a href="#github-添加-ssh" class="headerlink" title="github 添加 ssh"></a>github 添加 ssh</h1><p>前往 GitHub 网站的 <code>&quot;account settings&quot;</code></p>
+<p>依次点击 <code>&quot;Setting -&gt; SSH Keys&quot;-&gt;&quot;New SSH key&quot;</code></p>
+<p>Title 处填写 “id_rsa.pub” 或其他任意信息（上图我的命名为 <code>github_lance_rsa</code>）。 key处原样拷贝上边复制的公钥信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pbcopy &lt; ~/.ssh/id_rsa.pub <span class="comment"># 自动拷贝到粘贴板</span></span><br></pre></td></tr></table></figure>
 
-<p>如果出现 <code>You’ve successfully authenticated, but GitHub does not provide shell access</code> 。这就表示已成功连上 <code>github</code>。</p>
-<h3 id="gitlab-和-github-不同账号配置"><a href="#gitlab-和-github-不同账号配置" class="headerlink" title="gitlab 和 github 不同账号配置"></a>gitlab 和 github 不同账号配置</h3><p>一般开发用户应该都配置过一个git的账号，想在添加一个账号。</p>
-<h4 id="清除-git-的全局设置"><a href="#清除-git-的全局设置" class="headerlink" title="清除 git 的全局设置"></a>清除 <code>git</code> 的全局设置</h4><p>使用 <strong>git config –list</strong> 查看当前配置</p>
-<p>如果你之前在设置本地仓库和 <code>github</code> 连接的时候设置过 <code>user.name</code> 和 <code>user.email</code>, 那么你必须首先清楚掉该设置，因为不清楚掉该设置，两个账号在提交资料的时候，验证肯定冲突（只能设置一个全局的<code>user.name</code> 和 <code>user.email</code>，而你现在有两个账号就对应两个不同的）。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1.取消global</span><br><span class="line">git config --global --unset user.name</span><br><span class="line">git config --global --unset user.email</span><br><span class="line"></span><br><span class="line">2.设置每个项目repo的自己的user.email</span><br><span class="line">git config  user.email &quot;xxxx@xx.com&quot;</span><br><span class="line">git config  user.name &quot;suzie&quot;</span><br></pre></td></tr></table></figure>
+<p>最后，输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 对于我的账号，则是：</span></span><br><span class="line">ssh -T evestorm@github.com</span><br></pre></td></tr></table></figure>
 
-<p>或者直接直接编辑电脑<code>.gitconfig</code> 文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~&#x2F;&#x2F; 进入根目录</span><br><span class="line">$ vim .gitconfig &#x2F;&#x2F; 把 &#96;name&#96; 和 &#96;email&#96; 都去掉</span><br></pre></td></tr></table></figure>
+<p>如果报错</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Permission denied (publickey)</span><br></pre></td></tr></table></figure>
 
-<h4 id="生成另外一个账号新的SSH-keys"><a href="#生成另外一个账号新的SSH-keys" class="headerlink" title="生成另外一个账号新的SSH keys"></a>生成另外一个账号新的SSH keys</h4><ol>
-<li>用 <code>ssh-keygen</code> 命令生成一组新的<code> id_rsa_new</code> 和 <code>id_rsa_new.pub</code></li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;new email&quot;</span><br></pre></td></tr></table></figure>
+<p>则输入如下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add -k ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
 
-<p>平时我们都是直接回车，默认生成 <code>id_rsa</code> 和 <code>id_rsa.pub</code>。这里特别需要注意，出现提示输入文件名的时候(<code>Enter file in which to save the key (~/.ssh/id_rsa): id_rsa_new</code>)要输入与默认配置不一样的文件名，比如：我这里填的是 <code>id_rsa_new</code>.</p>
-<p>注：<code>windows</code> 用户和 <code>mac</code> 用户的区别就是，<code>mac</code> 中 <code>.ssh</code> 文件夹在根目录下，所以表示成 <code>~/.ssh/</code> ,而 <code>windwos</code> 用户是 <code>C:\Users\Administrator\.ssh</code>。</p>
-<ol>
-<li>执行 <code>ssh-agent</code> 让 <code>ssh</code> 识别新的私钥，因为默认只读取 <code>id_rsa</code>，为了让 <code>SSH</code> 识别新的私钥，需将其添加到 <code>SSH agent</code> 中：</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh-add ~/.ssh/id_rsa_work</span>  </span><br></pre></td></tr></table></figure>
+<h1 id="配置-git-config"><a href="#配置-git-config" class="headerlink" title="配置 git config"></a>配置 git config</h1><p>终端输入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.ssh/config</span><br></pre></td></tr></table></figure>
 
-<p>如果出现 <strong>Could not open a connection to your authentication agent</strong> 的错误，就试着用以下命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh-agent bash</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ssh-add ~/.ssh/id_rsa_work</span></span><br></pre></td></tr></table></figure>
+<img src="/posts/50710/find_config.png" class="" title="find_config">
 
-<ol>
-<li>配置 <code>~/.ssh/config</code> 文件<br>前面我们在 <code>~/.ssh</code> 目录下面，使用 <code>ssh-keygen -C “your_email” -t rsa</code> 生成公私秘钥，当有多个<code>github</code> 账号的时候，可以生成多组 <code>rsa</code> 的公司密钥。然后配置 <code>~/.ssh/config</code> 文件（如果没有的话请重新创建一个）。</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> touch config        <span class="comment"># 创建config文件</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># gitlab 公司gitlab</span></span><br><span class="line">Host gitlab</span><br><span class="line">    User git</span><br><span class="line">    HostName gitlab.company.com</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    IdentityFile ~/.ssh/gitlab_rsa</span><br><span class="line">    ServerAliveInterval 300</span><br><span class="line">    ServerAliveCountMax 10</span><br><span class="line"><span class="comment"># github 个人github</span></span><br><span class="line">Host github</span><br><span class="line">    User git</span><br><span class="line">    HostName github.com</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    IdentityFile ~/.ssh/github_rsa</span><br><span class="line">    ServerAliveInterval 300</span><br><span class="line">    ServerAliveCountMax 10</span><br></pre></td></tr></table></figure>
 
-<p>然后修改如下：<br>我的 <code>config</code> 配置如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 该文件用于配置私钥对应的服务器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Default github user(609514766@qq.com)</span></span><br><span class="line">Host git@github.com</span><br><span class="line">HostName github.com</span><br><span class="line">User jawil</span><br><span class="line">IdentityFile ~/.ssh/id_rsa_github</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> gitlab user(yenian.ll@alibaba-inc.com)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 建一个gitlab别名，新建的帐号使用这个别名做克隆和更新</span></span><br><span class="line">Host git@gitlab.alibaba-inc.com</span><br><span class="line">HostName gitlab.alibaba-inc.com</span><br><span class="line">User yenian.ll</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
-
-<p>如果存在 <code>config </code>文件的话，其实就是往这个 <code>config</code> 中添加一个 <code>Host</code>。</p>
-<h3 id="同一个电脑-两个-github-账号配置"><a href="#同一个电脑-两个-github-账号配置" class="headerlink" title="同一个电脑 两个 github 账号配置"></a>同一个电脑 两个 github 账号配置</h3><p>然而事情并没有到此结束，装完逼还想跑那是不行的。小猪日后发现自己是一个念旧的人。他想要同时使用两个 <code>github</code>。</p>
-<p>那好吧，<code>What a big deal～</code></p>
-<p>这个时候我们需要先找到 <code>~/.ssh/config</code> 文件，然后往里面添加如下配置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Host jawil.github.com</span><br><span class="line">        HostName github.com</span><br><span class="line">        IdentityFile ~/.ssh/github_rsa</span><br></pre></td></tr></table></figure>
-
-<p>我们指定 pig.github.com 这个”作用域”下的ssh连接统一指向 <code>github.com</code> ，并且使用之前生成好的 <code>github_rsa</code> 这个密钥加密。</p>
-<p>那么默认的就是使用 <code>~/.ssh/id_rsa</code> 这个密钥加密咯。 并且 <code>HostName</code> 与“作用域”相同。这个就不需要我们管了。</p>
-<p>这个时候我们测试一下呗。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh -T git@jawil.github.com</span></span><br><span class="line">Hi jawil! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> ssh -T git@github.com</span></span><br><span class="line">Hi yenian!  You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
-
-<p>: ) , orz , 这时候还差最后一步，就是修改一下我们在 <code>jawil</code> 克隆下来的项目的 <code>remote</code> “作用域” 。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git remote rm origin</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git remote add origin git@jawil.github.com:jawil/demo.git</span> </span><br><span class="line">// 注意是 `jawil.github.com` 噢？把这个理解为一个“作用域”吧。</span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin master</span></span><br><span class="line">Everything up-to-date </span><br></pre></td></tr></table></figure>
+<h1 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h1><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21402411/answer/95945718">https://www.zhihu.com/question/21402411/answer/95945718</a></p>
 
     </div>
 
