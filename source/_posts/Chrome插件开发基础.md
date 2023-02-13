@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 首先，给一个大致通信图。关于 `content script`、`popup script`、`background script`，它们之间的通信总体概览图如下：
 
-![overview](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/ce44193d-0aaf-4db2-bd8d-7d2694d6db32/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T045648Z&X-Amz-Expires=86400&X-Amz-Signature=d285d5d206fee8a91e37b48f9d26363599fccb20e024cab9edb153b575375f19&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img overview.png overview %}
 
 开始吧。还是和以前一样，新建插件文件夹，增加必须的 `manifest.json` 和基本文件。
 
@@ -207,7 +207,7 @@ document.getElementById('rBgInfo').onclick = function() {
 
 在 `popup.html` 引入 `popup.js` ，并添加id为 `rBgInfo` 的按钮，安装插件，点击按钮，如果弹窗如下样式，则表明成功。
 
-![alert popup](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/2206e862-1913-496d-b1c8-3ecb9b58204b/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T045956Z&X-Amz-Expires=86400&X-Amz-Signature=a43c50956f0dca67095af7918b57a069854539d1b64d3aae71ceb53891b473a5&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img alertPopup.png alertPopup %}
 
 ### `popup` 给 `background` 发送消息
 
@@ -250,7 +250,7 @@ if (pups.length) {
 
 点击插件刷新按钮，点击【背景页】按钮，可以看到每次点击一下插件图标，就会发送一次信息。
 
-![send to bg](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/0fc85460-ad0f-4d83-8cf2-641dd64a555c/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T050147Z&X-Amz-Expires=86400&X-Amz-Signature=f077af9cb79829a01591137ed323da108e29384eb15ed1fa3ec36d46aea40f3f&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img send2Bg.png send-to-bg %}
 
 这也告诉了 chrome 插件的另一个机制：点击图标出现和隐藏 `popup` 弹窗页面，实际上是对整个页面的销毁，类似于关闭网页，而不是切换网页。（很重要的哦）
 
@@ -294,7 +294,7 @@ function getAll() {
 
 刷新插件，点击插件图标，就会弹窗如下页面了：
 
-![popup page](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/2f1e970a-6684-448b-bc28-2237f67e8c10/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T050348Z&X-Amz-Expires=86400&X-Amz-Signature=d0bbb3fad32c1cffa63ef8fb2c430f6d9dae0f4ba28bf698df81f71ae108d0be&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img popupPage.png popup-page %}
 
 ## `popup` 和 `content` 之间的通信
 
@@ -346,11 +346,11 @@ chrome.runtime.onMessage.addListener((req,sender, sendResponse) => {
 
 刷新插件，点击插件按钮，打开一个页面，保持插件 `popup` 处于活跃状态（上面讲了哈~，插件关闭等于页面销毁），然后刷新页面，会发现浏览器弹出弹窗：
 
-![alert-popup](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b97e7eef-6086-4761-bfd6-e111311a8d74/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T050607Z&X-Amz-Expires=86400&X-Amz-Signature=0386014a41e7eec0b293d1bbb7029c2bf6d86ce3bdbc4dc360b5cb308f6d4df7&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img alertPopup2.png alert-popup2 %}
 
 最后，右键插件图标，点击“审查弹窗内容”，可以看到 `content.js` 和 `popup.js` 的 `console.log` 日志（👻这等于告诉您如何调试插件~）
 
-![console log](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/eb2d15f1-eb91-41ab-9e93-02da76acd9a3/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T050646Z&X-Amz-Expires=86400&X-Amz-Signature=dede02fea6330d3b777de099b0f4cc13518fefea7760111d74725fbefad6415d&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img console-log.png console-log %}
 
 弹窗说明我们的程序是成功运行的，日志打印表明我们的通信是成功的，现在我们已经知道了 `content` 给 `popup` 发送消息。
 
@@ -389,7 +389,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 点击插件刷新按钮，打开页面，点击弹窗的 `rBgInfo` 按钮，日志打印如下：
 
-![log content](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/594d0979-9b93-42fd-a049-31dd920f0966/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T050818Z&X-Amz-Expires=86400&X-Amz-Signature=726e193f4c530db4fd4c1cb3468224ed733c530cb2cf863376ecc992f636d972&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img log-content.png log-content %}
 
 关于 `popup` 给 `content` 的通信又又又成功了~
 
@@ -413,7 +413,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 2. 通过单击页面右侧「开发者模式」旁边的切换开关来启用开发人员模式。
 3. 单击“加载已解压的扩展程序”按钮，然后选择插件目录。
 
-![unpacked extension](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b07234d3-a7d0-4b6d-896f-9ba067506d57/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230124%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230124T051057Z&X-Amz-Expires=86400&X-Amz-Signature=9d436c532fbcf8b494874b52874e63f9d4fe991fb93ab56589d1403a60675707&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+{% asset_img unpacked-extension.png unpacked-extension %}
 
 # 参考资源
 
