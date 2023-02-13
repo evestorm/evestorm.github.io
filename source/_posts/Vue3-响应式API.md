@@ -6,7 +6,6 @@ categories:
   - 前端
   - 框架
   - Vue3
-top: true
 abbrlink: 6721
 date: 2021-10-15 09:01:52
 ---
@@ -293,7 +292,7 @@ export default {
 - reactive 对象属性更新，对应 toRef 值也会更新
 - 使用场景：
 
-- - 不需要整个 reactive 响应式对象，只想使用其下的某个属性单独拿出来作为响应式 ref 使用
+  - - 不需要整个 reactive 响应式对象，只想使用其下的某个属性单独拿出来作为响应式 ref 使用
 
 ```vue
 <template></template>
@@ -964,8 +963,6 @@ export default {
 
 {% asset_img 1647089101778-e7ed038b-c9c2-4d94-9fcc-87614f72a78d.png 100% %}
 
-
-
 - 首次执行 watchEffect ，是在组件 `mounted` 之前被调用
 
 ```vue
@@ -1391,7 +1388,7 @@ export default {
 
 - 检查一个对象是否是被 **reactive 或者 readonly** 代理的对象
 
-- - 普通对象为 false
+  - - 普通对象为 false
   - **自己 new 的 Proxy 对象为 false**
 
 ```vue
@@ -1460,7 +1457,6 @@ export default {
 ```
 
 {% asset_img 1647137350474-7b2fcf97-69ce-4938-aa26-3343c5ba771b.png 100% %}
-
 
 ## shallowReactive
 
@@ -1586,7 +1582,6 @@ export default {
 ```
 
 {% asset_img 1647141911211-b3fe9c17-814d-41c8-aade-f2173bdc2552.png 100% %}
-
 
 - markRow 和 `shallowXXX` API 默认都只作用于对象的第一层对象，第二层就失效了
   - 例如
