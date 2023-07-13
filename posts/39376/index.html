@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="原文链接：https:&#x2F;&#x2F;ishadeed.com&#x2F;article&#x2F;clip-path&#x2F; 以前当我第一次学习 CSS clip-path 时，我花了比预计更多的时间，并且也很难记住它。我不知道确切的原因，可能是因为我没有经常使用它吧? 不管怎样，我会和你一起重新学习它。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="翻译-理解CSS的clip-path">
+<meta property="og:url" content="https://evestorm.github.io/posts/39376/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="原文链接：https:&#x2F;&#x2F;ishadeed.com&#x2F;article&#x2F;clip-path&#x2F; 以前当我第一次学习 CSS clip-path 时，我花了比预计更多的时间，并且也很难记住它。我不知道确切的原因，可能是因为我没有经常使用它吧? 不管怎样，我会和你一起重新学习它。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/circle.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/circle.gif">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/coordinate-system.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/circle2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/circle3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/inset.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/inset-radius.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/inset-radius2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/ellipse-1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/polygon-1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/path-1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/use-case-1-1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/use-case-1-2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/use-case-2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/inset-directions-1.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/use-case-3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/39376/use-case-4.png">
+<meta property="article:published_time" content="2023-05-16T06:32:03.000Z">
+<meta property="article:modified_time" content="2023-06-04T09:49:17.172Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="SVG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/39376/circle.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/39376/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>翻译-理解CSS的clip-path | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E8%A7%92%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.</span> <span class="nav-text">直角坐标系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Clip-Path-%E7%9A%84%E5%80%BC"><span class="nav-number">3.</span> <span class="nav-text">Clip-Path 的值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Inset"><span class="nav-number">3.1.</span> <span class="nav-text">Inset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Circle"><span class="nav-number">3.2.</span> <span class="nav-text">Circle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ellipse"><span class="nav-number">3.3.</span> <span class="nav-text">Ellipse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Polygon"><span class="nav-number">3.4.</span> <span class="nav-text">Polygon</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Path"><span class="nav-number">3.5.</span> <span class="nav-text">Path</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">用例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%9C%E8%A7%92%E6%95%88%E6%9E%9C"><span class="nav-number">4.1.</span> <span class="nav-text">斜角效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E6%96%9C%E8%A7%92%E6%95%88%E6%9E%9C%E7%9B%B8%E5%AF%B9%E4%BA%8E%E7%94%A8%E6%88%B7%E5%8F%AF%E8%A7%86%E7%AA%97%E5%8F%A3%E5%AE%BD%E5%BA%A6"><span class="nav-number">4.2.</span> <span class="nav-text">使斜角效果相对于用户可视窗口宽度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E6%96%9C%E8%A7%92%E6%95%88%E6%9E%9C"><span class="nav-number">4.3.</span> <span class="nav-text">多重斜角效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%9A%E5%8A%A8%E4%B8%AD%E5%B1%95%E7%A4%BA"><span class="nav-number">4.4.</span> <span class="nav-text">滚动中展示</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Inset-1"><span class="nav-number">4.4.1.</span> <span class="nav-text">Inset</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%82%AC%E5%81%9C-%E4%BB%A5%E5%8F%8A-%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C"><span class="nav-number">4.5.</span> <span class="nav-text">悬停 以及 动画效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%BC%AA%E6%95%88%E6%9E%9C"><span class="nav-number">4.6.</span> <span class="nav-text">连漪效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Clip-Path-%E5%80%BC%E5%BE%97%E4%B8%80%E7%9F%A5%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="nav-number">5.</span> <span class="nav-text">Clip-Path 值得一知的知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E8%A7%81%E5%8C%BA%E5%9F%9F%E4%B8%8D%E6%8E%A5%E6%94%B6-pointer-%E4%BA%8B%E4%BB%B6"><span class="nav-number">5.1.</span> <span class="nav-text">不可见区域不接收 pointer 事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%A0%E5%8F%AF%E4%BB%A5%E7%94%A8%E7%9B%B8%E5%AF%B9%E5%80%BC"><span class="nav-number">5.2.</span> <span class="nav-text">你可以用相对值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%85%E8%AF%BB%E6%9B%B4%E5%A4%9A"><span class="nav-number">6.</span> <span class="nav-text">阅读更多</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">332</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">115</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/39376/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          翻译-理解CSS的clip-path
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-05-16 14:32:03" itemprop="dateCreated datePublished" datetime="2023-05-16T14:32:03+08:00">2023-05-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/39376/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/39376/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文链接：<a target="_blank" rel="noopener" href="https://ishadeed.com/article/clip-path/">https://ishadeed.com/article/clip-path/</a></p>
+<p>以前当我第一次学习 CSS <code>clip-path</code> 时，我花了比预计更多的时间，并且也很难记住它。我不知道确切的原因，可能是因为我没有经常使用它吧? 不管怎样，我会和你一起重新学习它。</p>
+<a id="more"></a>
+
+<p>在本文中，我旨在为您提供有关 <code>clip-path</code> 的详细工作原理、何时使用它以及如何在您的Web开发项目中使用它的清晰解释。您准备好了吗？让我们开始吧。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>clip-path</code> 属性创造一个剪切区域，内容在该区域是可见的，而该区域之外是隐藏。以下例子演示一个圆形剪切区域。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#77cce9</span>;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">circle</span>(<span class="number">80px</span> at <span class="number">50%</span> <span class="number">50%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/circle.png" class="" title="circle">
+
+<p>应用clip-path后，可见区域仅为蓝色圆形。圆形外的任何内容都是不可见的。以下是一个动画，展示了前一个示例中圆形的剪辑效果。</p>
+<img src="/posts/39376/circle.gif" class="" title="动画展示">
+
+<h2 id="直角坐标系"><a href="#直角坐标系" class="headerlink" title="直角坐标系"></a>直角坐标系</h2><p>在深入了解 <code>clip-path</code> 的细节前，值得提下直角坐标系的运作。原点是左上角，x轴向右，y轴向下。</p>
+<img src="/posts/39376/coordinate-system.png" class="" title="coordinate-system">
+
+<p>有了这个理解，让我们来看一个简单的示例，以了解如何裁剪元素。在这个示例中，需要裁剪的区域是一个大小为 <code>100px</code> 的圆，其圆心位于 <code>0,0</code>（左上角）。</p>
+<img src="/posts/39376/circle2.png" class="" title="circle2">
+
+<p>请注意，用户只能看到高亮区域（深蓝色）。圆的其余部分被<strong>裁剪</strong>了。问题是，我们如何才能让整个圆可见呢？好的，我们需要改变x轴和y轴的位置。</p>
+<img src="/posts/39376/circle3.png" class="" title="circle3">
+
+<p>圆的中心位置距离左侧 <code>100px</code>，距离顶部 <code>100px</code>。现在你已经了解了坐标系统是如何工作的，接下来我会解释 <code>clip-path</code> 属性可能的取值。</p>
+<h2 id="Clip-Path-的值"><a href="#Clip-Path-的值" class="headerlink" title="Clip-Path 的值"></a>Clip-Path 的值</h2><h3 id="Inset"><a href="#Inset" class="headerlink" title="Inset"></a>Inset</h3><p><code>inset</code> 值定义一个嵌入的长方形。我们可以控制四个边，就像我们处理 <code>margin</code> 或 <code>padding</code>。以下例子演示一个区域的 <code>inset</code> 的边 (上下左右) 都是 <code>20px</code> 。</p>
+<img src="/posts/39376/inset.png" class="" title="inset">
+
+<p>如果你需要微调边缘的插入量，可以这样做。这是另一个示例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">inset</span>(<span class="number">20px</span> <span class="number">20px</span> <span class="number">50px</span> <span class="number">20px</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该元素距离底部边距 <code>50px</code> 。</p>
+<p>问题是，我们是否可以有圆形内边距？ 是的！这是可能的，感谢 <code>round</code> 关键字。附加 <code>round &lt;border-radius&gt;</code> 关键字可以使角落变成圆角。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">inset</span>(<span class="number">20px</span> <span class="number">20px</span> <span class="number">50px</span> round <span class="number">15px</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/inset-radius.png" class="" title="inset-radius">
+
+<p>不仅如此，我们还可以单独调整每个边的半径。下面是一个示例，其中顶部右侧和底部左侧角落的半径为零。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">inset</span>(<span class="number">20px</span> <span class="number">20px</span> <span class="number">50px</span> round <span class="number">15px</span> <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/inset-radius2.png" class="" title="inset-radius2">
+
+<h3 id="Circle"><a href="#Circle" class="headerlink" title="Circle"></a>Circle</h3><p>要使用 <code>circle()</code> 值，我们需要它的半径和位置。下面是一个示例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">circle</span>(<span class="number">80px</span> at <span class="number">50%</span> <span class="number">50%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>圆的半径是 <code>80px</code>，它的位置是距 <code>x</code> 和 <code>y</code> 轴 <code>50%</code> 。</p>
+<h3 id="Ellipse"><a href="#Ellipse" class="headerlink" title="Ellipse"></a>Ellipse</h3><p>利用 <code>ellipse()</code>，我们可以设定寛度和高度来创造一个椭圆形。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">ellipse</span>(<span class="number">100px</span> <span class="number">80px</span> at center);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/ellipse-1.png" class="" title="ellipse-1">
+
+<h3 id="Polygon"><a href="#Polygon" class="headerlink" title="Polygon"></a>Polygon</h3><p>对我来说，<code>polygon()</code> 是最有趣的。我们可以有能力去控制多个不同的x和y轴的值。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">5%</span> <span class="number">5%</span>, <span class="number">95%</span> <span class="number">5%</span>, <span class="number">95%</span> <span class="number">95%</span>, <span class="number">5%</span> <span class="number">95%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/polygon-1.png" class="" title="polygon-1">
+
+<p>我们可以用 <code>polygon</code> 设定多个点的值，画复杂的形状。</p>
+<h3 id="Path"><a href="#Path" class="headerlink" title="Path"></a>Path</h3><p><code>path()</code> 值允许我们使用 <code>SVG</code> 路径来裁剪特定区域。目前，浏览器支持不一致。为了使它在不同的浏览器中正常工作，我们需要使用内联 <code>SVG</code> ，然后将 <code>url()</code> 用作 <code>clip-path</code> 的值。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">svg</span> <span class="attr">class</span>=<span class="string">&quot;svg&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">clipPath</span> <span class="attr">id</span>=<span class="string">&quot;triangle&quot;</span> <span class="attr">clipPathUnits</span>=<span class="string">&quot;objectBoundingBox&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">path</span> <span class="attr">d</span>=<span class="string">&quot;M0.05,0.05 h1 v1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">path</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">clipPath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">svg</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在 CSS 中，我们需要把 path 值（通常是id）传入 <code>url()</code> 中。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.card</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">url</span>(<span class="string">&quot;#triangle&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/posts/39376/path-1.png" class="" title="path-1">
+
+<p>我们了解了 <code>clip-path</code> 的理论和它的可取值，是时候用它来实战探索一些用例。你准备好吗？</p>
+<h2 id="用例"><a href="#用例" class="headerlink" title="用例"></a>用例</h2><h3 id="斜角效果"><a href="#斜角效果" class="headerlink" title="斜角效果"></a>斜角效果</h3><p>在网络上，你可能看见网站的一个区域会有细微斜角背景， 利用 <code>clip-path</code> 可以完全实现该效果。</p>
+<p>你能猜出怎样实现斜角效果？我们需要使用 <code>polygon()</code> 。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.section</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">0</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">80%</span>, <span class="number">0</span> <span class="number">100%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>某些情况下，去调整 <code>polygon</code> 的8个值是烦人的事情。我有小技巧，可以利用浏览器去创造我们想要的形状。首先，我们需要增加如下属性：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.section</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">0</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">100%</span>, <span class="number">0</span> <span class="number">100%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后，我们需要检查在开发者工具下对应的元素。注意有一个小的多边形图标在 <code>polygon()</code> 值的左边。</p>
+<img src="/posts/39376/use-case-1-1.png" class="" title="use-case-1-1">
+
+<p>一旦点击图标，可以在浏览器编辑多边形了。</p>
+
+
+<p>(P.S. 只有 Firefox 可以这样，Chrome 不支持)</p>
+<h3 id="使斜角效果相对于用户可视窗口宽度"><a href="#使斜角效果相对于用户可视窗口宽度" class="headerlink" title="使斜角效果相对于用户可视窗口宽度"></a>使斜角效果相对于用户可视窗口宽度</h3><p>我们还可以利用 CSS的 <code>calc()</code> 混合 CSS 的可视窗口单位 (VM) 使角度相对于可视窗口宽度。我是从 Kilian Valkhof 的 Sloped edges with consistent angle in CSS 学到的。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.section</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">0</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">0</span>, <span class="number">100%</span> calc(<span class="number">100%</span> - <span class="number">5vw</span>), <span class="number">0</span> <span class="number">100%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多重斜角效果"><a href="#多重斜角效果" class="headerlink" title="多重斜角效果"></a>多重斜角效果</h3><p>如果我们想要多个有角度的区块怎么办？请参见下面的图例。</p>
+<img src="/posts/39376/use-case-1-2.png" class="" title="use-case-1-2">
+
+<p>我首先想到的是简单增加 <code>box-shadow</code> 或 <code>border</code>。不幸的是，上述属性是会被裁剪的，所以即使我们添加其中一个，它也不会如预期展现出来。</p>
+<p>在这情况下，解决方法是利用多重元素，每一个有不同的裁剪点。以下是解决方法：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;hero&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;bg.jpg&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.hero</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">min-height</span>: <span class="number">350px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.hero</span> <span class="selector-tag">img</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">0</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">80%</span>, <span class="number">0</span> <span class="number">90%</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.hero</span><span class="selector-pseudo">:after</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">bottom</span>: -<span class="number">20%</span>;</span><br><span class="line">  <span class="attribute">z-index</span>: -<span class="number">1</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#4545a0</span>;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">polygon</span>(<span class="number">0</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">0</span>, <span class="number">100%</span> <span class="number">80%</span>, <span class="number">0</span> <span class="number">90%</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们有一个伪元素有相同大小和 <code>clip-path</code> 作为其他元素。不同之处是它通过 <code>bottom: -20%</code> 和 <code>z-index: -1</code> 处于父元素底下。我使用 20% 是因为它是 <code>100 - 80</code> 的结果。</p>
+<h3 id="滚动中展示"><a href="#滚动中展示" class="headerlink" title="滚动中展示"></a>滚动中展示</h3><p>利用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API">IntersectionObserver API</a>，当用户滚动页面，元素才展示 （译者注：懒加载）。</p>
+<h4 id="Inset-1"><a href="#Inset-1" class="headerlink" title="Inset"></a>Inset</h4><p><code>inset</code> 是我发现对这效果最有用的 <code>clip-path</code> 值。你可能想为什么？我会在下一个图中告诉你。</p>
+
+
+<p>注意通过 <code>inset(50%)</code>，蓝色长方形完全不可见。是的，之所以是 50%，是因为我们从四边设定 <code>inset</code>。即是说，<code>inset</code> 从长方形的边缩小至中心。</p>
+<p>下图中，当用户滚动页面，<code>inset</code> 用来展示图像。</p>
+<img src="/posts/39376/use-case-2.png" class="" title="use-case-2">
+
+<p>当图像处于可视窗口，下面的 javascript 代码增加 <code>is-visible</code> class，我们因而可以通过滚动展示页面。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> images = <span class="built_in">document</span>.querySelectorAll(<span class="string">&quot;img&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">check</span>(<span class="params">entries</span>) </span>&#123;</span><br><span class="line">  entries.map(<span class="function">(<span class="params">entry</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (entry.isIntersecting) &#123;</span><br><span class="line">      entry.target.classList.add(<span class="string">&quot;is-visible&quot;</span>);</span><br><span class="line">      observer.unobserve(entry.target);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> observer = <span class="keyword">new</span> IntersectionObserver(check);</span><br><span class="line">images.forEach(<span class="function">(<span class="params">image</span>) =&gt;</span> observer.observe(image));</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">img</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">inset</span>(<span class="number">50%</span>);</span><br><span class="line">  <span class="attribute">transition</span>: <span class="number">1.2s</span> ease-in;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">img</span><span class="selector-class">.is-visible</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">inset</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很简单吧？我们利用几行css和javascript，创造一个简单的滚动效果。</p>
+<p><a target="_blank" rel="noopener" href="https://codepen.io/shadeed/pen/mdrvKEz">Demo</a></p>
+<p>不只如此，我们还能控制展示过渡的方向。我们只需要四边的其中一边的值。例如，如果我们想要至顶向下的过渡，底的值应该从 100% 至 0。下图解释上述原理。</p>
+<img src="/posts/39376/inset-directions-1.png" class="" title="inset-directions-1">
+
+<p>附上互动连接：</p>
+<p><a target="_blank" rel="noopener" href="https://codepen.io/shadeed/pen/WNGPKPM">demo</a></p>
+<h3 id="悬停-以及-动画效果"><a href="#悬停-以及-动画效果" class="headerlink" title="悬停 以及 动画效果"></a>悬停 以及 动画效果</h3><p>利用 <code>clip-path</code> 来创造悬停动画效果的可能性是无穷的。考虑以下例子：</p>
+<img src="/posts/39376/use-case-3.png" class="" title="use-case-3">
+
+<p>我们需要把悬停效果增加至指定位置。利用 <code>circle()</code> 达到这效果吧。</p>
+<p>为了让例子更容易和更好维护，我们使用 css 变量，因而不会重复整个 <code>clip-path</code> ，我们只改变需要的 css 变量。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-pseudo">:root</span> &#123;</span><br><span class="line">  <span class="attribute">--pos</span>: left center;</span><br><span class="line">  <span class="attribute">--size</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.stats__item</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#7777e9</span>;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">circle</span>(var(--size) at <span class="built_in">var</span>(--pos));</span><br><span class="line">  <span class="attribute">transition</span>: <span class="number">0.4s</span> linear;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.stats__item</span><span class="selector-pseudo">:hover</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">--size</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不只如此，我们能容易改变动画。我造了一个互动演示，可以通过选择框改变位置。</p>
+<p><a target="_blank" rel="noopener" href="https://codepen.io/shadeed/pen/vYXbrrb">demo</a></p>
+<p>如果你想深入了解更多动画效果，Adam Argyle 先生创造一个非常有用的 css 动画库，它是 100% 依赖 css 的 <code>clip-path</code>。<a target="_blank" rel="noopener" href="https://www.transition.style/">Transition.css</a></p>
+<h3 id="连漪效果"><a href="#连漪效果" class="headerlink" title="连漪效果"></a>连漪效果</h3><p>连漪效果因 Material design 的出现而流行。通过 <code>clip-path</code> ，我们可以容易复现这效果。</p>
+<img src="/posts/39376/use-case-4.png" class="" title="use-case-4">
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;button&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>Sign up now<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.button</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.button</span> <span class="selector-tag">span</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="attribute">position</span>: absolute;</span><br><span class="line">  <span class="attribute">left</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">top</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#fff</span>;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0.1</span>;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">circle</span>(<span class="number">0</span> at center);</span><br><span class="line">  <span class="attribute">transition</span>: <span class="number">0.3s</span> ease-out;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.button</span><span class="selector-pseudo">:hover</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">clip-path</span>: <span class="built_in">circle</span>(<span class="number">100px</span> at center);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://codepen.io/shadeed/pen/LYRaNwg">demo</a></p>
+<h2 id="Clip-Path-值得一知的知识"><a href="#Clip-Path-值得一知的知识" class="headerlink" title="Clip-Path 值得一知的知识"></a>Clip-Path 值得一知的知识</h2><h3 id="不可见区域不接收-pointer-事件"><a href="#不可见区域不接收-pointer-事件" class="headerlink" title="不可见区域不接收 pointer 事件"></a>不可见区域不接收 <code>pointer</code> 事件</h3><p>当一个区域被裁剪，它之外的区域不接收任何 <code>pointer</code> 事件。这意味着用户不能在不可见区域悬停。</p>
+<h3 id="你可以用相对值"><a href="#你可以用相对值" class="headerlink" title="你可以用相对值"></a>你可以用相对值</h3><p>你可否让 <code>clip-path</code> 相对于 <code>font-size</code> ？你可以在 <code>clip-path</code> 利用 <code>em</code> 或 <code>rem</code>。</p>
+<h2 id="阅读更多"><a href="#阅读更多" class="headerlink" title="阅读更多"></a>阅读更多</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://bennettfeely.com/clippy/">可视化生成多种clip-path</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/143876210">用SVG实现一个优雅的提示框</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/welldone-software/tooltips-using-svg-path-1bd69cc7becd">Tooltips using SVG Path</a></li>
+<li><a target="_blank" rel="noopener" href="https://uipencil.com/2022/09/05/tutorial-for-html-css-svg-clipping-and-masking/">CSS Clipping &amp; Masking: A Comprehensive Tutorial with Examples</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SVG/" rel="tag"><i class="fa fa-tag"></i> SVG</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/64832/" rel="prev" title="转载-CSS子元素文本长度超过父元素宽度的文本居中方法">
+                  <i class="fa fa-chevron-left"></i> 转载-CSS子元素文本长度超过父元素宽度的文本居中方法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/8360/" rel="next" title="Vue利用Object.freeze提升渲染性能">
+                  Vue利用Object.freeze提升渲染性能 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>

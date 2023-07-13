@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="起因接到一个需求是实现 Chrome 浏览器自带的「Ctrl+F」搜索功能。起初想当然的以为直接正则+replace 不就搞定了么。但后边发现直接粗暴的 innerHTML + replace 会导致 Vue 的响应式以及事件绑定都失效。所以得想其他的法子。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现chrome的自定义搜索功能">
+<meta property="og:url" content="https://evestorm.github.io/posts/14922/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="起因接到一个需求是实现 Chrome 浏览器自带的「Ctrl+F」搜索功能。起初想当然的以为直接正则+replace 不就搞定了么。但后边发现直接粗暴的 innerHTML + replace 会导致 Vue 的响应式以及事件绑定都失效。所以得想其他的法子。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-06T05:37:29.000Z">
+<meta property="article:modified_time" content="2023-06-04T09:49:17.172Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="Highlight">
+<meta property="article:tag" content="::selection">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/14922/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>实现chrome的自定义搜索功能 | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%B1%82%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">寻求方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-DEMO"><span class="nav-number">3.</span> <span class="nav-text">实现 DEMO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99-innserHTML-replace"><span class="nav-number">3.1.</span> <span class="nav-text">正则 + innserHTML.replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#new-Highlight-%E7%9A%84%E6%96%B9%E6%A1%88"><span class="nav-number">3.2.</span> <span class="nav-text">new Highlight 的方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">4.</span> <span class="nav-text">资源</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">332</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">115</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/14922/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实现chrome的自定义搜索功能
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-04-06 13:37:29" itemprop="dateCreated datePublished" datetime="2023-04-06T13:37:29+08:00">2023-04-06</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/14922/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/14922/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>接到一个需求是实现 Chrome 浏览器自带的「Ctrl+F」搜索功能。起初想当然的以为直接正则+replace 不就搞定了么。但后边发现直接粗暴的 innerHTML + replace 会导致 Vue 的响应式以及事件绑定都失效。所以得想其他的法子。</p>
+<a id="more"></a>
+
+<h2 id="寻求方案"><a href="#寻求方案" class="headerlink" title="寻求方案"></a>寻求方案</h2><p>Google 之后发现一篇文章：<a target="_blank" rel="noopener" href="https://css-tricks.com/css-custom-highlight-api-early-look/">CSS Custom Highlight API: The Future of Highlighting Text Ranges on the Web</a></p>
+<p>我根据文章内容提炼了两种方案以及相应方案的优缺点：</p>
+<ul>
+<li><code>new Range()</code> + <code>document.getSelection()</code> + <code>::selection</code><ul>
+<li>优点：<ul>
+<li>兼容性强，基本所有浏览器都支持</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>创建的选择会重置用户已经手动选择的内容，反过来也一样</li>
+<li>除了 Firfox 外，Chrome 等浏览器只支持通过 <code>addRange</code> 创建一个选择范围，不支持添加多个选择</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>new Highlight</code><ul>
+<li>优点：<ul>
+<li>可以自定义的创建选择，支持不同 range 不同颜色</li>
+<li>支持创建多个选择范围</li>
+</ul>
+</li>
+<li>缺点：兼容性比较差，Chrome、Edge 只支持 105+ 的版本</li>
+</ul>
+</li>
+</ul>
+<h2 id="实现-DEMO"><a href="#实现-DEMO" class="headerlink" title="实现 DEMO"></a>实现 DEMO</h2><h3 id="正则-innserHTML-replace"><a href="#正则-innserHTML-replace" class="headerlink" title="正则 + innserHTML.replace"></a>正则 + innserHTML.replace</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;input type&#x3D;&quot;text&quot; v-model&#x3D;&quot;searchText&quot; placeholder&#x3D;&quot;输入关键字&quot; &#x2F;&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;goPrev&quot;&gt;上一个&lt;&#x2F;button&gt;</span><br><span class="line">    &lt;button @click&#x3D;&quot;goNext&quot;&gt;下一个&lt;&#x2F;button&gt;</span><br><span class="line">    &lt;div ref&#x3D;&quot;content&quot; v-html&#x3D;&quot;highlightedContent&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      content: &#96;&#96;,</span><br><span class="line">      searchText: &#39;&#39;,</span><br><span class="line">      highlightedContent: &#96;</span><br><span class="line">      &lt;div class&#x3D;&quot;container&quot;&gt;</span><br><span class="line">          &lt;span&gt;Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem quas ut laboriosam temporibus fuga blanditiis, laborum alias debitis modi illum culpa amet qui similique assumenda aliquam error numquam, vel distinctio!&lt;&#x2F;span&gt;</span><br><span class="line">          &lt;div class&#x3D;&quot;content&quot;&gt;</span><br><span class="line">            &lt;span&gt;Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem quas ut laboriosam temporibus fuga blanditiis, laborum alias debitis modi illum culpa amet qui similique assumenda aliquam error numquam, vel distinctio!&lt;&#x2F;span&gt;</span><br><span class="line">          &lt;&#x2F;div&gt;</span><br><span class="line">          &lt;div class&#x3D;&quot;footer&quot; title&#x3D;&quot;Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem quas ut laboriosam temporibus fuga blanditiis, laborum alias debitis modi illum culpa amet qui similique assumenda aliquam error numquam, vel distinctio!&quot;&gt;</span><br><span class="line">            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem quas ut laboriosam temporibus fuga blanditiis, laborum alias debitis modi illum culpa amet qui similique assumenda aliquam error numquam, vel distinctio!</span><br><span class="line">          &lt;&#x2F;div&gt;</span><br><span class="line">        &lt;&#x2F;div&gt;</span><br><span class="line">      &#96;,</span><br><span class="line">      matches: [],</span><br><span class="line">      currentMatch: -1</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    this.content &#x3D; this.$refs.content.innerHTML;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    goPrev() &#123;</span><br><span class="line">      if (this.currentMatch &gt; 0) &#123;</span><br><span class="line">        this.currentMatch--;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        this.currentMatch &#x3D; this.matches.length - 1;</span><br><span class="line">      &#125;</span><br><span class="line">      this.highlightMatch();</span><br><span class="line">    &#125;,</span><br><span class="line">    goNext() &#123;</span><br><span class="line">      if (this.currentMatch &lt; this.matches.length - 1) &#123;</span><br><span class="line">        this.currentMatch++;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        this.currentMatch &#x3D; 0;</span><br><span class="line">      &#125;</span><br><span class="line">      this.highlightMatch();</span><br><span class="line">    &#125;,</span><br><span class="line">    highlightMatch() &#123;</span><br><span class="line">      &#x2F;&#x2F; 取消之前的高亮</span><br><span class="line">      this.$refs.content.querySelectorAll(&#39;.highlighted&#39;).forEach((el) &#x3D;&gt; &#123;</span><br><span class="line">        el.classList.remove(&#39;highlighted&#39;);</span><br><span class="line">      &#125;);</span><br><span class="line">      &#x2F;&#x2F; 获取当前匹配位置</span><br><span class="line">      const match &#x3D; this.matches[this.currentMatch];</span><br><span class="line">      &#x2F;&#x2F; 将匹配关键词用span标签包裹并添加高亮样式</span><br><span class="line">      const highlightedContent &#x3D;</span><br><span class="line">        this.content.substring(0, match.startPos) +</span><br><span class="line">        &#39;&lt;span class&#x3D;&quot;highlighted&quot;&gt;&#39; +</span><br><span class="line">        match.text +</span><br><span class="line">        &#39;&lt;&#x2F;span&gt;&#39; +</span><br><span class="line">        this.content.substring(match.endPos);</span><br><span class="line">      this.$refs.content.innerHTML &#x3D; highlightedContent;</span><br><span class="line">      &#x2F;&#x2F; 滚动到匹配位置</span><br><span class="line">      this.$refs.content.querySelectorAll(&#39;.highlighted&#39;)[0].scrollIntoView();</span><br><span class="line">    &#125;,</span><br><span class="line">    search() &#123;</span><br><span class="line">      this.matches &#x3D; [];</span><br><span class="line">      this.currentMatch &#x3D; -1;</span><br><span class="line">      &#x2F;&#x2F; 忽略html标签属性中的关键词</span><br><span class="line">      &#x2F;&#x2F; const regex &#x3D; new RegExp(this.searchText, &#39;gi&#39;);</span><br><span class="line">      const regex &#x3D; new RegExp(&#96;(?![^&lt;]*&gt;)($&#123;this.searchText&#125;)&#96;, &quot;gi&quot;);</span><br><span class="line">      let match;</span><br><span class="line">      while ((match &#x3D; regex.exec(this.content))) &#123;</span><br><span class="line">        if (!match.input.substring(match.index - 1, match.index).match(&#x2F;[\w\\-]&#x2F;)) &#123;</span><br><span class="line">          this.matches.push(&#123; startPos: match.index, endPos: regex.lastIndex, text: match[0] &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      if (this.matches.length &gt; 0) &#123;</span><br><span class="line">        this.currentMatch &#x3D; 0;</span><br><span class="line">        this.highlightMatch();</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        this.$refs.content.innerHTML &#x3D; this.content;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  watch: &#123;</span><br><span class="line">    searchText() &#123;</span><br><span class="line">      this.highlightedContent &#x3D; this.content;</span><br><span class="line">      if (this.searchText) &#123;</span><br><span class="line">        this.search();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br><span class="line"></span><br><span class="line">&lt;style&gt;</span><br><span class="line">.highlighted &#123;</span><br><span class="line">  background-color: yellow;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;style&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="new-Highlight-的方案"><a href="#new-Highlight-的方案" class="headerlink" title="new Highlight 的方案"></a>new Highlight 的方案</h3><blockquote>
+<p>mixin.js</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      searchText: <span class="string">&#x27;&#x27;</span>, <span class="comment">// 用户输入的查询文本</span></span><br><span class="line">      matches: [], <span class="comment">// 匹配到的文本对象数组</span></span><br><span class="line">      currentMatch: -<span class="number">1</span>, <span class="comment">// 当前目标索引</span></span><br><span class="line">      isShowCustomSearch: <span class="literal">false</span> <span class="comment">// 是否显示搜索框</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.initCustomSearch()</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">reset</span>(<span class="params">isShowCustomSearch = <span class="literal">false</span></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.searchText = <span class="string">&#x27;&#x27;</span></span><br><span class="line">      <span class="built_in">this</span>.matches = []</span><br><span class="line">      <span class="built_in">this</span>.currentMatch = -<span class="number">1</span></span><br><span class="line">      <span class="built_in">this</span>.isShowCustomSearch = isShowCustomSearch</span><br><span class="line">      CSS.highlights.clear()</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">goPrev</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="built_in">this</span>.matches.length) <span class="keyword">return</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">this</span>.currentMatch &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.currentMatch--</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.currentMatch = <span class="built_in">this</span>.matches.length - <span class="number">1</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">this</span>.highlightMatch()</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">goNext</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="built_in">this</span>.matches.length) <span class="keyword">return</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">this</span>.currentMatch &lt; <span class="built_in">this</span>.matches.length - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.currentMatch++</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.currentMatch = <span class="number">0</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">this</span>.highlightMatch()</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">highlightMatch</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> range = <span class="keyword">new</span> Range()</span><br><span class="line">      <span class="keyword">const</span> &#123; word, parentNode, offset &#125; = <span class="built_in">this</span>.matches[<span class="built_in">this</span>.currentMatch]</span><br><span class="line">      range.setStart(parentNode, offset)</span><br><span class="line">      range.setEnd(parentNode, offset + word.length)</span><br><span class="line">      <span class="built_in">document</span>.getSelection().removeAllRanges()</span><br><span class="line">      <span class="built_in">document</span>.getSelection().addRange(range)</span><br><span class="line">      <span class="comment">// 滚动到匹配位置</span></span><br><span class="line">      <span class="keyword">const</span> targetSelector = <span class="built_in">document</span>.getSelection()</span><br><span class="line">      <span class="keyword">if</span> (targetSelector &amp;&amp; targetSelector.focusNode &amp;&amp; targetSelector.focusNode.parentElement) &#123;</span><br><span class="line">        targetSelector.focusNode.parentElement.scrollIntoView()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">highlightAllMatches</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> ranges = []</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> <span class="built_in">this</span>.matches) &#123;</span><br><span class="line">        <span class="keyword">const</span> range = <span class="keyword">new</span> Range()</span><br><span class="line">        <span class="keyword">const</span> &#123; word, parentNode, offset &#125; = item</span><br><span class="line">        range.setStart(parentNode, offset)</span><br><span class="line">        range.setEnd(parentNode, offset + word.length)</span><br><span class="line">        ranges.push(range)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> highlight = <span class="keyword">new</span> Highlight(...ranges)</span><br><span class="line">      CSS.highlights.set(<span class="string">&#x27;custom-search-highlight&#x27;</span>, highlight)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">search</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.matches = []</span><br><span class="line">      <span class="built_in">this</span>.currentMatch = -<span class="number">1</span></span><br><span class="line">      <span class="comment">// 1. 获取页面中的所有文本节点</span></span><br><span class="line">      <span class="keyword">const</span> treeWalker = <span class="built_in">document</span>.createTreeWalker(<span class="built_in">this</span>.$refs.qbContent, NodeFilter.SHOW_TEXT)</span><br><span class="line">      <span class="keyword">const</span> allTextNodes = []</span><br><span class="line">      <span class="keyword">let</span> currentNode = treeWalker.nextNode()</span><br><span class="line">      <span class="keyword">while</span> (currentNode) &#123;</span><br><span class="line">        <span class="comment">// 忽略不显示的内容</span></span><br><span class="line">        <span class="keyword">if</span> (getComputedStyle(currentNode.parentNode).display !== <span class="string">&#x27;none&#x27;</span>) &#123;</span><br><span class="line">          allTextNodes.push(currentNode)</span><br><span class="line">        &#125;</span><br><span class="line">        currentNode = treeWalker.nextNode()</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">console</span>.log(allTextNodes)</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 2. 遍历它们，每次将它们分成单独的单词，并为每个节点创建单词列表</span></span><br><span class="line">      <span class="keyword">const</span> allWords = []</span><br><span class="line">      <span class="keyword">const</span> reg = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">`(?![^&lt;]*&gt;)(<span class="subst">$&#123;<span class="built_in">this</span>.searchText&#125;</span>)`</span>, <span class="string">&#x27;gi&#x27;</span>)</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">const</span> textNode <span class="keyword">of</span> allTextNodes) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> word <span class="keyword">of</span> textNode.textContent.matchAll(reg)) &#123;</span><br><span class="line">          allWords.push(&#123;</span><br><span class="line">            word: word[<span class="number">0</span>],</span><br><span class="line">            parentNode: textNode,</span><br><span class="line">            offset: word.index</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">console</span>.log(allWords)</span><br><span class="line">      <span class="built_in">this</span>.matches = allWords</span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">this</span>.matches.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.currentMatch = <span class="number">0</span></span><br><span class="line">        <span class="built_in">this</span>.highlightMatch()</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">this</span>.highlightAllMatches()</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">initCustomSearch</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;keydown&#x27;</span>, <span class="built_in">this</span>.preventBrowserDefaultSearch)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">removeCustomSearch</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">document</span>.removeEventListener(<span class="string">&#x27;keydown&#x27;</span>, <span class="built_in">this</span>.preventBrowserDefaultSearch)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">preventBrowserDefaultSearch</span>(<span class="params">event</span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (event.keyCode === <span class="number">114</span> || ((event.ctrlKey || event.metaKey) &amp;&amp; event.keyCode === <span class="number">70</span>)) &#123;</span><br><span class="line">        <span class="built_in">this</span>.isShowCustomSearch = <span class="literal">true</span></span><br><span class="line">        event.preventDefault()</span><br><span class="line">        <span class="comment">// 在此处添加您希望在按下搜索快捷键时执行的代码</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">closeCustomSearch</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.reset()</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">handleCustomSearchChange</span>(<span class="params">val</span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (val &amp;&amp; !<span class="built_in">this</span>.isLoading) &#123;</span><br><span class="line">        <span class="built_in">this</span>.search()</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (!val) &#123;</span><br><span class="line">        <span class="built_in">this</span>.reset(<span class="literal">true</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>组件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div v-show&#x3D;&quot;isShowCustomSearch&quot; class&#x3D;&quot;custom-search&quot;&gt;</span><br><span class="line">      &lt;el-input type&#x3D;&quot;text&quot; size&#x3D;&quot;small&quot; v-model&#x3D;&quot;searchText&quot; placeholder&#x3D;&quot;输入关键字&quot; @input&#x3D;&quot;handleCustomSearchChange&quot; &#x2F;&gt;</span><br><span class="line">      &lt;span v-show&#x3D;&quot;currentMatch &gt;&#x3D; 0&quot;&gt;&#123;&#123; currentMatch + 1 &#125;&#125;&#x2F;&#123;&#123; matches.length &#125;&#125;&lt;&#x2F;span&gt;</span><br><span class="line">      &lt;span @click&#x3D;&quot;goPrev&quot;&gt;&lt;i class&#x3D;&quot;el-icon-arrow-left&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;span&gt;</span><br><span class="line">      &lt;span @click&#x3D;&quot;goNext&quot;&gt;&lt;i class&#x3D;&quot;el-icon-arrow-right&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;span&gt;</span><br><span class="line">      &lt;span @click&#x3D;&quot;closeCustomSearch&quot;&gt;&lt;i class&#x3D;&quot;el-icon-circle-close&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;span&gt;</span><br><span class="line">    &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import CustomSearchMixin from &#39;.&#x2F;mixin.js&#39;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  &#x2F;&#x2F;...,</span><br><span class="line">  mixins: [CustomSearchMixin],</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://css-tricks.com/css-custom-highlight-api-early-look/">CSS Custom Highlight API: The Future of Highlighting Text Ranges on the Web</a></li>
+<li><a target="_blank" rel="noopener" href="https://javascript.info/selection-range">Selection and Range</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7128298322292375582">记一次由::selection引起的小小bug</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/padolsey/findAndReplaceDOMText">padolsey/findAndReplaceDOMTextPublic</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904197024907271">全文关键词查找（关键词高亮） vue</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Highlight/" rel="tag"><i class="fa fa-tag"></i> Highlight</a>
+              <a href="/tags/selection/" rel="tag"><i class="fa fa-tag"></i> ::selection</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/54634/" rel="prev" title="包管理工具pnpm">
+                  <i class="fa fa-chevron-left"></i> 包管理工具pnpm
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/64832/" rel="next" title="转载-CSS子元素文本长度超过父元素宽度的文本居中方法">
+                  转载-CSS子元素文本长度超过父元素宽度的文本居中方法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evestorm.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="包管理器的介绍npm 简史在npm@3之前,如下图：   从上面可以看到，包是一层一层的安装的。那么这样会有些问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="包管理工具pnpm">
+<meta property="og:url" content="https://evestorm.github.io/posts/54634/index.html">
+<meta property="og:site_name" content="EVE | 暴风雨前夕">
+<meta property="og:description" content="包管理器的介绍npm 简史在npm@3之前,如下图：   从上面可以看到，包是一层一层的安装的。那么这样会有些问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evestorm.github.io/posts/54634/npm2.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/54634/npm2vsnpm3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/54634/npm3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/54634/npm3.png">
+<meta property="og:image" content="https://evestorm.github.io/posts/54634/npm-install.png">
+<meta property="article:published_time" content="2023-03-23T01:16:34.000Z">
+<meta property="article:modified_time" content="2023-06-04T09:49:17.169Z">
+<meta property="article:author" content="Lance">
+<meta property="article:tag" content="npm">
+<meta property="article:tag" content="pnpm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evestorm.github.io/posts/54634/npm2.png">
+
+
+<link rel="canonical" href="https://evestorm.github.io/posts/54634/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>包管理工具pnpm | EVE | 暴风雨前夕</title>
+  
+
+
+  <script>
+    !function(e,t,n,g,i){e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},n=t.createElement("script"),tag=t.getElementsByTagName("script")[0],n.async=1,n.src=('https:'==document.location.protocol?'https://':'http://')+g,tag.parentNode.insertBefore(n,tag)}(window,document,"script","assets.growingio.com/2.1/gio.js","gio");
+    gio('init', 'cc683d67407a283ba8d0382c43e8ca28', {});
+    gio('send');
+  </script>
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">EVE | 暴风雨前夕</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lance的博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">包管理器的介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#npm-%E7%AE%80%E5%8F%B2"><span class="nav-number">1.1.</span> <span class="nav-text">npm 简史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pnpm-%E7%AE%80%E5%8F%B2"><span class="nav-number">1.2.</span> <span class="nav-text">pnpm 简史</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pnpm-%E5%8F%AF%E4%BB%A5%E9%81%BF%E5%85%8D%E6%84%9A%E8%A0%A2%E7%9A%84%E9%94%99%E8%AF%AF"><span class="nav-number">2.</span> <span class="nav-text">pnpm 可以避免愚蠢的错误</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#npm"><span class="nav-number">2.1.</span> <span class="nav-text">npm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pnpm"><span class="nav-number">2.2.</span> <span class="nav-text">pnpm</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pnpm-%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">pnpm 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E6%8E%A8%E8%8D%90-ni"><span class="nav-number">3.2.</span> <span class="nav-text">工具推荐: ni</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%AE%89%E8%A3%85-ni"><span class="nav-number">3.2.1.</span> <span class="nav-text">全局安装 ni</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ni-%E5%AE%89%E8%A3%85"><span class="nav-number">3.2.2.</span> <span class="nav-text">ni - 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nr-%E8%BF%90%E8%A1%8C"><span class="nav-number">3.2.3.</span> <span class="nav-text">nr - 运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nun-%E5%8D%B8%E8%BD%BD"><span class="nav-number">3.2.4.</span> <span class="nav-text">nun - 卸载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#window10-11-%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F"><span class="nav-number">3.3.</span> <span class="nav-text">window10&#x2F;11 需要注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%8D%E6%AC%A1%E4%BC%98%E5%8C%96"><span class="nav-number">3.4.</span> <span class="nav-text">再次优化</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lance"
+      src="/uploads/avatar_lance.jpeg">
+  <p class="site-author-name" itemprop="name">Lance</p>
+  <div class="site-description" itemprop="description">Front-end developer and iOS developer</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">332</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">115</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evestorm" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evestorm" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572534835@qq.com" title="E-Mail → mailto:1572534835@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evestorm.github.io/posts/54634/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar_lance.jpeg">
+      <meta itemprop="name" content="Lance">
+      <meta itemprop="description" content="Front-end developer and iOS developer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="EVE | 暴风雨前夕">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          包管理工具pnpm
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-03-23 09:16:34" itemprop="dateCreated datePublished" datetime="2023-03-23T09:16:34+08:00">2023-03-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">构建工具</span></a>
+        </span>
+          /
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/pnpm/" itemprop="url" rel="index"><span itemprop="name">pnpm</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/posts/54634/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="posts/54634/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="包管理器的介绍"><a href="#包管理器的介绍" class="headerlink" title="包管理器的介绍"></a>包管理器的介绍</h1><h2 id="npm-简史"><a href="#npm-简史" class="headerlink" title="npm 简史"></a>npm 简史</h2><p>在npm@3之前,如下图：</p>
+<img src="/posts/54634/npm2.png" class="" title="npm2">
+
+<p>从上面可以看到，包是一层一层的安装的。那么这样会有些问题。</p>
+<a id="more"></a>
+
+<ol>
+<li>假如我们依赖的包又依赖了其他的包，这样的话，路径就会很长，在window上会找不到包的地址。</li>
+<li>一个包可能会有多个副本存在，比如：foo引用了bar，假如aaa包引用了bar，那么bar就会存在两份。</li>
+</ol>
+<img src="/posts/54634/npm2vsnpm3.png" class="" title="npm2vsnpm3">
+
+<p>在npm@3 之后</p>
+<img src="/posts/54634/npm3.png" class="" title="npm3">
+
+<p>因为有这些问题，所以 npm3 版本之后，就换了一种包的安装管理方式。从上图可以看到，它将包的给拉平了，全部都放到了 node_modules 下面。但是这样还是会有一些问题。</p>
+<ol>
+<li>有些包可以访问到并不依赖的包，比如，A 包会访问到 C 包的东西</li>
+<li>拉平算法比较复杂，在安装时候的可以感觉到很慢<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1964485">拉平规则</a></li>
+<li>假如说 C 包，就必须存在到 B 包下面，但是 npm 还是会安装到根 node_modules下面</li>
+</ol>
+<h2 id="pnpm-简史"><a href="#pnpm-简史" class="headerlink" title="pnpm 简史"></a>pnpm 简史</h2><p>pnpm 也是一个包管理工具。</p>
+<img src="/posts/54634/npm3.png" class="" title="npm3">
+
+<p>pnpm 并没有拉平包，但是通过软链接的方法，将包给关联起来，所以也就相应的解决了上面的这些问题。</p>
+<h1 id="pnpm-可以避免愚蠢的错误"><a href="#pnpm-可以避免愚蠢的错误" class="headerlink" title="pnpm 可以避免愚蠢的错误"></a>pnpm 可以避免愚蠢的错误</h1><h2 id="npm"><a href="#npm" class="headerlink" title="npm"></a>npm</h2><p>假如我们使用 下面的命令来创建一个应用</p>
+<ol>
+<li>创建一个新项目 <code>mkdir project &amp;&amp; npm init -y</code></li>
+<li>安装依赖 <code>npm install express --save</code></li>
+<li>运行 <code>ls -l</code></li>
+</ol>
+<img src="/posts/54634/npm-install.png" class="" title="npm-install">
+
+<p>可以看到在 node_modules 中存在很多的包。</p>
+<p>假如你在项目中要使用 debug 这个包，但是忘记将它添加到依赖中，在开始的时候，没什么问题，一切都运行良好，但是在几周或者几个月后可能会发生以下情况：</p>
+<ol>
+<li>express 更新了依赖，将 <code>debug@1.x.x</code> 更新到了 <code>debug@2.x.x</code>。但是对于 <code>express</code> 来说，只是发了一个 <code>patch</code> 的版本，没有重大更新，但是你的代码中，用的还是 <code>debug@1.x.x</code> 的 <code>api</code>，那么这样再次运行就会错误</li>
+<li><code>express</code> 不在使用了 <code>debug</code> 包，那么我们用的时候就会出现 <code>bug</code>，会提示找不到该包。</li>
+</ol>
+<p>总结以下出现的问题：因为 npm@3 版本之后，将所有的包都拉平了，所以我们可以直接使用 <code>node_modules</code> 中的包，最终会在某一天出现错误。</p>
+<h2 id="pnpm"><a href="#pnpm" class="headerlink" title="pnpm"></a>pnpm</h2><p>我们在安装后可以看到，<code>node_modules</code> 里面只有一个 <code>express</code>，没有其他的包。假设我们需要使用 <code>debug</code> 包，忘记了在 <code>package</code> 中声明，为了让代码可以运行，必须在 <code>package</code> 中将其引用。</p>
+<p>用了 pnpm 工具之后，可以明确的知道我们用的这个包是从那里得到的。</p>
+<h1 id="pnpm-使用"><a href="#pnpm-使用" class="headerlink" title="pnpm 使用"></a>pnpm 使用</h1><h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><p>首先全局安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g pnpm</span><br></pre></td></tr></table></figure>
+
+<p>安装全部依赖：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm i</span><br></pre></td></tr></table></figure>
+
+<p>安装指定依赖:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm add vue / pnpm add @types/node -D</span><br></pre></td></tr></table></figure>
+
+<p>删除指定依赖：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm remove vue / pnpm remove @types/node -D</span><br></pre></td></tr></table></figure>
+
+<p>运行脚本：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line">  &quot;dev&quot;: &quot;webpack&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm dev / pnpm run dev</span><br></pre></td></tr></table></figure>
+
+<h2 id="工具推荐-ni"><a href="#工具推荐-ni" class="headerlink" title="工具推荐: ni"></a>工具推荐: <a target="_blank" rel="noopener" href="https://github.com/antfu/ni">ni</a></h2><h3 id="全局安装-ni"><a href="#全局安装-ni" class="headerlink" title="全局安装 ni"></a>全局安装 ni</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -g @antfu/ni</span><br></pre></td></tr></table></figure>
+
+<h3 id="ni-安装"><a href="#ni-安装" class="headerlink" title="ni - 安装"></a>ni - 安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ni</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm install</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn install</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm install</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun install</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ni vite</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm i vite</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn add vite</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm add vite</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun add vite</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ni @types/node -D</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm i @types/node -D</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn add @types/node -D</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm add -D @types/node</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun add -d @types/node</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="nr-运行"><a href="#nr-运行" class="headerlink" title="nr - 运行"></a>nr - 运行</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nr dev --port=3000</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm run dev -- --port=3000</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn run dev --port=3000</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm run dev --port=3000</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun run dev --port=3000</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="nun-卸载"><a href="#nun-卸载" class="headerlink" title="nun - 卸载"></a>nun - 卸载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nun webpack</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm uninstall webpack</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn remove webpack</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm remove webpack</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun remove webpack</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nun -g silent</span><br><span class="line"><span class="meta">#</span><span class="bash"> npm uninstall -g silent</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> yarn global remove silent</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pnpm remove -g silent</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bun remove -g silent</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="window10-11-需要注意"><a href="#window10-11-需要注意" class="headerlink" title="window10/11 需要注意"></a>window10/11 需要注意</h2><p><code>ni</code> 指令和 <code>PowerShell</code> 中的 NI(new-item)冲突，如果要使用 ni 命令，请执行下面的指令：</p>
+<p><code>&#39;Remove-Item Alias:ni -Force -ErrorAction Ignore&#39;</code></p>
+<p>如果想保留指令，可以将下面的代码添加到 <code>$profile</code> 中。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (-not (Test-Path $profile)) &#123;</span><br><span class="line">  New-Item -ItemType File -Path (Split-Path $profile) -Force -Name (Split-Path $profile -Leaf)</span><br><span class="line">&#125;</span><br><span class="line">$profileEntry = <span class="string">&#x27;Remove-Item Alias:ni -Force -ErrorAction Ignore&#x27;</span></span><br><span class="line">$profileContent = Get-Content $profile</span><br><span class="line"><span class="keyword">if</span> ($profileContent -notcontains $profileEntry) &#123;</span><br><span class="line">  $profileEntry | Out-File $profile -Append -Force</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以在 <code>PowerShell</code> 中运行 <code>$profile</code> 指令查看文件位置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> PowerShell 5:</span> </span><br><span class="line">C:\Users\USERNAME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1</span><br><span class="line"><span class="meta">#</span><span class="bash"> PowerShell 7:</span> </span><br><span class="line">C:\Users\USERNAME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1</span><br></pre></td></tr></table></figure>
+
+<h2 id="再次优化"><a href="#再次优化" class="headerlink" title="再次优化"></a>再次优化</h2><p>我们已经可以通过 <code>nr dev</code> 来运行脚本里面定义的指令了，但是每次还是需要输入6个字符，那么我们可以通过添加别名的方式再次优化我们的操作。<code>win10/11-powershell</code> 如下：</p>
+<p>将下面的命令添加到 <code>profile</code> 文件中，以后我们运行 dev 的时候只需要输入 <code>d</code> 即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># NPM Aliases</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span> </span>&#123; nr test &#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">serve</span></span>&#123; nr serve &#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dev</span></span>&#123; nr dev&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">build</span></span>&#123; nr build&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">release</span></span>&#123; nr release&#125;</span><br><span class="line"><span class="built_in">Set</span>-Alias -Name t -Value test</span><br><span class="line"><span class="built_in">Set</span>-Alias -Name s -Value serve</span><br><span class="line"><span class="built_in">Set</span>-Alias -Name d -Value dev</span><br><span class="line"><span class="built_in">Set</span>-Alias -Name b -Value build</span><br><span class="line"><span class="built_in">Set</span>-Alias -Name r -Value release</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/npm/" rel="tag"><i class="fa fa-tag"></i> npm</a>
+              <a href="/tags/pnpm/" rel="tag"><i class="fa fa-tag"></i> pnpm</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/40642/" rel="prev" title="实现Chrome的搜索功能词功能功能">
+                  <i class="fa fa-chevron-left"></i> 实现Chrome的搜索功能词功能功能
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/14922/" rel="next" title="实现chrome的自定义搜索功能">
+                  实现chrome的自定义搜索功能 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lance</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  NexT.utils.loadComments('#SOHUCS', () => {
+    NexT.utils.getScript('https://changyan.sohu.com/upload/changyan.js', () => {
+      window.changyan.api.config({
+        appid: 'cyvaqAKVv',
+        conf : 'c7535289deb20d0d9235ebae6a69b912'
+      });
+    });
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/clipboard-use.js"></script>
+</body>
+</html>
